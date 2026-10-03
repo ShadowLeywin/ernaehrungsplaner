@@ -27,6 +27,9 @@ let zaehlerModus = 'tag';
 
 export const heute = {
   titel: 'Heute',
+  kopf: () => el('span', { class: 'wortmarke', 'aria-label': 'FORGE' },
+    icon('flamme-voll', 30),
+    el('span', { class: 'wortmarke-text' }, 'FORGE')),
   render() {
     const wurzel = el('div');
     lade(wurzel);

@@ -1,17 +1,17 @@
 <!doctype html>
-<html lang="de" data-thema="wald" data-modus="dunkel">
+<html lang="de" data-thema="glut" data-modus="dunkel">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0b0e0d">
-  <meta name="description" content="Ernährungsplaner – offline, alle Daten lokal.">
-  <title>Ernährungsplaner</title>
+  <meta name="theme-color" content="#110d0c">
+  <meta name="description" content="FORGE – Fuel. Train. Grow. Ernährung und Training, offline, alle Daten lokal.">
+  <title>FORGE</title>
   <script>
     // Farbthema sofort setzen, damit beim Start nichts aufblitzt (gleiche Logik wie js/darstellung.js)
     try {
       var d = JSON.parse(localStorage.getItem('darstellung') || '{}');
       var m = d.modus || 'system';
-      document.documentElement.dataset.thema = d.thema || 'wald';
+      document.documentElement.dataset.thema = d.thema || 'glut';
       document.documentElement.dataset.modus = m === 'system'
         ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dunkel' : 'hell')
         : m;
@@ -26,7 +26,7 @@
 </head>
 <body>
   <header class="kopf">
-    <h1 id="titel">Ernährungsplaner</h1>
+    <h1 id="titel">FORGE</h1>
     <span id="offline-hinweis" class="offline-hinweis" hidden>offline</span>
   </header>
 

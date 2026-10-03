@@ -46,6 +46,29 @@ a { color: var(--akzent); }
 }
 .kopf h1 { margin: 0; font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; }
 
+/* FORGE-Schriftzug */
+.wortmarke { display: inline-flex; align-items: center; gap: 6px; }
+.wortmarke .icon { color: var(--akzent); filter: drop-shadow(0 2px 8px color-mix(in oklab, var(--akzent) 50%, transparent)); }
+.wortmarke-text {
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  background: var(--verlauf);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding-right: 0.08em; /* kursives E nicht abschneiden */
+}
+.wortmarke-text.gross { font-size: 2.4rem; margin: 0; display: block; }
+.slogan {
+  margin: 2px 0 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text-leise);
+}
+
 .offline-hinweis {
   font-size: 0.75rem;
   font-weight: 700;

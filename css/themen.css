@@ -8,9 +8,9 @@
   --nav-hoehe: 68px;
   --schrift: "Segoe UI Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
-  /* Standard bis das Skript läuft: dunkel, Wald */
-  --akzent: #4ade80;
-  --akzent-2: #14b8a6;
+  /* Standard bis das Skript läuft: dunkel, Glut */
+  --akzent: #fb923c;
+  --akzent-2: #f43f5e;
   --akzent-text: #04130b;
 }
 

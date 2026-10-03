@@ -13,7 +13,7 @@ export const THEMEN = {
 export const MODI = { system: 'System', hell: 'Hell', dunkel: 'Dunkel' };
 
 const SCHLUESSEL = 'darstellung';
-const STANDARD = { thema: 'wald', modus: 'system' };
+const STANDARD = { thema: 'glut', modus: 'system' };
 const dunkelAbfrage = window.matchMedia('(prefers-color-scheme: dark)');
 
 export function ladeDarstellung() {

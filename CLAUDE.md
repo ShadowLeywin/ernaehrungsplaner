@@ -1,4 +1,6 @@
-# Ernährungsplaner (PWA)
+# FORGE – Ernährungsplaner (PWA)
+
+App-Name: **FORGE**, Slogan „Fuel. Train. Grow.“, Logo: Flamme. Standard-Thema „Glut“ (orange → rot). Das Repo heißt weiterhin `ernaehrungsplaner` (die URL bleibt gleich).
 
 ## Ziel
 Progressive Web App für ein Samsung-Handy: offline-fähig, komplett deutsch, alle Daten lokal auf dem Gerät. Später sollen Freunde die App nutzen können, jeder mit eigenen lokalen Daten (kein gemeinsames Backend).

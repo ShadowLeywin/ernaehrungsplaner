@@ -21,8 +21,11 @@ export function starteRouter(ansichten, standard, ziel, wache = () => null) {
       return;
     }
     document.body.dataset.route = name;
-    document.getElementById('titel').textContent = ansicht.titel;
-    document.title = `${ansicht.titel} – Ernährungsplaner`;
+    // Ansichten können statt des Titels einen eigenen Kopf liefern (z. B. den FORGE-Schriftzug)
+    const titel = document.getElementById('titel');
+    if (ansicht.kopf) titel.replaceChildren(ansicht.kopf());
+    else titel.textContent = ansicht.titel;
+    document.title = `${ansicht.titel} – FORGE`;
     ziel.replaceChildren(ansicht.render());
     ziel.focus({ preventScroll: true });
     window.scrollTo(0, 0);

@@ -88,9 +88,10 @@ function schrittGueltig() {
 function willkommen(geh) {
   return [
     el('section', { class: 'karte willkommen hero' },
-      el('div', { class: 'logo' }, icon('flamme', 38)),
-      el('h2', {}, 'Willkommen'),
-      el('p', {}, 'Plane deine Ernährung nach deinen Zielen – offline, alle Daten bleiben auf deinem Handy.'),
+      el('div', { class: 'logo' }, icon('flamme-voll', 44)),
+      el('h2', { class: 'wortmarke-text gross' }, 'FORGE'),
+      el('p', { class: 'slogan' }, 'Fuel. Train. Grow.'),
+      el('p', {}, 'Ernährung und Training nach deinen Zielen – offline, alle Daten bleiben auf deinem Handy.'),
       el('p', { class: 'leise klein' }, 'Die Einrichtung dauert ca. 2 Minuten. Alles lässt sich später in den Einstellungen ändern.'),
       el('div', { class: 'knopfreihe' },
         el('button', { class: 'knopf', type: 'button', onclick: () => geh(1) }, 'Neu einrichten'),
