@@ -20,7 +20,8 @@ export async function speichereProfil(neu) {
 
 /** Tagesdaten; neue Tage starten mit getrunkenem Morning Stack und leerer Supplement-Checkliste. */
 export async function holeTag(schluessel) {
-  return (await lese('tage', schluessel)) ?? { datum: schluessel, morningStackGenommen: true, supplements: {} };
+  const neu = { datum: schluessel, morningStackGenommen: true, supplements: {}, wasser: [] };
+  return { ...neu, ...(await lese('tage', schluessel)) };
 }
 
 export const speichereTag = (tag) => schreibe('tage', tag.datum, tag);

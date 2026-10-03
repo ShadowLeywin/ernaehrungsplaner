@@ -5,6 +5,9 @@ import { holeProfil, holeTag, speichereTag } from '../state.js';
 import { holeLebensmittel } from '../lebensmittel.js';
 import { tagestypFuerDatum, mahlzeitenZiele, datumSchluessel } from '../logic/ziele.js';
 import { fixeNaehrwerte } from '../logic/fixeintraege.js';
+import { wasserSumme, wasserBisUhrzeit, pruefeWassermenge } from '../logic/wasser.js';
+
+const uhrzeitFormat = new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit' });
 
 const datumFormat = new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
 
@@ -42,6 +45,7 @@ function zeichne(wurzel, profil, lebensmittel, tag, datum) {
         + `Ballaststoffe ${typ.ballaststoffeMinG}–${typ.ballaststoffeMaxG} g · `
         + `Wasser bis Mittag ${zahl(typ.wasserBisMittagMl / 1000)} l`)),
 
+    wasserKarte(profil, typ, tag, speichern),
     profil.morningStack.aktiv ? morningStackKarte(profil, lebensmittel, fix, tag, speichern) : null,
     supplementKarte(profil, tag, speichern),
 
@@ -55,6 +59,79 @@ function zeichne(wurzel, profil, lebensmittel, tag, datum) {
       el('p', { class: 'leise klein' },
         `Nach Abzug von Morning Stack und Supplements (${makroText(fix.gesamt)}).`)),
   );
+}
+
+function wasserKarte(profil, typ, tag, speichern) {
+  const karte = el('section', { class: 'karte' });
+  const { presetsMl, mittagspause } = profil.wasser;
+  const ziel = typ.wasserBisMittagMl;
+  let offeneListe = false;
+
+  const hinzufuegen = (ml) => {
+    tag.wasser.push({ ml, zeit: new Date().toISOString() });
+    speichern();
+    zeichneKarte();
+  };
+
+  const zeichneKarte = () => {
+    const gesamt = wasserSumme(tag.wasser);
+    const bisMittag = wasserBisUhrzeit(tag.wasser, mittagspause);
+    const anteil = Math.min(100, Math.round((bisMittag / ziel) * 100));
+
+    const eingabe = el('input', {
+      type: 'number',
+      inputMode: 'numeric',
+      min: 1,
+      placeholder: 'ml',
+      'aria-label': 'Wassermenge in ml',
+    });
+    const fehler = el('p', { class: 'warnung klein', role: 'alert' });
+    const manuell = () => {
+      const { ml, fehler: meldung } = pruefeWassermenge(eingabe.value);
+      if (meldung) { fehler.textContent = meldung; return; }
+      hinzufuegen(ml);
+    };
+    eingabe.addEventListener('keydown', (e) => { if (e.key === 'Enter') manuell(); });
+
+    const liste = el('details', {
+      open: offeneListe,
+      ontoggle: (e) => { offeneListe = e.currentTarget.open; },
+    },
+    el('summary', {}, `Einträge (${tag.wasser.length})`),
+    el('ul', { class: 'eintragsliste' }, ...tag.wasser
+      .map((eintrag, index) => ({ eintrag, index }))
+      .reverse()
+      .map(({ eintrag, index }) => el('li', {},
+        el('span', {}, `${uhrzeitFormat.format(new Date(eintrag.zeit))} · ${zahl(eintrag.ml)} ml`),
+        el('button', {
+          class: 'knopf-klein',
+          type: 'button',
+          'aria-label': `${eintrag.ml} ml löschen`,
+          onclick: () => { tag.wasser.splice(index, 1); speichern(); zeichneKarte(); },
+        }, '✕')))));
+
+    karte.replaceChildren(
+      el('h2', { class: 'zeile' }, '💧 Wasser', el('span', { class: 'leise klein' }, `heute ${zahl(gesamt)} ml`)),
+      el('p', { class: 'klein' }, `Bis Mittag (${mittagspause} Uhr): ${zahl(bisMittag)} / ${zahl(ziel)} ml`),
+      el('div', {
+        class: `balken${bisMittag >= ziel ? ' erreicht' : ''}`,
+        role: 'progressbar',
+        'aria-valuemin': 0,
+        'aria-valuemax': ziel,
+        'aria-valuenow': bisMittag,
+      }, el('div', { style: `width:${anteil}%` })),
+      el('div', { class: 'knopfreihe presets' },
+        ...presetsMl.map((ml) => el('button', { class: 'knopf', type: 'button', onclick: () => hinzufuegen(ml) }, `+${zahl(ml)} ml`))),
+      el('div', { class: 'manuell' },
+        eingabe,
+        el('button', { class: 'knopf zweitrangig', type: 'button', onclick: manuell }, 'Hinzufügen')),
+      fehler,
+      tag.wasser.length ? liste : null,
+    );
+  };
+
+  zeichneKarte();
+  return karte;
 }
 
 function morningStackKarte(profil, lebensmittel, fix, tag, speichern) {

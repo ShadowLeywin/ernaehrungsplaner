@@ -206,6 +206,41 @@ details .felder { margin-top: 8px; }
 .schalter input { width: 22px; height: 22px; flex: none; accent-color: var(--akzent); }
 .zeile { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
 
+/* Fortschrittsbalken */
+.balken {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--hintergrund);
+  border: 1px solid var(--rand);
+  overflow: hidden;
+  margin: 4px 0 12px;
+}
+.balken > div { height: 100%; background: #3b8fd9; transition: width 0.3s; }
+.balken.erreicht > div { background: var(--akzent); }
+
+/* Wasser */
+.presets .knopf { flex: 1; }
+.manuell { display: flex; gap: 8px; margin-top: 8px; }
+.manuell input { flex: 1; }
+.eintragsliste { list-style: none; margin: 4px 0 0; padding: 0; }
+.eintragsliste li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 0;
+  border-bottom: 1px solid var(--rand);
+}
+.eintragsliste li:last-child { border-bottom: 0; }
+.knopf-klein {
+  font: inherit;
+  min-width: 44px;
+  min-height: 40px;
+  border: 0;
+  background: transparent;
+  color: var(--text-leise);
+  cursor: pointer;
+}
+
 /* Lebensmittel-Suche */
 .suchleiste {
   position: sticky;

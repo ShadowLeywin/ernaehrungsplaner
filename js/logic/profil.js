@@ -36,6 +36,10 @@ export function standardProfil() {
       { tagestyp: 'calisthenics', notiz: '' },
       { tagestyp: 'rest', notiz: '' },
     ],
+    wasser: {
+      presetsMl: [250, 500, 800],
+      mittagspause: '12:00', // Ziel „Wasser bis Mittag“ zählt Einträge vor dieser Uhrzeit
+    },
     // Täglich nüchtern, wird jeden Tag als getrunken vorbelegt
     morningStack: {
       aktiv: true,

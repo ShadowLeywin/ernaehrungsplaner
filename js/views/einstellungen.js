@@ -46,6 +46,8 @@ function zeichne(wurzel, profil, geaendert, lebensmittel) {
     wochenKarte(profil, markiereGeaendert),
     el('h2', { class: 'abschnitt' }, 'Verteilung auf die Mahlzeiten'),
     mahlzeitenKarte(profil, markiereGeaendert),
+    el('h2', { class: 'abschnitt' }, 'Wasser'),
+    wasserKarte(profil, markiereGeaendert),
     el('h2', { class: 'abschnitt' }, 'Morning Stack & Supplements'),
     morningStackKarte(profil, lebensmittel, markiereGeaendert),
     ...profil.supplements.map((s) => supplementKarte(s, markiereGeaendert)),
@@ -137,6 +139,23 @@ function wochenKarte(profil, markiereGeaendert) {
     return el('div', { class: 'wochenzeile' }, el('span', { class: 'wochentag' }, tag.slice(0, 2)), auswahl, notiz);
   });
   return el('section', { class: 'karte' }, ...zeilen);
+}
+
+function wasserKarte(profil, markiereGeaendert) {
+  const w = profil.wasser;
+  const uhrzeit = el('input', {
+    type: 'time',
+    value: w.mittagspause,
+    oninput: () => { if (uhrzeit.value) { w.mittagspause = uhrzeit.value; markiereGeaendert(); } },
+  });
+  return el('section', { class: 'karte' },
+    el('div', { class: 'felder' },
+      el('label', { class: 'feld' }, el('span', {}, 'Mittagspause ab'), uhrzeit),
+      ...w.presetsMl.map((ml, i) => zahlFeld(`Knopf ${i + 1}`, ml, 'ml', (wert) => {
+        w.presetsMl[i] = Math.round(wert);
+        markiereGeaendert();
+      }))),
+    el('p', { class: 'leise klein' }, 'Das Ziel „Wasser bis Mittag“ steht beim jeweiligen Tagestyp unter „Weitere Tagesziele“.'));
 }
 
 function morningStackKarte(profil, lebensmittel, markiereGeaendert) {
