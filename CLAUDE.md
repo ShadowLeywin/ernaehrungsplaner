@@ -79,6 +79,10 @@ Alle folgenden Märkte sind relevant:
 - Mikronährstoffe: alle gesundheitlich relevanten (Vitamine A, C, D, E, K, B1, B2, B3, B6, B9, B12; Calcium, Eisen, Magnesium, Zink, Kalium, Natrium, Jod, Selen, Phosphor; Ballaststoffe, Omega-3, Zucker, gesättigte Fettsäuren). Unvollständige Daten (z. B. aus Open Food Facts) kennzeichnen.
 - Zähler: Morning Stack zählt, wenn „getrunken“ (vorbelegt), Supplements, wenn abgehakt. Ziele pro Mahlzeit ziehen beide immer vorher ab. Wochenansicht = Durchschnitt über Tage mit Einträgen. Referenzwerte DGE (Altersgruppe im Profil), Obergrenzen EFSA, in `js/logic/referenzwerte.js`. Kartoffeln zählen nicht zum Gemüseziel.
 - Wasser: Presets 250/500/800 ml + freie Eingabe; „bis Mittag“ zählt Einträge vor der eingestellten Uhrzeit.
+- Profil: Der Code enthält nur ein neutrales Standardprofil. Neue Nutzer durchlaufen beim ersten Start die Ersteinrichtung (Körperdaten, Sport mit eigenem kcal-Verbrauch, Wochenplan, Ziel) oder stellen ein Backup wieder her. Persönliche Profile liegen nur lokal (`nutzerdaten/`, gitignored) und im Backup.
+- Kalorienbedarf: Mifflin-St Jeor × Alltags-PAL (ohne Sport) + Sport-kcal des Tagestyps + Zielzuschlag (kg/Woche × 7.700 / 7), auf 25 kcal gerundet. Makros: Protein g/kg (alle Tage gleich), Fett-Anteil, Rest KH. Berechnung immer als Vorschlag, Nutzer bestätigt.
+- Backup-Import ersetzt nur die Bereiche, die in der Datei stehen (reine Profil-Datei lässt Tage unverändert).
+- Gewicht: täglich morgens manuell eintragen (Health Connect ist für Web-Apps nicht zugänglich). Wochendurchschnitt; wöchentlicher Anpassungsvorschlag ab 2 Wochen Daten, max. ±150 kcal/Tag pro Woche, nur mit Bestätigung.
 - Bewertung: Obst/Gemüse 0–10 (0 = nie). Rezepte: Gesamtnote 1–10, Teilnoten Geschmack, Sättigung, Aufwand, Preis, dazu Tags, Geschmacksbeschreibung, Vorteile, Notiz, „wieder essen“. Geschmack und Vorteile werden immer beschrieben.
 
 ## Schrittplan
@@ -87,11 +91,13 @@ Alle folgenden Märkte sind relevant:
 3. Lebensmitteldatenbank, Morning Stack, Supplements
 4. Tagesansicht
 5. Backup-Export/-Import
-6. Rezepte mit Bewertung
-7. Meal-Prep-Modus
-8. Wochenplaner und Einkaufsliste
-9. Barcode-Scan mit Open Food Facts
-10. Angebote
+6. Ersteinrichtung, Körperdaten, Sport, Gewichtsziel
+7. Gewicht-Tracking mit Wochendurchschnitt und Kalorien-Anpassung
+8. Rezepte mit Bewertung
+9. Meal-Prep-Modus
+10. Wochenplaner und Einkaufsliste
+11. Barcode-Scan mit Open Food Facts
+12. Angebote
 
 ## Entwicklung
 - Lokaler Server: `python -m http.server 8080` (Konfiguration in `.claude/launch.json`).

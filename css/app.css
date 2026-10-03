@@ -297,6 +297,24 @@ details .felder { margin-top: 8px; }
 }
 .umschalter button.aktiv { background: var(--akzent); color: var(--akzent-text); font-weight: 600; }
 
+/* Ersteinrichtung: ohne Navigation */
+body[data-route=einrichtung] .navigation { display: none; }
+.schrittleiste { justify-content: space-between; margin-top: 16px; }
+.wochensport { padding: 8px 0; border-bottom: 1px solid var(--rand); }
+.wochensport:last-child { border-bottom: 0; }
+.wochensport .chips { margin-top: 6px; }
+.chip.an { background: var(--akzent); color: var(--akzent-text); border-color: var(--akzent); font-weight: 600; }
+a.knopf { display: inline-flex; align-items: center; text-decoration: none; }
+.aktivitaet {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: end;
+  margin-bottom: 8px;
+}
+.aktivitaet:has(> :nth-child(2):last-child) { grid-template-columns: minmax(0, 1fr) auto; }
+.sportauswahl { margin: 8px 0; }
+
 .hinweis-karte {
   display: block;
   color: var(--text);

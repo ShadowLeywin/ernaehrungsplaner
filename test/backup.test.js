@@ -28,9 +28,13 @@ test('Backup: kaputte oder fremde Dateien werden abgelehnt', () => {
   assert.ok(pruefeBackup(JSON.stringify({ ...beispiel(), daten: { tage: 'kaputt' } })).fehler);
 });
 
-test('Backup: fehlende Bereiche gelten als leer', () => {
-  const { daten } = pruefeBackup(JSON.stringify({ app: 'ernaehrungsplaner', format: 1, daten: {} }));
-  assert.deepEqual(daten, { einstellungen: [], tage: [] });
+test('Backup: fehlende Bereiche bleiben unverändert (z. B. reine Profil-Datei)', () => {
+  const nurProfil = { app: 'ernaehrungsplaner', format: 1, daten: { einstellungen: [['profil', standardProfil()]] } };
+  const { daten, info } = pruefeBackup(JSON.stringify(nurProfil));
+  assert.deepEqual(Object.keys(daten), ['einstellungen']);
+  assert.equal(info.anzahlTage, null);
+  assert.equal(info.hatProfil, true);
+  assert.ok(pruefeBackup(JSON.stringify({ app: 'ernaehrungsplaner', format: 1, daten: {} })).fehler);
 });
 
 test('Backup: Dateiname mit lokalem Datum', () => {

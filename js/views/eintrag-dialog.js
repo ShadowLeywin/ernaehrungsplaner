@@ -1,5 +1,5 @@
 // Dialog: Lebensmittel suchen und Menge festlegen – zum Hinzufügen und Bearbeiten von Einträgen.
-import { el, zahl } from '../ui.js';
+import { el, setze, zahl } from '../ui.js';
 import { sucheLebensmittel } from '../lebensmittel.js';
 import { naehrwerteFuerMenge, KATEGORIEN } from '../logic/naehrstoffe.js';
 
@@ -30,12 +30,12 @@ export function oeffneEintragDialog(optionen) {
     });
     const zeigeTreffer = () => {
       const treffer = sucheLebensmittel(optionen.lebensmittel, suche.value).slice(0, 60);
-      liste.replaceChildren(...treffer.map((lm) => el('li', {},
+      setze(liste, ...treffer.map((lm) => el('li', {},
         el('button', { type: 'button', class: 'auswahl-eintrag', onclick: () => zeigeMenge(lm, lm.stueckG ?? 100) },
           el('span', {}, lm.name),
           el('span', { class: 'leise klein' }, `${KATEGORIEN[lm.kategorie]} · ${zahl(lm.je100g.kcal)} kcal/100 g`)))));
     };
-    dialog.replaceChildren(kopf(optionen.titel), el('div', { class: 'dialog-inhalt' }, suche, liste));
+    setze(dialog, kopf(optionen.titel), el('div', { class: 'dialog-inhalt' }, suche, liste));
     zeigeTreffer();
     suche.focus();
   };
@@ -70,7 +70,7 @@ export function oeffneEintragDialog(optionen) {
       ...[50, 100, 150, 200, 250].map((g) => [`${g} g`, g]),
     ];
 
-    dialog.replaceChildren(
+    setze(dialog,
       kopf(lm.name, optionen.eintrag ? null : zeigeAuswahl),
       el('div', { class: 'dialog-inhalt' },
         el('label', { class: 'feld' }, el('span', {}, 'Menge (g)'), menge),

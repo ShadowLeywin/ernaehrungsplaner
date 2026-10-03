@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   kcalAusMakros, skaliereMakros, tagestypFuerDatum, summeAnteile, mahlzeitenZiele, wochentagIndex,
 } from '../js/logic/ziele.js';
-import { standardProfil } from '../js/logic/profil.js';
+import { beispielProfil as standardProfil } from './beispielprofil.js';
 
 const trainingstag = { protein: 175, kh: 375, fett: 75 };
 
@@ -42,12 +42,12 @@ test('Wochentag: Montag = 0, Sonntag = 6', () => {
   assert.equal(wochentagIndex(new Date(2026, 9, 11)), 6); // So 11.10.2026
 });
 
-test('Standardwoche: Mittwoch Beine, Samstag Calisthenics, Sonntag Rest', () => {
+test('Standardwoche: Mittwoch Beine, Samstag leicht, Sonntag Ruhetag', () => {
   const p = standardProfil();
   const mi = tagestypFuerDatum(p, new Date(2026, 9, 7));
   assert.equal(mi.typ.id, 'training');
   assert.equal(mi.notiz, 'Beine');
-  assert.equal(tagestypFuerDatum(p, new Date(2026, 9, 10)).typ.id, 'calisthenics');
+  assert.equal(tagestypFuerDatum(p, new Date(2026, 9, 10)).typ.id, 'leicht');
   assert.equal(tagestypFuerDatum(p, new Date(2026, 9, 11)).typ.id, 'rest');
 });
 

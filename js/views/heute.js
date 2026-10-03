@@ -1,6 +1,6 @@
 // Tagesansicht: Tagesziele mit Fortschritt, Wasser, Morning Stack, Supplements,
 // Einträge pro Mahlzeit und Zähler (Tag / Wochendurchschnitt).
-import { el, zahl, schalter } from '../ui.js';
+import { el, setze, zahl, schalter } from '../ui.js';
 import { holeProfil, holeTag, holeTage, speichereTag } from '../state.js';
 import { holeLebensmittel } from '../lebensmittel.js';
 import { tagestypFuerDatum, mahlzeitenZiele, datumSchluessel } from '../logic/ziele.js';
@@ -38,7 +38,7 @@ function lade(wurzel) {
       profil, lebensmittel: daten.lebensmittel, tag, datum,
       backupFaellig: backupErinnerungFaellig(letztesBackup, anzahlTage > 0),
     }))
-    .catch((fehler) => wurzel.replaceChildren(el('p', { class: 'warnung' }, fehler.message)));
+    .catch((fehler) => setze(wurzel, el('p', { class: 'warnung' }, fehler.message)));
 }
 
 const makroText = (w) => `${zahl(Math.round(w.kcal ?? 0))} kcal · P ${zahl(Math.round(w.protein ?? 0))} · KH ${zahl(Math.round(w.kh ?? 0))} · F ${zahl(Math.round(w.fett ?? 0))}`;
@@ -57,7 +57,7 @@ function zeichne(wurzel, kontext) {
   };
 
   const zaehlerBereich = el('div');
-  wurzel.replaceChildren(
+  setze(wurzel,
     kontext.backupFaellig
       ? el('a', { class: 'karte hinweis-karte', href: '#/backup' },
         '💾 Dein letztes Backup ist über eine Woche alt (oder fehlt). Jetzt sichern →')
@@ -87,17 +87,17 @@ function zeichne(wurzel, kontext) {
   );
 
   if (zaehlerModus === 'tag') {
-    zaehlerBereich.replaceChildren(...zaehlerInhalt({
+    setze(zaehlerBereich, ...zaehlerInhalt({
       werte: ist, gemueseObst: gemueseObstGramm(tag, lebensmittel), typ, referenzgruppe: profil.referenzgruppe,
     }));
   } else {
-    zaehlerBereich.replaceChildren(el('p', { class: 'leise' }, 'Lade Woche …'));
+    setze(zaehlerBereich, el('p', { class: 'leise' }, 'Lade Woche …'));
     const schluessel = wochenSchluessel(datum);
     holeTage(schluessel).then((tage) => {
       // Den angezeigten Tag mit seinem aktuellen Stand verwenden
       const woche = tage.map((t) => (t.datum === tag.datum ? tag : t));
       const schnitt = wochenDurchschnitt(woche, profil, lebensmittel);
-      zaehlerBereich.replaceChildren(
+      setze(zaehlerBereich,
         el('p', { class: 'leise klein' },
           schnitt.tage
             ? `Durchschnitt pro Tag über ${schnitt.tage} Tag${schnitt.tage === 1 ? '' : 'e'} mit Einträgen (Mo–So). Ziele des Trainingstags als Vergleich.`
@@ -221,7 +221,7 @@ function wasserKarte(profil, typ, tag, speichern) {
           onclick: () => { tag.wasser.splice(index, 1); speichern(); zeichneKarte(); },
         }, '✕')))));
 
-    karte.replaceChildren(
+    setze(karte,
       el('h2', { class: 'zeile' }, '💧 Wasser', el('span', { class: 'leise klein' }, `Tag: ${zahl(gesamt)} ml`)),
       balkenZeile(`Bis Mittag (${mittagspause} Uhr)`, bisMittag, ziel, 'ml', bisMittag >= ziel ? 'erreicht' : 'wasser'),
       el('div', { class: 'knopfreihe presets' },

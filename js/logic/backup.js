@@ -31,23 +31,26 @@ export function pruefeBackup(text) {
   if (backup.format > BACKUP_FORMAT) return { fehler: 'Das Backup stammt aus einer neueren App-Version. Bitte zuerst die App aktualisieren.' };
   if (typeof backup.daten !== 'object' || backup.daten === null) return { fehler: 'Das Backup enthält keine Daten.' };
 
+  // Nur Bereiche, die in der Datei stehen, werden ersetzt (z. B. reine Profil-Datei lässt Tage unverändert)
   const daten = {};
   for (const store of BACKUP_STORES) {
-    const eintraege = backup.daten[store] ?? [];
+    if (!(store in backup.daten)) continue;
+    const eintraege = backup.daten[store];
     const gueltig = Array.isArray(eintraege)
       && eintraege.every((e) => Array.isArray(e) && e.length === 2 && typeof e[0] === 'string');
     if (!gueltig) return { fehler: `Der Bereich „${store}“ im Backup ist beschädigt.` };
     daten[store] = eintraege;
   }
+  if (!Object.keys(daten).length) return { fehler: 'Das Backup enthält keine Daten.' };
 
-  const tage = daten.tage.map(([k]) => k).sort();
+  const tage = daten.tage?.map(([k]) => k).sort() ?? null;
   return {
     daten,
     info: {
       exportiertAm: backup.exportiertAm,
-      anzahlTage: tage.length,
-      vonBis: tage.length ? [tage[0], tage.at(-1)] : null,
-      hatProfil: daten.einstellungen.some(([k]) => k === 'profil'),
+      anzahlTage: tage?.length ?? null, // null = nicht enthalten, bleibt unverändert
+      vonBis: tage?.length ? [tage[0], tage.at(-1)] : null,
+      hatProfil: (daten.einstellungen ?? []).some(([k]) => k === 'profil'),
     },
   };
 }

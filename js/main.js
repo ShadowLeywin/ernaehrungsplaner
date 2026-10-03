@@ -4,10 +4,17 @@ import { heute } from './views/heute.js';
 import { einstellungen } from './views/einstellungen.js';
 import { lebensmittel } from './views/lebensmittel.js';
 import { backup } from './views/backup.js';
+import { einrichtung } from './views/einrichtung.js';
+import { pruefeEinrichtung, istEingerichtet } from './state.js';
 
-const ansichten = { ...platzhalter, heute, einstellungen, lebensmittel, backup };
+const ansichten = { ...platzhalter, heute, einstellungen, lebensmittel, backup, einrichtung };
 
-starteRouter(ansichten, 'heute', document.getElementById('inhalt'));
+// Ohne Profil nur Einrichtung und Backup (zum Wiederherstellen) erlauben
+const wache = (name) => (istEingerichtet() || name === 'backup' ? null : 'einrichtung');
+
+pruefeEinrichtung().then(() => {
+  starteRouter(ansichten, 'heute', document.getElementById('inhalt'), wache);
+});
 
 // Offline-Hinweis im Kopf
 const offlineHinweis = document.getElementById('offline-hinweis');

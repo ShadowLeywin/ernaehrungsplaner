@@ -14,7 +14,12 @@ export function el(tag, eigenschaften = {}, ...kinder) {
   return element;
 }
 
-const zahlFormat = new Intl.NumberFormat('de-DE', { maximumFractionDigits: 1 });
+/** Wie replaceChildren, aber null/false werden übersprungen (replaceChildren würde "null" als Text einfügen). */
+export function setze(element, ...kinder) {
+  element.replaceChildren(...kinder.flat().filter((k) => k != null && k !== false));
+}
+
+const zahlFormat =new Intl.NumberFormat('de-DE', { maximumFractionDigits: 1 });
 export const zahl = (wert) => zahlFormat.format(wert);
 
 /** Zahlenfeld mit Beschriftung; ruft beiAenderung mit einer Zahl auf. */

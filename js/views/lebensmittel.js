@@ -1,5 +1,5 @@
 // Lebensmittel-Datenbank durchsuchen und Nährwerte je 100 g ansehen.
-import { el, zahl } from '../ui.js';
+import { el, setze, zahl } from '../ui.js';
 import { holeLebensmittel, sucheLebensmittel } from '../lebensmittel.js';
 import { NAEHRSTOFFE, KATEGORIEN, istUnvollstaendig } from '../logic/naehrstoffe.js';
 
@@ -12,7 +12,7 @@ export const lebensmittel = {
     const wurzel = el('div', {}, el('p', { class: 'leise' }, 'Lade …'));
     holeLebensmittel()
       .then((daten) => zeichne(wurzel, daten))
-      .catch((fehler) => wurzel.replaceChildren(el('p', { class: 'warnung' }, fehler.message)));
+      .catch((fehler) => setze(wurzel, el('p', { class: 'warnung' }, fehler.message)));
     return wurzel;
   },
 };
@@ -31,7 +31,7 @@ function zeichne(wurzel, daten) {
     const nachKategorie = Object.keys(KATEGORIEN)
       .map((k) => [k, treffer.filter((l) => l.kategorie === k)])
       .filter(([, eintraege]) => eintraege.length);
-    liste.replaceChildren(
+    setze(liste,
       ...(treffer.length ? [] : [el('p', { class: 'leise' }, 'Nichts gefunden.')]),
       ...nachKategorie.map(([k, eintraege]) => el('section', {},
         el('h2', { class: 'abschnitt' }, `${KATEGORIEN[k]} (${eintraege.length})`),
@@ -39,7 +39,7 @@ function zeichne(wurzel, daten) {
     );
   };
 
-  wurzel.replaceChildren(el('div', { class: 'suchleiste' }, suche), liste);
+  setze(wurzel, el('div', { class: 'suchleiste' }, suche), liste);
   zeigeListe();
 }
 

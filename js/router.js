@@ -6,7 +6,8 @@ export function aktuelleRoute(hash = location.hash) {
   return name || null;
 }
 
-export function starteRouter(ansichten, standard, ziel) {
+/** wache(name): optional – liefert eine andere Route, wenn `name` gerade nicht erlaubt ist. */
+export function starteRouter(ansichten, standard, ziel, wache = () => null) {
   const zeige = () => {
     const name = aktuelleRoute();
     const ansicht = ansichten[name];
@@ -14,6 +15,12 @@ export function starteRouter(ansichten, standard, ziel) {
       location.replace(`#/${standard}`);
       return;
     }
+    const umleitung = wache(name);
+    if (umleitung && umleitung !== name) {
+      location.replace(`#/${umleitung}`);
+      return;
+    }
+    document.body.dataset.route = name;
     document.getElementById('titel').textContent = ansicht.titel;
     document.title = `${ansicht.titel} – Ernährungsplaner`;
     ziel.replaceChildren(ansicht.render());

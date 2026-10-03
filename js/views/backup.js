@@ -1,5 +1,5 @@
 // Backup: alle Daten als JSON-Datei exportieren (teilen/herunterladen) und wieder importieren.
-import { el, zahl } from '../ui.js';
+import { el, setze, zahl } from '../ui.js';
 import { lese, schreibe, anzahl, alleEintraege, ersetzeAlles } from '../db.js';
 import { BACKUP_STORES, erstelleBackup, backupDateiname, pruefeBackup } from '../logic/backup.js';
 
@@ -24,7 +24,7 @@ async function zeichne(wurzel) {
     navigator.storage?.persisted?.() ?? Promise.resolve(false),
   ]);
 
-  wurzel.replaceChildren(
+  setze(wurzel,
     el('section', { class: 'karte' },
       el('h2', {}, '💾 Status'),
       el('p', { class: 'klein' }, `Letztes Backup: ${letztes ? datumZeitFormat.format(new Date(letztes)) : 'noch nie'}`),
@@ -97,7 +97,7 @@ function importKarte(wurzel) {
       if (!datei) return;
       const ergebnis = pruefeBackup(await datei.text());
       if (ergebnis.fehler) {
-        bereich.replaceChildren(el('p', { class: 'warnung' }, ergebnis.fehler));
+        setze(bereich, el('p', { class: 'warnung' }, ergebnis.fehler));
         return;
       }
       zeigeBestaetigung(ergebnis);
@@ -105,13 +105,19 @@ function importKarte(wurzel) {
   });
 
   const zeigeBestaetigung = ({ daten, info }) => {
-    bereich.replaceChildren(el('div', { class: 'vorschlag' },
+    setze(bereich, el('div', { class: 'vorschlag' },
       el('p', {}, el('strong', {}, 'Backup gefunden')),
       el('p', { class: 'klein' },
         `Erstellt: ${info.exportiertAm ? datumZeitFormat.format(new Date(info.exportiertAm)) : 'unbekannt'}`, el('br'),
-        `Tage: ${zahl(info.anzahlTage)}${info.vonBis ? ` (${alsDatum(info.vonBis[0])} – ${alsDatum(info.vonBis[1])})` : ''}`, el('br'),
+        info.anzahlTage === null
+          ? 'Tage: nicht enthalten – deine Tage bleiben unverändert'
+          : `Tage: ${zahl(info.anzahlTage)}${info.vonBis ? ` (${alsDatum(info.vonBis[0])} – ${alsDatum(info.vonBis[1])})` : ''}`,
+        el('br'),
         `Profil enthalten: ${info.hatProfil ? 'ja' : 'nein'}`),
-      el('p', { class: 'warnung klein' }, 'Achtung: Alle aktuellen Daten auf diesem Gerät werden durch das Backup ersetzt.'),
+      el('p', { class: 'warnung klein' },
+        info.anzahlTage === null
+          ? 'Achtung: Profil und Einstellungen auf diesem Gerät werden ersetzt.'
+          : 'Achtung: Alle aktuellen Daten auf diesem Gerät werden durch das Backup ersetzt.'),
       el('div', { class: 'knopfreihe' },
         el('button', {
           class: 'knopf',
@@ -125,7 +131,7 @@ function importKarte(wurzel) {
         el('button', {
           class: 'knopf zweitrangig',
           type: 'button',
-          onclick: () => { auswahl.value = ''; bereich.replaceChildren(); },
+          onclick: () => { auswahl.value = ''; setze(bereich); },
         }, 'Abbrechen'))));
   };
 

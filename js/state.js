@@ -16,7 +16,16 @@ export async function holeProfil() {
 export async function speichereProfil(neu) {
   await schreibe('einstellungen', 'profil', neu);
   profil = structuredClone(neu);
+  eingerichtet = true;
 }
+
+// Gibt es schon ein gespeichertes Profil? Sonst startet die Ersteinrichtung.
+let eingerichtet = false;
+export async function pruefeEinrichtung() {
+  eingerichtet = Boolean(await lese('einstellungen', 'profil'));
+  return eingerichtet;
+}
+export const istEingerichtet = () => eingerichtet;
 
 /** Tagesdaten; neue Tage starten mit getrunkenem Morning Stack und leerer Supplement-Checkliste. */
 export async function holeTag(schluessel) {

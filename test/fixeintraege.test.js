@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { summiere, naehrwerteZutaten, fixeNaehrwerte } from '../js/logic/fixeintraege.js';
-import { standardProfil } from '../js/logic/profil.js';
+import { beispielProfil as standardProfil } from './beispielprofil.js';
 import { mahlzeitenZiele, datumSchluessel } from '../js/logic/ziele.js';
 
 const { lebensmittel } = JSON.parse(readFileSync(new URL('../data/lebensmittel.json', import.meta.url), 'utf8'));
@@ -29,7 +29,7 @@ test('Supplements: Kreatin ohne kcal, Flohsamen mit ca. 4 g Ballaststoffen, Omeg
   assert.equal(werte.kreatin.kcal, 0);
   nahe(werte.flohsamen.ballaststoffe, 4.25, 0.1);
   assert.equal(werte.omega3.epaDha, 2100);
-  assert.equal(werte.athlete_stack.vitD, 25);
+  assert.equal(werte.multi.vitD, 25);
 });
 
 test('Inaktive Einträge zählen nicht', () => {

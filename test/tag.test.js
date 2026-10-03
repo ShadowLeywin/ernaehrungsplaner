@@ -5,7 +5,7 @@ import {
   eintragNaehrwerte, mahlzeitSumme, tagesNaehrwerte, gemueseObstGramm, wochenSchluessel, wochenDurchschnitt,
 } from '../js/logic/tag.js';
 import { referenzwerte, bewerte } from '../js/logic/referenzwerte.js';
-import { standardProfil } from '../js/logic/profil.js';
+import { beispielProfil as standardProfil } from './beispielprofil.js';
 import { NAEHRSTOFFE } from '../js/logic/naehrstoffe.js';
 
 const { lebensmittel } = JSON.parse(readFileSync(new URL('../data/lebensmittel.json', import.meta.url), 'utf8'));
@@ -36,10 +36,10 @@ test('Tageswerte: Morning Stack nur wenn getrunken, Supplements nur wenn abgehak
   nahe(tagesNaehrwerte(tag, profil, lebensmittel).kcal, 89, 1);
 
   tag.morningStackGenommen = true;
-  tag.supplements = { athlete_stack: true };
+  tag.supplements = { multi: true };
   const w = tagesNaehrwerte(tag, profil, lebensmittel);
   nahe(w.kcal, 89 + 163, 10);
-  assert.ok(w.vitD >= 25); // aus dem Athlete Stack
+  assert.ok(w.vitD >= 25); // aus dem Multivitamin
 });
 
 test('Gemüse und Obst: Kartoffeln zählen nicht als Gemüse', () => {
@@ -67,7 +67,7 @@ test('Referenzwerte: alle Schlüssel sind bekannte Nährstoffe, gesättigte Fett
   const ref = referenzwerte(profil.referenzgruppe, profil.tagestypen[0]);
   for (const k of Object.keys(ref)) assert.ok(NAEHRSTOFFE[k], k);
   assert.equal(ref.gesFett.wert, 32); // 10 % von 2.875 kcal / 9
-  assert.equal(ref.ballaststoffe.wert, 35);
+  assert.equal(ref.ballaststoffe.wert, profil.tagestypen[0].ballaststoffeMinG);
 });
 
 test('Bewertung: Ziel, Begrenzen und Obergrenze', () => {

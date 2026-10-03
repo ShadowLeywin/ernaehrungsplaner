@@ -5,17 +5,25 @@
 
 export const REFERENZGRUPPEN = {
   maenner_19_25: 'Männer 19–24 Jahre',
-  maenner_25_51: 'Männer 25–50 Jahre',
+  maenner_25_51: 'Männer ab 25 Jahre',
+  frauen_19_25: 'Frauen 19–24 Jahre',
+  frauen_25_51: 'Frauen ab 25 Jahre',
 };
 
-const GEMEINSAM = {
-  vitA: 850, vitB2: 1.4, vitB6: 1.6, folat: 300, vitB12: 4, vitC: 110, vitD: 20, vitK: 70,
-  calcium: 1000, eisen: 11, zink: 14, kalium: 4000, phosphor: 700, jod: 200, selen: 70,
+const BEIDE = { folat: 300, vitB12: 4, vitD: 20, calcium: 1000, kalium: 4000, phosphor: 700, jod: 200 };
+
+const MAENNER = {
+  ...BEIDE, vitA: 850, vitB2: 1.4, vitB6: 1.6, vitC: 110, vitK: 70, eisen: 11, zink: 14, selen: 70,
+};
+const FRAUEN = {
+  ...BEIDE, vitA: 700, vitB2: 1.1, vitB6: 1.4, vitC: 95, vitK: 60, eisen: 16, zink: 8, selen: 60,
 };
 
 const WERTE = {
-  maenner_19_25: { ...GEMEINSAM, vitB1: 1.3, vitB3: 16, vitE: 15, magnesium: 400 },
-  maenner_25_51: { ...GEMEINSAM, vitB1: 1.2, vitB3: 15, vitE: 14, magnesium: 350 },
+  maenner_19_25: { ...MAENNER, vitB1: 1.3, vitB3: 16, vitE: 15, magnesium: 400 },
+  maenner_25_51: { ...MAENNER, vitB1: 1.2, vitB3: 15, vitE: 14, magnesium: 350 },
+  frauen_19_25: { ...FRAUEN, vitB1: 1.0, vitB3: 13, vitE: 12, magnesium: 310 },
+  frauen_25_51: { ...FRAUEN, vitB1: 1.0, vitB3: 12, vitE: 12, magnesium: 300 },
 };
 
 // Tolerierbare Obergrenzen (EFSA) für Gesamtzufuhr inkl. Supplements
