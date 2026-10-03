@@ -196,6 +196,28 @@ details .felder { margin-top: 8px; }
 .tabelle th:first-child, .tabelle td:first-child { text-align: left; }
 .tabelle th { font-size: 0.8rem; color: var(--text-leise); font-weight: 600; }
 
+/* Lebensmittel-Suche */
+.suchleiste {
+  position: sticky;
+  top: 52px;
+  z-index: 1;
+  padding: 0 0 8px;
+  background: var(--hintergrund);
+}
+details.lm { margin: 0; border-bottom: 1px solid var(--rand); }
+details.lm:last-child { border-bottom: 0; }
+details.lm summary {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 16px;
+  color: var(--text);
+  list-style: none;
+}
+details.lm summary::-webkit-details-marker { display: none; }
+.lm-name { font-weight: 600; }
+.lm-inhalt { padding: 0 16px 12px; }
+.lm-inhalt .tabelle { margin-top: 8px; }
+
 .navigation {
   position: fixed;
   left: 0; right: 0; bottom: 0;

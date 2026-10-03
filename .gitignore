@@ -11,6 +11,9 @@ wochenpraeferenzen.json
 # Angebote vom Cowork-Agenten (lokale Arbeitskopie)
 /angebote.json
 
+# USDA-Rohdaten (werden vom Build-Skript gelesen, nicht eingecheckt)
+rohdaten/
+
 # Werkzeuge
 node_modules/
 .vscode/

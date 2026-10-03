@@ -96,3 +96,7 @@ Alle folgenden Märkte sind relevant:
 - Tests: `npm test` (Node 24, keine Abhängigkeiten). Tests liegen in `test/*.test.js`.
 - Bei Änderungen an App-Dateien `VERSION` in `sw.js` erhöhen und neue Dateien in `DATEIEN` eintragen.
 - Icons neu erzeugen: `python tools/icons_erzeugen.py`.
+- Lebensmitteldatenbank: Liste in `tools/lebensmittel-liste.js` pflegen, dann `node tools/build-lebensmittel.js` → `data/lebensmittel.json`.
+  - Benötigt die USDA-Rohdaten (ohne API-Key) entpackt unter `rohdaten/sr_legacy/` (gitignored): https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_sr_legacy_food_csv_2018-04.zip
+  - Kohlenhydrate werden auf EU-Kennzeichnung umgerechnet (USDA-KH minus Ballaststoffe).
+  - Jod fehlt in USDA SR Legacy fast immer; Hauptquelle in Deutschland ist Jodsalz.

@@ -2,8 +2,9 @@ import { starteRouter } from './router.js';
 import { ansichten as platzhalter } from './views/platzhalter.js';
 import { heute } from './views/heute.js';
 import { einstellungen } from './views/einstellungen.js';
+import { lebensmittel } from './views/lebensmittel.js';
 
-const ansichten = { ...platzhalter, heute, einstellungen };
+const ansichten = { ...platzhalter, heute, einstellungen, lebensmittel };
 
 starteRouter(ansichten, 'heute', document.getElementById('inhalt'));
 

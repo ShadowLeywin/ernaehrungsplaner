@@ -1,6 +1,6 @@
 // Service Worker: hält die App-Dateien offline vor.
 // Bei jeder Änderung an App-Dateien VERSION erhöhen, sonst sehen installierte Apps die Änderung nicht.
-const VERSION = 'v2';
+const VERSION = 'v4';
 const CACHE = `ernaehrung-${VERSION}`;
 
 // Alle Dateien der App-Hülle. Neue Dateien hier eintragen.
@@ -14,18 +14,23 @@ const DATEIEN = [
   './js/db.js',
   './js/state.js',
   './js/ui.js',
+  './js/lebensmittel.js',
+  './js/logic/naehrstoffe.js',
   './js/logic/profil.js',
   './js/logic/ziele.js',
   './js/views/platzhalter.js',
   './js/views/heute.js',
   './js/views/einstellungen.js',
+  './js/views/lebensmittel.js',
+  './data/lebensmittel.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-maskable-512.png',
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(DATEIEN)));
+  // cache: 'reload' umgeht den HTTP-Cache, sonst landen bei einem Update veraltete Dateien im neuen Cache
+  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(DATEIEN.map((url) => new Request(url, { cache: 'reload' })))));
   self.skipWaiting();
 });
 
@@ -45,7 +50,8 @@ self.addEventListener('fetch', (event) => {
 
   // Lokal entwickeln: Netz zuerst, damit Änderungen sofort sichtbar sind
   if (['localhost', '127.0.0.1'].includes(location.hostname)) {
-    event.respondWith(fetch(anfrage).catch(() => caches.match(anfrage, { ignoreSearch: true })));
+    const frisch = anfrage.mode === 'navigate' ? anfrage : new Request(anfrage, { cache: 'no-cache' });
+    event.respondWith(fetch(frisch).catch(() => caches.match(anfrage, { ignoreSearch: true })));
     return;
   }
 

@@ -18,6 +18,7 @@ function platzhalter(titel, text, reiter) {
 
 function mehrAnsicht() {
   const eintraege = [
+    ['lebensmittel', '🥦 Lebensmittel'],
     ['angebote', '🏷️ Angebote'],
     ['mealprep', '🥘 Meal-Prep'],
     ['einstellungen', '⚙️ Profil & Einstellungen'],
