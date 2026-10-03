@@ -41,13 +41,11 @@ function mehrAnsicht() {
 }
 
 export const ansichten = {
-  heute: platzhalter('Heute', 'Tagesansicht mit Mahlzeiten, Makros und Mikronährstoffen – kommt in Schritt 4.'),
   woche: platzhalter('Woche', 'Wochenplaner – kommt in Schritt 7.'),
   rezepte: platzhalter('Rezepte', 'Rezepte mit Bewertung, Geschmack und Vorteilen – kommt in Schritt 5.'),
   einkauf: platzhalter('Einkauf', 'Einkaufsliste aus dem Wochenplan – kommt in Schritt 7.'),
   mehr: { titel: 'Mehr', render: mehrAnsicht },
   angebote: platzhalter('Angebote', 'Angebote der Märkte – kommt in Schritt 9.', 'mehr'),
   mealprep: platzhalter('Meal-Prep', 'Gesamtgewicht ÷ Portionen – kommt in Schritt 6.', 'mehr'),
-  einstellungen: platzhalter('Profil & Einstellungen', 'Tagestypen, Makroziele, Märkte – kommt in Schritt 2.', 'mehr'),
-  backup: platzhalter('Backup', 'Export und Import aller Daten – kommt nach Schritt 4.', 'mehr'),
+  backup: platzhalter('Backup', 'Export und Import aller Daten – kommt in Schritt 5.', 'mehr'),
 };

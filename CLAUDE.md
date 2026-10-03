@@ -93,5 +93,6 @@ Alle folgenden Märkte sind relevant:
 
 ## Entwicklung
 - Lokaler Server: `python -m http.server 8080` (Konfiguration in `.claude/launch.json`).
+- Tests: `npm test` (Node 24, keine Abhängigkeiten). Tests liegen in `test/*.test.js`.
 - Bei Änderungen an App-Dateien `VERSION` in `sw.js` erhöhen und neue Dateien in `DATEIEN` eintragen.
 - Icons neu erzeugen: `python tools/icons_erzeugen.py`.

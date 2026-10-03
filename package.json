@@ -1,0 +1,9 @@
+{
+  "name": "ernaehrungsplaner",
+  "private": true,
+  "type": "module",
+  "description": "Nur für Tests – die App selbst braucht keinen Build-Schritt und keine Abhängigkeiten.",
+  "scripts": {
+    "test": "node --test"
+  }
+}
