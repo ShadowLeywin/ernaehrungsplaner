@@ -16,6 +16,10 @@ import { durchschnitt, anpassungsVorschlag } from '../logic/gewicht.js';
 import { holeGewichtsReihe } from './gewicht.js';
 import { oeffneEintragDialog } from './eintrag-dialog.js';
 import { icon } from '../icons.js';
+import { UEBUNGEN } from '../daten/uebungen.js';
+import { uebungsVerzeichnis, zusatzKcal, zielMitZusatz } from '../logic/training.js';
+
+const uebungsVerzeichnisCache = uebungsVerzeichnis(UEBUNGEN);
 import { balkenZeile, zaehlerInhalt } from './zaehler.js';
 
 const datumFormat = new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -54,7 +58,10 @@ const makroText = (w) => `${zahl(Math.round(w.kcal ?? 0))} kcal · P ${zahl(Math
 
 function zeichne(wurzel, kontext) {
   const { profil, lebensmittel, tag, datum } = kontext;
-  const { typ, notiz } = tagestypFuerDatum(profil, datum);
+  const { typ: planTyp, notiz } = tagestypFuerDatum(profil, datum);
+  // Zusatz-Training erhöht das Tagesziel (Hybrid-Regel); geplantes Training steckt im Tagestyp
+  const gewichtKg = kontext.gewichte.at(-1)?.kg ?? profil.koerper.gewichtKg ?? 75;
+  const typ = zielMitZusatz(planTyp, zusatzKcal(tag, uebungsVerzeichnisCache, gewichtKg));
   const fix = fixeNaehrwerte(profil, lebensmittel);
   const ziele = mahlzeitenZiele(typ, profil.mahlzeiten, fix.gesamt);
   const ist = tagesNaehrwerte(tag, profil, lebensmittel);
@@ -178,7 +185,9 @@ function heroKarte(typ, notiz, ist) {
   return el('section', { class: 'karte hero' },
     el('div', { class: 'hero-oben' },
       el('h2', {}, typ.name),
-      notiz ? el('span', { class: 'marke' }, notiz) : null),
+      el('div', { class: 'chips' },
+        typ.extraKcal ? el('a', { class: 'marke', href: '#/training' }, `+${zahl(typ.extraKcal)} kcal Training`) : null,
+        notiz ? el('span', { class: 'marke' }, notiz) : null)),
     el('div', { class: 'hero-mitte' },
       el('div', { class: `ring${drueber ? ' drueber' : ''}`, role: 'img', 'aria-label': `${Math.abs(uebrig)} kcal ${drueber ? 'über dem Ziel' : 'übrig'}` },
         svg,

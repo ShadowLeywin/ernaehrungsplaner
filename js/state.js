@@ -29,7 +29,7 @@ export const istEingerichtet = () => eingerichtet;
 
 /** Tagesdaten; neue Tage starten mit getrunkenem Morning Stack und leerer Supplement-Checkliste. */
 export async function holeTag(schluessel) {
-  const neu = { datum: schluessel, morningStackGenommen: true, supplements: {}, wasser: [], eintraege: [] };
+  const neu = { datum: schluessel, morningStackGenommen: true, supplements: {}, wasser: [], eintraege: [], trainings: [] };
   return { ...neu, ...(await lese('tage', schluessel)) };
 }
 

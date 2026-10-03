@@ -85,6 +85,7 @@ Alle folgenden Märkte sind relevant:
 - Kalorienbedarf: Mifflin-St Jeor × Alltags-PAL (ohne Sport) + Sport-kcal des Tagestyps + Zielzuschlag (kg/Woche × 7.700 / 7), auf 25 kcal gerundet. Makros: Protein g/kg (alle Tage gleich), Fett-Anteil, Rest KH. Berechnung immer als Vorschlag, Nutzer bestätigt.
 - Backup-Import ersetzt nur die Bereiche, die in der Datei stehen (reine Profil-Datei lässt Tage unverändert).
 - Gewicht: täglich morgens manuell eintragen (Health Connect ist für Web-Apps nicht zugänglich). Wochendurchschnitt; wöchentlicher Anpassungsvorschlag ab 2 Wochen Daten, max. ±150 kcal/Tag pro Woche, nur mit Bestätigung.
+- Training: Übungsdatenbank in `js/daten/uebungen.js` (Gym, Calisthenics, Cardio, Sport, Mobility, Alltag; MET nach 2024 Adult Compendium). kcal netto = (MET − 1) × kg × h; Kraft-Einheiten über Dauer × Intensität. Hybrid-Regel: geplantes Training steckt im Tagestyp, Training mit `zusatz: true` erhöht das Tagesziel (Protein fest, KH/Fett im Verhältnis). Navigation: Heute · Training · Rezepte · Woche · Mehr.
 - Bewertung: Obst/Gemüse 0–10 (0 = nie). Rezepte: Gesamtnote 1–10, Teilnoten Geschmack, Sättigung, Aufwand, Preis, dazu Tags, Geschmacksbeschreibung, Vorteile, Notiz, „wieder essen“. Geschmack und Vorteile werden immer beschrieben.
 
 ## Schrittplan
@@ -95,11 +96,12 @@ Alle folgenden Märkte sind relevant:
 5. Backup-Export/-Import
 6. Ersteinrichtung, Körperdaten, Sport, Gewichtsziel
 7. Gewicht-Tracking mit Wochendurchschnitt und Kalorien-Anpassung
-8. Rezepte mit Bewertung
-9. Meal-Prep-Modus
-10. Wochenplaner und Einkaufsliste
-11. Barcode-Scan mit Open Food Facts
-12. Angebote
+8. Trainings-Tracker: A Workouts loggen ✓ · B Vorlagen und Wochenplan · C Fortschritt (1RM, Rekorde, Volumen je Muskel)
+9. Rezepte mit Bewertung
+10. Meal-Prep-Modus
+11. Wochenplaner und Einkaufsliste
+12. Barcode-Scan mit Open Food Facts
+13. Angebote
 
 ## Entwicklung
 - Lokaler Server: `python -m http.server 8080` (Konfiguration in `.claude/launch.json`).
