@@ -545,6 +545,14 @@ details.lm summary::-webkit-details-marker { display: none; }
 .d-fokus { stroke: var(--text-leise); stroke-width: 1; }
 .d-fokuspunkt { fill: var(--text); stroke: var(--flaeche); stroke-width: 2; }
 .d-tooltip { margin-top: 6px; font-size: 0.85rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.m-saeule rect { fill: var(--flaeche-2); stroke: var(--rand); transition: fill 0.2s; }
+.m-saeule.aktiv rect { fill: var(--akzent); stroke: none; }
+.m-saeule { cursor: pointer; }
+.d-wert { fill: var(--text); font-size: 10px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.monat-titel { font-size: 1.25rem; font-weight: 800; margin: 0 0 8px; }
+.stat.plus strong { color: var(--akzent); }
+.stat.minus strong { color: var(--wasser); }
+
 .legende { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-bottom: 6px; color: var(--text-leise); }
 .legende span { display: inline-flex; align-items: center; gap: 6px; }
 .legende i { display: inline-block; }
@@ -642,6 +650,23 @@ details.lm summary::-webkit-details-marker { display: none; }
 .pausen-balken { position: absolute; inset: auto 0 0 0; height: 3px; }
 .pausen-balken > div { height: 100%; background: var(--verlauf); transition: width 0.25s linear; }
 .pausen-leiste.fertig { background: var(--verlauf); color: var(--akzent-text); }
+
+.vorlage {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--rand);
+}
+.vorlage:last-of-type { border-bottom: 0; }
+.vorlage > div:first-child { display: flex; flex-direction: column; min-width: 0; }
+.vorlage.erledigt strong { color: var(--akzent); }
+.vorlage-knoepfe { display: flex; align-items: center; gap: 4px; flex: none; }
+.vorlage-knoepfe .knopf { min-height: 40px; padding: 8px 18px; }
+.vorlagen-liste summary { margin-bottom: 4px; }
+.vorlage-uebung { padding: 10px 0; border-bottom: 1px solid var(--rand); }
+.vorlage-uebung .zeile > div { display: flex; flex: none; }
 
 .statistik { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
 .stat { display: flex; flex-direction: column; align-items: center; padding: 10px 4px; border-radius: var(--radius-klein); background: var(--flaeche-2); }

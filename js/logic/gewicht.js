@@ -73,6 +73,52 @@ export function anpassungsVorschlag(reihe, ziel, heute, letzteEntscheidung = nul
   return { status: 'anpassen', kcalProTag, soll, ...gemessen };
 }
 
+/** Monatsschlüssel "2026-10" für ein Datum "2026-10-05". */
+export const monatVon = (datum) => datum.slice(0, 7);
+
+/** Durchschnitt je Monat (aufsteigend): [{ monat, kg, anzahl, min, max }]. */
+export function monatsDurchschnitte(reihe) {
+  const gruppen = new Map();
+  for (const m of reihe) {
+    const monat = monatVon(m.datum);
+    if (!gruppen.has(monat)) gruppen.set(monat, []);
+    gruppen.get(monat).push(m.kg);
+  }
+  return [...gruppen.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([monat, werte]) => ({
+    monat,
+    kg: werte.reduce((s, w) => s + w, 0) / werte.length,
+    anzahl: werte.length,
+    min: Math.min(...werte),
+    max: Math.max(...werte),
+  }));
+}
+
+/**
+ * Monatsbericht: Durchschnitt, Anfang (Ø erste bis zu 7 Messungen) und Ende (Ø letzte bis zu 7),
+ * Veränderung im Monat und gegenüber dem Vormonat. null ohne Messungen im Monat.
+ */
+export function monatsBericht(reihe, monat) {
+  const imMonat = reihe.filter((m) => monatVon(m.datum) === monat);
+  if (!imMonat.length) return null;
+  const schnitt = (liste) => liste.reduce((s, m) => s + m.kg, 0) / liste.length;
+  const anfang = schnitt(imMonat.slice(0, 7));
+  const ende = schnitt(imMonat.slice(-7));
+  const monate = monatsDurchschnitte(reihe);
+  const index = monate.findIndex((m) => m.monat === monat);
+  const vormonat = index > 0 ? monate[index - 1] : null;
+  return {
+    monat,
+    anzahl: imMonat.length,
+    durchschnitt: schnitt(imMonat),
+    anfang,
+    ende,
+    aenderung: imMonat.length > 1 ? ende - anfang : 0,
+    gegenVormonat: vormonat ? schnitt(imMonat) - vormonat.kg : null,
+    min: Math.min(...imMonat.map((m) => m.kg)),
+    max: Math.max(...imMonat.map((m) => m.kg)),
+  };
+}
+
 /** Anpassung auf alle Tagestypen anwenden: kcal ± delta, Protein bleibt, KH/Fett im bisherigen Verhältnis. */
 export function wendeAnpassungAn(profil, kcalProTag) {
   for (const typ of profil.tagestypen) {

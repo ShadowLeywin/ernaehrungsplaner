@@ -113,17 +113,22 @@ function importKarte(wurzel) {
           ? 'Tage: nicht enthalten – deine Tage bleiben unverändert'
           : `Tage: ${zahl(info.anzahlTage)}${info.vonBis ? ` (${alsDatum(info.vonBis[0])} – ${alsDatum(info.vonBis[1])})` : ''}`,
         el('br'),
-        `Profil enthalten: ${info.hatProfil ? 'ja' : 'nein'}`),
+        `Profil enthalten: ${info.hatProfil ? 'ja' : 'nein'}`,
+        info.anzahlVorlagen != null ? el('br') : null,
+        info.anzahlVorlagen != null ? `Trainings-Vorlagen: ${info.anzahlVorlagen}` : null),
       el('p', { class: 'warnung klein' },
-        info.anzahlTage === null
-          ? 'Achtung: Profil und Einstellungen auf diesem Gerät werden ersetzt.'
+        info.anzahlTage === null && !info.hatProfil
+          ? 'Nur die enthaltenen Einstellungen (z. B. Vorlagen) werden übernommen – Profil und Tage bleiben.'
+          : info.anzahlTage === null
+            ? 'Achtung: Profil und Einstellungen auf diesem Gerät werden ersetzt.'
           : 'Achtung: Alle aktuellen Daten auf diesem Gerät werden durch das Backup ersetzt.'),
       el('div', { class: 'knopfreihe' },
         el('button', {
           class: 'knopf',
           type: 'button',
           onclick: async () => {
-            await ersetzeAlles(daten);
+            // Einstellungen zusammenführen: Teil-Dateien (z. B. nur Vorlagen) löschen das Profil nicht
+            await ersetzeAlles(daten, ['einstellungen']);
             location.hash = '#/heute';
             location.reload();
           },

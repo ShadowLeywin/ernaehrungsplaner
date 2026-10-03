@@ -11,6 +11,9 @@ import {
 } from '../logic/training.js';
 import { holeGewichtsReihe } from './gewicht.js';
 import { oeffneUebungDialog } from './uebung-dialog.js';
+import { oeffneVorlageEditor } from './vorlage-editor.js';
+import { vorlagenFuerTag, erledigteVorlagen, workoutAusVorlage } from '../logic/vorlagen.js';
+import { WOCHENTAGE } from '../logic/profil.js';
 
 const verzeichnis = uebungsVerzeichnis(UEBUNGEN);
 const datumKurz = new Intl.DateTimeFormat('de-DE', { weekday: 'short', day: 'numeric', month: 'numeric' });
@@ -30,12 +33,13 @@ export const training = {
 };
 
 async function lade(wurzel) {
-  const [profil, eintraege, gewichte, aktiv] = await Promise.all([
-    holeProfil(), alleEintraege('tage'), holeGewichtsReihe(), lese('einstellungen', 'aktivesTraining'),
+  const [profil, eintraege, gewichte, aktiv, vorlagen] = await Promise.all([
+    holeProfil(), alleEintraege('tage'), holeGewichtsReihe(), lese('einstellungen', 'aktivesTraining'), lese('einstellungen', 'vorlagen'),
   ]);
   const k = {
     wurzel,
     profil,
+    vorlagen: vorlagen ?? [],
     alleTage: eintraege.map(([, t]) => t),
     gewichtKg: gewichte.at(-1)?.kg ?? profil.koerper.gewichtKg ?? 75,
     gewichtGeschaetzt: !gewichte.length && !profil.koerper.gewichtKg,
@@ -95,13 +99,67 @@ function zeichneUebersicht(k, tag) {
       el('div', { class: 'knopfreihe' },
         el('button', { class: 'knopf', type: 'button', onclick: () => starteWorkout(k) }, icon('hantel', 20), 'Workout starten'),
         el('button', { class: 'knopf zweitrangig', type: 'button', onclick: () => aktivitaetEintragen(k, tag) }, icon('flamme', 20), 'Cardio / Sport'))),
-    fertig.length ? el('h2', { class: 'abschnitt' }, 'Heute') : null,
+    ...vorlagenBereich(k, tag),
+    fertig.length ? el('h2', { class: 'abschnitt' }, 'Heute erledigt') : null,
     ...fertig.map((t) => trainingKarte(t, k.gewichtKg, () => loesche(t))),
     frueher.length ? el('h2', { class: 'abschnitt' }, 'Letzte Einheiten') : null,
     ...frueher.map(({ datum, t }) => trainingKarte(t, k.gewichtKg, null, datum)),
     !fertig.length && !frueher.length
       ? el('p', { class: 'leise klein', style: 'text-align:center;margin-top:24px' }, `${UEBUNGEN.length} Übungen und Aktivitäten warten auf dich.`)
       : null);
+}
+
+// ---------------------------------------------------------------- Vorlagen
+
+async function speichereVorlagen(k, vorlagen) {
+  await schreibe('einstellungen', 'vorlagen', vorlagen);
+  lade(k.wurzel);
+}
+
+function bearbeiteVorlage(k, vorlage) {
+  const vorhanden = k.vorlagen.some((v) => v.id === vorlage.id);
+  oeffneVorlageEditor({
+    vorlage,
+    verzeichnis,
+    beiSpeichern: (neu) => speichereVorlagen(k, vorhanden ? k.vorlagen.map((v) => (v.id === neu.id ? neu : v)) : [...k.vorlagen, neu]),
+    beiLoeschen: vorhanden ? () => speichereVorlagen(k, k.vorlagen.filter((v) => v.id !== vorlage.id)) : null,
+  });
+}
+
+function vorlagenBereich(k, tag) {
+  const heute = vorlagenFuerTag(k.vorlagen, new Date());
+  const erledigt = erledigteVorlagen(tag);
+  const karte = (v, kompakt) => el('div', { class: `vorlage${erledigt.has(v.id) ? ' erledigt' : ''}` },
+    el('div', {},
+      el('strong', {}, erledigt.has(v.id) ? '✓ ' : '', v.name),
+      el('span', { class: 'leise klein' },
+        [v.uhrzeit, `${v.uebungen.length} Übung${v.uebungen.length === 1 ? '' : 'en'}`,
+          kompakt ? v.tage.map((t) => WOCHENTAGE[t].slice(0, 2)).join(' ') : null].filter(Boolean).join(' · '))),
+    el('div', { class: 'vorlage-knoepfe' },
+      el('button', { class: 'knopf-klein', type: 'button', 'aria-label': `${v.name} bearbeiten`, onclick: () => bearbeiteVorlage(k, v) }, icon('stift', 18)),
+      el('button', { class: `knopf${erledigt.has(v.id) ? ' zweitrangig' : ''}`, type: 'button', onclick: () => starteVorlage(k, v) }, 'Start')));
+
+  return [
+    heute.length ? el('h2', { class: 'abschnitt' }, 'Heute geplant') : null,
+    heute.length ? el('section', { class: 'karte' }, ...heute.map((v) => karte(v, false))) : null,
+    el('details', { class: 'karte vorlagen-liste' },
+      el('summary', {}, `Alle Vorlagen (${k.vorlagen.length})`),
+      ...k.vorlagen.map((v) => karte(v, true)),
+      el('button', {
+        class: 'knopf zweitrangig voll', type: 'button',
+        onclick: () => bearbeiteVorlage(k, { id: neueId(), name: '', tage: [], uhrzeit: '', uebungen: [] }),
+      }, icon('plus', 18), 'Neue Vorlage')),
+  ];
+}
+
+async function starteVorlage(k, vorlage) {
+  const datum = datumSchluessel(new Date());
+  const tag = await holeTag(datum);
+  const t = workoutAusVorlage(vorlage, k.alleTage, verzeichnis, { id: neueId(), zusatz: standardZusatz(k.profil) });
+  tag.trainings.push(t);
+  await speichereTag(tag);
+  await schreibe('einstellungen', 'aktivesTraining', { datum, id: t.id });
+  zeichneWorkout(k, tag, t);
 }
 
 function trainingKarte(t, gewichtKg, beiLoeschen, datum = null) {
@@ -256,6 +314,7 @@ function uebungsKarte(k, t, eintrag, speichern, neu) {
       return el('label', { class: 'feld' }, el('span', {}, `${beschriftung} (${einheit})`), eingabe);
     };
     return el('section', { class: 'karte' }, kopf,
+      eintrag.notiz ? el('p', { class: 'leise klein' }, eintrag.notiz) : null,
       el('div', { class: 'felder' }, feld('Dauer', 'min', 'min'), u.distanz ? feld('Distanz', 'km', 'km') : null));
   }
 
@@ -271,7 +330,7 @@ function uebungsKarte(k, t, eintrag, speichern, neu) {
       eintrag.saetze.splice(i, 1);
       speichern();
       zeichneSaetze();
-    })),
+    }, ersteZahl(eintrag.ziel))),
   );
   zeichneSaetze();
 
@@ -280,6 +339,10 @@ function uebungsKarte(k, t, eintrag, speichern, neu) {
     el('p', { class: 'leise klein' },
       u.muskeln.map((m) => MUSKELN[m]).join(', '),
       letzte ? el('span', { class: 'letztes-mal' }, ` · Letztes Mal: ${saetzeText(letzte.saetze, u.art)}`) : null),
+    eintrag.ziel || eintrag.notiz
+      ? el('p', { class: 'klein' }, eintrag.ziel ? el('strong', {}, `Ziel: ${eintrag.saetze.length} × ${eintrag.ziel}`) : null,
+        eintrag.notiz ? ` ${eintrag.notiz}` : null)
+      : null,
     tabelle,
     el('button', {
       class: 'knopf zweitrangig voll', type: 'button',
@@ -292,18 +355,34 @@ function uebungsKarte(k, t, eintrag, speichern, neu) {
     }, icon('plus', 18), 'Satz'));
 }
 
-function satzZeile(u, s, index, speichern, entfernen) {
-  const zahlEingabe = (schluessel, beschriftung) => {
+/** Untere Grenze aus einem Ziel wie „8–12“ oder „45–60 s“. */
+function ersteZahl(text) {
+  const treffer = String(text ?? '').match(/\d+/);
+  return treffer ? Number(treffer[0]) : undefined;
+}
+
+/** Eine Satzzeile. zielWert dient als Platzhalter und wird beim Abhaken eines leeren Felds übernommen. */
+function satzZeile(u, s, index, speichern, entfernen, zielWert) {
+  const eingaben = {};
+  const zahlEingabe = (schluessel, beschriftung, platzhalter) => {
     const eingabe = el('input', {
       type: 'number', inputMode: 'decimal', min: 0, step: 'any', value: s[schluessel] ?? '', 'aria-label': `${beschriftung} Satz ${index + 1}`,
+      placeholder: platzhalter ?? '',
       oninput: () => { s[schluessel] = eingabe.value === '' ? undefined : eingabe.valueAsNumber; speichern(); },
     });
+    eingaben[schluessel] = eingabe;
     return eingabe;
   };
+  const zielFeld = u.art === 'halten' ? 'sek' : 'wdh';
   const zeile = el('div', { class: `satz-zeile${s.erledigt ? ' erledigt' : ''}` });
   const haken = el('button', {
     class: 'satz-haken', type: 'button', 'aria-pressed': String(Boolean(s.erledigt)), 'aria-label': `Satz ${index + 1} erledigt`,
     onclick: () => {
+      // Leeres Ziel-Feld beim Abhaken mit dem Zielwert füllen (wie in gängigen Trainings-Apps)
+      if (!s.erledigt && s[zielFeld] == null && zielWert != null) {
+        s[zielFeld] = zielWert;
+        eingaben[zielFeld].value = zielWert;
+      }
       s.erledigt = !s.erledigt;
       zeile.classList.toggle('erledigt', s.erledigt);
       haken.setAttribute('aria-pressed', String(s.erledigt));
@@ -313,8 +392,8 @@ function satzZeile(u, s, index, speichern, entfernen) {
   }, icon('haken', 18));
   setze(zeile,
     el('button', { class: 'satz-nr', type: 'button', 'aria-label': `Satz ${index + 1} entfernen`, title: 'Antippen zum Entfernen', onclick: entfernen }, String(index + 1)),
-    u.art === 'halten' ? zahlEingabe('sek', 'Sekunden') : zahlEingabe('kg', 'Gewicht'),
-    u.art === 'halten' ? el('span') : zahlEingabe('wdh', 'Wiederholungen'),
+    u.art === 'halten' ? zahlEingabe('sek', 'Sekunden', zielWert) : zahlEingabe('kg', 'Gewicht', u.art === 'kraft' ? 'kg' : '0'),
+    u.art === 'halten' ? el('span') : zahlEingabe('wdh', 'Wiederholungen', zielWert),
     haken);
   return zeile;
 }

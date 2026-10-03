@@ -6,12 +6,15 @@ import { datumSchluessel } from '../logic/ziele.js';
 import { zielGewicht } from '../logic/bedarf.js';
 import {
   gewichtsReihe, gleitenderDurchschnitt, durchschnitt, anpassungsVorschlag, wendeAnpassungAn, zielRate,
+  monatsDurchschnitte, monatsBericht, monatVon,
 } from '../logic/gewicht.js';
-import { gewichtsDiagramm } from './gewicht-diagramm.js';
+import { gewichtsDiagramm, monatsDiagramm } from './gewicht-diagramm.js';
+import { icon } from '../icons.js';
 
 const datumFormat = new Intl.DateTimeFormat('de-DE', { weekday: 'short', day: 'numeric', month: 'numeric' });
 const alsDatum = (s) => new Date(`${s}T12:00:00`);
-const kg = (w) => `${zahl(Math.round(w * 10) / 10)} kg`;
+const eineStelle = new Intl.NumberFormat('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const kg = (w) => `${eineStelle.format(w)} kg`;
 const zweiStellen = new Intl.NumberFormat('de-DE', { maximumFractionDigits: 2 });
 const mitVorzeichen = (w, einheit) => {
   const gerundet = Math.round(w * 100) / 100;
@@ -55,6 +58,7 @@ function zeichne(wurzel, profil, reihe) {
     reihe.length ? statusKarte(reihe, heute, ziel, startKg) : null,
     vorschlagKarte(wurzel, profil, vorschlag, heute),
     reihe.length ? el('section', { class: 'karte' }, el('h2', {}, 'Verlauf'), gewichtsDiagramm(reihe, glatt, plan)) : null,
+    reihe.length ? monatsKarte(reihe, ziel) : null,
     reihe.length ? tabelle(reihe, glatt) : null);
 }
 
@@ -111,6 +115,44 @@ function vorschlagKarte(wurzel, profil, vorschlag, heute) {
   }[vorschlag.status];
 
   return el('section', { class: 'karte' }, el('h2', {}, 'Kalorien-Anpassung'), ...inhalt);
+}
+
+const monatLang = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' });
+
+/** Monatsbericht: Monat wählen (‹ ›), Kennzahlen, Monats-Säulen und Tagesverlauf des Monats. */
+function monatsKarte(reihe, ziel) {
+  const monate = monatsDurchschnitte(reihe);
+  let gewaehlt = monate.at(-1).monat;
+  const karte = el('section', { class: 'karte' });
+
+  const zeichneKarte = () => {
+    const b = monatsBericht(reihe, gewaehlt);
+    const index = monate.findIndex((m) => m.monat === gewaehlt);
+    const wechsel = (richtung) => { gewaehlt = monate[index + richtung].monat; zeichneKarte(); };
+    const imMonat = reihe.filter((m) => monatVon(m.datum) === gewaehlt);
+    // Plan-Soll für einen ganzen Monat (≈ 4,35 Wochen)
+    const soll = zielRate(ziel) * 4.35;
+    setze(karte,
+      el('div', { class: 'zeile' },
+        el('h2', {}, '📅 Monatsbericht'),
+        el('div', {},
+          el('button', { class: 'knopf-klein', type: 'button', 'aria-label': 'Vorheriger Monat', disabled: index <= 0, onclick: () => wechsel(-1) }, icon('zurueck', 20)),
+          el('button', { class: 'knopf-klein', type: 'button', 'aria-label': 'Nächster Monat', disabled: index >= monate.length - 1, onclick: () => wechsel(1) }, icon('weiter', 20)))),
+      el('p', { class: 'monat-titel' }, monatLang.format(new Date(`${gewaehlt}-15T12:00:00`))),
+      el('div', { class: 'statistik' },
+        el('div', { class: 'stat' }, el('strong', {}, kg(b.durchschnitt)), el('span', {}, 'Ø Monat')),
+        el('div', { class: `stat ${b.aenderung >= 0 ? 'plus' : 'minus'}` }, el('strong', {}, mitVorzeichen(b.aenderung, 'kg')), el('span', {}, 'im Monat')),
+        el('div', { class: 'stat' }, el('strong', {}, b.gegenVormonat == null ? '–' : mitVorzeichen(b.gegenVormonat, 'kg')), el('span', {}, 'zum Vormonat'))),
+      el('p', { class: 'leise klein' },
+        `Anfang Ø ${kg(b.anfang)} → Ende Ø ${kg(b.ende)} · ${b.anzahl} Messungen · Spanne ${kg(b.min)}–${kg(b.max)}`
+        + (ziel.art === 'halten' ? '' : ` · Plan pro Monat ${mitVorzeichen(soll, 'kg')}`)),
+      el('h2', { class: 'abschnitt' }, 'Monate im Vergleich'),
+      monatsDiagramm(monate, gewaehlt, (monat) => { gewaehlt = monat; zeichneKarte(); }),
+      el('h2', { class: 'abschnitt' }, 'Tage im Monat'),
+      gewichtsDiagramm(imMonat, gleitenderDurchschnitt(reihe).filter((m) => monatVon(m.datum) === gewaehlt), null));
+  };
+  zeichneKarte();
+  return karte;
 }
 
 function tabelle(reihe, glatt) {

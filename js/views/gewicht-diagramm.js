@@ -24,6 +24,41 @@ function achsenwerte(min, max) {
   return werte;
 }
 
+const monatKurz = new Intl.DateTimeFormat('de-DE', { month: 'short' });
+
+/**
+ * Monatsdurchschnitte als Säulen: Höhe = Ø-Gewicht (Achse startet nicht bei 0, damit Änderungen sichtbar sind –
+ * deshalb steht der Wert an jeder Säule). Der gewählte Monat ist hervorgehoben; Tippen wählt einen Monat.
+ */
+export function monatsDiagramm(monate, gewaehlt, beiAuswahl) {
+  if (!monate.length) return el('p', { class: 'leise klein' }, 'Noch keine Messungen.');
+  const letzte = monate.slice(-12);
+  const minKg = Math.min(...letzte.map((m) => m.kg));
+  const maxKg = Math.max(...letzte.map((m) => m.kg));
+  const unten = Math.floor((minKg - 0.5) * 2) / 2;
+  const oben = Math.ceil((maxKg + 0.3) * 2) / 2;
+  const breite = (B - RAND.links - RAND.rechts) / letzte.length;
+  const y = (kg) => RAND.oben + 12 + (1 - (kg - unten) / (oben - unten)) * (H - RAND.oben - RAND.unten - 12);
+
+  const saeulen = letzte.map((m, i) => {
+    const x = RAND.links + i * breite + breite * 0.18;
+    const w = breite * 0.64;
+    const yOben = y(m.kg);
+    const aktiv = m.monat === gewaehlt;
+    const gruppe = svg('g', { class: `m-saeule${aktiv ? ' aktiv' : ''}`, role: 'button', tabindex: 0, 'aria-label': `${m.monat}: ${zahl(Math.round(m.kg * 10) / 10)} kg` },
+      svg('rect', { x, y: yOben, width: w, height: Math.max(2, H - RAND.unten - yOben), rx: 4 }),
+      svg('text', { class: 'd-wert', x: x + w / 2, y: yOben - 4, 'text-anchor': 'middle' }, zahl(Math.round(m.kg * 10) / 10)),
+      svg('text', { class: 'd-achse', x: x + w / 2, y: H - 6, 'text-anchor': 'middle' }, monatKurz.format(new Date(`${m.monat}-15T12:00:00`))));
+    gruppe.addEventListener('click', () => beiAuswahl(m.monat));
+    return gruppe;
+  });
+
+  return el('div', { class: 'diagramm-rahmen' },
+    svg('svg', { viewBox: `0 0 ${B} ${H}`, class: 'diagramm', role: 'img', 'aria-label': 'Durchschnittsgewicht je Monat' },
+      svg('line', { class: 'd-raster', x1: RAND.links, x2: B - RAND.rechts, y1: H - RAND.unten, y2: H - RAND.unten }),
+      ...saeulen));
+}
+
 /**
  * reihe: [{ datum, kg }] Tageswerte · glatt: [{ datum, kg }] 7-Tage-Ø · plan: [{ datum, kg }, { datum, kg }] oder null
  */

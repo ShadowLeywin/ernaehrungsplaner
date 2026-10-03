@@ -55,15 +55,18 @@ export async function alleEintraege(store) {
   });
 }
 
-/** Speicher komplett ersetzen – alles in einer Transaktion: entweder alles oder nichts. */
-export async function ersetzeAlles(datenProStore) {
+/**
+ * Speicher ersetzen – alles in einer Transaktion: entweder alles oder nichts.
+ * Stores in `zusammenfuehren` werden nicht geleert, nur die enthaltenen Schlüssel überschrieben.
+ */
+export async function ersetzeAlles(datenProStore, zusammenfuehren = []) {
   const db = await oeffne();
   const stores = Object.keys(datenProStore);
   return new Promise((aufloesen, ablehnen) => {
     const tx = db.transaction(stores, 'readwrite');
     for (const store of stores) {
       const s = tx.objectStore(store);
-      s.clear();
+      if (!zusammenfuehren.includes(store)) s.clear();
       for (const [schluessel, wert] of datenProStore[store]) s.put(wert, schluessel);
     }
     tx.oncomplete = () => aufloesen();

@@ -51,6 +51,7 @@ export function pruefeBackup(text) {
       anzahlTage: tage?.length ?? null, // null = nicht enthalten, bleibt unverändert
       vonBis: tage?.length ? [tage[0], tage.at(-1)] : null,
       hatProfil: (daten.einstellungen ?? []).some(([k]) => k === 'profil'),
+      anzahlVorlagen: (daten.einstellungen ?? []).find(([k]) => k === 'vorlagen')?.[1]?.length ?? null,
     },
   };
 }

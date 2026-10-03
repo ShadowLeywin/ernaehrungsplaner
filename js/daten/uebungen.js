@@ -19,7 +19,7 @@ export const MUSKELN = {
   brust: 'Brust', ruecken: 'Rücken', lat: 'Latissimus', schultern: 'Schultern', nacken: 'Nacken',
   bizeps: 'Bizeps', trizeps: 'Trizeps', unterarme: 'Unterarme', bauch: 'Bauch', unterer_ruecken: 'Unterer Rücken',
   quadrizeps: 'Quadrizeps', beinbizeps: 'Beinbizeps', gesaess: 'Gesäß', waden: 'Waden', adduktoren: 'Adduktoren',
-  ganzkoerper: 'Ganzkörper', ausdauer: 'Ausdauer',
+  schienbein: 'Schienbein', hueftbeuger: 'Hüftbeuger', ganzkoerper: 'Ganzkörper', ausdauer: 'Ausdauer',
 };
 
 export const EQUIPMENT = {
@@ -42,6 +42,12 @@ const halten = (id, name, muskeln, equipment = 'koerpergewicht') => cali(id, nam
 const aktiv = (kategorie, art) => (id, name, met, distanz = false) => ({
   id, name, kategorie, art, met: { leicht: met[0], mittel: met[1], hart: met[2] }, distanz, muskeln: ['ausdauer'], equipment: 'sonstiges',
 });
+// Skill-Primer: zeitbasiert innerhalb eines Workouts, mit eigenem MET
+const skill = (id, name, muskeln, met) => ({
+  id, name, kategorie: 'calisthenics', art: 'dauer', met: { leicht: met[0], mittel: met[1], hart: met[2] }, distanz: false, muskeln, equipment: 'koerpergewicht',
+});
+// Dehnung/Prehab: Sätze × Sekunden (je Seite)
+const dehnung = (id, name, muskeln) => ({ id, name, kategorie: 'mobility', art: 'halten', muskeln, equipment: 'koerpergewicht' });
 const cardio = aktiv('cardio', 'cardio');
 const sport = aktiv('sport', 'dauer');
 const mobility = aktiv('mobility', 'dauer');
@@ -65,7 +71,7 @@ export const UEBUNGEN = [
   kraft('kabel_flys_tief', 'Kabel-Flys von unten', ['brust', 'schultern'], 'kabel'),
   kraft('pullover_kh', 'Pullover (Kurzhantel)', ['brust', 'lat'], 'kurzhantel'),
   kraft('landmine_press', 'Landmine Press', ['brust', 'schultern'], 'langhantel'),
-  kraft('dips_maschine', 'Dips (Maschine)', ['brust', 'trizeps'], 'maschine'),
+  kraft('dips_maschine', 'Dips (Maschine / unterstützt)', ['brust', 'trizeps'], 'maschine'),
 
   // ---------- Gym: Rücken ----------
   kraft('kreuzheben', 'Kreuzheben', ['unterer_ruecken', 'gesaess', 'beinbizeps', 'ruecken'], 'langhantel'),
@@ -81,6 +87,8 @@ export const UEBUNGEN = [
   kraft('chest_supported_row', 'Brustgestütztes Rudern', ['ruecken', 'lat'], 'kurzhantel'),
   kraft('meadows_row', 'Meadows Row', ['lat', 'ruecken'], 'langhantel'),
   kraft('kabelrudern', 'Kabelrudern sitzend', ['ruecken', 'lat', 'bizeps'], 'kabel'),
+  kraft('kabelrudern_stange', 'Rudern mit Stangengriff (Kabel)', ['ruecken', 'lat', 'bizeps'], 'kabel'),
+  kraft('kabelrudern_weit', 'Weites Rudern (Kabel)', ['ruecken', 'schultern'], 'kabel'),
   kraft('rudermaschine_kraft', 'Rudern an der Maschine', ['ruecken', 'lat'], 'maschine'),
   kraft('latzug_breit', 'Latzug breit', ['lat', 'bizeps'], 'kabel'),
   kraft('latzug_eng', 'Latzug eng (V-Griff)', ['lat', 'ruecken', 'bizeps'], 'kabel'),
@@ -107,6 +115,7 @@ export const UEBUNGEN = [
   kraft('frontheben', 'Frontheben', ['schultern'], 'kurzhantel'),
   kraft('reverse_flys', 'Reverse Flys (Kurzhantel)', ['schultern', 'ruecken'], 'kurzhantel'),
   kraft('reverse_butterfly', 'Reverse Butterfly', ['schultern', 'ruecken'], 'maschine'),
+  kraft('reverse_flys_kabel', 'Einarmige Reverse Flys (Kabel)', ['schultern', 'ruecken'], 'kabel'),
   kraft('aufrechtes_rudern', 'Aufrechtes Rudern', ['schultern', 'nacken'], 'sz'),
 
   // ---------- Gym: Arme ----------
@@ -119,7 +128,9 @@ export const UEBUNGEN = [
   kraft('scott_curls', 'Scottcurls (Preacher Curls)', ['bizeps'], 'sz'),
   kraft('spider_curls', 'Spider Curls', ['bizeps'], 'kurzhantel'),
   kraft('kabel_curls', 'Bizepscurls (Kabel)', ['bizeps'], 'kabel'),
-  kraft('bayesian_curls', 'Bayesian Curls', ['bizeps'], 'kabel'),
+  kraft('kabel_curls_seil', 'Bizepscurls am Seil', ['bizeps', 'unterarme'], 'kabel'),
+  kraft('kabel_curls_obergriff', 'Bizepscurls Obergriff (Kabel)', ['unterarme', 'bizeps'], 'kabel'),
+  kraft('bayesian_curls', 'Curl hinter dem Rücken (Bayesian Curl)', ['bizeps'], 'kabel'),
   kraft('bizeps_maschine', 'Bizepsmaschine', ['bizeps'], 'maschine'),
   kraft('pushdown_seil', 'Trizepsdrücken am Seil', ['trizeps'], 'kabel'),
   kraft('pushdown_stange', 'Trizepsdrücken an der Stange', ['trizeps'], 'kabel'),
@@ -130,6 +141,7 @@ export const UEBUNGEN = [
   kraft('kickbacks', 'Trizeps-Kickbacks', ['trizeps'], 'kurzhantel'),
   kraft('trizeps_maschine', 'Trizepsmaschine', ['trizeps'], 'maschine'),
   kraft('handgelenk_curls', 'Handgelenk-Curls', ['unterarme'], 'kurzhantel'),
+  kraft('handgelenk_strecken', 'Handgelenkstrecken (Reverse Wrist Curls)', ['unterarme'], 'kurzhantel'),
   kraft('reverse_curls', 'Reverse Curls', ['unterarme', 'bizeps'], 'sz'),
   kraft('farmers_walk', 'Farmer’s Walk', ['unterarme', 'nacken', 'ganzkoerper'], 'kurzhantel'),
 
@@ -164,6 +176,7 @@ export const UEBUNGEN = [
   kraft('russian_twist', 'Russian Twist', ['bauch'], 'kurzhantel'),
   kraft('woodchopper', 'Holzhacker (Kabel)', ['bauch'], 'kabel'),
   kraft('pallof_press', 'Pallof Press', ['bauch'], 'kabel'),
+  kraft('kabelrotation', 'Kabelrotation', ['bauch'], 'kabel'),
   kraft('kettlebell_swing', 'Kettlebell Swing', ['gesaess', 'beinbizeps', 'ganzkoerper'], 'kettlebell'),
   kraft('thrusters', 'Thrusters', ['quadrizeps', 'schultern', 'ganzkoerper'], 'langhantel'),
   kraft('power_clean', 'Power Clean', ['ganzkoerper'], 'langhantel'),
@@ -216,6 +229,11 @@ export const UEBUNGEN = [
   halten('plank', 'Unterarmstütz (Plank)', ['bauch']),
   halten('seitstuetz', 'Seitstütz', ['bauch']),
   halten('hollow_body', 'Hollow Body Hold', ['bauch']),
+  halten('rkc_plank', 'RKC Plank', ['bauch', 'gesaess']),
+  halten('kraehe', 'Krähe (Crow Pose)', ['schultern', 'bauch', 'unterarme']),
+  skill('handstand_primer', 'Handstand-Primer', ['schultern', 'bauch'], [3.0, 3.8, 5.0]),
+  skill('l_sit_primer', 'L-Sit-Primer', ['bauch', 'hueftbeuger', 'trizeps'], [3.0, 3.8, 5.0]),
+  skill('skill_session', 'Skill-Session (frei)', ['ganzkoerper'], [3.0, 3.8, 5.0]),
 
   // ---------- Calisthenics: Bauch und Beine ----------
   cali('beinheben_haengend', 'Hängendes Beinheben', ['bauch'], 'stange'),
@@ -236,6 +254,8 @@ export const UEBUNGEN = [
   cali('nordic_curls', 'Nordic Curls', ['beinbizeps']),
   cali('glute_bridge', 'Glute Bridge', ['gesaess']),
   cali('wadenheben', 'Wadenheben (Körpergewicht)', ['waden']),
+  cali('tibialis_wand', 'Tibialis-Raises an der Wand', ['schienbein']),
+  cali('chin_tucks', 'Chin Tucks', ['nacken']),
   cali('burpees', 'Burpees', ['ganzkoerper', 'ausdauer']),
 
   // ---------- Cardio ----------
@@ -294,6 +314,16 @@ export const UEBUNGEN = [
   mobility('mobility', 'Mobility-Training', [2.3, 2.5, 3.0]),
   mobility('faszienrolle', 'Faszienrolle', [2.0, 2.3, 2.5]),
   mobility('tai_chi', 'Tai Chi', [3.0, 3.0, 4.0]),
+  dehnung('couch_stretch', 'Couch Stretch', ['hueftbeuger', 'quadrizeps']),
+  dehnung('hip_90_90', '90/90 Hip Flow', ['gesaess', 'hueftbeuger']),
+  dehnung('bws_strecken', 'Brustwirbelsäule strecken', ['ruecken']),
+  dehnung('combat_stretch', 'Combat Stretch', ['hueftbeuger', 'adduktoren']),
+  dehnung('frog_stretch', 'Frog Stretch', ['adduktoren', 'gesaess']),
+  dehnung('pancake', 'Pancake', ['adduktoren', 'beinbizeps']),
+  dehnung('half_split', 'Half Split', ['beinbizeps']),
+  dehnung('front_split', 'Front Split', ['beinbizeps', 'hueftbeuger']),
+  dehnung('brustdehnung', 'Brustdehnung (Türrahmen)', ['brust', 'schultern']),
+  dehnung('lat_dehnung', 'Lat-Dehnung', ['lat']),
 
   // ---------- Alltag ----------
   alltag('treppensteigen', 'Treppensteigen', [4.0, 8.8, 8.8]),
