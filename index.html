@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2f7d4f">
+  <meta name="description" content="Ernährungsplaner für Lean-Bulk – offline, alle Daten lokal.">
+  <title>Ernährungsplaner</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="stylesheet" href="./css/app.css">
+  <script type="module" src="./js/main.js"></script>
+</head>
+<body>
+  <header class="kopf">
+    <h1 id="titel">Ernährungsplaner</h1>
+    <span id="offline-hinweis" class="offline-hinweis" hidden>offline</span>
+  </header>
+
+  <main id="inhalt" class="inhalt" tabindex="-1">
+    <noscript>Diese App braucht JavaScript.</noscript>
+  </main>
+
+  <nav class="navigation" aria-label="Hauptnavigation">
+    <a href="#/heute" data-route="heute"><span class="nav-icon" aria-hidden="true">☀️</span>Heute</a>
+    <a href="#/woche" data-route="woche"><span class="nav-icon" aria-hidden="true">📅</span>Woche</a>
+    <a href="#/rezepte" data-route="rezepte"><span class="nav-icon" aria-hidden="true">🍲</span>Rezepte</a>
+    <a href="#/einkauf" data-route="einkauf"><span class="nav-icon" aria-hidden="true">🛒</span>Einkauf</a>
+    <a href="#/mehr" data-route="mehr"><span class="nav-icon" aria-hidden="true">☰</span>Mehr</a>
+  </nav>
+</body>
+</html>

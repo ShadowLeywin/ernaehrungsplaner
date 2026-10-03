@@ -1,0 +1,16 @@
+# Geheimnisse (API-Keys für das Build-Skript)
+.env
+.env.*
+
+# Persönliche Daten und Backups – niemals einchecken
+nutzerdaten/
+*.backup.json
+backup-*.json
+wochenpraeferenzen.json
+
+# Angebote vom Cowork-Agenten (lokale Arbeitskopie)
+/angebote.json
+
+# Werkzeuge
+node_modules/
+.vscode/
