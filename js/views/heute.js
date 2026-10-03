@@ -12,6 +12,8 @@ import {
 } from '../logic/tag.js';
 import { lese, anzahl } from '../db.js';
 import { backupErinnerungFaellig } from '../logic/backup.js';
+import { durchschnitt, anpassungsVorschlag } from '../logic/gewicht.js';
+import { holeGewichtsReihe } from './gewicht.js';
 import { oeffneEintragDialog } from './eintrag-dialog.js';
 import { balkenZeile, zaehlerInhalt } from './zaehler.js';
 
@@ -33,9 +35,12 @@ export const heute = {
 
 function lade(wurzel) {
   const datum = angezeigtesDatum ?? new Date();
-  Promise.all([holeProfil(), holeLebensmittel(), holeTag(datumSchluessel(datum)), lese('einstellungen', 'letztesBackup'), anzahl('tage')])
-    .then(([profil, daten, tag, letztesBackup, anzahlTage]) => zeichne(wurzel, {
-      profil, lebensmittel: daten.lebensmittel, tag, datum,
+  Promise.all([
+    holeProfil(), holeLebensmittel(), holeTag(datumSchluessel(datum)),
+    lese('einstellungen', 'letztesBackup'), anzahl('tage'), holeGewichtsReihe(),
+  ])
+    .then(([profil, daten, tag, letztesBackup, anzahlTage, gewichte]) => zeichne(wurzel, {
+      profil, lebensmittel: daten.lebensmittel, tag, datum, gewichte, wurzel,
       backupFaellig: backupErinnerungFaellig(letztesBackup, anzahlTage > 0),
     }))
     .catch((fehler) => setze(wurzel, el('p', { class: 'warnung' }, fehler.message)));
@@ -63,6 +68,7 @@ function zeichne(wurzel, kontext) {
         '💾 Dein letztes Backup ist über eine Woche alt (oder fehlt). Jetzt sichern →')
       : null,
     datumsLeiste(wurzel, datum),
+    gewichtKarte(kontext),
     el('section', { class: 'karte' },
       el('h2', {}, typ.name, notiz ? el('span', { class: 'marke' }, notiz) : null),
       makroBalken('Kalorien', ist.kcal, typ.kcal, 'kcal'),
@@ -127,6 +133,62 @@ function datumsLeiste(wurzel, datum) {
     istHeute
       ? el('span', { class: 'knopf-klein' })
       : el('button', { class: 'knopf-klein', type: 'button', 'aria-label': 'Nächster Tag', onclick: () => springe(1) }, '›'));
+}
+
+function gewichtKarte({ tag, profil, gewichte, wurzel }) {
+  const karte = el('section', { class: 'karte' });
+  const schnitt = durchschnitt(gewichte, tag.datum, 7, 1);
+  const vorschlag = anpassungsVorschlag(gewichte, profil.ziel, datumSchluessel(new Date()), profil.ziel.letzteEntscheidung ?? null);
+
+  const speichern = async (wert) => {
+    if (wert == null) delete tag.gewichtKg;
+    else tag.gewichtKg = wert;
+    await speichereTag(tag);
+    lade(wurzel);
+  };
+
+  const zeigeEingabe = () => {
+    const eingabe = el('input', {
+      type: 'number',
+      inputMode: 'decimal',
+      step: 0.1,
+      min: 30,
+      max: 300,
+      value: tag.gewichtKg ?? '',
+      placeholder: 'kg',
+      'aria-label': 'Gewicht in kg',
+    });
+    const fehler = el('p', { class: 'warnung klein', role: 'alert' });
+    const ok = () => {
+      const wert = Math.round(Number(eingabe.value.replace(',', '.')) * 10) / 10;
+      if (!(wert >= 30 && wert <= 300)) { fehler.textContent = 'Bitte ein Gewicht zwischen 30 und 300 kg eingeben.'; return; }
+      speichern(wert);
+    };
+    eingabe.addEventListener('keydown', (e) => { if (e.key === 'Enter') ok(); });
+    return [
+      el('div', { class: 'manuell' },
+        eingabe,
+        el('button', { class: 'knopf', type: 'button', onclick: ok }, 'Speichern')),
+      fehler,
+    ];
+  };
+
+  const zeichneKarte = (bearbeiten) => setze(karte,
+    el('div', { class: 'zeile' },
+      el('h2', {}, '⚖️ Gewicht'),
+      el('a', { href: '#/gewicht', class: 'klein' }, 'Verlauf →')),
+    tag.gewichtKg && !bearbeiten
+      ? el('div', { class: 'zeile' },
+        el('p', { class: 'grosszahl' }, `${zahl(tag.gewichtKg)} kg`),
+        el('button', { class: 'knopf zweitrangig', type: 'button', onclick: () => zeichneKarte(true) }, 'Ändern'))
+      : zeigeEingabe(),
+    schnitt != null ? el('p', { class: 'leise klein' }, `Ø 7 Tage: ${zahl(Math.round(schnitt * 10) / 10)} kg`) : null,
+    vorschlag.status === 'anpassen'
+      ? el('a', { href: '#/gewicht', class: 'klein warnung' }, `Kalorien-Anpassung vorgeschlagen (${vorschlag.kcalProTag > 0 ? '+' : ''}${vorschlag.kcalProTag} kcal/Tag) →`)
+      : null);
+
+  zeichneKarte(false);
+  return karte;
 }
 
 function makroBalken(name, ist, ziel, einheit) {

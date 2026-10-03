@@ -18,6 +18,7 @@ function platzhalter(titel, text, reiter) {
 
 function mehrAnsicht() {
   const eintraege = [
+    ['gewicht', '⚖️ Gewicht & Anpassung'],
     ['lebensmittel', '🥦 Lebensmittel'],
     ['angebote', '🏷️ Angebote'],
     ['mealprep', '🥘 Meal-Prep'],

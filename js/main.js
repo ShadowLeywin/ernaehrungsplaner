@@ -5,9 +5,10 @@ import { einstellungen } from './views/einstellungen.js';
 import { lebensmittel } from './views/lebensmittel.js';
 import { backup } from './views/backup.js';
 import { einrichtung } from './views/einrichtung.js';
+import { gewicht } from './views/gewicht.js';
 import { pruefeEinrichtung, istEingerichtet } from './state.js';
 
-const ansichten = { ...platzhalter, heute, einstellungen, lebensmittel, backup, einrichtung };
+const ansichten = { ...platzhalter, heute, einstellungen, lebensmittel, backup, einrichtung, gewicht };
 
 // Ohne Profil nur Einrichtung und Backup (zum Wiederherstellen) erlauben
 const wache = (name) => (istEingerichtet() || name === 'backup' ? null : 'einrichtung');
