@@ -36,3 +36,38 @@ async function ausfuehren(store, modus, aktion) {
 
 export const lese = (store, schluessel) => ausfuehren(store, 'readonly', (s) => s.get(schluessel));
 export const schreibe = (store, schluessel, wert) => ausfuehren(store, 'readwrite', (s) => s.put(wert, schluessel));
+export const anzahl = (store) => ausfuehren(store, 'readonly', (s) => s.count());
+
+/** Alle Einträge eines Speichers als [[schluessel, wert], …] */
+export async function alleEintraege(store) {
+  const db = await oeffne();
+  return new Promise((aufloesen, ablehnen) => {
+    const ergebnis = [];
+    const tx = db.transaction(store, 'readonly');
+    tx.objectStore(store).openCursor().onsuccess = (e) => {
+      const cursor = e.target.result;
+      if (!cursor) return;
+      ergebnis.push([cursor.key, cursor.value]);
+      cursor.continue();
+    };
+    tx.oncomplete = () => aufloesen(ergebnis);
+    tx.onerror = () => ablehnen(tx.error);
+  });
+}
+
+/** Speicher komplett ersetzen – alles in einer Transaktion: entweder alles oder nichts. */
+export async function ersetzeAlles(datenProStore) {
+  const db = await oeffne();
+  const stores = Object.keys(datenProStore);
+  return new Promise((aufloesen, ablehnen) => {
+    const tx = db.transaction(stores, 'readwrite');
+    for (const store of stores) {
+      const s = tx.objectStore(store);
+      s.clear();
+      for (const [schluessel, wert] of datenProStore[store]) s.put(wert, schluessel);
+    }
+    tx.oncomplete = () => aufloesen();
+    tx.onerror = () => ablehnen(tx.error);
+    tx.onabort = () => ablehnen(tx.error);
+  });
+}

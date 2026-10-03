@@ -3,8 +3,9 @@ import { ansichten as platzhalter } from './views/platzhalter.js';
 import { heute } from './views/heute.js';
 import { einstellungen } from './views/einstellungen.js';
 import { lebensmittel } from './views/lebensmittel.js';
+import { backup } from './views/backup.js';
 
-const ansichten = { ...platzhalter, heute, einstellungen, lebensmittel };
+const ansichten = { ...platzhalter, heute, einstellungen, lebensmittel, backup };
 
 starteRouter(ansichten, 'heute', document.getElementById('inhalt'));
 

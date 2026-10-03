@@ -297,6 +297,14 @@ details .felder { margin-top: 8px; }
 }
 .umschalter button.aktiv { background: var(--akzent); color: var(--akzent-text); font-weight: 600; }
 
+.hinweis-karte {
+  display: block;
+  color: var(--text);
+  text-decoration: none;
+  border-color: var(--warnung);
+}
+input[type=file] { padding: 10px; }
+
 /* Dialog */
 .dialog {
   width: 100%;

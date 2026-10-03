@@ -10,6 +10,8 @@ import {
   eintragNaehrwerte, mahlzeitSumme, tagesNaehrwerte, gemueseObstGramm,
   wochenSchluessel, wochenDurchschnitt, neueEintragsId,
 } from '../logic/tag.js';
+import { lese, anzahl } from '../db.js';
+import { backupErinnerungFaellig } from '../logic/backup.js';
 import { oeffneEintragDialog } from './eintrag-dialog.js';
 import { balkenZeile, zaehlerInhalt } from './zaehler.js';
 
@@ -31,8 +33,11 @@ export const heute = {
 
 function lade(wurzel) {
   const datum = angezeigtesDatum ?? new Date();
-  Promise.all([holeProfil(), holeLebensmittel(), holeTag(datumSchluessel(datum))])
-    .then(([profil, daten, tag]) => zeichne(wurzel, { profil, lebensmittel: daten.lebensmittel, tag, datum }))
+  Promise.all([holeProfil(), holeLebensmittel(), holeTag(datumSchluessel(datum)), lese('einstellungen', 'letztesBackup'), anzahl('tage')])
+    .then(([profil, daten, tag, letztesBackup, anzahlTage]) => zeichne(wurzel, {
+      profil, lebensmittel: daten.lebensmittel, tag, datum,
+      backupFaellig: backupErinnerungFaellig(letztesBackup, anzahlTage > 0),
+    }))
     .catch((fehler) => wurzel.replaceChildren(el('p', { class: 'warnung' }, fehler.message)));
 }
 
@@ -53,6 +58,10 @@ function zeichne(wurzel, kontext) {
 
   const zaehlerBereich = el('div');
   wurzel.replaceChildren(
+    kontext.backupFaellig
+      ? el('a', { class: 'karte hinweis-karte', href: '#/backup' },
+        '💾 Dein letztes Backup ist über eine Woche alt (oder fehlt). Jetzt sichern →')
+      : null,
     datumsLeiste(wurzel, datum),
     el('section', { class: 'karte' },
       el('h2', {}, typ.name, notiz ? el('span', { class: 'marke' }, notiz) : null),

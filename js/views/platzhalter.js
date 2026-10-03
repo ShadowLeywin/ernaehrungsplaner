@@ -48,5 +48,4 @@ export const ansichten = {
   mehr: { titel: 'Mehr', render: mehrAnsicht },
   angebote: platzhalter('Angebote', 'Angebote der Märkte – kommt in Schritt 9.', 'mehr'),
   mealprep: platzhalter('Meal-Prep', 'Gesamtgewicht ÷ Portionen – kommt in Schritt 6.', 'mehr'),
-  backup: platzhalter('Backup', 'Export und Import aller Daten – kommt in Schritt 5.', 'mehr'),
 };
