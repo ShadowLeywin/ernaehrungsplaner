@@ -158,6 +158,7 @@ async function main() {
   const lebensmittel = LISTE.map((e) => {
     const basis = { id: e.id, name: e.name, kategorie: e.kategorie };
     if (e.stueckG) basis.stueckG = e.stueckG;
+    if (e.keinGemueseZiel) basis.keinGemueseZiel = true;
     if (e.eigen) return { ...basis, quelle: 'eigen', je100g: e.eigen };
     const fdcId = nachBeschreibung.get(e.usda);
     const je100g = je100gAusUsda(naehrwerte.get(fdcId));

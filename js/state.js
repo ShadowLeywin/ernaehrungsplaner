@@ -20,8 +20,10 @@ export async function speichereProfil(neu) {
 
 /** Tagesdaten; neue Tage starten mit getrunkenem Morning Stack und leerer Supplement-Checkliste. */
 export async function holeTag(schluessel) {
-  const neu = { datum: schluessel, morningStackGenommen: true, supplements: {}, wasser: [] };
+  const neu = { datum: schluessel, morningStackGenommen: true, supplements: {}, wasser: [], eintraege: [] };
   return { ...neu, ...(await lese('tage', schluessel)) };
 }
+
+export const holeTage = (schluesselListe) => Promise.all(schluesselListe.map(holeTag));
 
 export const speichereTag = (tag) => schreibe('tage', tag.datum, tag);

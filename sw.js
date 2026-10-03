@@ -1,6 +1,6 @@
 // Service Worker: hält die App-Dateien offline vor.
 // Bei jeder Änderung an App-Dateien VERSION erhöhen, sonst sehen installierte Apps die Änderung nicht.
-const VERSION = 'v6';
+const VERSION = 'v7';
 const CACHE = `ernaehrung-${VERSION}`;
 
 // Alle Dateien der App-Hülle. Neue Dateien hier eintragen.
@@ -18,12 +18,16 @@ const DATEIEN = [
   './js/logic/naehrstoffe.js',
   './js/logic/fixeintraege.js',
   './js/logic/wasser.js',
+  './js/logic/tag.js',
+  './js/logic/referenzwerte.js',
   './js/logic/profil.js',
   './js/logic/ziele.js',
   './js/views/platzhalter.js',
   './js/views/heute.js',
   './js/views/einstellungen.js',
   './js/views/lebensmittel.js',
+  './js/views/eintrag-dialog.js',
+  './js/views/zaehler.js',
   './data/lebensmittel.json',
   './icons/icon-192.png',
   './icons/icon-512.png',

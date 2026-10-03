@@ -3,6 +3,7 @@
 // Neue Lebensmittel hier eintragen und `node tools/build-lebensmittel.js` ausführen.
 // stueckG: typisches Gewicht eines Stücks (essbarer Anteil), optional.
 // kcalAusMakros: kcal nach EU-Faktoren neu berechnen (4/4/9, Ballaststoffe 2), wenn USDA abweicht.
+// keinGemueseZiel: zählt nicht zum Tagesziel Gemüse (z. B. Kartoffeln, laut DGE eine Sättigungsbeilage).
 
 const obst = 'obst';
 const gemuese = 'gemuese';
@@ -81,7 +82,7 @@ export const LISTE = [
   { id: 'mais', name: 'Mais (Dose, abgetropft)', kategorie: gemuese, usda: 'Corn, sweet, yellow, canned, whole kernel, drained solids' },
   { id: 'edamame', name: 'Edamame (TK)', kategorie: gemuese, usda: 'Edamame, frozen, unprepared' },
   { id: 'gemuese_mix_tk', name: 'Gemüsemischung (TK)', kategorie: gemuese, usda: 'Vegetables, mixed, frozen, unprepared' },
-  { id: 'kartoffel', name: 'Kartoffel', kategorie: gemuese, usda: 'Potatoes, flesh and skin, raw', stueckG: 150 },
+  { id: 'kartoffel', name: 'Kartoffel', kategorie: gemuese, usda: 'Potatoes, flesh and skin, raw', stueckG: 150, keinGemueseZiel: true },
   { id: 'suesskartoffel', name: 'Süßkartoffel', kategorie: gemuese, usda: 'Sweet potato, raw, unprepared', stueckG: 250 },
   { id: 'rote_bete', name: 'Rote Bete', kategorie: gemuese, usda: 'Beets, raw' },
   { id: 'staudensellerie', name: 'Staudensellerie', kategorie: gemuese, usda: 'Celery, raw' },

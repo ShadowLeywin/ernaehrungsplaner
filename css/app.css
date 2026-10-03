@@ -8,6 +8,9 @@
   --akzent-text: #ffffff;
   --rand: #dfe4e0;
   --warnung: #b4561f;
+  --fortschritt: #6b8fb3;
+  --fast: #c9a227;
+  --wasser: #3b8fd9;
   --nav-hoehe: 64px;
   --radius: 12px;
   color-scheme: light;
@@ -23,6 +26,9 @@
     --akzent-text: #0b1a12;
     --rand: #2c3530;
     --warnung: #f0995e;
+    --fortschritt: #7fa6cc;
+    --fast: #e0c04f;
+    --wasser: #5aa7ea;
     color-scheme: dark;
   }
 }
@@ -215,8 +221,18 @@ details .felder { margin-top: 8px; }
   overflow: hidden;
   margin: 4px 0 12px;
 }
-.balken > div { height: 100%; background: #3b8fd9; transition: width 0.3s; }
+.balken > div { height: 100%; background: var(--fortschritt); transition: width 0.3s; }
 .balken.erreicht > div { background: var(--akzent); }
+
+/* Zählerzeilen: Farbe je nach Status */
+.zaehler-zeile .balken { margin: 2px 0 8px; height: 8px; }
+.status-erreicht .balken > div, .status-ok .balken > div { background: var(--akzent); }
+.status-fast .balken > div { background: var(--fast); }
+.status-zu_viel .balken > div, .status-ueber_obergrenze .balken > div { background: var(--warnung); }
+.status-wasser .balken > div { background: var(--wasser); }
+.zaehler-zeile p.warnung { margin: -4px 0 8px; }
+.zaehler-gruppe { margin-top: 6px; }
+.zaehler-gruppe summary { font-weight: 600; }
 
 /* Wasser */
 .presets .knopf { flex: 1; }
@@ -240,6 +256,102 @@ details .felder { margin-top: 8px; }
   color: var(--text-leise);
   cursor: pointer;
 }
+
+/* Tagesansicht */
+.datumsleiste {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  text-align: center;
+}
+.datumsleiste .knopf-klein { font-size: 1.5rem; }
+.mahlzeit h2 { margin: 0; }
+.eintrag {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 0;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.knopf.voll { width: 100%; margin-top: 8px; }
+.knopf.gefahr { color: var(--warnung); }
+.umschalter { display: inline-flex; border: 1px solid var(--rand); border-radius: 999px; overflow: hidden; }
+.umschalter button {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  min-height: 36px;
+  border: 0;
+  background: transparent;
+  color: var(--text-leise);
+  cursor: pointer;
+}
+.umschalter button.aktiv { background: var(--akzent); color: var(--akzent-text); font-weight: 600; }
+
+/* Dialog */
+.dialog {
+  width: 100%;
+  max-width: 560px;
+  height: 100%;
+  max-height: 100dvh;
+  margin: auto;
+  padding: 0;
+  border: 0;
+  background: var(--hintergrund);
+  color: var(--text);
+}
+.dialog::backdrop { background: rgb(0 0 0 / 0.5); }
+@media (min-width: 600px) {
+  .dialog { height: auto; max-height: 85vh; border-radius: var(--radius); }
+}
+.dialog-kopf {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: calc(4px + env(safe-area-inset-top)) 8px 4px;
+  background: var(--flaeche);
+  border-bottom: 1px solid var(--rand);
+}
+.dialog-kopf h2 { flex: 1; margin: 0 8px; font-size: 1.05rem; }
+.dialog-inhalt { padding: 12px 16px 24px; display: flex; flex-direction: column; gap: 12px; }
+.auswahl li { border-bottom: 1px solid var(--rand); }
+.auswahl-eintrag {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 52px;
+  padding: 8px 4px;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  min-height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--rand);
+  background: var(--flaeche);
+  color: var(--text);
+  cursor: pointer;
+}
+.vorschau { margin: 0; font-weight: 600; }
 
 /* Lebensmittel-Suche */
 .suchleiste {

@@ -5,6 +5,7 @@ import { holeLebensmittel } from '../lebensmittel.js';
 import { kcalAusMakros, skaliereMakros, summeAnteile } from '../logic/ziele.js';
 import { WOCHENTAGE } from '../logic/profil.js';
 import { naehrwerteZutaten } from '../logic/fixeintraege.js';
+import { REFERENZGRUPPEN } from '../logic/referenzwerte.js';
 
 export const einstellungen = {
   titel: 'Profil & Einstellungen',
@@ -46,6 +47,8 @@ function zeichne(wurzel, profil, geaendert, lebensmittel) {
     wochenKarte(profil, markiereGeaendert),
     el('h2', { class: 'abschnitt' }, 'Verteilung auf die Mahlzeiten'),
     mahlzeitenKarte(profil, markiereGeaendert),
+    el('h2', { class: 'abschnitt' }, 'Referenzwerte Mikronährstoffe'),
+    referenzKarte(profil, markiereGeaendert),
     el('h2', { class: 'abschnitt' }, 'Wasser'),
     wasserKarte(profil, markiereGeaendert),
     el('h2', { class: 'abschnitt' }, 'Morning Stack & Supplements'),
@@ -139,6 +142,14 @@ function wochenKarte(profil, markiereGeaendert) {
     return el('div', { class: 'wochenzeile' }, el('span', { class: 'wochentag' }, tag.slice(0, 2)), auswahl, notiz);
   });
   return el('section', { class: 'karte' }, ...zeilen);
+}
+
+function referenzKarte(profil, markiereGeaendert) {
+  const auswahl = el('select', {
+    onchange: () => { profil.referenzgruppe = auswahl.value; markiereGeaendert(); },
+  }, ...Object.entries(REFERENZGRUPPEN).map(([id, name]) => el('option', { value: id, selected: id === profil.referenzgruppe }, name)));
+  return el('section', { class: 'karte' },
+    el('label', { class: 'feld' }, el('span', {}, 'Altersgruppe (DGE)'), auswahl));
 }
 
 function wasserKarte(profil, markiereGeaendert) {

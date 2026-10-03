@@ -77,6 +77,8 @@ Alle folgenden Märkte sind relevant:
 - Morning Stack und Supplements zählen in die Tagesziele. Supplements bleiben eine Checkliste, haben aber optionale Nährwerte pro Einnahme (inkl. Mikros aus dem Multivitamin).
 - Mahlzeitenverteilung: Startwert 20/10/25/10/25/10 % (Frühstück bis Abendsnack), einstellbar.
 - Mikronährstoffe: alle gesundheitlich relevanten (Vitamine A, C, D, E, K, B1, B2, B3, B6, B9, B12; Calcium, Eisen, Magnesium, Zink, Kalium, Natrium, Jod, Selen, Phosphor; Ballaststoffe, Omega-3, Zucker, gesättigte Fettsäuren). Unvollständige Daten (z. B. aus Open Food Facts) kennzeichnen.
+- Zähler: Morning Stack zählt, wenn „getrunken“ (vorbelegt), Supplements, wenn abgehakt. Ziele pro Mahlzeit ziehen beide immer vorher ab. Wochenansicht = Durchschnitt über Tage mit Einträgen. Referenzwerte DGE (Altersgruppe im Profil), Obergrenzen EFSA, in `js/logic/referenzwerte.js`. Kartoffeln zählen nicht zum Gemüseziel.
+- Wasser: Presets 250/500/800 ml + freie Eingabe; „bis Mittag“ zählt Einträge vor der eingestellten Uhrzeit.
 - Bewertung: Obst/Gemüse 0–10 (0 = nie). Rezepte: Gesamtnote 1–10, Teilnoten Geschmack, Sättigung, Aufwand, Preis, dazu Tags, Geschmacksbeschreibung, Vorteile, Notiz, „wieder essen“. Geschmack und Vorteile werden immer beschrieben.
 
 ## Schrittplan

@@ -22,6 +22,7 @@ function tagestyp(id, name, kcal, makros, obstG, basis = false) {
 export function standardProfil() {
   return {
     version: PROFIL_VERSION,
+    referenzgruppe: 'maenner_19_25', // für Mikronährstoff-Referenzwerte (DGE)
     tagestypen: [
       tagestyp('training', 'Trainingstag', 2875, { protein: 175, kh: 375, fett: 75 }, 300, true),
       tagestyp('calisthenics', 'Calisthenics-Tag', 2600, { protein: 175, kh: 328, fett: 65 }, 200),
