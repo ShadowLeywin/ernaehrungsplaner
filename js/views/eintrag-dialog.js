@@ -1,5 +1,6 @@
 // Dialog: Lebensmittel suchen und Menge festlegen – zum Hinzufügen und Bearbeiten von Einträgen.
 import { el, setze, zahl } from '../ui.js';
+import { icon } from '../icons.js';
 import { sucheLebensmittel } from '../lebensmittel.js';
 import { naehrwerteFuerMenge, KATEGORIEN } from '../logic/naehrstoffe.js';
 
@@ -15,10 +16,10 @@ export function oeffneEintragDialog(optionen) {
 
   const kopf = (titel, zurueck) => el('div', { class: 'dialog-kopf' },
     zurueck
-      ? el('button', { class: 'knopf-klein', type: 'button', 'aria-label': 'Zurück', onclick: zurueck }, '‹')
+      ? el('button', { class: 'knopf-klein', type: 'button', 'aria-label': 'Zurück', onclick: zurueck }, icon('zurueck'))
       : null,
     el('h2', {}, titel),
-    el('button', { class: 'knopf-klein', type: 'button', 'aria-label': 'Schließen', onclick: schliessen }, '✕'));
+    el('button', { class: 'knopf-klein', type: 'button', 'aria-label': 'Schließen', onclick: schliessen }, icon('schliessen')));
 
   const zeigeAuswahl = () => {
     const liste = el('ul', { class: 'liste auswahl' });

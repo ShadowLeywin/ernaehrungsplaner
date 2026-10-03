@@ -11,6 +11,8 @@ import { NAEHRSTOFFE } from '../logic/naehrstoffe.js';
 import { berechneTagesbedarf, berechneMakros } from '../logic/bedarf.js';
 import { koerperFelder, alltagFeld, aktivitaetenListe, zielFelder, makroRegelFelder } from './profil-bausteine.js';
 import { oeffneEintragDialog } from './eintrag-dialog.js';
+import { THEMEN, MODI, ladeDarstellung, speichereDarstellung } from '../darstellung.js';
+import { icon } from '../icons.js';
 
 export const einstellungen = {
   titel: 'Profil & Einstellungen',
@@ -26,6 +28,34 @@ export const einstellungen = {
 
 const abschnitt = (titel) => el('h2', { class: 'abschnitt' }, titel);
 const karte = (...kinder) => el('section', { class: 'karte' }, ...kinder);
+
+/** Farbthema und Hell/Dunkel – wirkt sofort, gilt nur für dieses Gerät (nicht Teil des Profils). */
+function darstellungKarte() {
+  const k = karte();
+  const zeichneKarte = () => {
+    const aktuell = ladeDarstellung();
+    const waehle = (aenderung) => { speichereDarstellung({ ...aktuell, ...aenderung }); zeichneKarte(); };
+    setze(k,
+      el('div', { class: 'themen' }, ...Object.entries(THEMEN).map(([id, t]) => el('button', {
+        class: `thema${aktuell.thema === id ? ' aktiv' : ''}`,
+        type: 'button',
+        'aria-pressed': String(aktuell.thema === id),
+        onclick: () => waehle({ thema: id }),
+      },
+      el('span', { class: 'thema-kreis', style: `background:linear-gradient(135deg, ${t.farben[0]}, ${t.farben[1]})` }),
+      t.name))),
+      el('div', { class: 'modus-reihe' },
+        el('div', { class: 'umschalter', role: 'group', 'aria-label': 'Hell oder dunkel' },
+          ...Object.entries(MODI).map(([id, name]) => el('button', {
+            type: 'button',
+            class: aktuell.modus === id ? 'aktiv' : '',
+            'aria-pressed': String(aktuell.modus === id),
+            onclick: () => waehle({ modus: id }),
+          }, icon({ system: 'system', hell: 'sonne', dunkel: 'mond' }[id], 16), name)))));
+  };
+  zeichneKarte();
+  return k;
+}
 
 function zeichne(wurzel, profil, geaendert, lebensmittel) {
   const status = el('p', { class: 'status', role: 'status' });
@@ -54,6 +84,8 @@ function zeichne(wurzel, profil, geaendert, lebensmittel) {
   };
 
   setze(wurzel,
+    abschnitt('Design'),
+    darstellungKarte(),
     abschnitt('Über dich'),
     karte(koerperFelder(profil, markiereGeaendert), alltagFeld(profil, markiereGeaendert)),
     abschnitt('Sport & Aktivitäten'),
@@ -247,7 +279,7 @@ function zutatenEditor(zutaten, lebensmittel, markiereGeaendert, neuZeichnen, ti
         type: 'button',
         'aria-label': `${name(z.lebensmittelId)} entfernen`,
         onclick: () => { zutaten.splice(zutaten.indexOf(z), 1); markiereGeaendert(); neuZeichnen(); },
-      }, '✕'))),
+      }, icon('schliessen', 18)))),
     summe,
     el('button', {
       class: 'knopf zweitrangig',

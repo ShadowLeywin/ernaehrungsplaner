@@ -6,6 +6,7 @@ import { WOCHENTAGE, profilAusEinrichtung } from '../logic/profil.js';
 import { koerperVollstaendig, pruefeZiel } from '../logic/bedarf.js';
 import { datumSchluessel } from '../logic/ziele.js';
 import { koerperFelder, alltagFeld, aktivitaetenListe, zielFelder, makroRegelFelder } from './profil-bausteine.js';
+import { icon } from '../icons.js';
 
 const VORLAGEN = [
   ['Krafttraining', 300], ['Calisthenics', 250], ['Laufen', 350], ['Radfahren / E-Bike', 200],
@@ -19,6 +20,7 @@ let schritt = 0;
 
 function neuerEntwurf() {
   return {
+    name: '',
     koerper: { geschlecht: null, alter: null, groesseCm: null, gewichtKg: null },
     alltag: 'sitzend',
     aktivitaeten: [],
@@ -64,7 +66,9 @@ function zeichne(wurzel) {
   ][schritt]();
 
   setze(wurzel, ...[
-    schritt > 0 ? el('p', { class: 'leise klein' }, `Schritt ${schritt} von ${SCHRITTE.length - 1}: ${SCHRITTE[schritt]}`) : null,
+    schritt > 0 ? el('div', { class: 'schritt-punkte', 'aria-hidden': 'true' },
+      ...SCHRITTE.slice(1).map((_, i) => el('i', { class: i < schritt ? 'an' : '' }))) : null,
+    schritt > 0 ? el('p', { class: 'abschnitt' }, `Schritt ${schritt} von ${SCHRITTE.length - 1} · ${SCHRITTE[schritt]}`) : null,
     ...[].concat(inhalt),
     schritt > 0 && schritt < SCHRITTE.length - 1
       ? el('div', { class: 'knopfreihe schrittleiste' },
@@ -83,9 +87,10 @@ function schrittGueltig() {
 
 function willkommen(geh) {
   return [
-    el('section', { class: 'karte' },
-      el('h2', {}, '👋 Willkommen'),
-      el('p', {}, 'Diese App plant deine Ernährung nach deinen Zielen – offline, alle Daten bleiben auf deinem Handy.'),
+    el('section', { class: 'karte willkommen hero' },
+      el('div', { class: 'logo' }, icon('flamme', 38)),
+      el('h2', {}, 'Willkommen'),
+      el('p', {}, 'Plane deine Ernährung nach deinen Zielen – offline, alle Daten bleiben auf deinem Handy.'),
       el('p', { class: 'leise klein' }, 'Die Einrichtung dauert ca. 2 Minuten. Alles lässt sich später in den Einstellungen ändern.'),
       el('div', { class: 'knopfreihe' },
         el('button', { class: 'knopf', type: 'button', onclick: () => geh(1) }, 'Neu einrichten'),

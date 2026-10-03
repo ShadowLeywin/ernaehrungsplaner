@@ -1,6 +1,7 @@
 // Formular-Bausteine für Profildaten – genutzt von Einstellungen und Ersteinrichtung.
 // Alle Bausteine ändern das übergebene Profil-Objekt direkt und rufen danach `geaendert()` auf.
 import { el, setze, zahl, zahlFeld, textFeld } from '../ui.js';
+import { icon } from '../icons.js';
 import { ALLTAG, ZIELARTEN, pruefeZiel, zielGewicht, zielZuschlag } from '../logic/bedarf.js';
 import { datumSchluessel } from '../logic/ziele.js';
 
@@ -14,6 +15,7 @@ export function koerperFelder(profil, geaendert) {
   const k = profil.koerper;
   const zahlWert = (schluessel) => (wert) => { k[schluessel] = wert || null; geaendert(); };
   return el('div', { class: 'felder' },
+    textFeld('Name (optional)', profil.name ?? '', (wert) => { profil.name = wert.trim(); geaendert(); }, 'für die Begrüßung'),
     auswahlFeld('Geschlecht', { '': '– bitte wählen –', m: 'männlich', w: 'weiblich' }, k.geschlecht ?? '', (wert) => {
       k.geschlecht = wert || null;
       geaendert();
@@ -43,7 +45,7 @@ export function aktivitaetenListe(profil, geaendert, neuZeichnen) {
         geaendert();
         neuZeichnen();
       },
-    }, '✕')));
+    }, icon('schliessen', 18))));
 
   return el('div', {},
     ...zeilen,

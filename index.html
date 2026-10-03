@@ -1,14 +1,26 @@
 <!doctype html>
-<html lang="de">
+<html lang="de" data-thema="wald" data-modus="dunkel">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#2f7d4f">
-  <meta name="description" content="Ernährungsplaner für Lean-Bulk – offline, alle Daten lokal.">
+  <meta name="theme-color" content="#0b0e0d">
+  <meta name="description" content="Ernährungsplaner – offline, alle Daten lokal.">
   <title>Ernährungsplaner</title>
+  <script>
+    // Farbthema sofort setzen, damit beim Start nichts aufblitzt (gleiche Logik wie js/darstellung.js)
+    try {
+      var d = JSON.parse(localStorage.getItem('darstellung') || '{}');
+      var m = d.modus || 'system';
+      document.documentElement.dataset.thema = d.thema || 'wald';
+      document.documentElement.dataset.modus = m === 'system'
+        ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dunkel' : 'hell')
+        : m;
+    } catch (e) { /* Standard bleibt */ }
+  </script>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/icon-192.png" type="image/png">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="stylesheet" href="./css/themen.css">
   <link rel="stylesheet" href="./css/app.css">
   <script type="module" src="./js/main.js"></script>
 </head>
@@ -23,11 +35,11 @@
   </main>
 
   <nav class="navigation" aria-label="Hauptnavigation">
-    <a href="#/heute" data-route="heute"><span class="nav-icon" aria-hidden="true">☀️</span>Heute</a>
-    <a href="#/woche" data-route="woche"><span class="nav-icon" aria-hidden="true">📅</span>Woche</a>
-    <a href="#/rezepte" data-route="rezepte"><span class="nav-icon" aria-hidden="true">🍲</span>Rezepte</a>
-    <a href="#/einkauf" data-route="einkauf"><span class="nav-icon" aria-hidden="true">🛒</span>Einkauf</a>
-    <a href="#/mehr" data-route="mehr"><span class="nav-icon" aria-hidden="true">☰</span>Mehr</a>
+    <a href="#/heute" data-route="heute"><span class="nav-icon" data-icon="heute"></span>Heute</a>
+    <a href="#/woche" data-route="woche"><span class="nav-icon" data-icon="woche"></span>Woche</a>
+    <a href="#/rezepte" data-route="rezepte"><span class="nav-icon" data-icon="rezepte"></span>Rezepte</a>
+    <a href="#/einkauf" data-route="einkauf"><span class="nav-icon" data-icon="einkauf"></span>Einkauf</a>
+    <a href="#/mehr" data-route="mehr"><span class="nav-icon" data-icon="mehr"></span>Mehr</a>
   </nav>
 </body>
 </html>

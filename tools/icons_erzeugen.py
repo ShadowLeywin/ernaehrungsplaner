@@ -1,6 +1,6 @@
 """Erzeugt die App-Icons (PNG) ohne Zusatzbibliotheken.
 
-Motiv: grüner Hintergrund, weißer Teller, grünes Blatt.
+Motiv: grün-türkiser Verlauf, weißer Teller, grünes Blatt.
 Aufruf: python tools/icons_erzeugen.py
 """
 import math
@@ -8,9 +8,10 @@ import struct
 import zlib
 from pathlib import Path
 
-GRUEN = (47, 125, 79)
+VERLAUF_START = (74, 222, 128)  # #4ade80
+VERLAUF_ENDE = (20, 184, 166)   # #14b8a6
 WEISS = (255, 255, 255)
-BLATT = (92, 191, 133)
+BLATT = (16, 150, 110)
 
 
 def png_schreiben(pfad, breite, hoehe, pixel):
@@ -40,7 +41,8 @@ def icon(groesse, motiv_anteil):
         for x in range(groesse):
             px, py = x + 0.5, y + 0.5
             d = math.hypot(px - mitte, py - mitte)
-            farbe = GRUEN
+            # Diagonaler Verlauf wie in der App (Thema Wald)
+            farbe = mische(VERLAUF_START, VERLAUF_ENDE, (x + y) / (2 * groesse))
             # Teller mit weichem Rand (Kantenglättung über 1 px)
             farbe = mische(farbe, WEISS, max(0.0, min(1.0, r_teller - d + 0.5)))
             # Innerer Ring leicht abgesetzt

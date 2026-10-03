@@ -37,6 +37,7 @@ export function neuerTagestyp(id, name, werte = {}) {
 export function standardProfil() {
   return {
     version: PROFIL_VERSION,
+    name: '',
     referenzgruppe: 'maenner_19_25', // wird bei der Einrichtung aus Geschlecht und Alter gesetzt
     koerper: { geschlecht: null, alter: null, groesseCm: null, gewichtKg: null },
     alltag: 'sitzend',
@@ -72,6 +73,7 @@ export function referenzgruppeFuer({ geschlecht, alter }) {
 export function profilAusEinrichtung(eingaben) {
   const profil = standardProfil();
   Object.assign(profil, {
+    name: eingaben.name ?? '',
     koerper: { ...eingaben.koerper },
     alltag: eingaben.alltag,
     aktivitaeten: structuredClone(eingaben.aktivitaeten),

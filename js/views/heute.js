@@ -15,6 +15,7 @@ import { backupErinnerungFaellig } from '../logic/backup.js';
 import { durchschnitt, anpassungsVorschlag } from '../logic/gewicht.js';
 import { holeGewichtsReihe } from './gewicht.js';
 import { oeffneEintragDialog } from './eintrag-dialog.js';
+import { icon } from '../icons.js';
 import { balkenZeile, zaehlerInhalt } from './zaehler.js';
 
 const datumFormat = new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -63,18 +64,14 @@ function zeichne(wurzel, kontext) {
 
   const zaehlerBereich = el('div');
   setze(wurzel,
+    begruessung(profil, datum),
     kontext.backupFaellig
       ? el('a', { class: 'karte hinweis-karte', href: '#/backup' },
-        '💾 Dein letztes Backup ist über eine Woche alt (oder fehlt). Jetzt sichern →')
+        icon('backup'), el('span', {}, 'Dein letztes Backup ist über eine Woche alt (oder fehlt). Jetzt sichern →'))
       : null,
     datumsLeiste(wurzel, datum),
+    heroKarte(typ, notiz, ist),
     gewichtKarte(kontext),
-    el('section', { class: 'karte' },
-      el('h2', {}, typ.name, notiz ? el('span', { class: 'marke' }, notiz) : null),
-      makroBalken('Kalorien', ist.kcal, typ.kcal, 'kcal'),
-      makroBalken('Protein', ist.protein, typ.protein, 'g'),
-      makroBalken('Kohlenhydrate', ist.kh, typ.kh, 'g'),
-      makroBalken('Fett', ist.fett, typ.fett, 'g')),
     wasserKarte(profil, typ, tag, () => speichereTag(tag)),
     profil.morningStack.aktiv ? morningStackKarte(profil, lebensmittel, fix, tag, aendern) : null,
     supplementKarte(profil, tag, aendern),
@@ -118,21 +115,80 @@ function zeichne(wurzel, kontext) {
   }
 }
 
+function begruessung(profil, datum) {
+  if (datumSchluessel(datum) !== datumSchluessel(new Date())) return null;
+  const stunde = new Date().getHours();
+  const gruss = stunde < 11 ? 'Guten Morgen' : stunde < 17 ? 'Hallo' : stunde < 22 ? 'Guten Abend' : 'Gute Nacht';
+  return el('p', { class: 'begruessung' }, profil.name ? `${gruss}, ${profil.name} 👋` : `${gruss} 👋`);
+}
+
 function datumsLeiste(wurzel, datum) {
   const istHeute = datumSchluessel(datum) === datumSchluessel(new Date());
   const springe = (tage) => {
-    angezeigtesDatum = new Date(datum.getFullYear(), datum.getMonth(), datum.getDate() + tage);
-    if (datumSchluessel(angezeigtesDatum) === datumSchluessel(new Date())) angezeigtesDatum = null;
+    angezeigtesDatum = tage === 0 ? null : new Date(datum.getFullYear(), datum.getMonth(), datum.getDate() + tage);
+    if (angezeigtesDatum && datumSchluessel(angezeigtesDatum) === datumSchluessel(new Date())) angezeigtesDatum = null;
     lade(wurzel);
   };
   return el('div', { class: 'datumsleiste' },
-    el('button', { class: 'knopf-klein', type: 'button', 'aria-label': 'Vorheriger Tag', onclick: () => springe(-1) }, '‹'),
-    el('div', {},
-      el('strong', {}, istHeute ? 'Heute' : datumFormat.format(datum)),
-      istHeute ? el('span', { class: 'leise klein' }, ` · ${datumFormat.format(datum)}`) : null),
+    el('button', { class: 'knopf-klein', type: 'button', 'aria-label': 'Vorheriger Tag', onclick: () => springe(-1) }, icon('zurueck', 22)),
+    el('div', { style: 'text-align:center' },
+      el('strong', {}, datumFormat.format(datum)),
+      istHeute ? null : el('div', {}, el('button', { class: 'chip', type: 'button', onclick: () => springe(0), style: 'min-height:30px;padding:3px 12px;margin-top:4px' }, 'Zu heute'))),
     istHeute
       ? el('span', { class: 'knopf-klein' })
-      : el('button', { class: 'knopf-klein', type: 'button', 'aria-label': 'Nächster Tag', onclick: () => springe(1) }, '›'));
+      : el('button', { class: 'knopf-klein', type: 'button', 'aria-label': 'Nächster Tag', onclick: () => springe(1) }, icon('weiter', 22)));
+}
+
+const RING_R = 56;
+const RING_U = 2 * Math.PI * RING_R;
+
+/** Kopfkarte: Tagestyp, Kalorien-Ring (übrig) und Makro-Balken. */
+function heroKarte(typ, notiz, ist) {
+  const SVG = 'http://www.w3.org/2000/svg';
+  const kcal = ist.kcal ?? 0;
+  const uebrig = Math.round(typ.kcal - kcal);
+  const anteil = typ.kcal > 0 ? Math.min(1, kcal / typ.kcal) : 0;
+  const drueber = uebrig < 0;
+
+  const svg = document.createElementNS(SVG, 'svg');
+  svg.setAttribute('viewBox', '0 0 136 136');
+  svg.innerHTML = `<defs><linearGradient id="ring-verlauf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" style="stop-color: var(--akzent)"/><stop offset="1" style="stop-color: var(--akzent-2)"/>
+    </linearGradient></defs>
+    <circle class="ring-spur" cx="68" cy="68" r="${RING_R}"/>
+    <circle class="ring-wert" cx="68" cy="68" r="${RING_R}" stroke-dasharray="${RING_U}" stroke-dashoffset="${RING_U}"/>`;
+  // Nach dem Einfügen animiert von 0 auf den Wert
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    svg.querySelector('.ring-wert').setAttribute('stroke-dashoffset', String(RING_U * (1 - anteil)));
+  }));
+
+  const makro = (name, wert, ziel) => {
+    const verhaeltnis = ziel > 0 ? (wert ?? 0) / ziel : 0;
+    return el('div', {},
+      el('div', { class: 'zeile' },
+        el('span', {}, name),
+        el('span', { class: 'leise' }, `${zahl(Math.round(wert ?? 0))} / ${zahl(ziel)} g`)),
+      el('div', { class: `balken${verhaeltnis > 1.1 ? ' status-zu_viel' : ''}` },
+        el('div', { style: `width:${Math.min(100, verhaeltnis * 100)}%;background:${verhaeltnis > 1.1 ? 'var(--warnung)' : 'var(--verlauf)'}` })));
+  };
+
+  return el('section', { class: 'karte hero' },
+    el('div', { class: 'hero-oben' },
+      el('h2', {}, typ.name),
+      notiz ? el('span', { class: 'marke' }, notiz) : null),
+    el('div', { class: 'hero-mitte' },
+      el('div', { class: `ring${drueber ? ' drueber' : ''}`, role: 'img', 'aria-label': `${Math.abs(uebrig)} kcal ${drueber ? 'über dem Ziel' : 'übrig'}` },
+        svg,
+        el('div', { class: 'ring-text' },
+          el('strong', {}, zahl(Math.abs(uebrig))),
+          el('span', {}, drueber ? 'kcal drüber' : 'kcal übrig'))),
+      el('div', { class: 'makro-mini' },
+        makro('Protein', ist.protein, typ.protein),
+        makro('Kohlenhydrate', ist.kh, typ.kh),
+        makro('Fett', ist.fett, typ.fett))),
+    el('div', { class: 'hero-fuss' },
+      el('span', {}, 'Gegessen ', el('strong', {}, `${zahl(Math.round(kcal))} kcal`)),
+      el('span', {}, 'Ziel ', el('strong', {}, `${zahl(typ.kcal)} kcal`))));
 }
 
 function gewichtKarte({ tag, profil, gewichte, wurzel }) {
@@ -191,12 +247,6 @@ function gewichtKarte({ tag, profil, gewichte, wurzel }) {
   return karte;
 }
 
-function makroBalken(name, ist, ziel, einheit) {
-  const anteil = ziel > 0 ? ist / ziel : 0;
-  const status = anteil > 1.1 ? 'zu_viel' : anteil >= 0.9 ? 'erreicht' : 'niedrig';
-  return balkenZeile(name, ist ?? 0, ziel, einheit, status);
-}
-
 function mahlzeitKarte(mahlzeit, ziel, tag, lebensmittel, aendern) {
   const eintraege = tag.eintraege.filter((e) => e.mahlzeit === mahlzeit.id);
   const summe = mahlzeitSumme(tag, mahlzeit.id, lebensmittel);
@@ -222,6 +272,10 @@ function mahlzeitKarte(mahlzeit, ziel, tag, lebensmittel, aendern) {
     el('div', { class: 'zeile' },
       el('h2', {}, mahlzeit.name),
       el('span', { class: 'leise klein' }, `${zahl(Math.round(summe.kcal ?? 0))} / ${zahl(ziel.kcal)} kcal`)),
+    el('div', { class: 'balken mini' }, el('div', {
+      style: `width:${ziel.kcal ? Math.min(100, ((summe.kcal ?? 0) / ziel.kcal) * 100) : 0}%;`
+        + `background:${(summe.kcal ?? 0) > ziel.kcal * 1.15 ? 'var(--warnung)' : 'var(--verlauf)'}`,
+    })),
     eintraege.length
       ? el('ul', { class: 'eintragsliste' }, ...eintraege.map((e) => {
         const w = eintragNaehrwerte(e, lebensmittel);
@@ -232,7 +286,7 @@ function mahlzeitKarte(mahlzeit, ziel, tag, lebensmittel, aendern) {
       }))
       : null,
     eintraege.length ? el('p', { class: 'leise klein' }, `Ziel: ${makroText(ziel)} · Ist: ${makroText(summe)}`) : null,
-    el('button', { class: 'knopf zweitrangig voll', type: 'button', onclick: hinzufuegen }, '+ Lebensmittel'));
+    el('button', { class: 'knopf zweitrangig voll', type: 'button', onclick: hinzufuegen }, icon('plus', 18), 'Lebensmittel'));
 }
 
 function wasserKarte(profil, typ, tag, speichern) {
@@ -281,7 +335,7 @@ function wasserKarte(profil, typ, tag, speichern) {
           type: 'button',
           'aria-label': `${eintrag.ml} ml löschen`,
           onclick: () => { tag.wasser.splice(index, 1); speichern(); zeichneKarte(); },
-        }, '✕')))));
+        }, icon('schliessen', 18))))));
 
     setze(karte,
       el('h2', { class: 'zeile' }, '💧 Wasser', el('span', { class: 'leise klein' }, `Tag: ${zahl(gesamt)} ml`)),

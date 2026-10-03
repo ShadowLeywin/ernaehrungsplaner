@@ -1,0 +1,72 @@
+/* Farbthemen: data-thema (wald, ozean, glut, nacht, gold, limette) × data-modus (hell, dunkel) auf <html>.
+   Neutrale Flächen werden leicht in Richtung der Akzentfarbe getönt, damit jedes Thema eine eigene Stimmung hat.
+   Hell: Akzente dunkel genug für lesbaren Text auf Weiß. Dunkel: kräftige, helle Akzente. */
+
+:root {
+  --radius: 20px;
+  --radius-klein: 12px;
+  --nav-hoehe: 68px;
+  --schrift: "Segoe UI Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Standard bis das Skript läuft: dunkel, Wald */
+  --akzent: #4ade80;
+  --akzent-2: #14b8a6;
+  --akzent-text: #04130b;
+}
+
+/* ---------- Akzentfarben je Thema ---------- */
+[data-modus=dunkel][data-thema=wald]    { --akzent: #4ade80; --akzent-2: #2dd4bf; }
+[data-modus=dunkel][data-thema=ozean]   { --akzent: #38bdf8; --akzent-2: #818cf8; }
+[data-modus=dunkel][data-thema=glut]    { --akzent: #fb923c; --akzent-2: #f43f5e; }
+[data-modus=dunkel][data-thema=nacht]   { --akzent: #a78bfa; --akzent-2: #f472b6; }
+[data-modus=dunkel][data-thema=gold]    { --akzent: #facc15; --akzent-2: #fb923c; }
+[data-modus=dunkel][data-thema=limette] { --akzent: #bef264; --akzent-2: #4ade80; }
+
+[data-modus=hell][data-thema=wald]    { --akzent: #15803d; --akzent-2: #0f766e; }
+[data-modus=hell][data-thema=ozean]   { --akzent: #0369a1; --akzent-2: #4338ca; }
+[data-modus=hell][data-thema=glut]    { --akzent: #c2410c; --akzent-2: #be123c; }
+[data-modus=hell][data-thema=nacht]   { --akzent: #6d28d9; --akzent-2: #be185d; }
+[data-modus=hell][data-thema=gold]    { --akzent: #a16207; --akzent-2: #c2410c; }
+[data-modus=hell][data-thema=limette] { --akzent: #4d7c0f; --akzent-2: #15803d; }
+
+/* ---------- Neutrale Flächen und Statusfarben ---------- */
+:root, [data-modus=dunkel] {
+  color-scheme: dark;
+  --akzent-text: #06100a;
+  --hintergrund: color-mix(in oklab, var(--akzent) 5%, #0a0c0d);
+  --flaeche: color-mix(in oklab, var(--akzent) 7%, #14181a);
+  --flaeche-2: color-mix(in oklab, var(--akzent) 9%, #1c2124);
+  --feld: color-mix(in oklab, var(--akzent) 5%, #0f1213);
+  --text: #eef2f1;
+  --text-leise: #97a3a0;
+  --rand: rgb(255 255 255 / 0.08);
+  --schatten: 0 8px 24px rgb(0 0 0 / 0.35);
+  --glanz: color-mix(in oklab, var(--akzent) 22%, transparent);
+
+  --warnung: #fb7185;
+  --fast: #fde047;
+  --fortschritt: #94a3b8;
+  --wasser: #38bdf8;
+}
+
+[data-modus=hell] {
+  color-scheme: light;
+  --akzent-text: #ffffff;
+  --hintergrund: color-mix(in oklab, var(--akzent) 5%, #f3f4f2);
+  --flaeche: #ffffff;
+  --flaeche-2: color-mix(in oklab, var(--akzent) 6%, #f7f8f6);
+  --feld: color-mix(in oklab, var(--akzent) 4%, #f4f5f3);
+  --text: #121716;
+  --text-leise: #5b6663;
+  --rand: rgb(0 0 0 / 0.08);
+  --schatten: 0 6px 20px rgb(15 23 20 / 0.08);
+  --glanz: color-mix(in oklab, var(--akzent) 14%, transparent);
+
+  --warnung: #dc2626;
+  --fast: #ca8a04;
+  --fortschritt: #64748b;
+  --wasser: #0284c7;
+}
+
+/* Verlauf für Hauptknöpfe, Ringe und Hervorhebungen */
+:root { --verlauf: linear-gradient(135deg, var(--akzent), var(--akzent-2)); }

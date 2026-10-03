@@ -7,6 +7,11 @@ import { backup } from './views/backup.js';
 import { einrichtung } from './views/einrichtung.js';
 import { gewicht } from './views/gewicht.js';
 import { pruefeEinrichtung, istEingerichtet } from './state.js';
+import { wendeDarstellungAn } from './darstellung.js';
+import { icon } from './icons.js';
+
+wendeDarstellungAn();
+document.querySelectorAll('.nav-icon[data-icon]').forEach((platz) => platz.append(icon(platz.dataset.icon, 22)));
 
 const ansichten = { ...platzhalter, heute, einstellungen, lebensmittel, backup, einrichtung, gewicht };
 
