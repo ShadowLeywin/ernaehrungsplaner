@@ -1,20 +1,24 @@
 // Profil & Einstellungen: Tagestypen mit Zielen, Wochenzuordnung, Mahlzeitenverteilung.
-import { el, zahl, zahlFeld, textFeld } from '../ui.js';
+import { el, zahl, zahlFeld, textFeld, schalter } from '../ui.js';
 import { holeProfil, speichereProfil } from '../state.js';
+import { holeLebensmittel } from '../lebensmittel.js';
 import { kcalAusMakros, skaliereMakros, summeAnteile } from '../logic/ziele.js';
 import { WOCHENTAGE } from '../logic/profil.js';
+import { naehrwerteZutaten } from '../logic/fixeintraege.js';
 
 export const einstellungen = {
   titel: 'Profil & Einstellungen',
   reiter: 'mehr',
   render() {
     const wurzel = el('div');
-    holeProfil().then((profil) => zeichne(wurzel, profil, false));
+    Promise.all([holeProfil(), holeLebensmittel()])
+      .then(([profil, daten]) => zeichne(wurzel, profil, false, daten.lebensmittel))
+      .catch((fehler) => wurzel.replaceChildren(el('p', { class: 'warnung' }, fehler.message)));
     return wurzel;
   },
 };
 
-function zeichne(wurzel, profil, geaendert) {
+function zeichne(wurzel, profil, geaendert, lebensmittel) {
   const status = el('p', { class: 'status', role: 'status' });
   const speichern = el('button', { class: 'knopf', type: 'button' }, 'Speichern');
 
@@ -33,7 +37,7 @@ function zeichne(wurzel, profil, geaendert) {
     status.textContent = 'Gespeichert ✓';
   });
 
-  const neuZeichnen = () => zeichne(wurzel, profil, true);
+  const neuZeichnen = () => zeichne(wurzel, profil, true, lebensmittel);
 
   wurzel.replaceChildren(
     el('h2', { class: 'abschnitt' }, 'Tagestypen und Ziele'),
@@ -42,6 +46,9 @@ function zeichne(wurzel, profil, geaendert) {
     wochenKarte(profil, markiereGeaendert),
     el('h2', { class: 'abschnitt' }, 'Verteilung auf die Mahlzeiten'),
     mahlzeitenKarte(profil, markiereGeaendert),
+    el('h2', { class: 'abschnitt' }, 'Morning Stack & Supplements'),
+    morningStackKarte(profil, lebensmittel, markiereGeaendert),
+    ...profil.supplements.map((s) => supplementKarte(s, markiereGeaendert)),
     el('div', { class: 'speicherleiste' }, status, speichern),
   );
   pruefe();
@@ -130,6 +137,35 @@ function wochenKarte(profil, markiereGeaendert) {
     return el('div', { class: 'wochenzeile' }, el('span', { class: 'wochentag' }, tag.slice(0, 2)), auswahl, notiz);
   });
   return el('section', { class: 'karte' }, ...zeilen);
+}
+
+function morningStackKarte(profil, lebensmittel, markiereGeaendert) {
+  const ms = profil.morningStack;
+  const summe = el('p', { class: 'leise klein' });
+  const aktualisiereSumme = () => {
+    const w = naehrwerteZutaten(ms.zutaten, lebensmittel);
+    summe.textContent = `Zusammen: ${zahl(Math.round(w.kcal))} kcal · P ${zahl(w.protein)} g · KH ${zahl(w.kh)} g · F ${zahl(w.fett)} g`;
+  };
+  const name = (id) => lebensmittel.find((l) => l.id === id)?.name ?? id;
+  const felder = ms.zutaten.map((z) => zahlFeld(name(z.lebensmittelId), z.gramm, 'g', (wert) => {
+    z.gramm = wert;
+    aktualisiereSumme();
+    markiereGeaendert();
+  }));
+  aktualisiereSumme();
+  return el('section', { class: 'karte' },
+    schalter(ms.aktiv, (wert) => { ms.aktiv = wert; markiereGeaendert(); }, el('strong', {}, ms.name), ' – täglich vorbelegt'),
+    el('div', { class: 'felder' }, ...felder),
+    summe);
+}
+
+function supplementKarte(s, markiereGeaendert) {
+  return el('section', { class: 'karte' },
+    schalter(s.aktiv, (wert) => { s.aktiv = wert; markiereGeaendert(); }, el('strong', {}, s.name)),
+    el('div', { class: 'felder' },
+      textFeld('Name', s.name, (wert) => { s.name = wert; markiereGeaendert(); }),
+      textFeld('Dosis', s.dosis, (wert) => { s.dosis = wert; markiereGeaendert(); })),
+    s.hinweis ? el('p', { class: 'leise klein' }, s.hinweis) : null);
 }
 
 function mahlzeitenKarte(profil, markiereGeaendert) {

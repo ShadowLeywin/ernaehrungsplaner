@@ -207,6 +207,7 @@ export const LISTE = [
   // Getränke
   { id: 'orangensaft', name: 'Orangensaft', kategorie: getraenke, usda: 'Orange juice, raw' },
   { id: 'apfelsaft', name: 'Apfelsaft', kategorie: getraenke, usda: 'Apple juice, canned or bottled, unsweetened, without added ascorbic acid' },
+  { id: 'rote_bete_saft', name: 'Rote-Bete-Saft', kategorie: getraenke, eigen: { kcal: 38, protein: 1, kh: 8.5, zucker: 8, fett: 0 } },
   { id: 'haferdrink', name: 'Haferdrink', kategorie: getraenke, eigen: { kcal: 46, protein: 0.5, kh: 6.7, fett: 1.5 } },
   { id: 'kaffee', name: 'Kaffee', kategorie: getraenke, usda: 'Beverages, coffee, brewed, prepared with tap water' },
   { id: 'gruener_tee', name: 'Grüner Tee', kategorie: getraenke, usda: 'Beverages, tea, green, brewed, regular' },

@@ -17,3 +17,10 @@ export async function speichereProfil(neu) {
   await schreibe('einstellungen', 'profil', neu);
   profil = structuredClone(neu);
 }
+
+/** Tagesdaten; neue Tage starten mit getrunkenem Morning Stack und leerer Supplement-Checkliste. */
+export async function holeTag(schluessel) {
+  return (await lese('tage', schluessel)) ?? { datum: schluessel, morningStackGenommen: true, supplements: {} };
+}
+
+export const speichereTag = (tag) => schreibe('tage', tag.datum, tag);

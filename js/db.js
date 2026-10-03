@@ -2,8 +2,9 @@
 // Neue Speicherbereiche: in STORES eintragen und DB_VERSION erhöhen.
 
 const DB_NAME = 'ernaehrungsplaner';
-const DB_VERSION = 1;
-const STORES = ['einstellungen'];
+const DB_VERSION = 2;
+// einstellungen: Profil · tage: Tagesdaten je Datum ("2026-10-05")
+const STORES = ['einstellungen', 'tage'];
 
 let dbVersprechen;
 

@@ -29,6 +29,12 @@ export function wochentagIndex(datum) {
   return (datum.getDay() + 6) % 7;
 }
 
+/** Lokales Datum als Schlüssel "2026-10-05" (nicht UTC, sonst springt der Tag um Mitternacht falsch). */
+export function datumSchluessel(datum) {
+  const zweistellig = (n) => String(n).padStart(2, '0');
+  return `${datum.getFullYear()}-${zweistellig(datum.getMonth() + 1)}-${zweistellig(datum.getDate())}`;
+}
+
 export function tagestypFuerDatum(profil, datum) {
   const wochentag = wochentagIndex(datum);
   const eintrag = profil.woche[wochentag] ?? {};

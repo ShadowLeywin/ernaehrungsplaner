@@ -23,13 +23,23 @@ export function zahlFeld(beschriftung, wert, einheit, beiAenderung) {
     type: 'number',
     inputMode: 'decimal',
     min: 0,
-    step: 1,
+    step: 'any',
     value: wert,
     oninput: () => beiAenderung(Number.isFinite(eingabe.valueAsNumber) ? eingabe.valueAsNumber : 0),
   });
   return el('label', { class: 'feld' },
     el('span', {}, einheit ? `${beschriftung} (${einheit})` : beschriftung),
     eingabe);
+}
+
+/** Checkbox mit Beschriftung (Kinder dürfen Elemente sein). */
+export function schalter(wert, beiAenderung, ...beschriftung) {
+  const eingabe = el('input', {
+    type: 'checkbox',
+    checked: wert,
+    onchange: () => beiAenderung(eingabe.checked),
+  });
+  return el('label', { class: 'schalter' }, eingabe, el('span', {}, ...beschriftung));
 }
 
 export function textFeld(beschriftung, wert, beiAenderung, platzhalter = '') {

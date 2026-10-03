@@ -36,6 +36,55 @@ export function standardProfil() {
       { tagestyp: 'calisthenics', notiz: '' },
       { tagestyp: 'rest', notiz: '' },
     ],
+    // Täglich nüchtern, wird jeden Tag als getrunken vorbelegt
+    morningStack: {
+      aktiv: true,
+      name: 'Morning Stack',
+      zutaten: [
+        { lebensmittelId: 'rote_bete_saft', gramm: 250 },
+        { lebensmittelId: 'manuka_honig', gramm: 8 }, // 1 TL
+        { lebensmittelId: 'schwarzkuemmeloel', gramm: 4.5 }, // 1 TL
+        { lebensmittelId: 'ingwer', gramm: 5 },
+      ],
+    },
+    // Checkliste; Nährwerte zählen in die Tagesziele.
+    // Entweder `zutaten` aus der Lebensmitteldatenbank oder `naehrwerte` pro Tagesportion.
+    supplements: [
+      {
+        id: 'athlete_stack',
+        name: 'ESN Athlete Stack Men',
+        dosis: '1 Tagesportion (Kapseln)',
+        aktiv: true,
+        hinweis: 'Werte laut Online-Shop, mit der Packung abgleichen. Folsäure 250 µg = 425 µg Folat-Äquivalent.',
+        naehrwerte: {
+          vitA: 800, vitB1: 3.5, vitB2: 3.4, vitB3: 32, vitB6: 4.8, folat: 425, vitB12: 3.7,
+          vitC: 200, vitD: 25, vitE: 12, vitK: 35,
+          calcium: 420, eisen: 18, magnesium: 210, zink: 20, kalium: 300, jod: 150, selen: 82,
+        },
+      },
+      {
+        id: 'omega3',
+        name: 'ESN Omega-3',
+        dosis: '1 Tagesportion',
+        aktiv: true,
+        hinweis: '1.200 mg EPA + 900 mg DHA. Fett und kcal geschätzt (ca. 3 g Fischöl).',
+        naehrwerte: { kcal: 27, fett: 3, omega3: 2.1, epaDha: 2100 },
+      },
+      {
+        id: 'kreatin',
+        name: 'Kreatin-Monohydrat',
+        dosis: '5 g',
+        aktiv: true,
+        zutaten: [{ lebensmittelId: 'kreatin', gramm: 5 }],
+      },
+      {
+        id: 'flohsamen',
+        name: 'Flohsamenschalen',
+        dosis: '5 g',
+        aktiv: true,
+        zutaten: [{ lebensmittelId: 'flohsamenschalen', gramm: 5 }],
+      },
+    ],
     mahlzeiten: [
       { id: 'fruehstueck', name: 'Frühstück', anteil: 20 },
       { id: 'morgensnack', name: 'Morgensnack', anteil: 10 },

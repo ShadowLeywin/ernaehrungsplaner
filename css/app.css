@@ -196,6 +196,16 @@ details .felder { margin-top: 8px; }
 .tabelle th:first-child, .tabelle td:first-child { text-align: left; }
 .tabelle th { font-size: 0.8rem; color: var(--text-leise); font-weight: 600; }
 
+.schalter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  cursor: pointer;
+}
+.schalter input { width: 22px; height: 22px; flex: none; accent-color: var(--akzent); }
+.zeile { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+
 /* Lebensmittel-Suche */
 .suchleiste {
   position: sticky;
