@@ -5,7 +5,8 @@ import { sucheLebensmittel } from '../lebensmittel.js';
 import { naehrwerteFuerMenge, KATEGORIEN } from '../logic/naehrstoffe.js';
 
 /**
- * optionen: { lebensmittel, titel, eintrag?, beiSpeichern(lebensmittelId, gramm), beiLoeschen? }
+ * optionen: { lebensmittel, titel, eintrag?, beiSpeichern(lebensmittelId, gramm), beiLoeschen?,
+ *             beiOhneMenge?(lebensmittelId) – „+“ in der Liste: ohne Menge eintragen, Dialog bleibt offen (Mengen-Memo) }
  * Mit `eintrag` startet der Dialog direkt bei der Mengenauswahl.
  */
 export function oeffneEintragDialog(optionen) {
@@ -31,12 +32,24 @@ export function oeffneEintragDialog(optionen) {
     });
     const zeigeTreffer = () => {
       const treffer = sucheLebensmittel(optionen.lebensmittel, suche.value).slice(0, 60);
-      setze(liste, ...treffer.map((lm) => el('li', {},
+      setze(liste, ...treffer.map((lm) => el('li', { class: optionen.beiOhneMenge ? 'mit-plus' : '' },
         el('button', { type: 'button', class: 'auswahl-eintrag', onclick: () => zeigeMenge(lm, lm.stueckG ?? 100) },
-          el('span', {}, lm.name),
-          el('span', { class: 'leise klein' }, `${KATEGORIEN[lm.kategorie]} · ${zahl(lm.je100g.kcal)} kcal/100 g`)))));
+          el('span', {}, lm.name, lm.marke ? el('span', { class: 'leise' }, ` · ${lm.marke}`) : null),
+          el('span', { class: 'leise klein' }, `${KATEGORIEN[lm.kategorie] ?? 'Eigenes'} · ${zahl(lm.je100g.kcal)} kcal/100 g`)),
+        optionen.beiOhneMenge ? el('button', {
+          type: 'button', class: 'knopf-klein plus-schnell', 'aria-label': `${lm.name} ohne Menge eintragen`,
+          onclick: (e) => {
+            optionen.beiOhneMenge(lm.id);
+            const knopf = e.currentTarget;
+            setze(knopf, icon('haken', 18));
+            knopf.classList.add('an');
+            hinweis.textContent = `${lm.name} eingetragen – Menge später im Mengen-Memo.`;
+          },
+        }, icon('plus', 18)) : null)));
     };
-    setze(dialog, kopf(optionen.titel), el('div', { class: 'dialog-inhalt' }, suche, liste));
+    const hinweis = el('p', { class: 'leise klein', role: 'status' },
+      optionen.beiOhneMenge ? 'Tipp: „+“ trägt ohne Menge ein – Mengen dann gesammelt im Mengen-Memo.' : '');
+    setze(dialog, kopf(optionen.titel), el('div', { class: 'dialog-inhalt' }, suche, hinweis, liste));
     zeigeTreffer();
     suche.focus();
   };

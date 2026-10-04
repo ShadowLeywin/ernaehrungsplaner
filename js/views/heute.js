@@ -21,6 +21,9 @@ import { uebungsVerzeichnis, zusatzKcal, zielMitZusatz } from '../logic/training
 
 const uebungsVerzeichnisCache = uebungsVerzeichnis(UEBUNGEN);
 import { balkenZeile, zaehlerInhalt } from './zaehler.js';
+import { oeffneMemoDialog } from './memo-dialog.js';
+import { spracheVerfuegbar, spracheErlaubt, setzeSpracheErlaubt } from '../sprache.js';
+import { episch } from '../darstellung.js';
 
 const datumFormat = new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
 const uhrzeitFormat = new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit' });
@@ -79,6 +82,7 @@ function zeichne(wurzel, kontext) {
       : null,
     datumsLeiste(wurzel, datum),
     heroKarte(typ, notiz, ist),
+    memoKarte(kontext, aendern),
     gewichtKarte(kontext),
     wasserKarte(profil, typ, tag, () => speichereTag(tag)),
     profil.morningStack.aktiv ? morningStackKarte(profil, lebensmittel, fix, tag, aendern) : null,
@@ -257,6 +261,23 @@ function gewichtKarte({ tag, profil, gewichte, wurzel }) {
   return karte;
 }
 
+function memoKarte({ tag, profil, lebensmittel, wurzel }, aendern) {
+  const offen = tag.eintraege.filter((e) => e.offen || !e.gramm).length;
+  return el('button', {
+    type: 'button',
+    class: `karte memo-karte${offen ? ' offen' : ''}`,
+    onclick: () => oeffneMemoDialog({ tag, profil, lebensmittel, beiSpeichern: aendern }),
+  },
+  icon('stift', 22),
+  el('span', {},
+    el('strong', {}, episch('Mengen-Memo', 'Mengen-Memo')),
+    el('br'),
+    el('span', { class: 'leise klein' }, offen
+      ? `${offen} Eintr${offen === 1 ? 'ag' : 'äge'} ohne Menge – jetzt ergänzen`
+      : 'Mengen gesammelt eintragen, tippen oder diktieren')),
+  icon('weiter', 20));
+}
+
 function mahlzeitKarte(mahlzeit, ziel, tag, lebensmittel, aendern) {
   const eintraege = tag.eintraege.filter((e) => e.mahlzeit === mahlzeit.id);
   const summe = mahlzeitSumme(tag, mahlzeit.id, lebensmittel);
@@ -276,6 +297,11 @@ function mahlzeitKarte(mahlzeit, ziel, tag, lebensmittel, aendern) {
       tag.eintraege.push({ id: neueEintragsId(), mahlzeit: mahlzeit.id, lebensmittelId, gramm, zeit: new Date().toISOString() });
       aendern();
     },
+    // Ohne Menge: Dialog bleibt offen, gespeichert wird sofort, neu gezeichnet erst beim Schließen
+    beiOhneMenge: (lebensmittelId) => {
+      tag.eintraege.push({ id: neueEintragsId(), mahlzeit: mahlzeit.id, lebensmittelId, gramm: 0, offen: true, zeit: new Date().toISOString() });
+      aendern();
+    },
   });
 
   return el('section', { class: 'karte mahlzeit' },
@@ -291,7 +317,9 @@ function mahlzeitKarte(mahlzeit, ziel, tag, lebensmittel, aendern) {
         const w = eintragNaehrwerte(e, lebensmittel);
         return el('li', {},
           el('button', { type: 'button', class: 'eintrag', onclick: () => bearbeiten(e) },
-            el('span', {}, `${name(e.lebensmittelId)} `, el('span', { class: 'leise' }, `${zahl(e.gramm)} g`)),
+            el('span', {}, `${name(e.lebensmittelId)} `, e.offen || !e.gramm
+              ? el('span', { class: 'marke warn' }, 'Menge offen')
+              : el('span', { class: 'leise' }, `${zahl(e.gramm)} g`)),
             el('span', { class: 'leise klein' }, `${zahl(Math.round(w.kcal ?? 0))} kcal`)));
       }))
       : null,
@@ -410,6 +438,11 @@ function ernaehrungsEinstellungen() {
         class: 'knopf zweitrangig', type: 'button',
         onclick: () => { w.presetsMl.push(500); speichern(); zeichneEinstellungen(); },
       }, icon('plus', 18), 'Knopf') : null,
+      el('h2', { class: 'abschnitt' }, 'Spracheingabe'),
+      spracheVerfuegbar()
+        ? schalter(spracheErlaubt(), (wert) => setzeSpracheErlaubt(wert), 'Diktieren im Mengen-Memo erlauben')
+        : el('p', { class: 'leise klein' }, 'Dieser Browser unterstützt keine Spracheingabe.'),
+      el('p', { class: 'leise klein' }, 'Hinweis: Chrome schickt die Sprachaufnahme zur Erkennung an Google. Ausgewertet wird der Text danach nur auf deinem Gerät.'),
       el('p', { class: 'leise klein' }, 'Wird sofort gespeichert. Ziele, Supplements und mehr unter Profil & Ziele.'));
     zeichneEinstellungen();
   });

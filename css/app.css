@@ -801,3 +801,34 @@ a.hub-kachel:active { transform: scale(0.98); }
 .hub-zeile { display: flex; align-items: center; gap: 10px; }
 .mini-ring { width: 52px; height: 52px; flex: none; }
 .hub-zahl { font-size: 1.35rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+/* ---------- Mengen-Memo ---------- */
+.marke.warn { background: color-mix(in oklab, var(--warnung) 20%, transparent); color: var(--warnung); }
+.memo-karte {
+  display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; color: inherit; cursor: pointer;
+  font: inherit;
+}
+.memo-karte > span { flex: 1; }
+.memo-karte > .icon:first-child { color: var(--akzent); }
+.memo-karte.offen { border-color: color-mix(in oklab, var(--warnung) 60%, var(--rand)); }
+.memo-feld {
+  width: 100%; font: inherit; color: inherit; background: var(--flaeche); border: 1px solid var(--rand);
+  border-radius: var(--radius-klein); padding: 12px; resize: vertical; margin-bottom: 8px;
+}
+.memo-gruppe { margin-bottom: 8px; }
+.memo-zeile {
+  display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: center;
+  padding: 8px 0; border-bottom: 1px solid var(--rand);
+}
+.memo-zeile select, .memo-kcal { grid-column: 1 / -1; }
+.memo-zeile .memo-kcal { grid-column: 2; text-align: right; }
+.memo-name { display: flex; gap: 8px; align-items: center; font-weight: 600; }
+.memo-menge { display: flex; align-items: center; gap: 4px; }
+.memo-menge input { width: 84px; text-align: right; }
+input.offen { border-color: var(--warnung); background: color-mix(in oklab, var(--warnung) 8%, var(--flaeche)); }
+.memo-zeile.unbekannt { opacity: 0.8; }
+.aufnahme { color: var(--warnung); border-color: var(--warnung); animation: gluehen 1.4s ease-in-out infinite; }
+.auswahl li.mit-plus { display: flex; align-items: center; }
+.auswahl li.mit-plus .auswahl-eintrag { flex: 1; }
+.plus-schnell { margin-right: 8px; }
+.plus-schnell.an { color: var(--akzent); }
