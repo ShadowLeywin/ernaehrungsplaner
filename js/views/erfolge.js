@@ -1,10 +1,11 @@
 // Erfolge: Übersicht nach Bereichen mit Stufen-Medaillen, Fortschritt zur nächsten Stufe und geheimen Erfolgen.
 import { el, setze } from '../ui.js';
+import { kopfBild } from '../bilder.js';
 import { episch } from '../darstellung.js';
 import { ladeSpielstand } from '../spiel.js';
 import { STUFEN, BEREICHE, erfolgsText } from '../logic/erfolge.js';
 import { medaille } from './emblem.js';
-import { bromSvg, bromAn } from './brom.js';
+import { bromPortraet, bromAn } from './brom.js';
 
 let bereichFilter = null;
 
@@ -26,8 +27,9 @@ function zeichne(wurzel, s) {
   const sichtbar = alle.filter((b) => !bereichFilter || b.erfolg.bereich === bereichFilter);
 
   setze(wurzel,
+    kopfBild('halle', 'Halle der Taten'),
     el('section', { class: 'karte hero erfolge-kopf' },
-      bromAn() && document.documentElement.dataset.stil !== 'schlicht' ? el('div', { class: 'erfolge-brom' }, bromSvg(84, 'portraet')) : null,
+      bromAn() && document.documentElement.dataset.stil !== 'schlicht' ? el('div', { class: 'erfolge-brom' }, bromPortraet(84)) : null,
       el('div', {},
         el('h2', {}, episch('Was du geschmiedet hast', 'Deine Erfolge')),
         el('div', { class: 'stufen-zaehler' }, ...zaehlung.map(({ st, n }) => el('span', { class: 'stufen-chip', title: st.name },

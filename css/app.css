@@ -1027,3 +1027,44 @@ input.offen { border-color: var(--warnung); background: color-mix(in oklab, var(
 
 .woche-links { margin: 4px 0 10px; }
 .woche-links .chip { text-decoration: none; color: inherit; }
+
+/* ---------- Bild-Szene (KI-Artwork) ---------- */
+.lagerfeuer.mit-bild .lager-text { z-index: 2; background: linear-gradient(180deg, rgb(0 0 0 / 0.72), rgb(0 0 0 / 0.25) 70%, transparent); color: #fff4ec; padding-bottom: 28px; }
+.lagerfeuer.mit-bild .lager-text .leise { color: #e6d2c6; }
+.bild-szene { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: #0b0706; }
+.szene-hg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 40% 60%; animation: szene-atmen 18s ease-in-out infinite alternate; }
+@keyframes szene-atmen { from { transform: scale(1.02); } to { transform: scale(1.07) translate(-0.6%, -0.4%); } }
+.szene-licht {
+  position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen;
+  background: radial-gradient(ellipse 38% 46% at var(--feuer-x) var(--feuer-y), rgb(255 150 60 / var(--licht, 0.45)), transparent 70%);
+  animation: feuerlicht 1.7s ease-in-out infinite alternate;
+}
+@keyframes feuerlicht { 0% { opacity: 0.7; } 30% { opacity: 1; } 55% { opacity: 0.8; } 80% { opacity: 0.95; } 100% { opacity: 0.75; } }
+.bild-szene[data-feuer="0"] { --licht: 0.08; filter: saturate(0.6) brightness(0.65); }
+.bild-szene[data-feuer="1"] { --licht: 0.2; filter: brightness(0.8); }
+.bild-szene[data-feuer="2"] { --licht: 0.32; filter: brightness(0.9); }
+.bild-szene[data-feuer="3"] { --licht: 0.45; }
+.bild-szene[data-feuer="4"] { --licht: 0.6; filter: brightness(1.05) saturate(1.1); }
+.bild-szene[data-feuer="5"] { --licht: 0.8; filter: brightness(1.1) saturate(1.2); }
+.szene-funken { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.szene-brom { position: absolute; right: 2%; bottom: 0; height: 82%; width: auto; filter: drop-shadow(-6px 0 14px rgb(255 140 50 / 0.35)); }
+.szene-brom-svg { height: 66%; right: 3%; }
+.szene-brom-aura {
+  position: absolute; right: 0; bottom: 0; width: 42%; height: 92%; pointer-events: none; mix-blend-mode: screen;
+  background: radial-gradient(ellipse 50% 55% at 55% 55%, color-mix(in oklab, var(--akzent) 45%, transparent), transparent 70%);
+  animation: aura-atmen 3.6s ease-in-out infinite alternate;
+}
+.szene-vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 75% 70% at 45% 55%, transparent 55%, rgb(0 0 0 / 0.7)); }
+.szene-ort { white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .szene-hg, .szene-licht, .szene-brom-aura { animation: none; } }
+
+.kopf-bild { position: relative; margin: 0 0 14px; border-radius: var(--radius); overflow: hidden; aspect-ratio: 12 / 5; box-shadow: var(--schatten); }
+.kopf-bild img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.kopf-bild::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgb(0 0 0 / 0.75)); }
+.kopf-bild-titel { position: absolute; left: 16px; bottom: 10px; z-index: 1; color: #fff4ec; font-size: 1.3rem; font-weight: 900; letter-spacing: 0.02em; text-shadow: 0 2px 10px #000; }
+
+.memo-knopf { width: 34px; height: 34px; min-height: 34px; margin-left: 2px; color: var(--text-leise); }
+.memo-knopf.offen { color: var(--warnung); background: color-mix(in oklab, var(--warnung) 16%, transparent); }
+
+.brom-portraet { display: inline-block; flex: none; border-radius: 14px; overflow: hidden; }
+.brom-portraet img { width: 100%; height: 100%; object-fit: cover; display: block; }

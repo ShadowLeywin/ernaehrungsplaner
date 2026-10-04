@@ -14,6 +14,8 @@ import { vorlagenFuerTag, erledigteVorlagen } from '../logic/vorlagen.js';
 import { holeGewichtsReihe } from './gewicht.js';
 import { ladeSpielstand } from '../spiel.js';
 import { feuerSerie, feuerStufe, istAktiv } from '../logic/feuer.js';
+import { szeneFuerLevel } from '../logic/szene.js';
+import { zeigeBildSzene } from './lager-szene.js';
 import { rangName } from '../logic/raenge.js';
 import { rangEmblem } from './emblem.js';
 import { bromMarkup, bromAn } from './brom.js';
@@ -50,7 +52,20 @@ async function lade(wurzel) {
     // Feuer wächst mit der Serie aktiver Tage (heute schon mitgezählt, falls etwas eingetragen ist)
     const aktive = spiel.tage.filter(istAktiv).map((t) => t.datum);
     if (istAktiv(tag)) aktive.push(tag.datum);
-    zeigeFeuerStufe(feuerKarte, feuerSerie(aktive));
+    const serie = feuerSerie(aktive);
+    zeigeFeuerStufe(feuerKarte, serie);
+    // Ort nach Level (KI-Bilder, falls vorhanden), Feuer nach Serie
+    const szene = szeneFuerLevel(spiel.level.level);
+    zeigeBildSzene(feuerKarte.querySelector('.feuer-buehne'), {
+      szeneNr: szene.nr,
+      feuerIndex: feuerStufe(serie).index,
+      mitBrom: bromAn() && document.documentElement.dataset.stil !== 'schlicht',
+    }).then((mitBild) => {
+      if (!mitBild) return;
+      feuerKarte.classList.add('mit-bild');
+      feuerKarte.querySelector('.feuer-serie')?.append(el('span', { class: 'leise klein szene-ort' },
+        ` · ${episch(szene.episch, szene.name)}${szene.naechste ? ` (ab Lvl ${szene.naechste.ab}: ${szene.naechste.name})` : ''}`));
+    });
   }).catch(() => {});
 
   setze(wurzel,

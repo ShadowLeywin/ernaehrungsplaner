@@ -1,6 +1,7 @@
 // Training: Übersicht (heute, letzte Einheiten), laufendes Workout mit Sätzen, Pausentimer und Abschluss,
 // Schnelleintrag für Cardio/Sport. Daten im Tagesdatensatz (tag.trainings), siehe js/logic/training.js.
 import { el, setze, zahl, schalter } from '../ui.js';
+import { kopfBild } from '../bilder.js';
 import { icon } from '../icons.js';
 import { lese, schreibe, alleEintraege } from '../db.js';
 import { holeProfil, holeTag, speichereTag } from '../state.js';
@@ -91,6 +92,7 @@ function zeichneUebersicht(k, tag) {
   };
 
   setze(k.wurzel,
+    kopfBild('uebungsplatz', 'Übungsplatz'),
     el('section', { class: 'karte hero' },
       el('div', { class: 'hero-oben' }, el('h2', {}, 'Heute verbrannt'), el('span', { class: 'marke' }, `${fertig.length} Einheit${fertig.length === 1 ? '' : 'en'}`)),
       el('p', { class: 'grosszahl' }, `≈ ${kcalText(gesamt)}`),

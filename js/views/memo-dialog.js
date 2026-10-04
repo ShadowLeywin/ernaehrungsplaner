@@ -16,8 +16,10 @@ export function mahlzeitNachUhrzeit(mahlzeiten, jetzt = new Date()) {
   return mahlzeiten[Math.min(index, mahlzeiten.length - 1)]?.id ?? mahlzeiten[0]?.id;
 }
 
-/** optionen: { tag, profil, lebensmittel, beiSpeichern() } */
-export function oeffneMemoDialog({ tag, profil, lebensmittel, beiSpeichern }) {
+/** optionen: { tag, profil, lebensmittel, beiSpeichern(), mahlzeitId? – nur diese Mahlzeit, Neues landet dort } */
+export function oeffneMemoDialog({ tag, profil, lebensmittel, beiSpeichern, mahlzeitId = null }) {
+  const mahlzeiten = mahlzeitId ? profil.mahlzeiten.filter((m) => m.id === mahlzeitId) : profil.mahlzeiten;
+  const imBereich = (e) => !mahlzeitId || e.mahlzeit === mahlzeitId;
   const dialog = el('dialog', { class: 'dialog' });
   let geaendert = false;
   const schliessen = () => {
@@ -46,12 +48,12 @@ export function oeffneMemoDialog({ tag, profil, lebensmittel, beiSpeichern }) {
 
   // ---------- Einträge des Tages mit Mengenfeldern
   const zeichneListe = () => {
-    const gruppen = profil.mahlzeiten
+    const gruppen = mahlzeiten
       .map((m) => ({ m, eintraege: tag.eintraege.filter((e) => e.mahlzeit === m.id) }))
       .filter((g) => g.eintraege.length);
-    const offen = tag.eintraege.filter((e) => e.offen || !e.gramm).length;
+    const offen = tag.eintraege.filter((e) => imBereich(e) && (e.offen || !e.gramm)).length;
     setze(listenBereich,
-      el('h3', { class: 'zeile' }, 'Einträge heute', offen ? el('span', { class: 'marke warn' }, `${offen} ohne Menge`) : null),
+      el('h3', { class: 'zeile' }, mahlzeitId ? 'Einträge' : 'Einträge heute', offen ? el('span', { class: 'marke warn' }, `${offen} ohne Menge`) : null),
       gruppen.length ? null : el('p', { class: 'leise klein' }, 'Noch nichts eingetragen. Schreib oder sprich oben, was du gegessen hast.'),
       ...gruppen.map(({ m, eintraege }) => el('div', { class: 'memo-gruppe' },
         el('p', { class: 'leise klein' }, m.name),
@@ -79,10 +81,11 @@ export function oeffneMemoDialog({ tag, profil, lebensmittel, beiSpeichern }) {
 
   // ---------- Memo auswerten
   const werteAus = () => {
-    const ergebnis = werteMemoAus(memo.value, lebensmittel, tag.eintraege.filter((e) => e.offen || !e.gramm)
-      .concat(tag.eintraege.filter((e) => e.gramm && !e.offen)));
+    const bereich = tag.eintraege.filter(imBereich);
+    const ergebnis = werteMemoAus(memo.value, lebensmittel, bereich.filter((e) => e.offen || !e.gramm)
+      .concat(bereich.filter((e) => e.gramm && !e.offen)));
     if (!ergebnis.length) { setze(vorschauBereich, el('p', { class: 'leise klein' }, 'Nichts erkannt. Schreib z. B. „Skyr 250“.')); return; }
-    const standardMahlzeit = mahlzeitNachUhrzeit(profil.mahlzeiten);
+    const standardMahlzeit = mahlzeitId ?? mahlzeitNachUhrzeit(profil.mahlzeiten);
     const zeilen = ergebnis.map((r) => ({ ...r, an: Boolean(r.lebensmittel && r.gramm), mahlzeit: standardMahlzeit }));
     const uebernehmen = el('button', { class: 'knopf', type: 'button' }, icon('haken', 18), 'Übernehmen');
     uebernehmen.addEventListener('click', () => {
@@ -113,7 +116,7 @@ export function oeffneMemoDialog({ tag, profil, lebensmittel, beiSpeichern }) {
               ? el('span', {}, z.lebensmittel.name, el('br'), el('span', { class: 'leise klein' }, z.eintragId ? 'Menge für vorhandenen Eintrag' : `neu: „${z.text}“`))
               : el('span', { class: 'warnung' }, `„${z.text}“ nicht gefunden`)),
           el('span', { class: 'memo-menge' }, feld, el('span', { class: 'leise' }, 'g')),
-          z.lebensmittel && !z.eintragId
+          z.lebensmittel && !z.eintragId && !mahlzeitId
             ? el('select', { 'aria-label': 'Mahlzeit', onchange: (e) => { z.mahlzeit = e.target.value; } },
               ...profil.mahlzeiten.map((m) => el('option', { value: m.id, selected: m.id === z.mahlzeit }, m.name)))
             : null);
@@ -141,7 +144,7 @@ export function oeffneMemoDialog({ tag, profil, lebensmittel, beiSpeichern }) {
 
   setze(dialog,
     el('div', { class: 'dialog-kopf' },
-      el('h2', {}, episch('Mengen-Memo des Schreibers', 'Mengen-Memo')),
+      el('h2', {}, mahlzeitId ? `Mengen-Memo: ${mahlzeiten[0]?.name ?? ''}` : episch('Mengen-Memo des Schreibers', 'Mengen-Memo')),
       el('button', { class: 'knopf-klein', type: 'button', 'aria-label': 'Schließen', onclick: schliessen }, icon('schliessen'))),
     el('div', { class: 'dialog-inhalt' },
       el('p', { class: 'leise klein' }, 'Trag erst alles ohne Menge ein und gib die Mengen hier gesammelt an – direkt in den Feldern oder als Memo.'),

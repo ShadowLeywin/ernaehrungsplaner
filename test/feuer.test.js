@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { feuerSerie, feuerStufe, istAktiv } from '../js/logic/feuer.js';
+import { szeneFuerLevel } from '../js/logic/szene.js';
 
 test('Serie mit Schonfrist', () => {
   const heute = '2026-10-10';
@@ -25,4 +26,13 @@ test('Stufen', () => {
 test('Aktiver Tag', () => {
   assert.equal(istAktiv({ eintraege: [{ gramm: 0 }] }), false);
   assert.equal(istAktiv({ wasser: [{ ml: 250 }] }), true);
+});
+
+
+test('Szene nach Level', () => {
+  assert.equal(szeneFuerLevel(1).nr, 1);
+  assert.equal(szeneFuerLevel(4).naechste.ab, 5);
+  assert.equal(szeneFuerLevel(12).name, 'Schmiedelager');
+  assert.equal(szeneFuerLevel(80).nr, 6);
+  assert.equal(szeneFuerLevel(80).naechste, null);
 });

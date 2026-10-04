@@ -1,6 +1,6 @@
 // Service Worker: hält die App-Dateien offline vor.
 // Bei jeder Änderung an App-Dateien VERSION erhöhen, sonst sehen installierte Apps die Änderung nicht.
-const VERSION = 'v32';
+const VERSION = 'v33';
 const CACHE = `ernaehrung-${VERSION}`;
 
 // Alle Dateien der App-Hülle. Neue Dateien hier eintragen.
@@ -87,6 +87,9 @@ const DATEIEN = [
   './js/logic/progression.js',
   './js/logic/feuer.js',
   './js/logic/verschluesselung.js',
+  './js/logic/szene.js',
+  './js/bilder.js',
+  './js/views/lager-szene.js',
   './data/lebensmittel.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
@@ -117,6 +120,13 @@ self.addEventListener('fetch', (event) => {
   if (['localhost', '127.0.0.1'].includes(location.hostname)) {
     const frisch = anfrage.mode === 'navigate' ? anfrage : new Request(anfrage, { cache: 'no-cache' });
     event.respondWith(fetch(frisch).catch(() => caches.match(anfrage, { ignoreSearch: true })));
+    return;
+  }
+
+  // Optionale Bilder (bilder/…) beim ersten Laden zwischenspeichern, danach offline verfügbar
+  if (new URL(anfrage.url).pathname.includes('/bilder/')) {
+    event.respondWith(caches.open(CACHE).then((cache) => cache.match(anfrage).then((treffer) => treffer
+      || fetch(anfrage).then((antwort) => { if (antwort.ok) cache.put(anfrage, antwort.clone()); return antwort; }))));
     return;
   }
 

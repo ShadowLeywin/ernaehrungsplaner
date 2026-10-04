@@ -1,6 +1,7 @@
 // Tagesansicht: Tagesziele mit Fortschritt, Wasser, Morning Stack, Supplements,
 // Einträge pro Mahlzeit und Zähler (Tag / Wochendurchschnitt).
 import { el, setze, zahl, zahlFeld, schalter } from '../ui.js';
+import { kopfBild } from '../bilder.js';
 import { holeProfil, speichereProfil, holeTag, holeTage, speichereTag } from '../state.js';
 import { holeLebensmittel } from '../lebensmittel.js';
 import { tagestypFuerDatum, mahlzeitenZiele, datumSchluessel } from '../logic/ziele.js';
@@ -80,6 +81,7 @@ function zeichne(wurzel, kontext) {
 
   const zaehlerBereich = el('div');
   setze(wurzel,
+    kopfBild('taverne', 'Taverne'),
     begruessung(profil, datum),
     kontext.backupFaellig
       ? el('a', { class: 'karte hinweis-karte', href: '#/backup' },
@@ -87,7 +89,6 @@ function zeichne(wurzel, kontext) {
       : null,
     datumsLeiste(wurzel, datum),
     heroKarte(typ, notiz, ist, profil.ernaehrung?.diaet === 'intervallfasten' ? `${profil.ernaehrung.fensterVon}–${profil.ernaehrung.fensterBis}` : null),
-    memoKarte(kontext, aendern),
     gewichtKarte(kontext),
     wasserKarte(profil, typ, tag, () => speichereTag(tag)),
     profil.morningStack.aktiv ? morningStackKarte(profil, lebensmittel, fix, tag, aendern) : null,
@@ -267,23 +268,6 @@ function gewichtKarte({ tag, profil, gewichte, wurzel }) {
   return karte;
 }
 
-function memoKarte({ tag, profil, lebensmittel, wurzel }, aendern) {
-  const offen = tag.eintraege.filter((e) => e.offen || !e.gramm).length;
-  return el('button', {
-    type: 'button',
-    class: `karte memo-karte${offen ? ' offen' : ''}`,
-    onclick: () => oeffneMemoDialog({ tag, profil, lebensmittel, beiSpeichern: aendern }),
-  },
-  icon('stift', 22),
-  el('span', {},
-    el('strong', {}, episch('Mengen-Memo', 'Mengen-Memo')),
-    el('br'),
-    el('span', { class: 'leise klein' }, offen
-      ? `${offen} Eintr${offen === 1 ? 'ag' : 'äge'} ohne Menge – jetzt ergänzen`
-      : 'Mengen gesammelt eintragen, tippen oder diktieren')),
-  icon('weiter', 20));
-}
-
 function mahlzeitKarte(mahlzeit, ziel, tag, lebensmittel, aendern, kontext) {
   const eintraege = tag.eintraege.filter((e) => e.mahlzeit === mahlzeit.id);
   const summe = mahlzeitSumme(tag, mahlzeit.id, lebensmittel);
@@ -314,7 +298,12 @@ function mahlzeitKarte(mahlzeit, ziel, tag, lebensmittel, aendern, kontext) {
 
   return el('section', { class: 'karte mahlzeit' },
     el('div', { class: 'zeile' },
-      el('h2', {}, mahlzeit.name),
+      el('h2', {}, mahlzeit.name,
+        el('button', {
+          class: `knopf-klein memo-knopf${eintraege.some((e) => e.offen || !e.gramm) ? ' offen' : ''}`, type: 'button',
+          'aria-label': `Mengen-Memo für ${mahlzeit.name}`, title: 'Mengen-Memo',
+          onclick: () => oeffneMemoDialog({ tag, profil: kontext.profil, lebensmittel, beiSpeichern: aendern, mahlzeitId: mahlzeit.id }),
+        }, icon('stift', 18))),
       el('span', { class: 'leise klein' }, `${zahl(Math.round(summe.kcal ?? 0))} / ${zahl(ziel.kcal)} kcal`)),
     el('div', { class: 'balken mini' }, el('div', {
       style: `width:${ziel.kcal ? Math.min(100, ((summe.kcal ?? 0) / ziel.kcal) * 100) : 0}%;`

@@ -1,5 +1,6 @@
 // Heldenbogen (Charakter): Level, Klasse, sechs Werte, Ränge je Muskelgruppe und gesamt.
 import { el, setze, zahl } from '../ui.js';
+import { kopfBild } from '../bilder.js';
 import { icon } from '../icons.js';
 import { episch } from '../darstellung.js';
 import { ladeSpielstand, verzeichnis } from '../spiel.js';
@@ -21,6 +22,7 @@ export const held = {
 function inhalt(s) {
   const { level, klasse, werte, raenge, xp, profil } = s;
   return [
+    kopfBild('held', 'Heldenbogen'),
     el('section', { class: 'karte hero held-kopf' },
       el('div', { class: 'held-zeile' },
         el('div', { class: 'level-kreis' }, el('span', {}, 'Lvl'), el('strong', {}, String(level.level))),

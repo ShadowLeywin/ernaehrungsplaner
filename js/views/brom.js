@@ -5,6 +5,7 @@ import { el, setze } from '../ui.js';
 import { icon } from '../icons.js';
 import { episch } from '../darstellung.js';
 import { bromSvg } from './brom-figur.js';
+import { findeBild } from '../bilder.js';
 
 const SCHLUESSEL = 'brom';
 
@@ -17,6 +18,15 @@ export function setzeBromAn(an) {
 }
 
 export { bromSvg, bromMarkup } from './brom-figur.js';
+
+/** Brom-Porträt: KI-Bild (bilder/brom/portraet), sonst die gezeichnete Fassung. */
+export function bromPortraet(groesse = 64) {
+  const huelle = el('span', { class: 'brom-portraet', style: `width:${groesse}px;height:${groesse}px` }, bromSvg(groesse, 'portraet'));
+  findeBild('brom/portraet').then((url) => {
+    if (url) setze(huelle, el('img', { src: url, alt: 'Brom', width: groesse, height: groesse }));
+  });
+  return huelle;
+}
 
 const HEROLD_SAETZE = [
   (n, s) => `Hört, hört! „${n}“ ist errungen – Stufe ${s}.`,
@@ -37,7 +47,7 @@ export function zeigeHerold(meldungen) {
   const schliessen = () => { karte.classList.add('weg'); setTimeout(() => karte.remove(), 300); };
   const erste = meldungen.slice(0, 3);
   setze(karte,
-    mitBrom ? el('div', { class: 'herold-brom' }, bromSvg(60, 'portraet')) : el('div', { class: 'herold-icon' }, icon('pokal', 26)),
+    mitBrom ? el('div', { class: 'herold-brom' }, bromPortraet(60)) : el('div', { class: 'herold-icon' }, icon('pokal', 26)),
     el('div', { class: 'herold-text' },
       el('strong', {}, mitBrom ? 'Brom verkündet' : episch('Neuer Erfolg', 'Neuer Erfolg')),
       ...erste.map((m) => el('p', {}, m.farbe ? el('span', { class: 'herold-punkt', style: `background:${m.farbe}` }) : null, m.text)),
