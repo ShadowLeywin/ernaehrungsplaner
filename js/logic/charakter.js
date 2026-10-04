@@ -88,3 +88,9 @@ export function bestimmeKlasse(werte) {
   const [episch, schlicht] = KLASSEN[haupt];
   return { id: haupt, episch, schlicht, haupt, neben };
 }
+
+/** Klassenname aus der Klassen-ID (z. B. von einer Rangkarte): [episch, schlicht] oder null. */
+export function klassenName(id) {
+  if (id === 'lehrling') return ['Lehrling', 'Einsteiger'];
+  return KLASSEN[id] ?? DOPPEL[id] ?? null;
+}

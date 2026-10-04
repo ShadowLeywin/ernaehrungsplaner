@@ -12,6 +12,7 @@ import { fortschritt } from './views/fortschritt.js';
 import { held } from './views/held.js';
 import { erfolge } from './views/erfolge.js';
 import { koerper } from './views/koerper.js';
+import { freunde } from './views/freunde.js';
 import { pruefeSpaeter } from './spiel.js';
 import { oeffnePanel, schnellEinstellungen } from './views/panel.js';
 import { pruefeEinrichtung, istEingerichtet, beiTagGespeichert } from './state.js';
@@ -21,7 +22,7 @@ import { icon } from './icons.js';
 wendeDarstellungAn();
 document.querySelectorAll('.nav-icon[data-icon]').forEach((platz) => platz.append(icon(platz.dataset.icon, 22)));
 
-const ansichten = { ...platzhalter, heute, einstellungen, lebensmittel, backup, einrichtung, gewicht, training, lager, fortschritt, held, erfolge, koerper };
+const ansichten = { ...platzhalter, heute, einstellungen, lebensmittel, backup, einrichtung, gewicht, training, lager, fortschritt, held, erfolge, koerper, freunde };
 
 // Ohne Profil nur Einrichtung und Backup (zum Wiederherstellen) erlauben
 const wache = (name) => (istEingerichtet() || name === 'backup' ? null : 'einrichtung');

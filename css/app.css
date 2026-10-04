@@ -926,3 +926,15 @@ input.offen { border-color: var(--warnung); background: color-mix(in oklab, var(
 .uebungs-info li:last-child { border-bottom: 0; }
 .uebungs-info summary { cursor: pointer; font-weight: 600; }
 .uebung-beschreibung { margin-top: 8px; }
+
+/* ---------- Freunde ---------- */
+.rangkarte { background: radial-gradient(ellipse at 0% 0%, color-mix(in oklab, var(--akzent) 18%, transparent), transparent 60%), var(--flaeche); }
+.rangkarte-kopf { display: flex; gap: 14px; align-items: center; }
+.rangkarte-kopf h2 { margin: 0; }
+.rangkarte-gruppen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+.rk-gruppe { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; padding: 8px 4px; border-radius: var(--radius-klein); background: var(--flaeche-2); }
+.vergleich { width: 100%; }
+.vergleich td:not(:first-child), .vergleich th:not(:first-child) { text-align: right; }
+.vergleich td.besser { color: var(--akzent); font-weight: 800; }
+.freund summary { list-style: none; }
+.freund-kopf { display: flex; gap: 12px; align-items: center; cursor: pointer; }
