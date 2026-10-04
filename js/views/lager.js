@@ -3,7 +3,7 @@ import { el, setze, zahl } from '../ui.js';
 import { icon } from '../icons.js';
 import { episch } from '../darstellung.js';
 import { holeProfil, holeTag, speichereTag } from '../state.js';
-import { lese } from '../db.js';
+import { lese, anzahl } from '../db.js';
 import { holeLebensmittel } from '../lebensmittel.js';
 import { datumSchluessel, tagestypFuerDatum } from '../logic/ziele.js';
 import { tagesNaehrwerte } from '../logic/tag.js';
@@ -15,6 +15,8 @@ import { holeGewichtsReihe } from './gewicht.js';
 import { ladeSpielstand } from '../spiel.js';
 import { feuerSerie, feuerStufe, istAktiv } from '../logic/feuer.js';
 import { szeneFuerLevel } from '../logic/szene.js';
+import { impulsFuerDatum } from '../logic/impulse.js';
+import { backupErinnerungFaellig } from '../logic/backup.js';
 import { zeigeBildSzene } from './lager-szene.js';
 import { rangName } from '../logic/raenge.js';
 import { rangEmblem } from './emblem.js';
@@ -69,14 +71,24 @@ async function lade(wurzel) {
     });
   }).catch(() => {});
 
+  const backupPlatz = el('div');
+  Promise.all([lese('einstellungen', 'letztesBackup'), anzahl('tage')]).then(([letztes, n]) => {
+    if (backupErinnerungFaellig(letztes, n > 0)) {
+      setze(backupPlatz, el('a', { class: 'karte hinweis-karte', href: '#/backup' }, icon('backup'),
+        el('span', {}, episch('Brom mahnt: Sichere deine Chronik – das letzte Backup ist über eine Woche alt.', 'Backup fällig – letztes Backup über eine Woche alt.'))));
+    }
+  });
+
   setze(wurzel,
     feuerKarte,
+    backupPlatz,
     heldPlatz,
     el('div', { class: 'hub-kacheln' },
       ernaehrungsKachel(typ, ist),
       trainingsKachel(vorlagen ?? [], tag, jetzt),
       wasserKachel(profil, typ, tag),
-      gewichtsKachel(tag, gewichte)));
+      gewichtsKachel(tag, gewichte)),
+    el('p', { class: 'tagesimpuls' }, el('span', { class: 'leise klein' }, episch('Weisheit des Tages', 'Tagesimpuls')), el('br'), impulsFuerDatum(datumSchluessel(jetzt))));
 }
 
 function begruessung(profil) {

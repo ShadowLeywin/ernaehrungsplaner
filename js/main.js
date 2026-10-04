@@ -22,6 +22,8 @@ import { vorlieben } from './views/vorlieben.js';
 import { angebote } from './views/angebote.js';
 import { ausbau } from './views/ausbau.js';
 import { masse } from './views/masse.js';
+import { aktion } from './views/aktion.js';
+import { zeigeTour, tourGesehen } from './views/tour.js';
 import { pruefeSpaeter } from './spiel.js';
 import { oeffnePanel, schnellEinstellungen } from './views/panel.js';
 import { pruefeEinrichtung, istEingerichtet, beiTagGespeichert } from './state.js';
@@ -32,7 +34,7 @@ wendeDarstellungAn();
 document.querySelectorAll('.nav-icon[data-icon]').forEach((platz) => platz.append(icon(platz.dataset.icon, 22)));
 
 const ansichten = {
-  mehr, heute, einstellungen, lebensmittel, backup, einrichtung, gewicht, training, lager, fortschritt, held, erfolge, koerper, freunde, tagebuch, rezepte, mealprep, woche, einkauf, vorlieben, angebote, ausbau, masse };
+  mehr, heute, einstellungen, lebensmittel, backup, einrichtung, gewicht, training, lager, fortschritt, held, erfolge, koerper, freunde, tagebuch, rezepte, mealprep, woche, einkauf, vorlieben, angebote, ausbau, masse, aktion };
 
 // Ohne Profil nur Einrichtung und Backup (zum Wiederherstellen) erlauben
 const wache = (name) => (istEingerichtet() || name === 'backup' ? null : 'einrichtung');
@@ -42,6 +44,8 @@ pruefeEinrichtung().then(() => {
   neuZeichnen = starteRouter(ansichten, 'lager', document.getElementById('inhalt'), wache);
   // Erfolge prüfen: beim Start und nach jeder gespeicherten Änderung (Brom verkündet Neues)
   if (istEingerichtet()) pruefeSpaeter(2500);
+  // Einführung einmal nach der Einrichtung zeigen
+  if (istEingerichtet() && !tourGesehen()) setTimeout(zeigeTour, 1200);
   beiTagGespeichert(() => pruefeSpaeter());
 });
 

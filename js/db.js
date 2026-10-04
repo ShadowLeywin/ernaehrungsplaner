@@ -35,9 +35,12 @@ async function ausfuehren(store, modus, aktion) {
 }
 
 export const lese = (store, schluessel) => ausfuehren(store, 'readonly', (s) => s.get(schluessel));
-export const schreibe = (store, schluessel, wert) => ausfuehren(store, 'readwrite', (s) => s.put(wert, schluessel));
+// Änderungszähler: Zwischenspeicher (z. B. Spielstand) wissen so, ob sie neu rechnen müssen
+let aenderungen = 0;
+export const aenderungsStand = () => aenderungen;
+export const schreibe = (store, schluessel, wert) => { aenderungen += 1; return ausfuehren(store, 'readwrite', (s) => s.put(wert, schluessel)); };
 export const anzahl = (store) => ausfuehren(store, 'readonly', (s) => s.count());
-export const loesche = (store, schluessel) => ausfuehren(store, 'readwrite', (s) => s.delete(schluessel));
+export const loesche = (store, schluessel) => { aenderungen += 1; return ausfuehren(store, 'readwrite', (s) => s.delete(schluessel)); };
 
 /** Alle Einträge eines Speichers als [[schluessel, wert], …] */
 export async function alleEintraege(store) {
@@ -61,6 +64,7 @@ export async function alleEintraege(store) {
  * Stores in `zusammenfuehren` werden nicht geleert, nur die enthaltenen Schlüssel überschrieben.
  */
 export async function ersetzeAlles(datenProStore, zusammenfuehren = []) {
+  aenderungen += 1;
   const db = await oeffne();
   const stores = Object.keys(datenProStore);
   return new Promise((aufloesen, ablehnen) => {

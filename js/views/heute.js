@@ -23,6 +23,7 @@ import { uebungsVerzeichnis, zusatzKcal, zielMitZusatz } from '../logic/training
 const uebungsVerzeichnisCache = uebungsVerzeichnis(UEBUNGEN);
 import { balkenZeile, zaehlerInhalt } from './zaehler.js';
 import { oeffneMemoDialog } from './memo-dialog.js';
+import { zeigeHinweis } from './hinweis.js';
 import { kopiereMahlzeit, vorlageAusMahlzeit, eintraegeAusVorlage } from '../logic/schnell.js';
 import { rest, wasFehlt, mikroTipps, KOFFEIN, KOFFEIN_GRENZE } from '../logic/vorschlaege.js';
 import { spracheVerfuegbar, spracheErlaubt, setzeSpracheErlaubt } from '../sprache.js';
@@ -217,6 +218,10 @@ function heroKarte(typ, notiz, ist, fenster = null) {
 
 function gewichtKarte({ tag, profil, gewichte, wurzel }) {
   const karte = el('section', { class: 'karte' });
+  if (sessionStorage.getItem('fokusGewicht')) {
+    sessionStorage.removeItem('fokusGewicht');
+    setTimeout(() => { karte.scrollIntoView({ block: 'center' }); karte.querySelector('input')?.focus(); }, 300);
+  }
   const schnitt = durchschnitt(gewichte, tag.datum, 7, 1);
   const vorschlag = anpassungsVorschlag(gewichte, profil.ziel, datumSchluessel(new Date()), profil.ziel.letzteEntscheidung ?? null);
 
@@ -282,7 +287,12 @@ function mahlzeitKarte(mahlzeit, ziel, tag, lebensmittel, aendern, kontext) {
     titel: mahlzeit.name,
     eintrag,
     beiSpeichern: (lebensmittelId, gramm) => { Object.assign(eintrag, { lebensmittelId, gramm }); aendern(); },
-    beiLoeschen: () => { tag.eintraege.splice(tag.eintraege.indexOf(eintrag), 1); aendern(); },
+    beiLoeschen: () => {
+      const pos = tag.eintraege.indexOf(eintrag);
+      tag.eintraege.splice(pos, 1);
+      aendern();
+      zeigeHinweis(`${name(eintrag.lebensmittelId)} gelöscht`, { rueckgaengig: () => { tag.eintraege.splice(pos, 0, eintrag); aendern(); } });
+    },
   });
   const hinzufuegen = () => oeffneEintragDialog({
     lebensmittel,
@@ -402,7 +412,12 @@ function wasserKarte(profil, typ, tag, speichern) {
           class: 'knopf-klein',
           type: 'button',
           'aria-label': `${eintrag.ml} ml löschen`,
-          onclick: () => { tag.wasser.splice(index, 1); speichern(); zeichneKarte(); },
+          onclick: () => {
+            const [weg] = tag.wasser.splice(index, 1);
+            speichern();
+            zeichneKarte();
+            zeigeHinweis(`${zahl(weg.ml)} ml gelöscht`, { rueckgaengig: () => { tag.wasser.splice(index, 0, weg); speichern(); zeichneKarte(); } });
+          },
         }, icon('schliessen', 18))))));
 
     setze(karte,

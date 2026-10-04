@@ -3,6 +3,7 @@ import { el, setze, schalter } from '../ui.js';
 import { icon } from '../icons.js';
 import { THEMEN, MODI, STILE, ladeDarstellung, speichereDarstellung } from '../darstellung.js';
 import { bromAn, setzeBromAn } from './brom.js';
+import { zeigeTour } from './tour.js';
 
 export function oeffnePanel(titel, inhalt, beiSchliessen) {
   const dialog = el('dialog', { class: 'panel' });
@@ -64,5 +65,6 @@ export function schnellEinstellungen() {
       schalter(bromAn(), setzeBromAn, 'Brom, der Herold', el('span', { class: 'leise klein' }, ' – verkündet Erfolge in der App (nie als Push-Nachricht)'))),
     el('div', { class: 'knopfreihe', style: 'margin-top:16px' },
       el('a', { class: 'knopf zweitrangig', href: '#/einstellungen' }, icon('einstellungen', 18), 'Profil & Ziele'),
-      el('a', { class: 'knopf zweitrangig', href: '#/backup' }, icon('backup', 18), 'Backup')));
+      el('a', { class: 'knopf zweitrangig', href: '#/backup' }, icon('backup', 18), 'Backup'),
+      el('button', { class: 'knopf zweitrangig', type: 'button', onclick: () => { document.querySelector('dialog.panel')?.close(); document.querySelector('dialog.panel')?.remove(); zeigeTour(); } }, 'Einführung')));
 }

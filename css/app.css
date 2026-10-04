@@ -1145,3 +1145,21 @@ input.offen { border-color: var(--warnung); background: color-mix(in oklab, var(
 .rat-option { display: flex; justify-content: space-between; gap: 8px; padding: 6px 10px; margin: 4px 0; border-radius: var(--radius-klein); background: var(--flaeche-2); font-size: 0.9rem; }
 .portionen-wahl { display: flex; align-items: center; gap: 6px; }
 .portionen-feld { width: 64px; min-height: 34px; padding: 4px 8px; text-align: center; }
+
+/* ---------- Hinweise, Tour, Impuls ---------- */
+.hinweis-toast {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--nav-hoehe) + 16px + env(safe-area-inset-bottom)); z-index: 25;
+  display: flex; align-items: center; gap: 14px; padding: 8px 10px 8px 16px; border-radius: 999px; max-width: calc(100% - 32px);
+  background: var(--text); color: var(--hintergrund); font-weight: 600; font-size: 0.9rem; box-shadow: 0 10px 30px rgb(0 0 0 / 0.35);
+  animation: hochfahren 0.25s ease-out; transition: opacity 0.25s;
+}
+.hinweis-toast.weg { opacity: 0; }
+.hinweis-toast .knopf-text { color: var(--akzent); padding: 4px 6px; font-weight: 800; }
+.tour-inhalt { text-align: center; padding-top: 24px; }
+.tour-kopf { display: flex; justify-content: center; align-items: center; gap: 12px; }
+.tour .schritt-punkte { margin: 14px 0; }
+.tour .knopfreihe { justify-content: center; }
+.tagesimpuls { margin: 16px 4px 8px; padding: 12px 16px; border-left: 3px solid var(--akzent); font-style: italic; color: var(--text); }
+[data-stil=schlicht] .tagesimpuls { font-style: normal; }
+.dialog.tour { height: auto; max-width: min(440px, calc(100% - 32px)); border-radius: var(--radius); border: 1px solid color-mix(in oklab, var(--akzent) 40%, var(--rand)); }
+.dialog.tour::backdrop { background: rgb(0 0 0 / 0.6); }

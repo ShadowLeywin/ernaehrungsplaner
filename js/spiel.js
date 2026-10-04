@@ -1,6 +1,6 @@
 // Spiel-Ebene zur Laufzeit: lädt alle Daten, berechnet Spielstand, Ränge, Werte, Level und Erfolge
 // und lässt Brom neue Erfolge verkünden. Rechenlogik liegt in js/logic/ (getestet).
-import { alleEintraege, lese, schreibe } from './db.js';
+import { alleEintraege, lese, schreibe, aenderungsStand } from './db.js';
 import { holeProfil } from './state.js';
 import { holeLebensmittel } from './lebensmittel.js';
 import { UEBUNGEN } from './daten/uebungen.js';
@@ -20,7 +20,17 @@ import { episch } from './darstellung.js';
 
 export const verzeichnis = uebungsVerzeichnis(UEBUNGEN);
 
-export async function ladeSpielstand() {
+// Zwischenspeicher: gleicher Datenstand und Tag → kein Neuberechnen
+let cache = null;
+
+export function ladeSpielstand() {
+  const schluessel = `${aenderungsStand()}|${new Date().toDateString()}`;
+  if (cache?.schluessel !== schluessel) cache = { schluessel, versprechen: berechneSpielstand() };
+  cache.versprechen.catch(() => { cache = null; });
+  return cache.versprechen;
+}
+
+async function berechneSpielstand() {
   const [eintraege, profil, daten, gespeichertesLager] = await Promise.all([alleEintraege('tage'), holeProfil(), holeLebensmittel(), lese('einstellungen', 'lager')]);
   const lager = { ...leeresLager(), ...gespeichertesLager };
   const tage = eintraege.map(([, t]) => t);

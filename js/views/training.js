@@ -13,6 +13,7 @@ import {
 import { neueRekorde } from '../logic/fortschritt.js';
 import { steigerung, stillstand } from '../logic/progression.js';
 import { SATZ_TYPEN, scheiben, aufwaermSaetze } from '../logic/hantel.js';
+import { zeigeHinweis } from './hinweis.js';
 import { episch } from '../darstellung.js';
 import { holeGewichtsReihe } from './gewicht.js';
 import { oeffneUebungDialog } from './uebung-dialog.js';
@@ -78,6 +79,12 @@ function stoppeWorkoutHilfen() {
 
 function zeichneUebersicht(k, tag) {
   stoppeWorkoutHilfen();
+  if (sessionStorage.getItem('schnellstartWorkout')) {
+    sessionStorage.removeItem('schnellstartWorkout');
+    const geplant = vorlagenFuerTag(k.vorlagen, new Date()).find((v) => !erledigteVorlagen(tag).has(v.id));
+    if (geplant) starteVorlage(k, geplant); else starteWorkout(k);
+    return;
+  }
   const fertig = tag.trainings.filter((t) => t.typ === 'aktivitaet' || t.ende);
   const gesamt = fertig.reduce((s, t) => s + kcalTraining(t, verzeichnis, k.gewichtKg), 0);
   const zusatz = zusatzKcal(tag, verzeichnis, k.gewichtKg);
@@ -89,9 +96,11 @@ function zeichneUebersicht(k, tag) {
 
   const neuLaden = () => lade(k.wurzel);
   const loesche = async (t) => {
-    tag.trainings.splice(tag.trainings.indexOf(t), 1);
+    const pos = tag.trainings.indexOf(t);
+    tag.trainings.splice(pos, 1);
     await speichereTag(tag);
     neuLaden();
+    zeigeHinweis('Training gelöscht', { rueckgaengig: async () => { tag.trainings.splice(pos, 0, t); await speichereTag(tag); neuLaden(); } });
   };
 
   setze(k.wurzel,
@@ -111,6 +120,7 @@ function zeichneUebersicht(k, tag) {
       el('div', { class: 'knopfreihe' },
         el('a', { class: 'knopf zweitrangig', href: '#/fortschritt' }, icon('hoch', 18), 'Fortschritt & Rekorde'),
         el('a', { class: 'knopf zweitrangig', href: '#/koerper' }, icon('koerper', 18), 'Körper'))),
+    deloadHinweis(k),
     ...vorlagenBereich(k, tag),
     fertig.length ? el('h2', { class: 'abschnitt' }, 'Heute erledigt') : null,
     ...fertig.map((t) => trainingKarte(t, k.gewichtKg, () => loesche(t))),
@@ -119,6 +129,25 @@ function zeichneUebersicht(k, tag) {
     !fertig.length && !frueher.length
       ? el('p', { class: 'leise klein', style: 'text-align:center;margin-top:24px' }, `${UEBUNGEN.length} Übungen und Aktivitäten warten auf dich.`)
       : null);
+}
+
+/** Nach 6+ harten Wochen am Stück eine leichtere Woche vorschlagen. */
+function deloadHinweis(k) {
+  const wochen = new Map();
+  for (const tag of k.alleTage) {
+    if (!(tag.trainings ?? []).some((t) => t.typ === 'workout' && t.ende)) continue;
+    const d = new Date(`${tag.datum}T12:00:00`);
+    const montag = datumSchluessel(new Date(d.getFullYear(), d.getMonth(), d.getDate() - ((d.getDay() + 6) % 7)));
+    wochen.set(montag, (wochen.get(montag) ?? 0) + 1);
+  }
+  let serie = 0;
+  const m = new Date();
+  let montag = new Date(m.getFullYear(), m.getMonth(), m.getDate() - ((m.getDay() + 6) % 7) - 7);
+  while ((wochen.get(datumSchluessel(montag)) ?? 0) >= 3) { serie += 1; montag = new Date(montag.getFullYear(), montag.getMonth(), montag.getDate() - 7); }
+  if (serie < 6) return null;
+  return el('section', { class: 'karte hinweis-karte' }, icon('uhr'),
+    el('span', {}, episch(`${serie} harte Wochen am Stück – Brom rät zu einer Deload-Woche: gleiche Übungen, etwa 40 % weniger Gewicht oder Sätze. Danach kommt der nächste Sprung.`,
+      `${serie} Trainingswochen in Folge – eine Deload-Woche (ca. 40 % weniger Volumen) beugt Überlastung vor.`)));
 }
 
 // ---------------------------------------------------------------- Vorlagen
@@ -562,6 +591,10 @@ function ladePause() {
   try { return Number(localStorage.getItem('pauseSek')) || 90; } catch { return 90; }
 }
 
+function ladeAnsage() {
+  try { return localStorage.getItem('pauseAnsage') === 'an'; } catch { return false; }
+}
+
 function ladeWachHalten() {
   try { return localStorage.getItem('wachHalten') !== 'aus'; } catch { return true; }
 }
@@ -576,7 +609,9 @@ function trainingsEinstellungen() {
     el('h2', { class: 'abschnitt' }, 'Workout'),
     el('label', { class: 'feld' }, el('span', {}, 'Pausentimer nach jedem Satz (Sekunden)'), pause),
     schalter(ladeWachHalten(), (an) => { try { localStorage.setItem('wachHalten', an ? 'an' : 'aus'); } catch { /* egal */ } },
-      'Bildschirm während des Workouts anlassen'));
+      'Bildschirm während des Workouts anlassen'),
+    schalter(ladeAnsage(), (an) => { try { localStorage.setItem('pauseAnsage', an ? 'an' : 'aus'); } catch { /* egal */ } },
+      'Sprachansage am Pausenende', el('span', { class: 'leise klein' }, ' – über die Sprachausgabe des Handys, offline')));
 }
 
 function startePause(sek = null) {
@@ -605,6 +640,11 @@ function startePause(sek = null) {
     balken.style.width = `${(rest / gesamt) * 100}%`;
     if (rest === 0) {
       navigator.vibrate?.([200, 100, 200]);
+      if (ladeAnsage() && 'speechSynthesis' in window) {
+        const satz = new SpeechSynthesisUtterance(document.documentElement.dataset.stil === 'schlicht' ? 'Pause vorbei.' : 'Zurück an den Amboss.');
+        satz.lang = 'de-DE';
+        speechSynthesis.speak(satz);
+      }
       leiste.classList.add('fertig');
       anzeige.textContent = 'Los geht’s!';
       setTimeout(() => leiste.remove(), 4000);
