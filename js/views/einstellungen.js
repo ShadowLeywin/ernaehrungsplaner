@@ -109,7 +109,7 @@ function zeichne(wurzel, profil, geaendert, lebensmittel) {
     abschnitt('Referenzwerte Mikronährstoffe'),
     referenzKarte(profil, markiereGeaendert),
     abschnitt('Wasser'),
-    wasserKarte(profil, markiereGeaendert),
+    wasserKarte(profil, markiereGeaendert, neuZeichnen),
     abschnitt('Morning Stack'),
     morningStackKarte(profil, lebensmittel, markiereGeaendert, neuZeichnen),
     abschnitt('Supplements'),
@@ -243,7 +243,7 @@ function referenzKarte(profil, markiereGeaendert) {
   return karte(el('label', { class: 'feld' }, el('span', {}, 'Gruppe (DGE)'), auswahl));
 }
 
-function wasserKarte(profil, markiereGeaendert) {
+function wasserKarte(profil, markiereGeaendert, neuZeichnen) {
   const w = profil.wasser;
   const uhrzeit = el('input', {
     type: 'time',
@@ -251,12 +251,22 @@ function wasserKarte(profil, markiereGeaendert) {
     oninput: () => { if (uhrzeit.value) { w.mittagspause = uhrzeit.value; markiereGeaendert(); } },
   });
   return karte(
-    el('div', { class: 'felder' },
-      el('label', { class: 'feld' }, el('span', {}, 'Mittagspause ab'), uhrzeit),
-      ...w.presetsMl.map((ml, i) => zahlFeld(`Knopf ${i + 1}`, ml, 'ml', (wert) => {
-        w.presetsMl[i] = Math.round(wert);
-        markiereGeaendert();
-      }))),
+    el('div', { class: 'felder' }, el('label', { class: 'feld' }, el('span', {}, 'Mittagspause ab'), uhrzeit)),
+    el('p', { class: 'feld', style: 'margin-top:12px' }, el('span', {}, 'Schnellknöpfe (1 bis 3)')),
+    ...w.presetsMl.map((ml, i) => el('div', { class: 'aktivitaet' },
+      zahlFeld(`Knopf ${i + 1}`, ml, 'ml', (wert) => { w.presetsMl[i] = Math.round(wert); markiereGeaendert(); }),
+      w.presetsMl.length > 1
+        ? el('button', {
+          class: 'knopf-klein', type: 'button', 'aria-label': `Knopf ${i + 1} entfernen`,
+          onclick: () => { w.presetsMl.splice(i, 1); markiereGeaendert(); neuZeichnen(); },
+        }, icon('schliessen', 18))
+        : null)),
+    w.presetsMl.length < 3
+      ? el('button', {
+        class: 'knopf zweitrangig', type: 'button',
+        onclick: () => { w.presetsMl.push(500); markiereGeaendert(); neuZeichnen(); },
+      }, icon('plus', 18), 'Knopf')
+      : null,
     el('p', { class: 'leise klein' }, 'Das Ziel „Wasser bis Mittag“ steht beim jeweiligen Tagestyp unter „Weitere Tagesziele“.'));
 }
 

@@ -47,7 +47,7 @@ export function standardProfil() {
     tagestypen: [neuerTagestyp('standard', 'Standardtag', { basis: true })],
     woche: WOCHENTAGE.map(() => ({ tagestyp: 'standard', notiz: '' })),
     wasser: {
-      presetsMl: [250, 500, 800],
+      presetsMl: [250], // bis zu 3 Schnellknöpfe, in den Einstellungen änderbar
       mittagspause: '12:00', // Ziel „Wasser bis Mittag“ zählt Einträge vor dieser Uhrzeit
     },
     // Fester täglicher Eintrag (z. B. Shake am Morgen), als getrunken vorbelegt

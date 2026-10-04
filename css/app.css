@@ -364,7 +364,7 @@ details .felder { margin-top: 8px; }
   border: 0;
   cursor: pointer;
 }
-.presets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.presets { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; }
 .presets .knopf { padding: 10px 6px; }
 .manuell { display: flex; gap: 8px; margin-top: 10px; }
 .manuell input { flex: 1; }

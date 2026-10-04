@@ -143,6 +143,8 @@ export const UEBUNGEN = [
   kraft('handgelenk_curls', 'Handgelenk-Curls', ['unterarme'], 'kurzhantel'),
   kraft('handgelenk_strecken', 'Handgelenkstrecken (Reverse Wrist Curls)', ['unterarme'], 'kurzhantel'),
   kraft('reverse_curls', 'Reverse Curls', ['unterarme', 'bizeps'], 'sz'),
+  // Reiseimer: Hände im Reis wühlen, greifen, drehen – Sätze nach Zeit
+  { id: 'reiseimer', name: 'Reiseimer-Wühlen', kategorie: 'gym', art: 'halten', muskeln: ['unterarme'], equipment: 'sonstiges' },
   kraft('farmers_walk', 'Farmer’s Walk', ['unterarme', 'nacken', 'ganzkoerper'], 'kurzhantel'),
 
   // ---------- Gym: Beine ----------
