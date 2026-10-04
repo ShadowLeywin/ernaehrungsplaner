@@ -21,7 +21,7 @@ const MEHR = [
   ['tagebuch', 'buch', 'Tagebuch', 'Chronik deiner Tage'],
   ['fortschritt', 'hoch', 'Fortschritt', 'Rekorde & Verlauf'],
   ['gewicht', 'gewicht', 'Gewicht', 'Verlauf & Anpassung'],
-  ['rezepte', 'rezepte', 'Rezepte', 'Kommt bald'],
+  ['rezepte', 'rezepte', 'Rezepte', 'Bewertet & eintragbar'],
   ['lebensmittel', 'lebensmittel', 'Lebensmittel', 'Nährwerte suchen'],
   ['einstellungen', 'einstellungen', 'Profil', 'Ziele, Sport, Design'],
   ['backup', 'backup', 'Backup', 'Sichern & laden'],
@@ -38,9 +38,7 @@ function mehrAnsicht() {
 
 export const ansichten = {
   woche: platzhalter('Woche', 'woche', 'Der Wochenplaner kommt in einem der nächsten Schritte.'),
-  rezepte: platzhalter('Rezepte', 'rezepte', 'Rezepte mit Bewertung, Geschmack und Vorteilen kommen bald.', 'mehr'),
   einkauf: platzhalter('Einkauf', 'einkauf', 'Die Einkaufsliste entsteht später automatisch aus dem Wochenplan.', 'mehr'),
   mehr: { titel: 'Mehr', render: mehrAnsicht },
   angebote: platzhalter('Angebote', 'angebote', 'Die Angebote der Märkte kommen in einem späteren Schritt.', 'mehr'),
-  mealprep: platzhalter('Meal-Prep', 'mealprep', 'Gesamtgewicht ÷ Portionen – kommt zusammen mit den Rezepten.', 'mehr'),
 };

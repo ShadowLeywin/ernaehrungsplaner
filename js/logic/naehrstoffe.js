@@ -48,6 +48,8 @@ export const KATEGORIEN = {
   suesses: 'Süßes',
   getraenke: 'Getränke',
   sonstiges: 'Sonstiges',
+  eigen: 'Eigene & Marken',
+  rezept: 'Rezepte',
 };
 
 /** Nährwerte für eine Menge in Gramm aus den Werten je 100 g. Unbekannte Nährstoffe bleiben unbekannt. */

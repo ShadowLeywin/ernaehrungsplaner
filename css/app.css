@@ -949,3 +949,13 @@ input.offen { border-color: var(--warnung); background: color-mix(in oklab, var(
 .chronik-liste li::before { content: "◆"; position: absolute; left: 0; color: var(--akzent); font-size: 0.6rem; top: 9px; }
 [data-stil=episch] .chronik-liste li { font-style: italic; }
 .auswahl li.unpassend .auswahl-eintrag > span:first-child { opacity: 0.75; }
+
+/* ---------- Rezepte ---------- */
+.rezept-karte { display: block; color: inherit; text-decoration: none; }
+.rezept-karte .chips { margin-top: 6px; }
+.rezept-note { font-weight: 800; color: var(--akzent); white-space: nowrap; }
+.rezept-note.gross { font-size: 1.3rem; }
+.regler input[type=range] { width: 100%; accent-color: var(--akzent); padding: 0; min-height: 32px; background: none; border: 0; }
+.regler .zeile strong { color: var(--text); }
+.portion-eintragen { margin-top: 12px; }
+.rezept-suche { width: 100%; margin-top: 12px; }
