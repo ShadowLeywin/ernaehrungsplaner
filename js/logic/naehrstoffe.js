@@ -50,6 +50,7 @@ export const KATEGORIEN = {
   sonstiges: 'Sonstiges',
   eigen: 'Eigene & Marken',
   rezept: 'Rezepte',
+  auswaerts: 'Auswärts (geschätzt)',
 };
 
 /** Nährwerte für eine Menge in Gramm aus den Werten je 100 g. Unbekannte Nährstoffe bleiben unbekannt. */

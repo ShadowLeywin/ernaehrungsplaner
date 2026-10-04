@@ -24,6 +24,7 @@ const uebungsVerzeichnisCache = uebungsVerzeichnis(UEBUNGEN);
 import { balkenZeile, zaehlerInhalt } from './zaehler.js';
 import { oeffneMemoDialog } from './memo-dialog.js';
 import { kopiereMahlzeit, vorlageAusMahlzeit, eintraegeAusVorlage } from '../logic/schnell.js';
+import { rest, wasFehlt, mikroTipps, KOFFEIN, KOFFEIN_GRENZE } from '../logic/vorschlaege.js';
 import { spracheVerfuegbar, spracheErlaubt, setzeSpracheErlaubt } from '../sprache.js';
 import { episch } from '../darstellung.js';
 import { ERNAEHRUNGSWEISEN, UNVERTRAEGLICHKEITEN, DIAETEN, diaetMakros } from '../logic/ernaehrungsweise.js';
@@ -89,8 +90,10 @@ function zeichne(wurzel, kontext) {
       : null,
     datumsLeiste(wurzel, datum),
     heroKarte(typ, notiz, ist, profil.ernaehrung?.diaet === 'intervallfasten' ? `${profil.ernaehrung.fensterVon}–${profil.ernaehrung.fensterBis}` : null),
+    ratKarte(kontext, typ, ist),
     gewichtKarte(kontext),
     wasserKarte(profil, typ, tag, () => speichereTag(tag)),
+    koffeinKarte(tag, () => speichereTag(tag)),
     profil.morningStack.aktiv ? morningStackKarte(profil, lebensmittel, fix, tag, aendern) : null,
     supplementKarte(profil, tag, aendern),
     ...profil.mahlzeiten.map((m) => mahlzeitKarte(m, ziele.find((z) => z.id === m.id), tag, lebensmittel, aendern, kontext)),
@@ -517,4 +520,56 @@ function ernaehrungsweiseBereich(profil, speichern, neuZeichnen) {
       bestaetigen)
       : null,
   ];
+}
+
+/** Brom's Rat: was heute noch fehlt (aus Favoriten und zuletzt Gegessenem) und Mikronährstoff-Lücken der Woche. */
+function ratKarte({ tag, profil, lebensmittel, datum }, typ, ist) {
+  if (datumSchluessel(datum) !== datumSchluessel(new Date())) return null;
+  const karte = el('section', { class: 'karte rat-karte', hidden: true });
+  const r = rest(ist, typ);
+  Promise.all([lese('einstellungen', 'favoriten'), lese('einstellungen', 'zuletzt'), holeTage(wochenSchluessel(datum))]).then(([fav, zul, woche]) => {
+    const nachId = new Map(lebensmittel.map((l) => [l.id, l]));
+    const menge = new Map((zul ?? []).map((z) => [z.id, z.gramm]));
+    const ids = [...new Set([...(fav ?? []), ...(zul ?? []).map((z) => z.id)])].slice(0, 25);
+    const kandidaten = ids.map((id) => nachId.get(id)).filter(Boolean)
+      .map((lm) => ({ lm, gramm: menge.get(lm.id) ?? lm.stueckG ?? 100 }));
+    const stunde = new Date().getHours();
+    const optionen = stunde >= 14 && tag.eintraege.length ? wasFehlt(r, kandidaten) : [];
+    const schnitt = wochenDurchschnitt(woche.map((t) => (t.datum === tag.datum ? tag : t)), profil, lebensmittel);
+    const tipps = schnitt.tage >= 3 ? mikroTipps(schnitt.werte, profil.referenzgruppe, profil.tagestypen.find((t) => t.basis) ?? typ, lebensmittel, 2) : [];
+    if (!optionen.length && !tipps.length) return;
+    setze(karte,
+      el('h2', {}, episch('🔥 Brom rät', '💡 Tipps')),
+      optionen.length ? el('p', { class: 'klein' }, `Noch ${zahl(Math.max(0, r.kcal))} kcal und ${zahl(Math.max(0, r.protein))} g Protein offen. Das würde passen:`) : null,
+      ...optionen.map((o) => el('div', { class: 'rat-option' },
+        el('span', {}, o.teile.map((t) => `${zahl(t.gramm)} g ${t.lm.name}`).join(' + ')),
+        el('span', { class: 'leise klein' }, `${zahl(o.kcal)} kcal · ${zahl(o.protein)} g P`))),
+      ...tipps.map((t) => el('p', { class: 'klein' },
+        el('strong', {}, `${t.name}: `), `diese Woche nur ${t.anteil} % – gute Quellen: ${t.quellen.map((q) => q.name).join(', ') || '–'}.`)));
+    karte.hidden = false;
+  }).catch(() => {});
+  return karte;
+}
+
+/** Koffein-Zähler mit Tagesgrenze (EFSA 400 mg) und Hinweis für den Schlaf am Nachmittag. */
+function koffeinKarte(tag, speichern) {
+  const karte = el('section', { class: 'karte' });
+  const namen = { kaffee: '☕ Kaffee', espresso: 'Espresso', energy: '⚡ Energy', gruener_tee: '🍵 Tee', cola: 'Cola', preworkout: '💥 Pre-Workout' };
+  const zeichne = () => {
+    tag.koffein ??= [];
+    const summe = tag.koffein.reduce((s, k) => s + k.mg, 0);
+    const spaet = new Date().getHours() >= 15;
+    setze(karte,
+      el('div', { class: 'zeile' }, el('h2', {}, episch('☕ Wachtrank', '☕ Koffein')),
+        el('span', { class: `klein${summe > KOFFEIN_GRENZE ? ' warnung' : ' leise'}` }, `${zahl(summe)} / ${KOFFEIN_GRENZE} mg`)),
+      el('div', { class: 'chips' }, ...Object.entries(namen).map(([id, name]) => el('button', {
+        class: 'chip', type: 'button',
+        onclick: () => { tag.koffein.push({ art: id, mg: KOFFEIN[id], zeit: new Date().toISOString() }); speichern(); zeichne(); },
+      }, name)),
+      tag.koffein.length ? el('button', { class: 'chip', type: 'button', 'aria-label': 'Letzten Eintrag entfernen', onclick: () => { tag.koffein.pop(); speichern(); zeichne(); } }, '↶') : null),
+      summe > KOFFEIN_GRENZE ? el('p', { class: 'warnung klein' }, 'Über 400 mg – das ist mehr, als die EFSA für einen Tag als unbedenklich einstuft.') : null,
+      spaet && summe > 0 && tag.koffein.some((k) => new Date(k.zeit).getHours() >= 15) ? el('p', { class: 'leise klein' }, 'Koffein nach 15 Uhr kann den Schlaf stören – und Schlaf ist Muskelaufbau.') : null);
+  };
+  zeichne();
+  return karte;
 }

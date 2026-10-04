@@ -11,6 +11,7 @@ import { REZEPT_ARTEN, BEWERTUNGEN, neuesRezept, proPortion, portionsGewicht, ge
 import { pruefeLebensmittel } from '../logic/ernaehrungsweise.js';
 import { oeffneRezeptEditor } from './rezept-editor.js';
 import { mahlzeitNachUhrzeit } from './memo-dialog.js';
+import { skaliereRezept } from '../logic/vorschlaege.js';
 
 let artFilter = null;
 let sortierung = 'note';
@@ -133,10 +134,7 @@ function detail(k, r) {
       el('ul', { class: 'liste-einfach klein' }, ...Object.entries(BEWERTUNGEN).map(([key, t]) => el('li', {}, `${t}: ${r.bewertung[key] ?? '–'}`))),
       r.tags.length ? el('div', { class: 'chips' }, ...r.tags.map((t) => el('span', { class: 'marke' }, t))) : null,
       r.notiz ? el('p', { class: 'leise' }, r.notiz) : null),
-    el('section', { class: 'karte' },
-      el('h2', {}, 'Zutaten'),
-      el('ul', { class: 'liste-einfach' }, ...r.zutaten.map((z) => el('li', {}, `${zahl(z.gramm)} g ${nachId.get(z.lebensmittelId)?.name ?? z.lebensmittelId}`))),
-      r.gewichtGekochtG ? el('p', { class: 'leise klein' }, `Gewicht nach dem Kochen: ${zahl(r.gewichtGekochtG)} g`) : null),
+    zutatenKarte(k, r, nachId),
     r.zubereitung ? el('section', { class: 'karte' }, el('h2', {}, 'Zubereitung'), el('p', { class: 'chronik-text' }, r.zubereitung)) : null,
     el('div', { class: 'knopfreihe' },
       el('button', { class: 'knopf zweitrangig', type: 'button', onclick: () => bearbeite(k, r, false) }, icon('stift', 18), 'Bearbeiten'),
@@ -165,4 +163,33 @@ function portionEintragen(k, r) {
       },
     }, icon('plus', 18), 'Heute eintragen'),
     status);
+}
+
+/** Zutaten mit Skalierung auf eine andere Portionszahl (Ansicht, auf Wunsch speichern). */
+function zutatenKarte(k, r, nachId) {
+  const liste = el('ul', { class: 'liste-einfach' });
+  const info = el('p', { class: 'leise klein' });
+  let aktuell = r;
+  const zeichne = () => {
+    setze(liste, ...aktuell.zutaten.map((z) => el('li', {}, `${zahl(z.gramm)} g ${nachId.get(z.lebensmittelId)?.name ?? z.lebensmittelId}`)));
+    info.textContent = aktuell.gewichtGekochtG ? `Gewicht nach dem Kochen: ${zahl(aktuell.gewichtGekochtG)} g` : '';
+  };
+  const speichern = el('button', { class: 'chip', type: 'button', hidden: true, onclick: async () => {
+    await speichereRezepte(k.liste.map((x) => (x.id === r.id ? aktuell : x)));
+    k.neu();
+  } }, 'So speichern');
+  const feld = el('input', {
+    type: 'number', inputMode: 'numeric', min: 1, step: 1, value: r.portionen, 'aria-label': 'Portionen', class: 'portionen-feld',
+    oninput: (e) => {
+      const n = Math.max(1, Math.round(e.target.valueAsNumber || 1));
+      aktuell = n === r.portionen ? r : skaliereRezept(r, n);
+      speichern.hidden = n === r.portionen;
+      zeichne();
+    },
+  });
+  zeichne();
+  return el('section', { class: 'karte' },
+    el('div', { class: 'zeile' }, el('h2', {}, 'Zutaten'),
+      el('label', { class: 'klein portionen-wahl' }, 'für ', feld, ' Portionen')),
+    liste, info, speichern);
 }

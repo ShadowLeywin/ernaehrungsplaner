@@ -2,6 +2,7 @@
 // und ergänzt sie um eigene Lebensmittel (z. B. per Barcode aus Open Food Facts) und Rezepte.
 import { lese } from './db.js';
 import { rezeptAlsLebensmittel } from './logic/rezepte.js';
+import { SCHAETZWERTE } from './logic/vorschlaege.js';
 
 let basisVersprechen;
 let gesamtVersprechen;
@@ -22,7 +23,7 @@ export function holeLebensmittel() {
     .then(([daten, eigene, rezepte]) => {
       const basis = [...daten.lebensmittel, ...(eigene ?? [])];
       const ausRezepten = (rezepte ?? []).map((r) => rezeptAlsLebensmittel(r, basis)).filter(Boolean);
-      return { ...daten, basis, lebensmittel: [...basis, ...ausRezepten] };
+      return { ...daten, basis, lebensmittel: [...basis, ...ausRezepten, ...SCHAETZWERTE] };
     })
     .catch((fehler) => { gesamtVersprechen = undefined; throw fehler; });
   return gesamtVersprechen;

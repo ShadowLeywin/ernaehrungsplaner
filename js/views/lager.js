@@ -46,7 +46,7 @@ async function lade(wurzel) {
   const ist = tagesNaehrwerte(tag, profil, daten.lebensmittel);
 
   const heldPlatz = el('div');
-  const feuerKarte = lagerfeuer(profil, typ, notiz, jetzt, bromSpruch(vorlagenFuerTag(vorlagen ?? [], jetzt).filter((v) => !erledigteVorlagen(tag).has(v.id)), ist, typ, jetzt));
+  const feuerKarte = lagerfeuer(profil, typ, notiz, jetzt, bromSpruch(vorlagenFuerTag(vorlagen ?? [], jetzt).filter((v) => !erledigteVorlagen(tag).has(v.id)), ist, typ, jetzt, profil, tag));
   ladeSpielstand().then((spiel) => {
     setze(heldPlatz, heldKachel(spiel), ausbauKachel(spiel));
     // Feuer wächst mit der Serie aktiver Tage (heute schon mitgezählt, falls etwas eingetragen ist); Glutschilde zählen mit
@@ -90,8 +90,10 @@ function begruessung(profil) {
 
 /** Lagerfeuer als animiertes SVG: Holzscheite, drei Flammenschichten, aufsteigende Funken, Glühen. */
 /** Ein kurzer, respektvoller Satz von Brom – nie drängend. */
-function bromSpruch(offen, ist, typ, jetzt) {
+function bromSpruch(offen, ist, typ, jetzt, profil = null, tag = null) {
   const stunde = jetzt.getHours();
+  const fehlendeSupps = profil && tag ? profil.supplements.filter((s) => s.aktiv && !tag.supplements?.[s.id]) : [];
+  if (stunde >= 12 && fehlendeSupps.length && fehlendeSupps.length <= 3) return `Die Kräuter warten: ${fehlendeSupps.map((s) => s.name).join(', ')} noch nicht genommen.`;
   if (offen.length) return `„${offen[0].name}“ steht heute an. Der Amboss ist heiß, wenn du es bist.`;
   if (stunde >= 17 && (ist.protein ?? 0) < typ.protein * 0.7) return 'Ein Schmied ohne Protein ist wie Eisen ohne Glut. Noch etwas Eiweiß heute?';
   if (stunde < 11) return 'Guten Morgen. Ein Schluck Wasser zuerst – dann sehen wir weiter.';
