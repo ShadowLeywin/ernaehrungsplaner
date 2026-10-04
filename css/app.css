@@ -1068,3 +1068,42 @@ input.offen { border-color: var(--warnung); background: color-mix(in oklab, var(
 
 .brom-portraet { display: inline-block; flex: none; border-radius: 14px; overflow: hidden; }
 .brom-portraet img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* ---------- Ausbau, Aufträge, Boss ---------- */
+.vorrat-zahlen { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.vorrat { display: flex; flex-direction: column; align-items: center; padding: 12px; border-radius: var(--radius-klein); background: var(--flaeche-2); }
+.vorrat strong { font-size: 1.7rem; font-weight: 900; font-variant-numeric: tabular-nums; }
+.vorrat-symbol { font-size: 1.4rem; }
+.vorrat.erz strong { color: #b9c3cf; }
+.vorrat.glut strong { color: #ff9a4a; }
+.auftrag-kopf { display: flex; gap: 12px; align-items: center; margin-bottom: 6px; }
+.auftrag-kopf h2 { margin: 0; }
+.auftrag { padding: 8px 0; border-bottom: 1px solid var(--rand); }
+.auftrag:last-child { border-bottom: 0; }
+.auftrag p { margin: 2px 0 0; }
+.auftrag.fertig .zeile span:first-child { color: #22c55e; font-weight: 700; }
+.boss-karte { display: flex; gap: 14px; align-items: center; background: radial-gradient(ellipse at 0% 50%, rgb(180 30 30 / 0.25), transparent 60%), var(--flaeche); }
+.boss-karte h2 { margin: 0 0 2px; }
+.boss-karte.besiegt { opacity: 0.85; }
+.boss-bild { flex: none; width: 76px; height: 76px; border-radius: 16px; display: grid; place-items: center; background: #1a0d0b; color: #e0443b; overflow: hidden; }
+.boss-bild img { width: 100%; height: 100%; object-fit: cover; }
+.boss-text { flex: 1; min-width: 0; }
+.boss-leben { height: 12px; border-radius: 999px; background: #2a1412; overflow: hidden; margin: 6px 0 4px; border: 1px solid #5a1f1a; }
+.boss-leben div { height: 100%; background: linear-gradient(90deg, #b91c1c, #ef4444); transition: width 0.8s; }
+.boss-leben.mini { height: 6px; margin: 4px 0 0; }
+.bauten-raster { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; }
+.bau-karte { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; margin: 0; padding: 14px 10px; }
+.bau-karte .knopf { min-height: 36px; padding: 6px 10px; font-size: 0.82rem; margin-top: auto; width: 100%; }
+.bau-karte.gesperrt { opacity: 0.55; }
+.bau-karte.legendaer { border-color: #ff8a3d; box-shadow: 0 0 18px rgb(255 138 61 / 0.25); }
+.bau-text { margin: 2px 0 6px; }
+.bau-bild { width: 72px; height: 72px; display: grid; place-items: center; }
+.bau-bild img { width: 100%; height: 100%; object-fit: contain; }
+.bauwerk.ungebaut { opacity: 0.45; filter: grayscale(1); }
+.bauwerk.legendaer { filter: drop-shadow(0 0 8px #ff8a3d); }
+.ausbau-kachel { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; align-items: center; text-decoration: none; color: inherit; }
+.ausbau-vorrat { display: flex; flex-direction: column; gap: 2px; font-variant-numeric: tabular-nums; }
+.ausbau-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ausbau-kachel > .leise { grid-column: 1 / -1; text-align: right; }
+
+.szene-bau { position: absolute; height: auto; pointer-events: none; filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.6)) brightness(0.92); }

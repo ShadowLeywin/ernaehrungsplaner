@@ -122,6 +122,64 @@ wide 12:5 banner, darker bottom area, no people, no text, no watermark
 
 ---
 
+## 6. Bauwerke (Lager ausbauen) → `bilder/bauten/<id>-<stufe>.webp`
+
+Jedes Bauwerk einzeln, **freigestellt (transparenter Hintergrund)**, quadratisch 1024 × 1024, leicht von schräg oben
+(gleiche Perspektive wie die Lager-Szene). Stufen: **1 Holz, 2 Stein, 3 Eisen, 4 Gold, 5 Legendär**.
+Die App nimmt automatisch die höchste vorhandene Stufe – du musst nicht alle 60 Bilder machen.
+
+Grund-Prompt (Platzhalter ersetzen):
+```
+A single [BAUWERK] for a dwarven blacksmith camp, made of [MATERIAL], isolated object, three-quarter view from
+slightly above, Korean manhwa webtoon style, dark fantasy, highly detailed, sharp lineart, cel shading, warm
+firelight from the left, TRANSPARENT BACKGROUND, no ground, no people, no text, no watermark
+```
+
+| id (Dateiname) | [BAUWERK] |
+|---|---|
+| `amboss` | blacksmith anvil on a tree stump with hammer and tongs |
+| `brunnen` | water well with bucket and rope |
+| `banner` | tall war banner on a pole with a flame emblem |
+| `esse` | blacksmith forge with glowing coals and bellows |
+| `kraeutergarten` | raised herb garden bed with medicinal plants and potion bottles |
+| `steinbank` | weight bench with a heavy stone barbell |
+| `vorratskammer` | small storehouse with sacks, barrels and hanging meat |
+| `klimmzugbalken` | pull-up bar made of a thick beam between two posts |
+| `statue` | statue of a muscular dwarf warrior on a pedestal |
+| `chronikhaus` | small library hut with scrolls and books |
+| `wachturm` | watchtower with a lit brazier on top |
+| `trophaeenhalle` | small trophy hall with shields, crowns and weapons |
+
+| Stufe | [MATERIAL] |
+|---|---|
+| 1 | rough weathered wood and rope |
+| 2 | carved grey stone and wood |
+| 3 | dark forged iron with rivets |
+| 4 | polished gold with engravings |
+| 5 | black obsidian with glowing orange runes and molten gold veins, legendary aura |
+
+Beispiel: `bilder/bauten/amboss-3.webp` = Amboss aus Eisen.
+
+## 7. Monats-Bosse → `bilder/bosse/<id>.webp`
+
+Quadratisch 512 × 512, dunkler Hintergrund, bedrohlich, Manhwa-Stil.
+
+| Datei | Prompt-Anfang |
+|---|---|
+| `bosse/golem.webp` | `A colossal iron golem made of rusty plates and chains, glowing furnace core in its chest` |
+| `bosse/drache.webp` | `A fearsome ember dragon with cracked lava scales, smoke and sparks around it` |
+| `bosse/troll.webp` | `A huge swamp troll with moss, mud and a wooden club, glowing yellow eyes` |
+| `bosse/lich.webp` | `A starving undead lich king in tattered robes, empty plates and goblets floating around` |
+| `bosse/wyrm.webp` | `A frost wyrm with icy crystal scales, freezing breath, snowy mountain night` |
+
+Jeweils anhängen:
+```
+, boss portrait, Korean manhwa webtoon style, dark fantasy, dramatic lighting, highly detailed, sharp lineart,
+cel shading, dark background, no text, no watermark
+```
+
+---
+
 ## Tipps
 
 - **Zu bunt oder zu „Anime“?** Ergänze: `muted color palette, gritty, realistic shading`.

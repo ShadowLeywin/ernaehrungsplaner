@@ -48,9 +48,9 @@ async function lade(wurzel) {
   const heldPlatz = el('div');
   const feuerKarte = lagerfeuer(profil, typ, notiz, jetzt, bromSpruch(vorlagenFuerTag(vorlagen ?? [], jetzt).filter((v) => !erledigteVorlagen(tag).has(v.id)), ist, typ, jetzt));
   ladeSpielstand().then((spiel) => {
-    setze(heldPlatz, heldKachel(spiel));
-    // Feuer wächst mit der Serie aktiver Tage (heute schon mitgezählt, falls etwas eingetragen ist)
-    const aktive = spiel.tage.filter(istAktiv).map((t) => t.datum);
+    setze(heldPlatz, heldKachel(spiel), ausbauKachel(spiel));
+    // Feuer wächst mit der Serie aktiver Tage (heute schon mitgezählt, falls etwas eingetragen ist); Glutschilde zählen mit
+    const aktive = [...spiel.tage.filter(istAktiv).map((t) => t.datum), ...(spiel.lager.schildTage ?? [])];
     if (istAktiv(tag)) aktive.push(tag.datum);
     const serie = feuerSerie(aktive);
     zeigeFeuerStufe(feuerKarte, serie);
@@ -60,6 +60,7 @@ async function lade(wurzel) {
       szeneNr: szene.nr,
       feuerIndex: feuerStufe(serie).index,
       mitBrom: bromAn() && document.documentElement.dataset.stil !== 'schlicht',
+      bauten: spiel.lager.bauten,
     }).then((mitBild) => {
       if (!mitBild) return;
       feuerKarte.classList.add('mit-bild');
@@ -108,6 +109,21 @@ function zeigeFeuerStufe(karte, serie) {
     el('span', { class: 'leise klein' }, stufe.naechste
       ? ` noch ${stufe.naechste.ab - serie} bis ${episch(stufe.naechste.episch, stufe.naechste.name)}`
       : ` ${stufe.text}`));
+}
+
+/** Vorräte, Aufträge der Woche und Monats-Boss auf einen Blick. */
+function ausbauKachel(spiel) {
+  const fertig = spiel.auftraege.filter((a) => a.fertig).length;
+  return el('a', { class: 'karte ausbau-kachel', href: '#/ausbau' },
+    el('div', { class: 'ausbau-vorrat' },
+      el('span', {}, '⛏ ', el('strong', {}, zahl(Math.floor(spiel.konto.erz)))),
+      el('span', {}, '🔥 ', el('strong', {}, zahl(Math.floor(spiel.konto.glut)))),
+      spiel.lager.schilde ? el('span', {}, '🛡 ', el('strong', {}, String(spiel.lager.schilde))) : null),
+    el('div', { class: 'ausbau-info' },
+      el('span', { class: 'klein' }, `${episch('Aufträge', 'Aufträge')} ${fertig}/${spiel.auftraege.length}`),
+      el('span', { class: 'klein' }, spiel.boss.besiegt ? `✓ ${spiel.boss.boss.name}` : spiel.boss.boss.name),
+      el('div', { class: 'boss-leben mini' }, el('div', { style: `width:${Math.round((1 - spiel.boss.anteil) * 100)}%` }))),
+    el('span', { class: 'leise klein' }, episch('Lager ausbauen →', 'Ausbau →')));
 }
 
 function heldKachel(spiel) {

@@ -8,4 +8,7 @@ Fehlt ein Bild, nutzt die App ihre eingebaute Grafik.
 - `brom/portraet.webp` – Brom-Porträt (quadratisch)
 - `kopf/taverne.webp`, `kopf/uebungsplatz.webp`, `kopf/held.webp`, `kopf/halle.webp` – Seitenköpfe (12:5)
 
+- `bauten/<id>-<stufe>.webp` – Bauwerke im Lager (Stufe 1–5, freigestellt)
+- `bosse/<id>.webp` – Monats-Bosse
+
 Erlaubt sind `.webp` und `.png`.

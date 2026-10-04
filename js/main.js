@@ -20,6 +20,7 @@ import { woche } from './views/woche.js';
 import { einkauf } from './views/einkauf.js';
 import { vorlieben } from './views/vorlieben.js';
 import { angebote } from './views/angebote.js';
+import { ausbau } from './views/ausbau.js';
 import { pruefeSpaeter } from './spiel.js';
 import { oeffnePanel, schnellEinstellungen } from './views/panel.js';
 import { pruefeEinrichtung, istEingerichtet, beiTagGespeichert } from './state.js';
@@ -30,7 +31,7 @@ wendeDarstellungAn();
 document.querySelectorAll('.nav-icon[data-icon]').forEach((platz) => platz.append(icon(platz.dataset.icon, 22)));
 
 const ansichten = {
-  mehr, heute, einstellungen, lebensmittel, backup, einrichtung, gewicht, training, lager, fortschritt, held, erfolge, koerper, freunde, tagebuch, rezepte, mealprep, woche, einkauf, vorlieben, angebote };
+  mehr, heute, einstellungen, lebensmittel, backup, einrichtung, gewicht, training, lager, fortschritt, held, erfolge, koerper, freunde, tagebuch, rezepte, mealprep, woche, einkauf, vorlieben, angebote, ausbau };
 
 // Ohne Profil nur Einrichtung und Backup (zum Wiederherstellen) erlauben
 const wache = (name) => (istEingerichtet() || name === 'backup' ? null : 'einrichtung');

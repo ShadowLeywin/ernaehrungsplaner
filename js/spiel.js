@@ -11,12 +11,18 @@ import { berechneRaenge } from './logic/raenge.js';
 import { bewerteAlle, erfolgsXp, neueErfolge, stufenStand, STUFEN } from './logic/erfolge.js';
 import { berechneWerte, berechneXp, levelAus, bestimmeKlasse } from './logic/charakter.js';
 import { zeigeHerold, heroldSatz } from './views/brom.js';
+import { tagesKennzahlen } from './logic/tageswerte.js';
+import { verdient, kontostand, leeresLager, bauXp } from './logic/lagerbau.js';
+import { alleBelohnungen, auftragsStand, bossStand, gruppiere } from './logic/auftraege.js';
+import { datumSchluessel } from './logic/ziele.js';
+import { montagVon } from './logic/fortschritt.js';
 import { episch } from './darstellung.js';
 
 export const verzeichnis = uebungsVerzeichnis(UEBUNGEN);
 
 export async function ladeSpielstand() {
-  const [eintraege, profil, daten] = await Promise.all([alleEintraege('tage'), holeProfil(), holeLebensmittel()]);
+  const [eintraege, profil, daten, gespeichertesLager] = await Promise.all([alleEintraege('tage'), holeProfil(), holeLebensmittel(), lese('einstellungen', 'lager')]);
+  const lager = { ...leeresLager(), ...gespeichertesLager };
   const tage = eintraege.map(([, t]) => t);
   const reihe = gewichtsReihe(tage);
   const kgKoerper = reihe.at(-1)?.kg ?? profil.koerper.gewichtKg ?? 75;
@@ -25,9 +31,18 @@ export async function ladeSpielstand() {
   const raenge = berechneRaenge(tage, verzeichnis, kgKoerper, geschlecht);
   const bewertungen = bewerteAlle(st);
   const werte = berechneWerte(st, raenge);
-  const xp = berechneXp(st, erfolgsXp(bewertungen));
+  // Wirtschaft: Erz und Glut aus den Tagen, Belohnungen aus Aufträgen und Bossen, abzüglich Ausgaben
+  const kennzahlen = tage.map((t) => tagesKennzahlen(t, { profil, lebensmittel: daten.lebensmittel }));
+  const belohnungen = alleBelohnungen(kennzahlen, profil);
+  const konto = kontostand(verdient(kennzahlen), belohnungen, lager);
+  const { wochen, monate } = gruppiere(kennzahlen);
+  const montag = datumSchluessel(montagVon(new Date()));
+  const monat = datumSchluessel(new Date()).slice(0, 7);
+  const xp = berechneXp(st, erfolgsXp(bewertungen) + belohnungen.xp + bauXp(lager));
   return {
-    profil, tage, kgKoerper, geschlecht, st, raenge, bewertungen, werte, xp,
+    profil, tage, kgKoerper, geschlecht, st, raenge, bewertungen, werte, xp, lager, konto, belohnungen, kennzahlen,
+    auftraege: auftragsStand(montag, profil, wochen.get(montag) ?? []),
+    boss: bossStand(monat, monate),
     level: levelAus(xp),
     klasse: bestimmeKlasse(werte),
   };

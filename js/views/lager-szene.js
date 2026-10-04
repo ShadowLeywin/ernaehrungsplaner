@@ -8,6 +8,35 @@ import { bromSvg } from './brom-figur.js';
 const FEUER_X = 0.42;
 const FEUER_Y = 0.72;
 
+// Plätze der Bauwerke in der Szene (links/unten/Breite in % der Szene), hinten zuerst
+const PLAETZE = {
+  wachturm: [2, 34, 14], chronikhaus: [70, 36, 16], trophaeenhalle: [16, 38, 18], statue: [58, 30, 9],
+  banner: [30, 40, 7], esse: [2, 12, 18], vorratskammer: [72, 18, 14], kraeutergarten: [20, 8, 14],
+  brunnen: [60, 10, 12], klimmzugbalken: [8, 30, 14], steinbank: [24, 2, 14], amboss: [52, 2, 12],
+};
+
+/** Bauwerke als Bild-Ebenen (nur die, für die es ein Bild gibt – höchste vorhandene Stufe ≤ gebaute). */
+async function bautenEbenen(bauten) {
+  const ebenen = [];
+  for (const [id, platz] of Object.entries(PLAETZE)) {
+    const stufe = bauten?.[id] ?? 0;
+    for (let st = stufe; st >= 1; st -= 1) {
+      const url = await findeBild(`bauten/${id}-${st}`);
+      if (!url) continue;
+      const img = document.createElement('img');
+      img.className = 'szene-bau';
+      img.src = url;
+      img.alt = '';
+      img.style.left = `${platz[0]}%`;
+      img.style.bottom = `${platz[1]}%`;
+      img.style.width = `${platz[2]}%`;
+      ebenen.push(img);
+      break;
+    }
+  }
+  return ebenen;
+}
+
 /** Höchstes vorhandenes Szenenbild ≤ nr (so kannst du Bilder nach und nach ergänzen). */
 async function besteSzene(nr) {
   for (let i = nr; i >= 1; i -= 1) {
@@ -19,9 +48,9 @@ async function besteSzene(nr) {
 
 /**
  * Ersetzt die SVG-Szene in `buehne` durch die Bild-Szene, falls Bilder vorhanden sind.
- * optionen: { szeneNr, feuerIndex (0–5), mitBrom }
+ * optionen: { szeneNr, feuerIndex (0–5), mitBrom, bauten }
  */
-export async function zeigeBildSzene(buehne, { szeneNr, feuerIndex, mitBrom }) {
+export async function zeigeBildSzene(buehne, { szeneNr, feuerIndex, mitBrom, bauten }) {
   const hintergrund = await besteSzene(szeneNr);
   if (!hintergrund || !buehne.isConnected) return false;
   const bromBild = mitBrom ? await findeBild('brom/sitzend') : null;
@@ -42,7 +71,7 @@ export async function zeigeBildSzene(buehne, { szeneNr, feuerIndex, mitBrom }) {
   funken.className = 'szene-funken';
   const vignette = document.createElement('div');
   vignette.className = 'szene-vignette';
-  szene.append(hg, licht, funken);
+  szene.append(hg, ...(await bautenEbenen(bauten)), licht, funken);
 
   if (mitBrom) {
     if (bromBild) {
