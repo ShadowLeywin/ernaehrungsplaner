@@ -1,5 +1,5 @@
 import { starteRouter, aktuelleRoute } from './router.js';
-import { ansichten as platzhalter } from './views/platzhalter.js';
+import { mehr } from './views/mehr.js';
 import { heute } from './views/heute.js';
 import { einstellungen } from './views/einstellungen.js';
 import { lebensmittel } from './views/lebensmittel.js';
@@ -16,6 +16,10 @@ import { freunde } from './views/freunde.js';
 import { tagebuch } from './views/tagebuch.js';
 import { rezepte } from './views/rezepte.js';
 import { mealprep } from './views/mealprep.js';
+import { woche } from './views/woche.js';
+import { einkauf } from './views/einkauf.js';
+import { vorlieben } from './views/vorlieben.js';
+import { angebote } from './views/angebote.js';
 import { pruefeSpaeter } from './spiel.js';
 import { oeffnePanel, schnellEinstellungen } from './views/panel.js';
 import { pruefeEinrichtung, istEingerichtet, beiTagGespeichert } from './state.js';
@@ -25,7 +29,8 @@ import { icon } from './icons.js';
 wendeDarstellungAn();
 document.querySelectorAll('.nav-icon[data-icon]').forEach((platz) => platz.append(icon(platz.dataset.icon, 22)));
 
-const ansichten = { ...platzhalter, heute, einstellungen, lebensmittel, backup, einrichtung, gewicht, training, lager, fortschritt, held, erfolge, koerper, freunde, tagebuch, rezepte, mealprep };
+const ansichten = {
+  mehr, heute, einstellungen, lebensmittel, backup, einrichtung, gewicht, training, lager, fortschritt, held, erfolge, koerper, freunde, tagebuch, rezepte, mealprep, woche, einkauf, vorlieben, angebote };
 
 // Ohne Profil nur Einrichtung und Backup (zum Wiederherstellen) erlauben
 const wache = (name) => (istEingerichtet() || name === 'backup' ? null : 'einrichtung');

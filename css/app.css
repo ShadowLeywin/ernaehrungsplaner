@@ -959,3 +959,20 @@ input.offen { border-color: var(--warnung); background: color-mix(in oklab, var(
 .regler .zeile strong { color: var(--text); }
 .portion-eintragen { margin-top: 12px; }
 .rezept-suche { width: 100%; margin-top: 12px; }
+
+/* ---------- Woche, Einkauf, Angebote ---------- */
+.plan-tag summary { cursor: pointer; list-style: none; }
+.plan-tag summary .chips { margin-top: 6px; }
+.plan-tag.heute { border-color: color-mix(in oklab, var(--akzent) 55%, var(--rand)); }
+.plan-mahlzeit { padding: 6px 0; border-top: 1px solid var(--rand); }
+.plan-mahlzeit:first-of-type { margin-top: 10px; }
+.plan-posten { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; padding-left: 8px; }
+.angebot-marke { background: color-mix(in oklab, #22c55e 22%, transparent); color: inherit; margin-left: 6px; }
+.einkauf-zeile { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--rand); flex: 1; }
+.einkauf-zeile:last-child { border-bottom: 0; }
+.einkauf-zeile input { width: 22px; height: 22px; accent-color: var(--akzent); flex: none; }
+.einkauf-text { flex: 1; }
+.einkauf-zeile.erledigt .einkauf-text { text-decoration: line-through; opacity: 0.55; }
+.angebot .zeile strong { min-width: 0; }
+.vorliebe { display: grid; grid-template-columns: 1fr 1.4fr 28px; gap: 10px; align-items: center; padding: 4px 0; font-size: 0.92rem; color: var(--text); font-weight: 500; }
+.vorliebe-wert { text-align: right; }
