@@ -103,6 +103,17 @@ volumetric light, floating embers, no text, no watermark
 
 ---
 
+### 4b. Szenen mit Brom → `bilder/lager/szene-<nr>-brom.webp`
+
+Gleiche Szene, aber Brom ist mit im Bild und tut etwas (sitzt, schmiedet, isst, trainiert). Ist Brom in der App
+eingeschaltet, wird diese Fassung gezeigt, sonst die leere Szene. Vorhanden: 1 (sitzt im Wald), 2 (isst am Feuer),
+3 (schmiedet), 4 (Liegestütze). Für 5 und 6 z. B.:
+```
+[Szenen-Prompt 5 oder 6], with BROM (use the attached character as reference) [sitting on a stone bench, meditating /
+carrying a giant iron ingot / doing pull-ups on a beam] on the RIGHT side, fire left of center, Korean manhwa
+webtoon style, no other people, no text
+```
+
 ## 5. Kopfbilder der Seiten (nur im Stil „Episch“)
 
 Format **12:5 quer (z. B. 1200 × 500)**, Motiv mittig, unten etwas dunkler (dort steht der Titel), keine Personen.

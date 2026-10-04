@@ -8,6 +8,10 @@ import { bromSvg } from './brom-figur.js';
 const FEUER = {
   1: [0.385, 0.66], 2: [0.42, 0.72], 3: [0.42, 0.66], 4: [0.381, 0.66], 5: [0.42, 0.72], 6: [0.42, 0.72],
 };
+// Szenen mit eingemaltem Brom (szene-<nr>-brom): eigene Feuer-Positionen
+const FEUER_MIT_BROM = {
+  1: [0.373, 0.63], 2: [0.42, 0.708], 3: [0.427, 0.617], 4: [0.382, 0.662],
+};
 const STANDARD_FEUER = [0.42, 0.72];
 
 // Plätze der Bauwerke in der Szene (links/unten/Breite in % der Szene), hinten zuerst
@@ -52,9 +56,17 @@ async function besteSzene(nr) {
  * Ersetzt die SVG-Szene in `buehne` durch die Bild-Szene, falls Bilder vorhanden sind.
  * optionen: { szeneNr, feuerIndex (0–5), mitBrom, bauten }
  */
-export async function zeigeBildSzene(buehne, { szeneNr, feuerIndex, mitBrom, bauten }) {
+export async function zeigeBildSzene(buehne, { szeneNr, feuerIndex, mitBrom: mitBromWunsch, bauten }) {
+  let mitBrom = mitBromWunsch;
   const gefunden = await besteSzene(szeneNr);
   if (!gefunden || !buehne.isConnected) return false;
+  // Gibt es diese Szene mit eingemaltem Brom? Dann diese nehmen und keine Figur darüberlegen.
+  const mitBromBild = mitBrom ? await findeBild(`lager/szene-${gefunden.nr}-brom`) : null;
+  if (mitBromBild) {
+    gefunden.url = mitBromBild;
+    gefunden.mitBrom = true;
+    mitBrom = false;
+  }
   // Brom: sitzend (Wunschbild), sonst stehend (freigestellt aus dem Charakterblatt), sonst Zeichnung
   let bromBild = null;
   let bromHaltung = null;
@@ -64,7 +76,7 @@ export async function zeigeBildSzene(buehne, { szeneNr, feuerIndex, mitBrom, bau
       if (bromBild) { bromHaltung = haltung; break; }
     }
   }
-  const [feuerX, feuerY] = FEUER[gefunden.nr] ?? STANDARD_FEUER;
+  const [feuerX, feuerY] = (gefunden.mitBrom ? FEUER_MIT_BROM : FEUER)[gefunden.nr] ?? STANDARD_FEUER;
 
   const szene = document.createElement('div');
   szene.className = 'bild-szene';
