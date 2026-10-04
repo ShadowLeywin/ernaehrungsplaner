@@ -99,12 +99,21 @@ Alle folgenden Märkte sind relevant:
 5. Backup-Export/-Import
 6. Ersteinrichtung, Körperdaten, Sport, Gewichtsziel
 7. Gewicht-Tracking mit Wochendurchschnitt und Kalorien-Anpassung
-8. Trainings-Tracker: A Workouts loggen ✓ · B Vorlagen und Wochenplan · C Fortschritt (1RM, Rekorde, Volumen je Muskel)
-9. Rezepte mit Bewertung
-10. Meal-Prep-Modus
-11. Wochenplaner und Einkaufsliste
-12. Barcode-Scan mit Open Food Facts
-13. Angebote
+8. Trainings-Tracker: A Workouts loggen ✓ · B Vorlagen und Wochenplan ✓ · C Fortschritt (1RM, Rekorde, Volumen je Muskel) ✓
+9. Rezepte mit Bewertung ✓
+10. Meal-Prep-Modus ✓
+11. Wochenplaner und Einkaufsliste ✓
+12. Barcode-Scan mit Open Food Facts ✓
+13. Angebote ✓
+RPG-Ebene P1–P9 ✓ (Stand 04.10.2026: grob fertig, Feinschliff nach Tests auf dem Handy). Zusätzlich Mengen-Memo ✓.
+Später: Capacitor-App (Health Connect, Spracherkennung auf dem Gerät), Foto-KI nur optional mit eigenem Schlüssel.
+
+## Datenablage (IndexedDB, alles im Backup)
+- `tage/<datum>`: eintraege (mit `offen: true` = Menge fehlt), wasser, supplements, trainings (inkl. `rekorde`), gewichtKg, tagebuch
+- `einstellungen/<schlüssel>`: profil (inkl. `ernaehrung`), vorlagen, rezepte, eigeneLebensmittel, wochenplaene, einkauf,
+  praeferenzen, angebote, angeboteEinstellungen, freunde, erfolgeGesehen, aktivesTraining, letztesBackup
+- Pro Gerät (localStorage): darstellung, brom, spracheErlaubt, pauseSek, wachHalten
+- Spiel-Logik: `logic/spielstand.js` (Kennzahlen) → `raenge.js`, `erfolge.js`, `charakter.js`; Laufzeit in `js/spiel.js`
 
 ## Entwicklung
 - Lokaler Server: `python -m http.server 8080` (Konfiguration in `.claude/launch.json`).
