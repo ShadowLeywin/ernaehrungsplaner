@@ -15,7 +15,7 @@ import { holeGewichtsReihe } from './gewicht.js';
 import { ladeSpielstand } from '../spiel.js';
 import { rangName } from '../logic/raenge.js';
 import { rangEmblem } from './emblem.js';
-import { bromSvg, bromAn } from './brom.js';
+import { bromMarkup, bromAn } from './brom.js';
 
 const verzeichnis = uebungsVerzeichnis(UEBUNGEN);
 const datumFormat = new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -86,6 +86,7 @@ function heldKachel(spiel) {
 }
 
 function lagerfeuer(profil, typ, notiz, jetzt, spruch) {
+  const mitBrom = bromAn() && document.documentElement.dataset.stil !== 'schlicht';
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('viewBox', '0 0 360 190');
   svg.setAttribute('class', 'feuer-szene');
@@ -118,11 +119,11 @@ function lagerfeuer(profil, typ, notiz, jetzt, spruch) {
       <path class="flamme f2" d="M180 152c-17 0-25-11-21-24 3-10 12-15 15-26 5 11 13 17 16 26 2-7 5-11 9-15 3 14 3 39-19 39Z"/>
       <path class="flamme f3" d="M180 152c-9 0-13-6-11-13 2-6 7-9 9-15 4 7 11 11 12 18 1 6-3 10-10 10Z"/>
     </g>
-    <g class="funken">${funken}</g>`;
+    <g class="funken">${funken}</g>
+    ${mitBrom ? `<g class="brom-im-lager" transform="translate(226 40) scale(0.6)">${bromMarkup('lagerbrom')}</g>` : ''}`;
 
-  const mitBrom = bromAn() && document.documentElement.dataset.stil !== 'schlicht';
   return el('section', { class: 'karte lagerfeuer' },
-    el('div', { class: 'feuer-buehne' }, svg, mitBrom ? el('div', { class: 'lager-brom' }, bromSvg(66)) : null),
+    el('div', { class: 'feuer-buehne' }, svg),
     mitBrom ? el('p', { class: 'brom-spruch' }, el('strong', {}, 'Brom: '), spruch) : null,
     el('div', { class: 'lager-text' },
       el('p', { class: 'lager-gruss' }, begruessung(profil)),

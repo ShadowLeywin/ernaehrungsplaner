@@ -27,7 +27,7 @@ function zeichne(wurzel, s) {
 
   setze(wurzel,
     el('section', { class: 'karte hero erfolge-kopf' },
-      bromAn() && document.documentElement.dataset.stil !== 'schlicht' ? el('div', { class: 'erfolge-brom' }, bromSvg(70)) : null,
+      bromAn() && document.documentElement.dataset.stil !== 'schlicht' ? el('div', { class: 'erfolge-brom' }, bromSvg(84, 'portraet')) : null,
       el('div', {},
         el('h2', {}, episch('Was du geschmiedet hast', 'Deine Erfolge')),
         el('div', { class: 'stufen-zaehler' }, ...zaehlung.map(({ st, n }) => el('span', { class: 'stufen-chip', title: st.name },
