@@ -106,14 +106,21 @@ Alle folgenden Märkte sind relevant:
 12. Barcode-Scan mit Open Food Facts ✓
 13. Angebote ✓
 RPG-Ebene P1–P9 ✓ (Stand 04.10.2026: grob fertig, Feinschliff nach Tests auf dem Handy). Zusätzlich Mengen-Memo ✓.
+Ausbau-Runde ✓: Basisbau (Erz/Glut, Bauwerke, Aufträge, Boss, Glutschild, Titel), Maße/Prognose/Fotos, Trainings-Werkzeuge,
+Brom rät, Koffein, Programme, Rückblick, Geschichte, Duell, Komfort (Schnellaktionen, Rückgängig, Tour).
+Offen: Kalorien vorausplanen, größere deutsche Grunddatenbank, Wischgesten, Widget/Health Connect (Capacitor).
 Später: Capacitor-App (Health Connect, Spracherkennung auf dem Gerät), Foto-KI nur optional mit eigenem Schlüssel.
 
 ## Datenablage (IndexedDB, alles im Backup)
-- `tage/<datum>`: eintraege (mit `offen: true` = Menge fehlt), wasser, supplements, trainings (inkl. `rekorde`), gewichtKg, tagebuch
+- `tage/<datum>`: eintraege (mit `offen: true` = Menge fehlt), wasser, koffein, supplements, trainings (inkl. `rekorde`;
+  Sätze mit `typ` aufwaermen/drop/versagen und `rir`; Übungen mit `gruppe` = Superset), gewichtKg, masse, tagebuch
 - `einstellungen/<schlüssel>`: profil (inkl. `ernaehrung`), vorlagen, rezepte, eigeneLebensmittel, wochenplaene, einkauf,
   praeferenzen, angebote, angeboteEinstellungen, freunde, erfolgeGesehen, aktivesTraining, letztesBackup,
-  favoriten, zuletzt, mahlzeitVorlagen
-- Pro Gerät (localStorage): darstellung, brom, spracheErlaubt, pauseSek, wachHalten
+  favoriten, zuletzt, mahlzeitVorlagen, uebungsNotizen, lager (Bauten, Ausgaben, Glutschilde, Titel)
+- `fotos/<id>`: Fortschrittsfotos (Blob, verkleinert) – bewusst NICHT im Backup
+- Pro Gerät (localStorage): darstellung, brom, spracheErlaubt, pauseSek, pauseJeUebung, pauseAnsage, wachHalten, tourGesehen
+- Wirtschaft: Erz/Glut werden immer aus den Tagen berechnet (`logic/tageswerte.js`, `lagerbau.js`, `auftraege.js`), gespeichert sind nur Ausgaben
+- Bilder optional unter `bilder/` (Prompts: `docs/bild-prompts.md`), sonst SVG-Ersatz
 - Spiel-Logik: `logic/spielstand.js` (Kennzahlen) → `raenge.js`, `erfolge.js`, `charakter.js`; Laufzeit in `js/spiel.js`
 
 ## Entwicklung

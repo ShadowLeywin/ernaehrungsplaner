@@ -8,21 +8,24 @@ Ernährung und Training planen – als Progressive Web App, offline-fähig, komp
 
 ## Was FORGEBORN kann
 
-- **Lager:** Startseite mit Lagerfeuer, Brom (dem Schmied) und dem Wichtigsten des Tages
-- **Ernährung („Taverne“):** Mahlzeiten, Kalorien-Ring, Makros, alle wichtigen Mikronährstoffe (Tag und Woche), Wasser, Supplements
-- **Mengen-Memo:** erst alles eintragen, Mengen danach gesammelt ergänzen – tippen oder diktieren („Skyr 250, 2 Äpfel“)
-- **Barcode & Marken:** Barcode scannen oder online suchen (Open Food Facts), eigene Lebensmittel anlegen
+- **Lager:** Startseite mit Lagerfeuer und Brom, dem Zwergenschmied. Das Feuer wächst mit deiner Serie, der Ort mit deinem Level
+- **Lager ausbauen:** Training bringt Erz, Disziplin bringt Glut – damit baust du 12 Bauwerke in 5 Stufen aus. Dazu Brom's Wochen-Aufträge, ein Monats-Boss, Glutschilde und Titel
+- **Ernährung („Taverne“):** Mahlzeiten, Kalorien-Ring, Makros, Mikronährstoffe (Tag und Woche), Wasser, Koffein, Supplements
+- **Schnell erfassen:** Favoriten, zuletzt gegessen, „Wie gestern“, Mahlzeiten-Vorlagen, Mengen-Memo je Mahlzeit (tippen oder diktieren), Barcode und Online-Suche (Open Food Facts), Schätzwerte für auswärts
+- **Brom rät:** was heute noch fehlt (aus deinen Favoriten) und welche Mikronährstoffe diese Woche zu kurz kommen
 - **Ernährungsweisen & Diäten:** vegan, vegetarisch, pescetarisch, laktose-/glutenfrei … sowie Keto, Low Carb, High Protein, Intervallfasten
-- **Rezepte & Meal-Prep:** Bewertung mit Geschmack und Vorteilen, Portionen eintragen, Gesamtgewicht ÷ Portionen
+- **Rezepte & Meal-Prep:** Bewertung mit Geschmack und Vorteilen, Skalierung, „Was kann ich kochen?“, Portionen eintragen, Gesamtgewicht ÷ Portionen
 - **Wochenplan & Einkauf:** Mahlzeiten planen, Einkaufsliste automatisch, Angebote der Märkte, Obst-/Gemüse-Vorlieben
-- **Training:** über 250 Übungen, Vorlagen, Sätze mit „letztes Mal“, Pausentimer, Rekorde, 1RM-Verlauf, Volumen je Muskel
-- **Körper:** Muskelkarte (vorn/hinten, Mann/Frau) mit Übungen und Beschreibungen
-- **Heldenreise:** Level, Klasse, sechs Charakter-Werte, Ränge von Schlacke bis Legende, Erfolge bis „Legendär“ plus geheime
-- **Freunde:** Rangkarte als Link teilen und vergleichen – ganz ohne Server
+- **Training:** über 250 Übungen, fertige Programme, Vorlagen, Steigerungsvorschläge, Satz-Typen (Aufwärmen, Drop, Versagen), Reserve-Wdh, Aufwärmsätze, Scheiben-Rechner, Supersätze, Pause und Notiz je Übung, Rekorde, 1RM-Verlauf, Volumen je Muskel, Deload-Hinweis
+- **Körper:** Muskelkarte (vorn/hinten, Mann/Frau) mit Volumen, Erholung und Rängen; Maße, Prognose, Phasen-Bericht und Fortschrittsfotos (nur lokal)
+- **Heldenreise:** Level, Klasse, sechs Charakter-Werte, Ränge von Schlacke bis Legende, Erfolge bis „Legendär“ plus geheime, Brom's Geschichte in Kapiteln, Rückblick für Monat und Jahr
+- **Freunde:** Rangkarte als Link teilen und vergleichen, inklusive Monats-Duell – ganz ohne Server
 - **Tagebuch:** Stimmung, Energie, Schlaf und eine automatische Chronik (episch oder schlicht)
 - **Gewicht:** Verlauf, Wochen- und Monatsbericht, wöchentlicher Vorschlag zur Kalorien-Anpassung
-- **Backup:** Export und Import aller Daten als Datei
-- Farbthemen, Hell/Dunkel, Stil „Episch“ oder „Schlicht“
+- **Backup:** Export und Import aller Daten als Datei, optional mit Passwort verschlüsselt
+- Schnellaktionen am App-Symbol, Einführungs-Tour, Farbthemen, Hell/Dunkel, Stil „Episch“ oder „Schlicht“
+
+Bilder im Manhwa-Stil (Brom, Lager-Szenen, Bauwerke, Bosse) sind optional – Prompts für KI-Bildgeneratoren stehen in [docs/bild-prompts.md](docs/bild-prompts.md).
 
 ## Datenquellen
 
