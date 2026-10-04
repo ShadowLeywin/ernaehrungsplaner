@@ -3,7 +3,7 @@ import { el, setze, zahl } from '../ui.js';
 import { icon } from '../icons.js';
 import { episch } from '../darstellung.js';
 import { schreibe } from '../db.js';
-import { findeBild } from '../bilder.js';
+import { findeBild, bauBild, istFleischlos, kopfBild } from '../bilder.js';
 import { ladeSpielstand } from '../spiel.js';
 import { BAUTEN, STUFEN_NAMEN, kosten, baueAus, kaufeSchild, setzeSchild, SCHILD_PREIS, MAX_SCHILDE } from '../logic/lagerbau.js';
 import { BOSS_BELOHNUNG, XP_JE_AUFTRAG } from '../logic/auftraege.js';
@@ -29,6 +29,7 @@ async function lade(wurzel) {
   const s = await ladeSpielstand();
   const speichern = async (lager) => { await schreibe('einstellungen', 'lager', lager); lade(wurzel); };
   setze(wurzel,
+    kopfBild('esse', 'Lager ausbauen'),
     vorratKarte(s),
     auftragKarte(s),
     bossKarte(s),
@@ -87,7 +88,7 @@ function bauKarte(s, bau, speichern) {
   const naechste = stufe < STUFEN_NAMEN.length ? kosten(bau, stufe + 1) : null;
   const leistbar = naechste && s.konto.erz >= naechste.erz && s.konto.glut >= naechste.glut;
   const bild = el('div', { class: 'bau-bild' }, bauwerkSvg(bau.id, gesperrt ? 0 : stufe, 72));
-  if (stufe) findeBild(`bauten/${bau.id}-${stufe}`).then((url) => { if (url) setze(bild, el('img', { src: url, alt: bau.name })); });
+  if (stufe) bauBild(bau.id, stufe, istFleischlos(s.profil)).then((url) => { if (url) setze(bild, el('img', { src: url, alt: bau.name })); });
   const fehler = el('p', { class: 'warnung klein', role: 'alert' });
   return el('div', { class: `karte bau-karte${gesperrt ? ' gesperrt' : ''}${stufe === 5 ? ' legendaer' : ''}` },
     bild,

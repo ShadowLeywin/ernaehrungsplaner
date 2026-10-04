@@ -11,7 +11,7 @@ import { erholung, belastungenAus } from '../logic/hantel.js';
 import { datumSchluessel } from '../logic/ziele.js';
 
 // Pfade der rechten Körperhälfte (Betrachtersicht, x > 100), Koordinaten als „x,y“; links wird gespiegelt.
-const VORN = {
+export const VORN = {
   nacken: ['M108,66 L126,78 L110,80 Z'],
   schultern: ['M127,79 Q149,80 152,102 Q146,112 135,108 Q129,96 127,79 Z'],
   brust: ['M102,86 Q124,80 133,94 Q135,114 119,120 Q104,121 102,112 Z'],
@@ -24,7 +24,7 @@ const VORN = {
   schienbein: ['M114,313 Q122,313 122,340 Q120,370 116,378 Q112,350 114,313 Z'],
   waden: ['M124,311 Q133,317 132,344 Q129,360 125,360 Q124,330 124,311 Z'],
 };
-const HINTEN = {
+export const HINTEN = {
   nacken: ['M100,62 L114,71 L130,81 L113,95 L100,118 Z'],
   schultern: ['M128,80 Q149,80 152,102 Q146,112 135,108 Q129,96 128,80 Z'],
   ruecken: ['M102,100 Q115,96 125,100 Q123,124 106,131 Z'],
@@ -38,7 +38,7 @@ const HINTEN = {
   waden: ['M112,307 Q131,305 133,337 Q129,361 120,363 Q112,350 112,330 Z'],
 };
 // Umriss als eine geschlossene Linie: rechte Hälfte hinunter, gespiegelt wieder hinauf (keine Naht in der Mitte)
-const UMRISS_RECHTS = [[100, 62], [110, 64], [111, 73], [128, 78], [146, 83], [154, 102], [157, 140], [160, 196], [152, 212], [141, 200],
+export const UMRISS_RECHTS = [[100, 62], [110, 64], [111, 73], [128, 78], [146, 83], [154, 102], [157, 140], [160, 196], [152, 212], [141, 200],
   [137, 150], [133, 122], [131, 150], [128, 190], [134, 212], [137, 262], [131, 300], [130, 330], [127, 382], [131, 402], [110, 406],
   [110, 380], [108, 300], [105, 232], [100, 224]];
 const UMRISS = `M${[...UMRISS_RECHTS, ...UMRISS_RECHTS.slice(1, -1).reverse().map(([x, y]) => [200 - x, y])].map(([x, y]) => `${x},${y}`).join(' L')} Z`;

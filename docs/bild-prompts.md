@@ -154,7 +154,8 @@ firelight from the left, TRANSPARENT BACKGROUND, no ground, no people, no text, 
 | `esse` | blacksmith forge with glowing coals and bellows |
 | `kraeutergarten` | raised herb garden bed with medicinal plants and potion bottles |
 | `steinbank` | weight bench with a heavy stone barbell |
-| `vorratskammer` | small storehouse with sacks, barrels and hanging meat |
+| `vorratskammer` | small storehouse with sacks, barrels and hanging meat (Fleischhaus) |
+| `vorratskammer-veg` | small storehouse with vegetables, herbs, grain sacks and barrels (Gemüsehaus, für vegetarisch/vegan) |
 | `klimmzugbalken` | pull-up bar made of a thick beam between two posts |
 | `statue` | statue of a muscular dwarf warrior on a pedestal |
 | `chronikhaus` | small library hut with scrolls and books |
@@ -170,6 +171,9 @@ firelight from the left, TRANSPARENT BACKGROUND, no ground, no people, no text, 
 | 5 | black obsidian with glowing orange runes and molten gold veins, legendary aura |
 
 Beispiel: `bilder/bauten/amboss-3.webp` = Amboss aus Eisen.
+
+**Wichtig:** Viele Generatoren malen das Schachbrett „transparent“ nur auf. Besser so enden lassen:
+`on a solid flat pure magenta background (#FF00FF), no glow, no fire, no shadow on the background` – das lässt sich sauber freistellen.
 
 ## 7. Monats-Bosse → `bilder/bosse/<id>.webp`
 

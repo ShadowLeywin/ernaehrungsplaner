@@ -18,6 +18,7 @@ import { szeneFuerLevel } from '../logic/szene.js';
 import { impulsFuerDatum } from '../logic/impulse.js';
 import { backupErinnerungFaellig } from '../logic/backup.js';
 import { zeigeBildSzene } from './lager-szene.js';
+import { istFleischlos } from '../bilder.js';
 import { rangName } from '../logic/raenge.js';
 import { rangEmblem } from './emblem.js';
 import { bromMarkup, bromAn } from './brom.js';
@@ -63,6 +64,7 @@ async function lade(wurzel) {
       feuerIndex: feuerStufe(serie).index,
       mitBrom: bromAn() && document.documentElement.dataset.stil !== 'schlicht',
       bauten: spiel.lager.bauten,
+      fleischlos: istFleischlos(spiel.profil),
     }).then((mitBild) => {
       if (!mitBild) return;
       feuerKarte.classList.add('mit-bild');

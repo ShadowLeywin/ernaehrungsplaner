@@ -48,3 +48,18 @@ export function kopfBild(name, titel = '') {
   else findeBild(`kopf/${name}`).then(zeige);
   return huelle;
 }
+
+/** Pflanzliche Ernährung: Vorratskammer als Gemüsehaus statt Fleischhaus. */
+export const istFleischlos = (profil) => ['vegetarisch', 'vegan'].includes(profil?.ernaehrung?.weise);
+
+/** Bild eines Bauwerks: höchste vorhandene Stufe ≤ gebaute, Varianten (z. B. Gemüsehaus) bevorzugt. */
+export async function bauBild(id, stufe, fleischlos = false) {
+  const namen = id === 'vorratskammer' && fleischlos ? ['vorratskammer-veg', id] : [id];
+  for (let st = stufe; st >= 1; st -= 1) {
+    for (const n of namen) {
+      const url = await findeBild(`bauten/${n}-${st}`);
+      if (url) return url;
+    }
+  }
+  return null;
+}
