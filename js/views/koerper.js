@@ -169,3 +169,21 @@ function muskelInfo(m, saetze, rang, s) {
         el('p', { class: 'leise klein' }, uebungsBeschreibung(u)),
         bekannt.has(u.id) ? el('a', { class: 'klein', href: `#/fortschritt/${u.id}` }, 'Verlauf ansehen →') : null)))));
 }
+
+/** Kleine Muskelkarte (vorn und hinten) mit hervorgehobenen Muskeln: Haupt kräftig, Neben schwächer. */
+export function muskelMini(muskeln, frau = false) {
+  const alt = geschlecht;
+  geschlecht = frau ? 'w' : 'm';
+  const [haupt, ...neben] = muskeln;
+  const seite = (formen, name) => {
+    const teile = Object.entries(formen).map(([m, pfade]) => {
+      const wert = m === haupt ? 1 : neben.includes(m) ? 0.55 : 0;
+      const d = pfade.flatMap((p) => [forme(p, false), forme(p, true)]).map((x) => `<path d="${x}"/>`).join('');
+      return `<g class="k-muskel${wert ? ' aktiv' : ''}" style="fill:${wert ? 'var(--akzent)' : 'transparent'};fill-opacity:${wert || 0}">${d}</g>`;
+    }).join('');
+    return `<svg viewBox="30 0 140 420" class="koerper-figur mini" role="img" aria-label="${name}"><ellipse cx="100" cy="36" rx="19" ry="24" class="k-umriss"/><path d="${forme(UMRISS, false)}" class="k-umriss"/>${teile}</svg>`;
+  };
+  const html = seite(VORN, 'vorn') + seite(HINTEN, 'hinten');
+  geschlecht = alt;
+  return html;
+}

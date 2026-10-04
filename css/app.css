@@ -1182,3 +1182,21 @@ input.offen { border-color: var(--warnung); background: color-mix(in oklab, var(
 .szene-brom.brom-stehend { height: 94%; right: 5%; bottom: -2%; filter: drop-shadow(-8px 0 16px rgb(255 140 50 / 0.35)) brightness(0.92) sepia(0.12); }
 /* Text über der Szene: oben kräftiger abdunkeln, damit er auf jedem Bild lesbar ist */
 .lagerfeuer.mit-bild .lager-text { background: linear-gradient(180deg, rgb(0 0 0 / 0.8), rgb(0 0 0 / 0.35) 75%, transparent); }
+.muskel-mini { display: flex; justify-content: center; gap: 8px; }
+.koerper-figur.mini { width: 42%; max-width: 150px; height: auto; }
+.k-muskel.aktiv { animation: muskel-puls 1.6s ease-in-out infinite; }
+@keyframes muskel-puls { 50% { filter: brightness(1.4) drop-shadow(0 0 4px var(--akzent)); } }
+@media (prefers-reduced-motion: reduce) { .k-muskel.aktiv { animation: none; } }
+.legende-muskel { text-align: center; }
+.legende-muskel .punkt { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--akzent); vertical-align: middle; }
+.legende-muskel .punkt.schwach { opacity: 0.55; }
+.uebung-name { background: none; border: 0; padding: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+.uebung-name .info-i { font-size: 0.7em; opacity: 0.6; border: 1px solid currentColor; border-radius: 50%; width: 1.4em; height: 1.4em; display: inline-grid; place-items: center; }
+.abbild-rahmen { display: flex; justify-content: center; }
+.abbild { width: 60%; max-width: 220px; height: auto; }
+.abbild-koerper { fill: color-mix(in oklab, var(--text) 14%, #120a07); stroke: var(--akzent); stroke-width: 1.4; }
+.abbild-glieder path { stroke: color-mix(in oklab, var(--text) 14%, #120a07); stroke-linecap: round; fill: none; filter: drop-shadow(0 0 1.5px var(--akzent)); }
+.abbild-def path { stroke: var(--akzent); stroke-width: 1.2; fill: none; stroke-linecap: round; }
+.abbild-aura { animation: aura-atmen 4s ease-in-out infinite; transform-origin: center; }
+@keyframes aura-atmen { 50% { opacity: 0.7; transform: scale(0.97); } }
+@media (prefers-reduced-motion: reduce) { .abbild-aura { animation: none; } }

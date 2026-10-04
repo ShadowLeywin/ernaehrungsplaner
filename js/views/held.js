@@ -9,6 +9,7 @@ import { GRUPPEN, RAENGE, rangName } from '../logic/raenge.js';
 import { rangEmblem, werteNetz } from './emblem.js';
 import { TITEL, waehleTitel, titelName } from '../logic/geschichte.js';
 import { schreibe } from '../db.js';
+import { abbildKarte } from './abbild.js';
 
 export const held = {
   get titel() { return episch('Heldenbogen', 'Charakter'); },
@@ -37,6 +38,8 @@ function inhalt(s) {
       el('p', { class: 'leise klein zeile' },
         el('span', {}, `${zahl(level.xpInStufe)} / ${zahl(level.xpBisNaechste)} XP`),
         el('span', {}, `gesamt ${zahl(xp)} XP`))),
+
+    abbildKarte(s),
 
     el('section', { class: 'karte' },
       el('h2', {}, episch('Eigenschaften', 'Werte')),

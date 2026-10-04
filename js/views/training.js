@@ -15,6 +15,7 @@ import { steigerung, stillstand } from '../logic/progression.js';
 import { SATZ_TYPEN, scheiben, aufwaermSaetze } from '../logic/hantel.js';
 import { zeigeHinweis } from './hinweis.js';
 import { PROGRAMME } from '../daten/programme.js';
+import { oeffneUebungInfo } from './uebung-info.js';
 import { episch } from '../darstellung.js';
 import { holeGewichtsReihe } from './gewicht.js';
 import { oeffneUebungDialog } from './uebung-dialog.js';
@@ -393,7 +394,9 @@ function uebungsKarte(k, t, eintrag, speichern, neu) {
     onclick: () => { t.uebungen.splice(t.uebungen.indexOf(eintrag), 1); speichern(); neu(); },
   }, icon('schliessen', 18));
 
-  const kopf = el('div', { class: 'zeile' }, el('h2', {}, u.name), entfernen);
+  const kopf = el('div', { class: 'zeile' }, el('h2', {},
+    el('button', { class: 'uebung-name', type: 'button', 'aria-label': `${u.name}: Muskeln und Ausführung`, onclick: () => oeffneUebungInfo(u, k.profil?.koerper?.geschlecht === 'w') },
+      u.name, el('span', { class: 'info-i', 'aria-hidden': 'true' }, 'i'))), entfernen);
 
   if (eintrag.cardio) {
     const feld = (beschriftung, schluessel, einheit) => {
