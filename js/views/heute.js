@@ -1,7 +1,7 @@
 // Tagesansicht: Tagesziele mit Fortschritt, Wasser, Morning Stack, Supplements,
 // Einträge pro Mahlzeit und Zähler (Tag / Wochendurchschnitt).
-import { el, setze, zahl, schalter } from '../ui.js';
-import { holeProfil, holeTag, holeTage, speichereTag } from '../state.js';
+import { el, setze, zahl, zahlFeld, schalter } from '../ui.js';
+import { holeProfil, speichereProfil, holeTag, holeTage, speichereTag } from '../state.js';
 import { holeLebensmittel } from '../lebensmittel.js';
 import { tagestypFuerDatum, mahlzeitenZiele, datumSchluessel } from '../logic/ziele.js';
 import { fixeNaehrwerte } from '../logic/fixeintraege.js';
@@ -30,10 +30,8 @@ let angezeigtesDatum = null;
 let zaehlerModus = 'tag';
 
 export const heute = {
-  titel: 'Heute',
-  kopf: () => el('span', { class: 'wortmarke', 'aria-label': 'FORGE' },
-    icon('flamme-voll', 30),
-    el('span', { class: 'wortmarke-text' }, 'FORGE')),
+  titel: 'Ernährung',
+  einstellungen: ernaehrungsEinstellungen,
   render() {
     const wurzel = el('div');
     lade(wurzel);
@@ -386,4 +384,34 @@ function supplementKarte(profil, tag, aendern) {
       tag.supplements[s.id] = wert;
       aendern();
     }, s.name, el('span', { class: 'leise klein' }, ` · ${s.dosis}`))));
+}
+
+/** Zahnrad-Einstellungen der Ernährungsseite: Wasser-Schnellknöpfe und Mittagspause (sofort gespeichert). */
+function ernaehrungsEinstellungen() {
+  const wurzel = el('div', {}, el('p', { class: 'leise' }, 'Lade …'));
+  holeProfil().then((profil) => {
+    const w = profil.wasser;
+    const speichern = () => speichereProfil(profil);
+    const zeichneEinstellungen = () => setze(wurzel,
+      el('h2', { class: 'abschnitt' }, 'Wasser'),
+      el('div', { class: 'felder' },
+        el('label', { class: 'feld' }, el('span', {}, 'Mittagspause ab'), el('input', {
+          type: 'time', value: w.mittagspause,
+          oninput: (e) => { if (e.target.value) { w.mittagspause = e.target.value; speichern(); } },
+        }))),
+      el('p', { class: 'feld', style: 'margin-top:12px' }, el('span', {}, 'Schnellknöpfe (1 bis 3)')),
+      ...w.presetsMl.map((ml, i) => el('div', { class: 'aktivitaet' },
+        zahlFeld(`Knopf ${i + 1}`, ml, 'ml', (wert) => { w.presetsMl[i] = Math.round(wert); speichern(); }),
+        w.presetsMl.length > 1 ? el('button', {
+          class: 'knopf-klein', type: 'button', 'aria-label': `Knopf ${i + 1} entfernen`,
+          onclick: () => { w.presetsMl.splice(i, 1); speichern(); zeichneEinstellungen(); },
+        }, icon('schliessen', 18)) : null)),
+      w.presetsMl.length < 3 ? el('button', {
+        class: 'knopf zweitrangig', type: 'button',
+        onclick: () => { w.presetsMl.push(500); speichern(); zeichneEinstellungen(); },
+      }, icon('plus', 18), 'Knopf') : null,
+      el('p', { class: 'leise klein' }, 'Wird sofort gespeichert. Ziele, Supplements und mehr unter Profil & Ziele.'));
+    zeichneEinstellungen();
+  });
+  return wurzel;
 }

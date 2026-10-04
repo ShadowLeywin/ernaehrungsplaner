@@ -713,3 +713,90 @@ details.lm summary::-webkit-details-marker { display: none; }
 }
 .navigation a.aktiv { color: var(--akzent); background: color-mix(in oklab, var(--akzent) 14%, transparent); }
 .nav-icon { display: grid; place-items: center; height: 24px; }
+
+/* ---------- Kopf: Zahnrad immer oben rechts ---------- */
+.kopf-aktionen { display: flex; align-items: center; gap: 6px; }
+.zahnrad { color: var(--text-leise); }
+.zahnrad:active { transform: rotate(45deg); }
+.zahnrad .icon { transition: transform 0.3s; }
+
+/* ---------- Panel (von unten) ---------- */
+.panel {
+  margin: auto auto 0;
+  width: 100%;
+  max-width: 560px;
+  max-height: 88dvh;
+  padding: 0;
+  border: 0;
+  border-radius: 24px 24px 0 0;
+  background: var(--hintergrund);
+  color: var(--text);
+}
+.panel[open] { animation: hochfahren 0.25s cubic-bezier(.2,.8,.2,1); }
+.panel::backdrop { background: rgb(0 0 0 / 0.55); backdrop-filter: blur(3px); }
+.panel-blatt { padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+.panel-griff { width: 44px; height: 5px; border-radius: 999px; background: var(--rand); margin: 10px auto 0; }
+.panel .dialog-kopf { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; padding-top: 4px; }
+.panel-inhalt { padding: 0 18px; }
+.panel-inhalt .abschnitt:first-child { margin-top: 4px; }
+
+/* ---------- Lager (Hub) ---------- */
+.lagerfeuer {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  background:
+    radial-gradient(ellipse at 50% 100%, color-mix(in oklab, var(--akzent) 16%, transparent), transparent 70%),
+    linear-gradient(180deg, color-mix(in oklab, var(--hintergrund) 60%, #000), var(--flaeche));
+}
+[data-modus=hell] .lagerfeuer { background: radial-gradient(ellipse at 50% 100%, color-mix(in oklab, var(--akzent) 22%, transparent), transparent 70%), linear-gradient(180deg, #2a201c, #3a2b24); color: #fff4ec; }
+[data-modus=hell] .lagerfeuer .leise { color: #e3cfc4; }
+.feuer-szene { display: block; width: 100%; height: auto; margin-top: 54px; }
+.lager-text { position: absolute; inset: 0 0 auto 0; padding: 16px 18px; }
+.lager-gruss { font-size: 1.15rem; font-weight: 800; margin: 0 0 2px; letter-spacing: -0.01em; }
+.lager-text .chips { margin-top: 6px; }
+.boden { fill: rgb(0 0 0 / 0.35); }
+.steine ellipse { fill: #4a4440; stroke: rgb(0 0 0 / 0.3); stroke-width: 1; }
+.scheite rect { fill: #6b3f22; stroke: #3d2212; stroke-width: 2; }
+.flamme { transform-box: fill-box; transform-origin: 50% 100%; }
+.f1 { animation: flackern 1.6s ease-in-out infinite alternate; }
+.f2 { fill: #ffd27a; opacity: 0.95; animation: flackern 1.1s ease-in-out infinite alternate-reverse; }
+.f3 { fill: #fff6d6; animation: flackern 0.8s ease-in-out infinite alternate; }
+@keyframes flackern {
+  0% { transform: scale(1, 1) skewX(0deg); }
+  35% { transform: scale(0.96, 1.06) skewX(2deg); }
+  70% { transform: scale(1.03, 0.95) skewX(-2deg); }
+  100% { transform: scale(0.98, 1.04) skewX(1deg); }
+}
+.glut-schein { animation: gluehen 2.4s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+@keyframes gluehen { from { opacity: 0.7; transform: scale(0.97); } to { opacity: 1; transform: scale(1.03); } }
+.funke { fill: #ffcf7a; opacity: 0; animation: aufsteigen 3.2s linear infinite; }
+@keyframes aufsteigen {
+  0% { opacity: 0; transform: translate(0, 0); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--drift, 0px), -110px); }
+}
+@media (prefers-reduced-motion: reduce) { .flamme, .funke, .glut-schein { animation: none; } .funke { opacity: 0.6; } }
+
+.hub-kacheln { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.hub-kachel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+  border-radius: var(--radius);
+  background: var(--flaeche);
+  border: 1px solid var(--rand);
+  box-shadow: var(--schatten);
+  color: var(--text);
+  text-decoration: none;
+  min-width: 0;
+}
+a.hub-kachel:active { transform: scale(0.98); }
+.hub-kachel p { margin: 0; }
+.hub-kachel .knopf { min-height: 38px; padding: 6px 12px; margin-top: auto; }
+.hub-kachel-kopf { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+.kachel-icon.klein { width: 30px; height: 30px; border-radius: 10px; }
+.hub-zeile { display: flex; align-items: center; gap: 10px; }
+.mini-ring { width: 52px; height: 52px; flex: none; }
+.hub-zahl { font-size: 1.35rem; font-weight: 800; font-variant-numeric: tabular-nums; }

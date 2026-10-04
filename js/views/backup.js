@@ -129,7 +129,7 @@ function importKarte(wurzel) {
           onclick: async () => {
             // Einstellungen zusammenführen: Teil-Dateien (z. B. nur Vorlagen) löschen das Profil nicht
             await ersetzeAlles(daten, ['einstellungen']);
-            location.hash = '#/heute';
+            location.hash = '#/lager';
             location.reload();
           },
         }, 'Daten ersetzen'),

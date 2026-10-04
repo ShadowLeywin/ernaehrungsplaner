@@ -39,4 +39,5 @@ export function starteRouter(ansichten, standard, ziel, wache = () => null) {
 
   window.addEventListener('hashchange', zeige);
   zeige();
+  return zeige; // zum Neuzeichnen der aktuellen Seite, z. B. nach Einstellungen
 }

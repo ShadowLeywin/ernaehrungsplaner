@@ -147,7 +147,7 @@ function ergebnisSchritt(wurzel) {
     await speichereProfil(profil);
     entwurf = null;
     schritt = 0;
-    location.hash = '#/heute';
+    location.hash = '#/lager';
   };
 
   return [

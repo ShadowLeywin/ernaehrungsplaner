@@ -25,6 +25,7 @@ let wachHalten = null;
 
 export const training = {
   titel: 'Training',
+  einstellungen: trainingsEinstellungen,
   render() {
     const wurzel = el('div');
     lade(wurzel);
@@ -235,7 +236,7 @@ function zeichneWorkout(k, tag, t) {
   const neu = () => zeichneWorkout(k, tag, t);
 
   // Bildschirm während des Trainings anlassen (wenn unterstützt)
-  if (!wachHalten && navigator.wakeLock) {
+  if (!wachHalten && navigator.wakeLock && ladeWachHalten()) {
     navigator.wakeLock.request('screen').then((w) => { wachHalten = w; }).catch(() => {});
   }
 
@@ -402,6 +403,23 @@ function satzZeile(u, s, index, speichern, entfernen, zielWert) {
 
 function ladePause() {
   try { return Number(localStorage.getItem('pauseSek')) || 90; } catch { return 90; }
+}
+
+function ladeWachHalten() {
+  try { return localStorage.getItem('wachHalten') !== 'aus'; } catch { return true; }
+}
+
+/** Zahnrad-Einstellungen des Trainings (pro Gerät). */
+function trainingsEinstellungen() {
+  const pause = el('input', {
+    type: 'number', inputMode: 'numeric', min: 15, step: 15, value: ladePause(), 'aria-label': 'Pause in Sekunden',
+    oninput: () => { if (pause.valueAsNumber >= 15) { try { localStorage.setItem('pauseSek', String(pause.valueAsNumber)); } catch { /* egal */ } } },
+  });
+  return el('div', {},
+    el('h2', { class: 'abschnitt' }, 'Workout'),
+    el('label', { class: 'feld' }, el('span', {}, 'Pausentimer nach jedem Satz (Sekunden)'), pause),
+    schalter(ladeWachHalten(), (an) => { try { localStorage.setItem('wachHalten', an ? 'an' : 'aus'); } catch { /* egal */ } },
+      'Bildschirm während des Workouts anlassen'));
 }
 
 function startePause() {

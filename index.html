@@ -12,6 +12,7 @@
       var d = JSON.parse(localStorage.getItem('darstellung') || '{}');
       var m = d.modus || 'system';
       document.documentElement.dataset.thema = d.thema || 'glut';
+      document.documentElement.dataset.stil = d.stil || 'episch';
       document.documentElement.dataset.modus = m === 'system'
         ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dunkel' : 'hell')
         : m;
@@ -27,7 +28,10 @@
 <body>
   <header class="kopf">
     <h1 id="titel">FORGE</h1>
-    <span id="offline-hinweis" class="offline-hinweis" hidden>offline</span>
+    <div class="kopf-aktionen">
+      <span id="offline-hinweis" class="offline-hinweis" hidden>offline</span>
+      <button id="zahnrad" class="knopf-klein zahnrad" type="button" aria-label="Einstellungen dieser Seite"></button>
+    </div>
   </header>
 
   <main id="inhalt" class="inhalt" tabindex="-1">
@@ -35,9 +39,9 @@
   </main>
 
   <nav class="navigation" aria-label="Hauptnavigation">
-    <a href="#/heute" data-route="heute"><span class="nav-icon" data-icon="heute"></span>Heute</a>
+    <a href="#/lager" data-route="lager"><span class="nav-icon" data-icon="feuer"></span>Lager</a>
+    <a href="#/heute" data-route="heute"><span class="nav-icon" data-icon="lebensmittel"></span>Ernährung</a>
     <a href="#/training" data-route="training"><span class="nav-icon" data-icon="hantel"></span>Training</a>
-    <a href="#/rezepte" data-route="rezepte"><span class="nav-icon" data-icon="rezepte"></span>Rezepte</a>
     <a href="#/woche" data-route="woche"><span class="nav-icon" data-icon="woche"></span>Woche</a>
     <a href="#/mehr" data-route="mehr"><span class="nav-icon" data-icon="mehr"></span>Mehr</a>
   </nav>

@@ -1,4 +1,4 @@
-import { starteRouter } from './router.js';
+import { starteRouter, aktuelleRoute } from './router.js';
 import { ansichten as platzhalter } from './views/platzhalter.js';
 import { heute } from './views/heute.js';
 import { einstellungen } from './views/einstellungen.js';
@@ -7,6 +7,8 @@ import { backup } from './views/backup.js';
 import { einrichtung } from './views/einrichtung.js';
 import { gewicht } from './views/gewicht.js';
 import { training } from './views/training.js';
+import { lager } from './views/lager.js';
+import { oeffnePanel, schnellEinstellungen } from './views/panel.js';
 import { pruefeEinrichtung, istEingerichtet } from './state.js';
 import { wendeDarstellungAn } from './darstellung.js';
 import { icon } from './icons.js';
@@ -14,13 +16,27 @@ import { icon } from './icons.js';
 wendeDarstellungAn();
 document.querySelectorAll('.nav-icon[data-icon]').forEach((platz) => platz.append(icon(platz.dataset.icon, 22)));
 
-const ansichten = { ...platzhalter, heute, einstellungen, lebensmittel, backup, einrichtung, gewicht, training };
+const ansichten = { ...platzhalter, heute, einstellungen, lebensmittel, backup, einrichtung, gewicht, training, lager };
 
 // Ohne Profil nur Einrichtung und Backup (zum Wiederherstellen) erlauben
 const wache = (name) => (istEingerichtet() || name === 'backup' ? null : 'einrichtung');
 
+let neuZeichnen = () => {};
 pruefeEinrichtung().then(() => {
-  starteRouter(ansichten, 'heute', document.getElementById('inhalt'), wache);
+  neuZeichnen = starteRouter(ansichten, 'lager', document.getElementById('inhalt'), wache);
+});
+
+// Zahnrad: immer oben rechts, öffnet die Einstellungen der aktuellen Seite plus Darstellung
+const zahnrad = document.getElementById('zahnrad');
+zahnrad.append(icon('zahnrad', 22));
+zahnrad.addEventListener('click', () => {
+  const ansicht = ansichten[aktuelleRoute()];
+  const eigene = ansicht?.einstellungen?.();
+  oeffnePanel(eigene ? `Einstellungen: ${ansicht.titel}` : 'Einstellungen', [eigene, schnellEinstellungen()], () => {
+    const y = window.scrollY;
+    neuZeichnen();
+    window.scrollTo(0, y);
+  });
 });
 
 // Offline-Hinweis im Kopf

@@ -12,8 +12,11 @@ export const THEMEN = {
 
 export const MODI = { system: 'System', hell: 'Hell', dunkel: 'Dunkel' };
 
+// Stil: „episch“ = Mittelalter-/Spiel-Flair in Texten und Bildern, „schlicht“ = nüchtern und modern
+export const STILE = { episch: 'Episch', schlicht: 'Schlicht' };
+
 const SCHLUESSEL = 'darstellung';
-const STANDARD = { thema: 'glut', modus: 'system' };
+const STANDARD = { thema: 'glut', modus: 'system', stil: 'episch' };
 const dunkelAbfrage = window.matchMedia('(prefers-color-scheme: dark)');
 
 export function ladeDarstellung() {
@@ -22,16 +25,18 @@ export function ladeDarstellung() {
     return {
       thema: THEMEN[gespeichert?.thema] ? gespeichert.thema : STANDARD.thema,
       modus: MODI[gespeichert?.modus] ? gespeichert.modus : STANDARD.modus,
+      stil: STILE[gespeichert?.stil] ? gespeichert.stil : STANDARD.stil,
     };
   } catch {
     return { ...STANDARD };
   }
 }
 
-export function wendeDarstellungAn({ thema, modus } = ladeDarstellung()) {
+export function wendeDarstellungAn({ thema, modus, stil = STANDARD.stil } = ladeDarstellung()) {
   const dunkel = modus === 'dunkel' || (modus === 'system' && dunkelAbfrage.matches);
   document.documentElement.dataset.thema = thema;
   document.documentElement.dataset.modus = dunkel ? 'dunkel' : 'hell';
+  document.documentElement.dataset.stil = stil;
   // Statusleiste des Handys an den Hintergrund anpassen
   requestAnimationFrame(() => {
     const farbe = zuRgb(getComputedStyle(document.body).backgroundColor);
@@ -55,3 +60,8 @@ export function speichereDarstellung(darstellung) {
 
 // Bei „System“ dem Handy folgen, wenn es zwischen hell und dunkel wechselt
 dunkelAbfrage.addEventListener('change', () => wendeDarstellungAn());
+
+/** Text je nach Stil: episch('Willkommen am Feuer', 'Willkommen'). */
+export function episch(epischerText, schlichterText) {
+  return document.documentElement.dataset.stil === 'schlicht' ? schlichterText : epischerText;
+}

@@ -11,7 +11,7 @@ import { NAEHRSTOFFE } from '../logic/naehrstoffe.js';
 import { berechneTagesbedarf, berechneMakros } from '../logic/bedarf.js';
 import { koerperFelder, alltagFeld, aktivitaetenListe, zielFelder, makroRegelFelder } from './profil-bausteine.js';
 import { oeffneEintragDialog } from './eintrag-dialog.js';
-import { THEMEN, MODI, ladeDarstellung, speichereDarstellung } from '../darstellung.js';
+import { darstellungAuswahl } from './panel.js';
 import { icon } from '../icons.js';
 
 export const einstellungen = {
@@ -29,32 +29,8 @@ export const einstellungen = {
 const abschnitt = (titel) => el('h2', { class: 'abschnitt' }, titel);
 const karte = (...kinder) => el('section', { class: 'karte' }, ...kinder);
 
-/** Farbthema und Hell/Dunkel – wirkt sofort, gilt nur für dieses Gerät (nicht Teil des Profils). */
 function darstellungKarte() {
-  const k = karte();
-  const zeichneKarte = () => {
-    const aktuell = ladeDarstellung();
-    const waehle = (aenderung) => { speichereDarstellung({ ...aktuell, ...aenderung }); zeichneKarte(); };
-    setze(k,
-      el('div', { class: 'themen' }, ...Object.entries(THEMEN).map(([id, t]) => el('button', {
-        class: `thema${aktuell.thema === id ? ' aktiv' : ''}`,
-        type: 'button',
-        'aria-pressed': String(aktuell.thema === id),
-        onclick: () => waehle({ thema: id }),
-      },
-      el('span', { class: 'thema-kreis', style: `background:linear-gradient(135deg, ${t.farben[0]}, ${t.farben[1]})` }),
-      t.name))),
-      el('div', { class: 'modus-reihe' },
-        el('div', { class: 'umschalter', role: 'group', 'aria-label': 'Hell oder dunkel' },
-          ...Object.entries(MODI).map(([id, name]) => el('button', {
-            type: 'button',
-            class: aktuell.modus === id ? 'aktiv' : '',
-            'aria-pressed': String(aktuell.modus === id),
-            onclick: () => waehle({ modus: id }),
-          }, icon({ system: 'system', hell: 'sonne', dunkel: 'mond' }[id], 16), name)))));
-  };
-  zeichneKarte();
-  return k;
+  return karte(darstellungAuswahl());
 }
 
 function zeichne(wurzel, profil, geaendert, lebensmittel) {
