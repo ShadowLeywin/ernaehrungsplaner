@@ -1106,7 +1106,6 @@ input.offen { border-color: var(--warnung); background: color-mix(in oklab, var(
 .ausbau-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .ausbau-kachel > .leise { grid-column: 1 / -1; text-align: right; }
 
-.szene-bau { position: absolute; height: auto; pointer-events: none; filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.6)) brightness(0.92); }
 
 /* ---------- Maße & Fotos ---------- */
 .foto-raster { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }

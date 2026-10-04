@@ -1,7 +1,7 @@
 // Bild-Szene des Lagers: KI-Hintergrund je Level-Stufe, darüber flackerndes Feuerlicht, aufsteigende Funken
 // (Canvas), Brom freigestellt und eine Vignette. Fehlen die Bilder, bleibt die SVG-Szene stehen.
 // Das Feuer (Licht + Funken) wird mit der Serie stärker, der Ort mit dem Level prächtiger.
-import { findeBild, bauBild } from '../bilder.js';
+import { findeBild } from '../bilder.js';
 import { bromSvg } from './brom-figur.js';
 
 // Wo im Hintergrundbild das Feuer sitzt (Anteil von Breite/Höhe, Mitte der Flammen) – je Szene vermessen
@@ -14,33 +14,6 @@ const FEUER_MIT_BROM = {
 };
 const STANDARD_FEUER = [0.42, 0.72];
 
-// Plätze der Bauwerke in der Szene (links/unten/Breite in % der Szene), hinten zuerst
-const PLAETZE = {
-  wachturm: [2, 34, 14], chronikhaus: [70, 36, 16], trophaeenhalle: [16, 38, 18], statue: [58, 30, 9],
-  banner: [30, 40, 7], esse: [2, 12, 18], vorratskammer: [72, 18, 14], kraeutergarten: [20, 8, 14],
-  brunnen: [60, 10, 12], klimmzugbalken: [8, 30, 14], steinbank: [24, 2, 14], amboss: [52, 2, 12],
-};
-
-/** Bauwerke als Bild-Ebenen (nur die, für die es ein Bild gibt – höchste vorhandene Stufe ≤ gebaute). */
-async function bautenEbenen(bauten, fleischlos) {
-  const ebenen = [];
-  for (const [id, platz] of Object.entries(PLAETZE)) {
-    const stufe = bauten?.[id] ?? 0;
-    const url = await bauBild(id, stufe, fleischlos);
-    if (url) {
-      const img = document.createElement('img');
-      img.className = 'szene-bau';
-      img.src = url;
-      img.alt = '';
-      img.style.left = `${platz[0]}%`;
-      img.style.bottom = `${platz[1]}%`;
-      img.style.width = `${platz[2]}%`;
-      ebenen.push(img);
-    }
-  }
-  return ebenen;
-}
-
 /** Höchstes vorhandenes Szenenbild ≤ nr (so kannst du Bilder nach und nach ergänzen). */
 async function besteSzene(nr) {
   for (let i = nr; i >= 1; i -= 1) {
@@ -52,9 +25,9 @@ async function besteSzene(nr) {
 
 /**
  * Ersetzt die SVG-Szene in `buehne` durch die Bild-Szene, falls Bilder vorhanden sind.
- * optionen: { szeneNr, feuerIndex (0–5), mitBrom, bauten }
+ * optionen: { szeneNr, feuerIndex (0–5), mitBrom }
  */
-export async function zeigeBildSzene(buehne, { szeneNr, feuerIndex, mitBrom: mitBromWunsch, bauten, fleischlos = false }) {
+export async function zeigeBildSzene(buehne, { szeneNr, feuerIndex, mitBrom: mitBromWunsch }) {
   let mitBrom = mitBromWunsch;
   const gefunden = await besteSzene(szeneNr);
   if (!gefunden || !buehne.isConnected) return false;
@@ -93,7 +66,8 @@ export async function zeigeBildSzene(buehne, { szeneNr, feuerIndex, mitBrom: mit
   funken.className = 'szene-funken';
   const vignette = document.createElement('div');
   vignette.className = 'szene-vignette';
-  szene.append(hg, ...(await bautenEbenen(bauten, fleischlos)), licht, funken);
+  // Bauwerke nur in der gezeichneten Szene und in „Lager ausbauen“ – über gemalten Bildern wirken sie aufgeklebt
+  szene.append(hg, licht, funken);
 
   if (mitBrom) {
     if (bromBild) {
