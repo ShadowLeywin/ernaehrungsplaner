@@ -29,6 +29,7 @@ import { zeigeTour, tourGesehen } from './views/tour.js';
 import { pruefeSpaeter } from './spiel.js';
 import { oeffnePanel, schnellEinstellungen } from './views/panel.js';
 import { pruefeEinrichtung, istEingerichtet, beiTagGespeichert } from './state.js';
+import { aktualisiereAngeboteStill } from './angebote-speicher.js';
 import { wendeDarstellungAn } from './darstellung.js';
 import { icon } from './icons.js';
 
@@ -49,6 +50,8 @@ pruefeEinrichtung().then(() => {
   // Einführung einmal nach der Einrichtung zeigen
   if (istEingerichtet() && !tourGesehen()) setTimeout(zeigeTour, 1200);
   beiTagGespeichert(() => pruefeSpaeter());
+  // Angebote der Woche aus data/angebote.json holen (nur Preise, es wird nichts gesendet)
+  if (istEingerichtet()) setTimeout(aktualisiereAngeboteStill, 4000);
 });
 
 // Zahnrad: immer oben rechts, öffnet die Einstellungen der aktuellen Seite plus Darstellung

@@ -7,7 +7,7 @@ import { holeProfil, holeTag, speichereTag } from '../state.js';
 import { datumSchluessel } from '../logic/ziele.js';
 import { gewichtsReihe, durchschnitt } from '../logic/gewicht.js';
 import { zielGewicht } from '../logic/bedarf.js';
-import { MASSE, massReihe, aenderung, prognose, bulkBericht } from '../logic/koerpermasse.js';
+import { MASSE, MASS_GRUPPEN, massReihe, aenderung, prognose, bulkBericht } from '../logic/koerpermasse.js';
 import { verzeichnis } from '../spiel.js';
 import { linienDiagramm } from './fortschritt.js';
 import { speichereFoto, holeFotos, loescheFoto } from '../fotos.js';
@@ -15,7 +15,7 @@ import { speichereFoto, holeFotos, loescheFoto } from '../fotos.js';
 const datumKurz = new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'numeric', year: '2-digit' });
 const kurz = (d) => datumKurz.format(new Date(`${d}T12:00:00`));
 const vz = (x) => `${x > 0 ? '+' : x < 0 ? '−' : '±'}${zahl(Math.abs(x))}`;
-let gewaehltesMass = 'arm';
+let gewaehltesMass = 'armR';
 
 export const masse = {
   titel: 'Maße & Fotos',
@@ -87,7 +87,8 @@ function eingabeKarte(heute, neu) {
   return el('section', { class: 'karte' },
     el('div', { class: 'zeile' }, el('h2', {}, '📏 Heute messen'), status),
     el('p', { class: 'leise klein' }, 'Morgens, entspannt, Maßband waagerecht. Einmal pro Woche reicht.'),
-    el('div', { class: 'felder' }, ...Object.entries(MASSE).map(([id, m]) => el('label', { class: 'feld' }, el('span', {}, `${m.name} (cm)`),
+    ...Object.entries(MASS_GRUPPEN).map(([gruppe, titel]) => el('fieldset', { class: 'mass-gruppe' }, el('legend', {}, titel),
+    el('div', { class: 'felder' }, ...Object.entries(MASSE).filter(([, m]) => m.gruppe === gruppe).map(([id, m]) => el('label', { class: 'feld' }, el('span', {}, `${m.name} (cm)`),
       el('input', {
         type: 'number', inputMode: 'decimal', min: 0, step: 0.1, value: heute.masse[id] ?? '',
         oninput: (e) => {
@@ -97,7 +98,7 @@ function eingabeKarte(heute, neu) {
           timer = setTimeout(async () => { await speichereTag(heute); status.textContent = '✓ gespeichert'; }, 700);
         },
         onchange: () => setTimeout(neu, 900),
-      })))));
+      })))))));
 }
 
 function verlaufKarte(tage, neu) {
@@ -107,7 +108,7 @@ function verlaufKarte(tage, neu) {
     el('h2', {}, 'Verlauf'),
     el('div', { class: 'chips scroll' }, ...Object.entries(MASSE).map(([id, m]) => el('button', {
       class: `chip${gewaehltesMass === id ? ' an' : ''}`, type: 'button', onclick: () => { gewaehltesMass = id; neu(); },
-    }, m.name.split(' ')[0]))),
+    }, m.kurz))),
     r.length >= 2 ? linienDiagramm(r.map((m) => ({ x: m.datum, y: m.cm })), 'cm') : el('p', { class: 'leise klein' }, 'Ab zwei Messungen erscheint hier der Verlauf.'),
     r.length ? el('p', { class: 'klein' }, `Zuletzt ${zahl(r.at(-1).cm)} cm (${kurz(r.at(-1).datum)})`,
       aenderung(r, vor4) ? ` · 4 Wochen: ${vz(aenderung(r, vor4).diff)} cm` : '',

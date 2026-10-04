@@ -38,3 +38,12 @@ test('Bulk-Bericht', () => {
   assert.equal(b.kraft[0].uebungId, 'bankdruecken_lh');
   assert.equal(bulkBericht(tage, reihe, null, v), null);
 });
+
+test('links/rechts: Mittelwert, ältere Einträge ohne Seite zählen weiter', async () => {
+  const { massWert } = await import('../js/logic/koerpermasse.js');
+  assert.equal(massWert({ armL: 38, armR: 39 }, 'arm'), 38.5);
+  assert.equal(massWert({ arm: 37 }, 'arm'), 37);
+  assert.equal(massWert({ armL: 38 }, 'armR'), null);
+  const tage = [{ datum: '2026-09-01', masse: { arm: 37 } }, { datum: '2026-10-01', masse: { armL: 38, armR: 39 } }];
+  assert.equal(massReihe(tage, 'arm').at(-1).cm, 38.5);
+});

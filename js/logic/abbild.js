@@ -1,5 +1,6 @@
 // Abbild des Nutzers: Körperbau-Proportionen aus Größe, Gewicht, Maßen und Rängen (reine Funktionen).
 // Ergebnis sind halbe Breiten in SVG-Einheiten (Figur 200 breit, Mitte x = 100) plus Muskel-Definition 0–1.
+import { massWert } from './koerpermasse.js';
 
 const begrenze = (x, min, max) => Math.min(max, Math.max(min, x));
 
@@ -8,7 +9,7 @@ const begrenze = (x, min, max) => Math.min(max, Math.max(min, x));
  * @param {'m'|'w'|null} p.geschlecht
  * @param {number|null} p.groesseCm
  * @param {number|null} p.gewichtKg
- * @param {object|null} p.masse  letzte Maße { brust, taille, huefte, arm, oberschenkel, wade } in cm
+ * @param {object|null} p.masse  letzte Maße (Schlüssel wie MASSE in koerpermasse.js) in cm
  * @param {number} p.rangAnteil  Gesamtrang 0 (keiner) bis 1 (Legende)
  */
 export function koerperbau({ geschlecht = 'm', groesseCm = null, gewichtKg = null, masse = null, rangAnteil = 0 }) {
@@ -16,27 +17,32 @@ export function koerperbau({ geschlecht = 'm', groesseCm = null, gewichtKg = nul
   const m = groesseCm ? groesseCm / 100 : null;
   const bmi = m && gewichtKg ? gewichtKg / (m * m) : 22;
   const muskel = begrenze(rangAnteil, 0, 1);
+  // Bauchumfang: Abdomen (Bauchnabel), sonst Taille; Arme/Beine als Mittel aus links und rechts
+  const bauchCm = massWert(masse, 'abdomen') ?? massWert(masse, 'taille');
+  const armCm = massWert(masse, 'arm');
+  const beinCm = massWert(masse, 'oberschenkel');
+  const brustCm = massWert(masse, 'brust');
 
   // Fettanteil grob: Taille/Größe (WHtR) wenn gemessen, sonst aus BMI und Muskeln geschätzt
-  const whtr = masse?.taille && groesseCm ? masse.taille / groesseCm : begrenze(0.42 + (bmi - 21) * 0.012 - muskel * 0.04, 0.38, 0.7);
+  const whtr = bauchCm && groesseCm ? bauchCm / groesseCm : begrenze(0.42 + (bmi - 21) * 0.012 - muskel * 0.04, 0.38, 0.7);
   const fett = begrenze((whtr - 0.4) / 0.25, 0, 1);
 
   // Schulterbreite: Brust/Taille-Verhältnis (V-Form) wenn gemessen, sonst aus Muskeln
-  const vForm = masse?.brust && masse?.taille ? begrenze((masse.brust / masse.taille - 1) / 0.45, 0, 1) : muskel * 0.8;
+  const vForm = brustCm && bauchCm ? begrenze((brustCm / bauchCm - 1) / 0.45, 0, 1) : muskel * 0.8;
   const masseFaktor = begrenze((bmi - 18) / 12, 0, 1);
 
   const schulter = (frau ? 38 : 44) + vForm * 14 + masseFaktor * 4;
   const taille = (frau ? 24 : 28) + fett * 16 + masseFaktor * 2;
   const huefte = (frau ? 36 : 30) + fett * 8 + masseFaktor * 3;
-  const armMass = masse?.arm && groesseCm ? begrenze((masse.arm / groesseCm - 0.15) / 0.08, 0, 1) : muskel * 0.7 + masseFaktor * 0.3;
+  const armMass = armCm && groesseCm ? begrenze((armCm / groesseCm - 0.15) / 0.08, 0, 1) : muskel * 0.7 + masseFaktor * 0.3;
   const arm = 7 + armMass * 6 + fett * 1.5;
-  const beinMass = masse?.oberschenkel && groesseCm ? begrenze((masse.oberschenkel / groesseCm - 0.28) / 0.12, 0, 1) : muskel * 0.6 + masseFaktor * 0.4;
+  const beinMass = beinCm && groesseCm ? begrenze((beinCm / groesseCm - 0.28) / 0.12, 0, 1) : muskel * 0.6 + masseFaktor * 0.4;
   const bein = 13 + beinMass * 6 + fett * 3;
 
   return {
     schulter: rund(schulter), taille: rund(taille), huefte: rund(huefte), arm: rund(arm), bein: rund(bein),
     bauch: rund(fett), definition: rund(begrenze(muskel * 1.2 - fett * 0.8, 0, 1)), frau,
-    bmi: rund(bmi), schaetzung: !(masse?.taille && masse?.brust),
+    bmi: rund(bmi), schaetzung: !(bauchCm && brustCm),
   };
 }
 

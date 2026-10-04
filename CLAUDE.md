@@ -73,7 +73,8 @@ Alle folgenden Märkte sind relevant:
 - Architektur: Vanilla JS mit ES-Modulen, kein Build-Schritt, kein Framework. Hash-Router, IndexedDB, Service Worker. Rechenlogik als reine Funktionen in `js/logic/`, getestet mit `node --test`.
 - Hosting: GitHub Pages (öffentliches Repo, keine persönlichen Daten darin). Alle Pfade relativ (`./`).
 - Nährwerte: vorbereitete `data/lebensmittel.json`, erzeugt durch ein lokales Build-Skript; API-Key nur in `.env` (gitignored). Zusätzlich Barcode-Scan mit Live-Abfrage bei Open Food Facts, Treffer werden lokal gespeichert.
-- Angebote: Der Nutzer stößt den Cowork-Agenten wöchentlich selbst an. Die App unterstützt Datei-Import und Abruf einer gehosteten Datei. Das bestehende Format von `angebote.json` (`schema_version`, Märkte mit verschachtelten Angeboten) ist maßgeblich.
+- Angebote: Der Nutzer stößt den Cowork-Agenten wöchentlich selbst an. Ablage im Repo unter `data/angebote.json` (nur Preise,
+  keine persönlichen Daten); die App holt sie beim Start still ab (höchstens alle 6 h, nur wenn neuer). Die App unterstützt Datei-Import und Abruf einer gehosteten Datei. Das bestehende Format von `angebote.json` (`schema_version`, Märkte mit verschachtelten Angeboten) ist maßgeblich.
 - Kalorienziele: Trainingstag 2.875 kcal (175 g P, 375 g KH, 75 g F), Calisthenics 2.600 kcal, Rest Day 2.400 kcal.
 - Skalierung: Protein bleibt fest, KH und Fett werden im Verhältnis des Trainingstags angepasst (Calisthenics ca. 328 g KH / 65 g F, Rest ca. 293 g KH / 59 g F). Als Vorschlag anzeigen, Nutzer bestätigt.
 - Morning Stack und Supplements zählen in die Tagesziele. Supplements bleiben eine Checkliste, haben aber optionale Nährwerte pro Einnahme (inkl. Mikros aus dem Multivitamin).
@@ -113,7 +114,8 @@ Später: Capacitor-App (Health Connect, Spracherkennung auf dem Gerät), Foto-KI
 
 ## Datenablage (IndexedDB, alles im Backup)
 - `tage/<datum>`: eintraege (mit `offen: true` = Menge fehlt), wasser, koffein, supplements, trainings (inkl. `rekorde`;
-  Sätze mit `typ` aufwaermen/drop/versagen und `rir`; Übungen mit `gruppe` = Superset), gewichtKg, masse, tagebuch
+  Sätze mit `typ` aufwaermen/drop/versagen und `rir`; Übungen mit `gruppe` = Superset), gewichtKg, masse (17 Maße, links/rechts
+  getrennt, siehe `MASSE` in `logic/koerpermasse.js`; alte Schlüssel arm/oberschenkel/wade werden weiter gelesen), tagebuch
 - `einstellungen/<schlüssel>`: profil (inkl. `ernaehrung`), vorlagen, rezepte, eigeneLebensmittel, wochenplaene, einkauf,
   praeferenzen, angebote, angeboteEinstellungen, freunde, erfolgeGesehen, aktivesTraining, letztesBackup,
   favoriten, zuletzt, mahlzeitVorlagen, uebungsNotizen, lager (Bauten, Ausgaben, Glutschilde, Titel)

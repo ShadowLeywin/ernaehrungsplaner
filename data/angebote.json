@@ -1,0 +1,686 @@
+{
+  "schema_version": 1,
+  "erstellt_am": "2026-10-04T12:00:00+02:00",
+  "kalenderwoche": "2026-W41",
+  "zeitraum": {
+    "von": "2026-10-05",
+    "bis": "2026-10-10"
+  },
+  "hinweis": "Top-Angebote je Markt laut meinprospekt.de, nicht der vollständige Prospekt. Preise ohne Gewähr.",
+  "maerkte": [
+    {
+      "id": "netto-offingen",
+      "haendler": "Netto Marken-Discount",
+      "ort": "Offingen",
+      "quelle": "https://www.meinprospekt.de/offingen/netto-marken-discount-de",
+      "prospekte": [
+        {
+          "titel": "Aktuelle Angebote",
+          "gueltig_von": "2026-10-02",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "titel": "netto-online.de - Exklusive Angebote",
+          "gueltig_von": null,
+          "gueltig_bis": "2026-10-31"
+        }
+      ],
+      "angebote": [
+        {
+          "produkt": "H-Vollmilch (Kiste)",
+          "marke": "Gutes Land",
+          "preis": 9.0,
+          "preis_ab": false,
+          "streichpreis": 11.4,
+          "rabatt_prozent": 21,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Harzer Käse",
+          "marke": "Gutes Land",
+          "preis": 1.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Schmand",
+          "marke": "Berchtesgadener Land",
+          "preis": 0.89,
+          "preis_ab": false,
+          "streichpreis": 1.09,
+          "rabatt_prozent": 18,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Classic Bier (Kiste)",
+          "marke": "Krumbach",
+          "preis": 4.49,
+          "preis_ab": false,
+          "streichpreis": 6.79,
+          "rabatt_prozent": 34,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Spezi (Kiste)",
+          "marke": "Paulaner",
+          "preis": 15.0,
+          "preis_ab": false,
+          "streichpreis": 22.8,
+          "rabatt_prozent": 34,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Aufschnittboxen",
+          "marke": "Kitchen Club",
+          "preis": 3.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Glasauflaufform",
+          "marke": "Pyrex",
+          "preis": 10.0,
+          "preis_ab": false,
+          "streichpreis": 22.95,
+          "rabatt_prozent": 56,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Infrarotkabine Aarhus 140",
+          "marke": "Artsauna",
+          "preis": 1399.0,
+          "preis_ab": false,
+          "streichpreis": 1999.0,
+          "rabatt_prozent": 30,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "edeka-offingen",
+      "haendler": "EDEKA",
+      "ort": "Offingen",
+      "quelle": "https://www.meinprospekt.de/offingen/edeka",
+      "prospekte": [
+        {
+          "titel": "Wir lieben Lebensmittel.",
+          "gueltig_von": "2026-10-02",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "titel": "Aktuelle Angebote",
+          "gueltig_von": "2026-10-02",
+          "gueltig_bis": "2026-10-10"
+        }
+      ],
+      "angebote": [
+        {
+          "produkt": "Caffè Crema",
+          "marke": "Lavazza",
+          "preis": 13.99,
+          "preis_ab": true,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Fertiggericht",
+          "marke": "Frosta",
+          "preis": 2.29,
+          "preis_ab": true,
+          "streichpreis": 4.79,
+          "rabatt_prozent": 52,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Butter",
+          "marke": "Landliebe",
+          "preis": 1.29,
+          "preis_ab": true,
+          "streichpreis": 2.79,
+          "rabatt_prozent": 54,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Schorle/Eistee",
+          "marke": "Adelholzener",
+          "preis": 6.99,
+          "preis_ab": false,
+          "streichpreis": 9.29,
+          "rabatt_prozent": 25,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Schokolade",
+          "marke": "Ritter Sport",
+          "preis": 0.99,
+          "preis_ab": true,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Olivenöl",
+          "marke": "Bertolli",
+          "preis": 5.49,
+          "preis_ab": true,
+          "streichpreis": 7.99,
+          "rabatt_prozent": 31,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Bio-Gurke",
+          "marke": null,
+          "preis": 0.49,
+          "preis_ab": true,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Haferflocken",
+          "marke": "Kölln",
+          "preis": 0.79,
+          "preis_ab": true,
+          "streichpreis": 1.69,
+          "rabatt_prozent": 53,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Active O2 Cherry",
+          "marke": "Adelholzener",
+          "preis": 0.89,
+          "preis_ab": true,
+          "streichpreis": 1.19,
+          "rabatt_prozent": 25,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Nescafé Gold",
+          "marke": "Nestlé",
+          "preis": 6.99,
+          "preis_ab": true,
+          "streichpreis": 11.99,
+          "rabatt_prozent": 42,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Steinofen Pizza",
+          "marke": "Original Wagner",
+          "preis": 1.79,
+          "preis_ab": true,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "lidl-burgau",
+      "haendler": "Lidl",
+      "ort": "Burgau",
+      "quelle": "https://www.meinprospekt.de/burgau/lidl",
+      "prospekte": [
+        {
+          "titel": "LIDL LOHNT SICH",
+          "gueltig_von": "2026-10-03",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "titel": "Der Preisführer macht Deutschland dauerhaft günstiger!",
+          "gueltig_von": null,
+          "gueltig_bis": "2026-12-31"
+        }
+      ],
+      "angebote": [
+        {
+          "produkt": "Mandarinen/Satsumas 1 kg",
+          "marke": null,
+          "preis": 1.99,
+          "preis_ab": false,
+          "streichpreis": 3.49,
+          "rabatt_prozent": 43,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Almighurt",
+          "marke": "Ehrmann",
+          "preis": 0.29,
+          "preis_ab": true,
+          "streichpreis": 0.89,
+          "rabatt_prozent": 67,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Bananen lose",
+          "marke": null,
+          "preis": 0.99,
+          "preis_ab": false,
+          "streichpreis": 1.29,
+          "rabatt_prozent": 23,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Kiwi Gold lose",
+          "marke": "Zespri",
+          "preis": 0.55,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Rote Zwiebeln (DE)",
+          "marke": null,
+          "preis": 0.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Möhren (DE)",
+          "marke": null,
+          "preis": 1.11,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Himbeeren",
+          "marke": null,
+          "preis": 1.79,
+          "preis_ab": true,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Herbstwoche-Artikel",
+          "marke": "Deluxe",
+          "preis": 2.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Premium-Pfanne",
+          "marke": "Silvercrest",
+          "preis": 39.99,
+          "preis_ab": true,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Schnee-Overall",
+          "marke": "Lupilu",
+          "preis": 14.99,
+          "preis_ab": false,
+          "streichpreis": 19.99,
+          "rabatt_prozent": 25,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        },
+        {
+          "produkt": "Grünpflanzen im Korb",
+          "marke": null,
+          "preis": 2.99,
+          "preis_ab": false,
+          "streichpreis": 3.49,
+          "rabatt_prozent": 14,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-10"
+        }
+      ]
+    },
+    {
+      "id": "kaufland-dillingen",
+      "haendler": "Kaufland",
+      "ort": "Dillingen a.d. Donau",
+      "quelle": "https://www.meinprospekt.de/dillingen-donau/kaufland",
+      "prospekte": [
+        {
+          "titel": "Hier bin ich richtig",
+          "gueltig_von": "2026-09-30",
+          "gueltig_bis": "2026-10-07"
+        }
+      ],
+      "angebote": [
+        {
+          "produkt": "Barista Hafer",
+          "marke": "Alpro",
+          "preis": 1.69,
+          "preis_ab": true,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-07"
+        },
+        {
+          "produkt": "Weiße Bohnen",
+          "marke": "Dilek",
+          "preis": 1.49,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-07"
+        },
+        {
+          "produkt": "Cerealien",
+          "marke": "Kellogg's",
+          "preis": 2.49,
+          "preis_ab": false,
+          "streichpreis": 4.49,
+          "rabatt_prozent": 45,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-07"
+        },
+        {
+          "produkt": "Kirsche",
+          "marke": "K-Classic",
+          "preis": 0.99,
+          "preis_ab": false,
+          "streichpreis": 1.39,
+          "rabatt_prozent": 29,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-07"
+        },
+        {
+          "produkt": "Weichspüler",
+          "marke": "Sofin",
+          "preis": 1.69,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "drogerie",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-07"
+        },
+        {
+          "produkt": "Sandwich-Maker XXL",
+          "marke": "Princess",
+          "preis": 19.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-07"
+        },
+        {
+          "produkt": "Kontaktgrill Inicio Classic",
+          "marke": "Tefal",
+          "preis": 49.99,
+          "preis_ab": false,
+          "streichpreis": 94.99,
+          "rabatt_prozent": 47,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-07"
+        },
+        {
+          "produkt": "Klappdeckelbox",
+          "marke": null,
+          "preis": 3.99,
+          "preis_ab": true,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-07"
+        },
+        {
+          "produkt": "Kaffeemaschine AromaFresh II",
+          "marke": "Melitta",
+          "preis": 119.0,
+          "preis_ab": false,
+          "streichpreis": 179.0,
+          "rabatt_prozent": 34,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-07"
+        },
+        {
+          "produkt": "Slips",
+          "marke": "Esmara",
+          "preis": 8.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-07"
+        },
+        {
+          "produkt": "2-in-1-Zyklon-Staubsauger",
+          "marke": "Tristar",
+          "preis": 24.99,
+          "preis_ab": true,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-05",
+          "gueltig_bis": "2026-10-07"
+        }
+      ],
+      "hinweis": "Aktueller Prospekt gilt nur bis Mi 07.10.; der neue Prospekt ab Do 08.10. ist noch nicht online."
+    },
+    {
+      "id": "dm-lauingen",
+      "haendler": "dm-drogerie markt",
+      "ort": "Lauingen (Donau)",
+      "quelle": "https://www.meinprospekt.de/lauingen-donau/dm-de",
+      "prospekte": [
+        {
+          "titel": "Aktuelle Angebote",
+          "gueltig_von": "2026-10-01",
+          "gueltig_bis": "2026-10-15"
+        }
+      ],
+      "angebote": [
+        {
+          "produkt": "Silikon-Badebürste",
+          "marke": "ebelin",
+          "preis": 3.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "drogerie",
+          "gueltig_von": "2026-10-01",
+          "gueltig_bis": "2026-10-15"
+        },
+        {
+          "produkt": "Ringe Gold-Optik",
+          "marke": "ebelin",
+          "preis": 3.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "drogerie",
+          "gueltig_von": "2026-10-01",
+          "gueltig_bis": "2026-10-15"
+        },
+        {
+          "produkt": "Strumpfhose Thermo 130 DEN",
+          "marke": "Fascino",
+          "preis": 6.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-01",
+          "gueltig_bis": "2026-10-15"
+        },
+        {
+          "produkt": "Strumpfhose Thermo mit Innenfleece 100 DEN",
+          "marke": "nur die",
+          "preis": 14.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-01",
+          "gueltig_bis": "2026-10-15"
+        },
+        {
+          "produkt": "Adventskalender Tüten Set",
+          "marke": "Profissimo",
+          "preis": 6.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-01",
+          "gueltig_bis": "2026-10-15"
+        },
+        {
+          "produkt": "LED Kugel Sternenglanz 12 cm",
+          "marke": "Dekorieren & Einrichten",
+          "preis": 7.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-01",
+          "gueltig_bis": "2026-10-15"
+        },
+        {
+          "produkt": "LED Kugel aus Porzellan 7 cm",
+          "marke": "Dekorieren & Einrichten",
+          "preis": 6.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-01",
+          "gueltig_bis": "2026-10-15"
+        },
+        {
+          "produkt": "Servietten Lebkuchenmann",
+          "marke": "Boltze",
+          "preis": 1.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-01",
+          "gueltig_bis": "2026-10-15"
+        },
+        {
+          "produkt": "Keramikkürbis weiß 10 cm",
+          "marke": "Boltze",
+          "preis": 3.45,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-01",
+          "gueltig_bis": "2026-10-15"
+        },
+        {
+          "produkt": "Stoffelch mit Ausziehbeinen",
+          "marke": "Boltze",
+          "preis": 24.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-01",
+          "gueltig_bis": "2026-10-15"
+        },
+        {
+          "produkt": "Streudeko Spinnen",
+          "marke": "Dekorieren & Einrichten",
+          "preis": 1.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-01",
+          "gueltig_bis": "2026-10-15"
+        },
+        {
+          "produkt": "T-Shirt Schultüten-Print Gr. 128",
+          "marke": "Alana",
+          "preis": 7.9,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-01",
+          "gueltig_bis": "2026-10-15"
+        }
+      ]
+    }
+  ]
+}

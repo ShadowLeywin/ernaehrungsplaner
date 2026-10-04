@@ -1,22 +1,51 @@
 // Körpermaße, Gewichts-Prognose und Bulk-Bericht (reine Funktionen).
-// Maße im Tagesdatensatz: tag.masse = { hals, brust, arm, taille, huefte, oberschenkel, wade } in cm.
+// Maße im Tagesdatensatz: tag.masse = { hals, schulter, brust, armL, armR, … } in cm (siehe MASSE).
+// Ältere Daten mit arm/oberschenkel/wade (ohne Seite) werden weiter gelesen.
 import { datumSchluessel } from './ziele.js';
 import { uebungsVerlauf } from './fortschritt.js';
 
-export const MASSE = {
-  arm: { name: 'Oberarm (angespannt)' },
-  brust: { name: 'Brust' },
-  taille: { name: 'Taille (Bauchnabel)' },
-  huefte: { name: 'Hüfte' },
-  oberschenkel: { name: 'Oberschenkel' },
-  wade: { name: 'Wade' },
-  hals: { name: 'Hals' },
+export const MASS_GRUPPEN = {
+  oberkoerper: 'Oberkörper',
+  rumpf: 'Rumpf',
+  arme: 'Arme',
+  beine: 'Beine',
 };
+
+export const MASSE = {
+  hals: { name: 'Hals', kurz: 'Hals', gruppe: 'oberkoerper' },
+  schulter: { name: 'Schulter', kurz: 'Schulter', gruppe: 'oberkoerper' },
+  brust: { name: 'Brust', kurz: 'Brust', gruppe: 'oberkoerper' },
+  taille: { name: 'Taille (schmalste Stelle)', kurz: 'Taille', gruppe: 'rumpf' },
+  abdomen: { name: 'Abdomen (Bauchnabel)', kurz: 'Abdomen', gruppe: 'rumpf' },
+  huefte: { name: 'Hüfte', kurz: 'Hüfte', gruppe: 'rumpf' },
+  gesaess: { name: 'Gesäß', kurz: 'Gesäß', gruppe: 'rumpf' },
+  armL: { name: 'Oberarm links', kurz: 'Arm L', gruppe: 'arme' },
+  armR: { name: 'Oberarm rechts', kurz: 'Arm R', gruppe: 'arme' },
+  handgelenkObenL: { name: 'Handgelenk oben links', kurz: 'HG oben L', gruppe: 'arme' },
+  handgelenkObenR: { name: 'Handgelenk oben rechts', kurz: 'HG oben R', gruppe: 'arme' },
+  handgelenkUntenL: { name: 'Handgelenk unten links', kurz: 'HG unten L', gruppe: 'arme' },
+  handgelenkUntenR: { name: 'Handgelenk unten rechts', kurz: 'HG unten R', gruppe: 'arme' },
+  oberschenkelL: { name: 'Oberschenkel links', kurz: 'Bein L', gruppe: 'beine' },
+  oberschenkelR: { name: 'Oberschenkel rechts', kurz: 'Bein R', gruppe: 'beine' },
+  wadeL: { name: 'Wade links', kurz: 'Wade L', gruppe: 'beine' },
+  wadeR: { name: 'Wade rechts', kurz: 'Wade R', gruppe: 'beine' },
+};
+
+// Zusammengefasste Werte (Mittel aus links/rechts, ältere Einträge ohne Seite zählen mit)
+const PAARE = { arm: ['armL', 'armR'], oberschenkel: ['oberschenkelL', 'oberschenkelR'], wade: ['wadeL', 'wadeR'] };
+
+/** Wert eines Maßes; arm/oberschenkel/wade = Mittel aus links und rechts. */
+export function massWert(masse, feld) {
+  if (!masse) return null;
+  if (masse[feld] > 0) return masse[feld];
+  const werte = (PAARE[feld] ?? []).map((k) => masse[k]).filter((v) => v > 0);
+  return werte.length ? Math.round((werte.reduce((a, b) => a + b, 0) / werte.length) * 10) / 10 : null;
+}
 
 /** Messreihe eines Maßes: [{ datum, cm }] älteste zuerst. */
 export function massReihe(tage, feld) {
-  return tage.filter((t) => t.masse?.[feld] > 0)
-    .map((t) => ({ datum: t.datum, cm: t.masse[feld] }))
+  return tage.map((t) => ({ datum: t.datum, cm: massWert(t.masse, feld) }))
+    .filter((m) => m.cm > 0)
     .sort((a, b) => a.datum.localeCompare(b.datum));
 }
 

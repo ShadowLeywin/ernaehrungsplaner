@@ -6,7 +6,7 @@ import { holeLebensmittel } from '../lebensmittel.js';
 import { aktuelleAngebote, zugeordnetesLebensmittel, preisText, KATEGORIE_NAMEN } from '../logic/angebote.js';
 import { datumSchluessel } from '../logic/ziele.js';
 import {
-  holeAngebotsDaten, speichereAngebotsEinstellungen, importiereAngebote, ladeAngeboteVonUrl,
+  holeAngebotsDaten, speichereAngebotsEinstellungen, importiereAngebote, ladeAngeboteVonUrl, standardAngeboteUrl, aktualisiereAngeboteStill,
 } from '../angebote-speicher.js';
 
 let nurPassende = false;
@@ -21,9 +21,11 @@ export const angebote = {
   },
 };
 
-async function lade(wurzel) {
+async function lade(wurzel, frisch = false) {
+  // Beim ersten Öffnen nach neuen Angeboten schauen (still, höchstens alle 6 Stunden)
+  if (!frisch) aktualisiereAngeboteStill().then((neu) => { if (neu && wurzel.isConnected) lade(wurzel, true); });
   const [{ daten, einstellungen }, lm] = await Promise.all([holeAngebotsDaten(), holeLebensmittel()]);
-  const neu = () => lade(wurzel);
+  const neu = () => lade(wurzel, true);
   const status = el('p', { class: 'klein', role: 'status' });
 
   const datei = el('input', {
@@ -35,18 +37,18 @@ async function lade(wurzel) {
       if (r.fehler) { status.textContent = r.fehler; status.className = 'warnung klein'; } else neu();
     },
   });
-  const url = el('input', { type: 'url', value: einstellungen.url, placeholder: 'https://… /angebote.json', 'aria-label': 'Adresse der Angebotsdatei' });
+  const url = el('input', { type: 'url', value: einstellungen.url, placeholder: standardAngeboteUrl(), 'aria-label': 'Adresse der Angebotsdatei (leer = Standard)' });
   const abrufen = async () => {
     status.textContent = 'Lade …';
     einstellungen.url = url.value.trim();
     await speichereAngebotsEinstellungen(einstellungen);
-    const r = await ladeAngeboteVonUrl(einstellungen.url);
+    const r = await ladeAngeboteVonUrl(einstellungen.url || standardAngeboteUrl());
     if (r.fehler) { status.textContent = r.fehler; status.className = 'warnung klein'; } else neu();
   };
 
   const importKarte = el('details', { class: 'karte', open: !daten },
     el('summary', {}, el('strong', {}, daten ? 'Neue Angebote laden' : 'Angebote laden')),
-    el('p', { class: 'leise klein' }, 'Die angebote.json erzeugt dein Cowork-Agent. Lade sie als Datei oder hinterlege eine Adresse, unter der sie liegt. Dabei werden keine persönlichen Daten gesendet.'),
+    el('p', { class: 'leise klein' }, 'Die Angebote der Woche kommen automatisch mit der App (data/angebote.json im Repo). Alternativ eine Datei laden oder eine eigene Adresse eintragen. Dabei werden keine persönlichen Daten gesendet.'),
     el('label', { class: 'feld' }, el('span', {}, 'Datei'), datei),
     el('div', { class: 'manuell', style: 'margin-top:8px' }, url, el('button', { class: 'knopf zweitrangig', type: 'button', onclick: abrufen }, 'Abrufen')),
     status);

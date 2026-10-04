@@ -1232,3 +1232,5 @@ input.offen { border-color: var(--warnung); background: color-mix(in oklab, var(
 /* Seitenkopf-Bild: der Titel steht schon mittig in der Kopfzeile */
 .kopf-bild-titel { display: none; }
 .kopf-bild::after { background: linear-gradient(180deg, transparent 60%, rgb(0 0 0 / 0.45)); }
+.mass-gruppe { border: 0; padding: 0; margin: 12px 0 0; }
+.mass-gruppe legend { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--akzent); margin-bottom: 6px; }
