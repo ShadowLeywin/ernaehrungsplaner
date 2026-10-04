@@ -2,9 +2,9 @@
 // Neue Speicherbereiche: in STORES eintragen und DB_VERSION erhöhen.
 
 const DB_NAME = 'ernaehrungsplaner';
-const DB_VERSION = 2;
-// einstellungen: Profil · tage: Tagesdaten je Datum ("2026-10-05")
-const STORES = ['einstellungen', 'tage'];
+const DB_VERSION = 3;
+// einstellungen: Profil · tage: Tagesdaten je Datum ("2026-10-05") · fotos: Fortschrittsfotos (nicht im Backup)
+const STORES = ['einstellungen', 'tage', 'fotos'];
 
 let dbVersprechen;
 
@@ -37,6 +37,7 @@ async function ausfuehren(store, modus, aktion) {
 export const lese = (store, schluessel) => ausfuehren(store, 'readonly', (s) => s.get(schluessel));
 export const schreibe = (store, schluessel, wert) => ausfuehren(store, 'readwrite', (s) => s.put(wert, schluessel));
 export const anzahl = (store) => ausfuehren(store, 'readonly', (s) => s.count());
+export const loesche = (store, schluessel) => ausfuehren(store, 'readwrite', (s) => s.delete(schluessel));
 
 /** Alle Einträge eines Speichers als [[schluessel, wert], …] */
 export async function alleEintraege(store) {

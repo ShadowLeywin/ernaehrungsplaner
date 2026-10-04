@@ -56,6 +56,7 @@ function zeichne(wurzel, profil, reihe) {
     reihe.length ? null : el('section', { class: 'karte' },
       el('p', {}, 'Noch keine Messungen. Trage dein Gewicht morgens unter „Heute“ ein.')),
     reihe.length ? statusKarte(reihe, heute, ziel, startKg) : null,
+    el('a', { class: 'knopf zweitrangig voll', href: '#/masse', style: 'margin-bottom:14px' }, 'Maße, Fotos & Prognose →'),
     vorschlagKarte(wurzel, profil, vorschlag, heute),
     reihe.length ? el('section', { class: 'karte' }, el('h2', {}, 'Verlauf'), gewichtsDiagramm(reihe, glatt, plan)) : null,
     reihe.length ? monatsKarte(reihe, ziel) : null,

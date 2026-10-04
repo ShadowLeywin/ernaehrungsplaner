@@ -18,6 +18,7 @@ const GRUPPEN = () => [
   ]],
   ['Körper & Einstellungen', [
     ['gewicht', 'gewicht', 'Gewicht', 'Verlauf & Anpassung'],
+    ['masse', 'koerper', 'Maße & Fotos', 'Prognose & Phasen-Bericht'],
     ['einstellungen', 'einstellungen', 'Profil', 'Ziele, Sport, Design'],
     ['backup', 'backup', 'Backup', 'Sichern & teilen'],
   ]],
