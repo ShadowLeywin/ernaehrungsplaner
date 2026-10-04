@@ -832,3 +832,17 @@ input.offen { border-color: var(--warnung); background: color-mix(in oklab, var(
 .auswahl li.mit-plus .auswahl-eintrag { flex: 1; }
 .plus-schnell { margin-right: 8px; }
 .plus-schnell.an { color: var(--akzent); }
+
+/* ---------- Fortschritt ---------- */
+.zurueck-link { display: inline-flex; align-items: center; gap: 4px; text-decoration: none; margin-bottom: 6px; }
+.wochen-balken { display: flex; align-items: flex-end; gap: 6px; height: 140px; margin: 8px 0 4px; }
+.w-saeule { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 3px; }
+.w-saeule i { display: block; width: 100%; max-width: 30px; border-radius: 6px 6px 3px 3px; background: color-mix(in oklab, var(--akzent) 45%, transparent); }
+.w-saeule.aktuell i { background: var(--verlauf); }
+.w-wert { font-size: 0.7rem; font-weight: 700; color: var(--text-leise); }
+.w-name { font-size: 0.65rem; color: var(--text-leise); white-space: nowrap; }
+.linien-diagramm { width: 100%; height: auto; display: block; }
+.rekordliste li { border-bottom: 1px solid var(--rand); }
+.rekordliste li:last-child { border-bottom: 0; }
+.rekordliste a.eintrag { color: inherit; }
+.rekord-hinweis { color: var(--akzent); font-weight: 700; }

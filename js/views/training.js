@@ -9,6 +9,8 @@ import { UEBUNGEN, MUSKELN, INTENSITAETEN } from '../daten/uebungen.js';
 import {
   uebungsVerzeichnis, kcalTraining, dauerMin, statistik, letzteLeistung, saetzeText, zusatzKcal,
 } from '../logic/training.js';
+import { neueRekorde } from '../logic/fortschritt.js';
+import { episch } from '../darstellung.js';
 import { holeGewichtsReihe } from './gewicht.js';
 import { oeffneUebungDialog } from './uebung-dialog.js';
 import { oeffneVorlageEditor } from './vorlage-editor.js';
@@ -99,7 +101,10 @@ function zeichneUebersicht(k, tag) {
         : null,
       el('div', { class: 'knopfreihe' },
         el('button', { class: 'knopf', type: 'button', onclick: () => starteWorkout(k) }, icon('hantel', 20), 'Workout starten'),
-        el('button', { class: 'knopf zweitrangig', type: 'button', onclick: () => aktivitaetEintragen(k, tag) }, icon('flamme', 20), 'Cardio / Sport'))),
+        el('button', { class: 'knopf zweitrangig', type: 'button', onclick: () => aktivitaetEintragen(k, tag) }, icon('flamme', 20), 'Cardio / Sport')),
+      el('div', { class: 'knopfreihe' },
+        el('a', { class: 'knopf zweitrangig', href: '#/fortschritt' }, icon('hoch', 18), 'Fortschritt & Rekorde'),
+        el('a', { class: 'knopf zweitrangig', href: '#/koerper' }, icon('koerper', 18), 'Körper'))),
     ...vorlagenBereich(k, tag),
     fertig.length ? el('h2', { class: 'abschnitt' }, 'Heute erledigt') : null,
     ...fertig.map((t) => trainingKarte(t, k.gewichtKg, () => loesche(t))),
@@ -186,6 +191,8 @@ function trainingKarte(t, gewichtKg, beiLoeschen, datum = null) {
       el('h2', {}, icon(t.typ === 'workout' ? 'hantel' : 'flamme', 20), name),
       t.zusatz ? el('span', { class: 'marke' }, 'Zusatz') : null),
     el('p', { class: 'leise klein' }, meta),
+    t.rekorde?.length ? el('p', { class: 'klein rekord-hinweis' }, `🏆 ${t.rekorde.length} neue${t.rekorde.length === 1 ? 'r' : ''} Rekord${t.rekorde.length === 1 ? '' : 'e'}: `,
+      t.rekorde.map((r) => verzeichnis.get(r.uebungId)?.name ?? r.uebungId).join(', ')) : null,
     t.typ === 'workout' && t.uebungen.length ? el('details', {},
       el('summary', {}, `${t.uebungen.length} Übung${t.uebungen.length === 1 ? '' : 'en'}`),
       el('ul', { class: 'liste-einfach klein' }, ...t.uebungen.map((e) => {
@@ -486,6 +493,9 @@ function oeffneAbschluss(k, tag, t) {
 
   const speichernUndBeenden = async () => {
     Object.assign(t, { intensitaet: entwurf.intensitaet, zusatz: entwurf.zusatz, dauerMin: entwurf.dauerMin, ende: new Date().toISOString() });
+    // Neue Bestleistungen merken (für Anzeige, Erfolge und Brom)
+    const andereTage = k.alleTage.filter((x) => x.datum !== tag.datum).concat([tag]);
+    t.rekorde = neueRekorde(t, andereTage, verzeichnis, k.gewichtKg);
     await speichereTag(tag);
     await schreibe('einstellungen', 'aktivesTraining', null);
     schliessen();
