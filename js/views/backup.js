@@ -1,7 +1,8 @@
 // Backup: alle Daten als JSON-Datei exportieren (teilen/herunterladen) und wieder importieren.
-import { el, setze, zahl } from '../ui.js';
+import { el, setze, zahl, schalter } from '../ui.js';
 import { lese, schreibe, anzahl, alleEintraege, ersetzeAlles } from '../db.js';
-import { BACKUP_STORES, erstelleBackup, backupDateiname, pruefeBackup } from '../logic/backup.js';
+import { BACKUP_STORES, BACKUP_APP, erstelleBackup, backupDateiname, pruefeBackup } from '../logic/backup.js';
+import { verschluessele, entschluessele, istVerschluesselt } from '../logic/verschluesselung.js';
 
 const datumZeitFormat = new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium', timeStyle: 'short' });
 const datumFormat = new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium' });
@@ -44,11 +45,21 @@ async function zeichne(wurzel) {
 function exportKarte(wurzel) {
   const status = el('p', { class: 'klein', role: 'status' });
 
+  let mitPasswort = false;
+  const passwort = el('input', { type: 'password', autocomplete: 'new-password', placeholder: 'Passwort (mind. 6 Zeichen)', 'aria-label': 'Passwort für das Backup' });
+  const passwortBereich = el('div', { hidden: true },
+    passwort,
+    el('p', { class: 'leise klein' }, 'Ohne dieses Passwort lässt sich das Backup nicht mehr öffnen – auch nicht von mir. Gut merken!'));
+
   const erzeugeDatei = async () => {
     const daten = {};
     for (const store of BACKUP_STORES) daten[store] = await alleEintraege(store);
-    const json = JSON.stringify(erstelleBackup(daten), null, 1);
-    return new File([json], backupDateiname(), { type: 'application/json' });
+    let json = JSON.stringify(erstelleBackup(daten), null, 1);
+    if (mitPasswort) {
+      if (passwort.value.length < 6) throw Object.assign(new Error('Bitte ein Passwort mit mindestens 6 Zeichen eingeben.'), { name: 'Eingabe' });
+      json = JSON.stringify(await verschluessele(json, passwort.value, BACKUP_APP));
+    }
+    return new File([json], backupDateiname().replace('.json', mitPasswort ? '-verschluesselt.json' : '.json'), { type: 'application/json' });
   };
   const merkeBackup = async () => {
     await schreibe('einstellungen', 'letztesBackup', new Date().toISOString());
@@ -58,14 +69,15 @@ function exportKarte(wurzel) {
   const teilen = async () => {
     try {
       const datei = await erzeugeDatei();
-      await navigator.share({ files: [datei], title: 'Backup Ernährungsplaner' });
+      await navigator.share({ files: [datei], title: 'FORGEBORN-Backup' });
       await merkeBackup();
     } catch (fehler) {
       if (fehler.name !== 'AbortError') status.textContent = `Teilen fehlgeschlagen: ${fehler.message}`;
     }
   };
   const herunterladen = async () => {
-    const datei = await erzeugeDatei();
+    let datei;
+    try { datei = await erzeugeDatei(); } catch (f) { status.textContent = f.message; return; }
     const url = URL.createObjectURL(datei);
     const link = el('a', { href: url, download: datei.name });
     document.body.append(link);
@@ -79,7 +91,9 @@ function exportKarte(wurzel) {
 
   return el('section', { class: 'karte' },
     el('h2', {}, 'Backup erstellen'),
-    el('p', { class: 'leise klein' }, 'Speichert Profil, Einstellungen und alle Tage in eine JSON-Datei.'),
+    el('p', { class: 'leise klein' }, 'Speichert Profil, Einstellungen, Rezepte, Pläne und alle Tage in eine Datei. „Teilen“ schickt sie mit einem Tipp nach Google Drive, in WhatsApp an dich selbst o. Ä.'),
+    schalter(false, (an) => { mitPasswort = an; passwortBereich.hidden = !an; }, 'Mit Passwort verschlüsseln'),
+    passwortBereich,
     el('div', { class: 'knopfreihe' },
       kannTeilen ? el('button', { class: 'knopf', type: 'button', onclick: teilen }, 'Teilen / in Drive speichern') : null,
       el('button', { class: `knopf${kannTeilen ? ' zweitrangig' : ''}`, type: 'button', onclick: herunterladen }, 'Datei herunterladen')),
@@ -95,14 +109,35 @@ function importKarte(wurzel) {
     onchange: async () => {
       const datei = auswahl.files[0];
       if (!datei) return;
-      const ergebnis = pruefeBackup(await datei.text());
-      if (ergebnis.fehler) {
-        setze(bereich, el('p', { class: 'warnung' }, ergebnis.fehler));
-        return;
-      }
-      zeigeBestaetigung(ergebnis);
+      const text = await datei.text();
+      let roh = null;
+      try { roh = JSON.parse(text); } catch { /* pruefeBackup meldet den Fehler */ }
+      if (istVerschluesselt(roh)) { fragePasswort(roh); return; }
+      pruefeUndZeige(text);
     },
   });
+  const pruefeUndZeige = (text) => {
+    const ergebnis = pruefeBackup(text);
+    if (ergebnis.fehler) {
+      setze(bereich, el('p', { class: 'warnung' }, ergebnis.fehler));
+      return;
+    }
+    zeigeBestaetigung(ergebnis);
+  };
+  const fragePasswort = (huelle) => {
+    const feld = el('input', { type: 'password', autocomplete: 'current-password', placeholder: 'Passwort', 'aria-label': 'Passwort des Backups' });
+    const meldung = el('p', { class: 'warnung klein', role: 'alert' });
+    const oeffnen = async () => {
+      meldung.textContent = 'Entschlüssele …';
+      try { pruefeUndZeige(await entschluessele(huelle, feld.value)); } catch (f) { meldung.textContent = f.message; }
+    };
+    feld.addEventListener('keydown', (e) => { if (e.key === 'Enter') oeffnen(); });
+    setze(bereich, el('div', { class: 'vorschlag' },
+      el('p', {}, el('strong', {}, '🔒 Verschlüsseltes Backup')),
+      el('div', { class: 'manuell' }, feld, el('button', { class: 'knopf', type: 'button', onclick: oeffnen }, 'Öffnen')),
+      meldung));
+    feld.focus();
+  };
 
   const zeigeBestaetigung = ({ daten, info }) => {
     setze(bereich, el('div', { class: 'vorschlag' },

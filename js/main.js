@@ -65,8 +65,28 @@ aktualisiereOnline();
 
 // Service Worker für Offline-Betrieb (nur über HTTPS oder localhost)
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').catch((fehler) => {
+  const hatteVersion = Boolean(navigator.serviceWorker.controller);
+  navigator.serviceWorker.register('./sw.js').then((reg) => {
+    // Beim Zurückkehren in die App nach Updates sehen (installierte PWAs laufen oft tagelang)
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) reg.update().catch(() => {}); });
+  }).catch((fehler) => {
     console.error('Service Worker konnte nicht registriert werden:', fehler);
+  });
+  // Neue Version aktiv → Hinweis zum Neuladen (nicht beim allerersten Start)
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hatteVersion || document.querySelector('.update-hinweis')) return;
+    const hinweis = document.createElement('div');
+    hinweis.className = 'update-hinweis';
+    hinweis.setAttribute('role', 'status');
+    const knopf = document.createElement('button');
+    knopf.className = 'knopf';
+    knopf.type = 'button';
+    knopf.textContent = 'Neu laden';
+    knopf.addEventListener('click', () => location.reload());
+    const text = document.createElement('span');
+    text.textContent = document.documentElement.dataset.stil === 'schlicht' ? 'Neue Version verfügbar.' : 'Die Schmiede hat Neues gefertigt.';
+    hinweis.append(text, knopf);
+    document.body.append(hinweis);
   });
 }
 

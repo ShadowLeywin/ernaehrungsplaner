@@ -13,7 +13,7 @@ let nurPassende = false;
 
 export const angebote = {
   get titel() { return episch('Marktschreier', 'Angebote'); },
-  reiter: 'mehr',
+  reiter: 'woche',
   render() {
     const wurzel = el('div', {}, el('p', { class: 'leise' }, 'Lade …'));
     lade(wurzel);

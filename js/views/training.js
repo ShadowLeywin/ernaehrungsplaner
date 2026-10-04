@@ -10,6 +10,7 @@ import {
   uebungsVerzeichnis, kcalTraining, dauerMin, statistik, letzteLeistung, saetzeText, zusatzKcal,
 } from '../logic/training.js';
 import { neueRekorde } from '../logic/fortschritt.js';
+import { steigerung, stillstand } from '../logic/progression.js';
 import { episch } from '../darstellung.js';
 import { holeGewichtsReihe } from './gewicht.js';
 import { oeffneUebungDialog } from './uebung-dialog.js';
@@ -351,6 +352,7 @@ function uebungsKarte(k, t, eintrag, speichern, neu) {
       ? el('p', { class: 'klein' }, eintrag.ziel ? el('strong', {}, `Ziel: ${eintrag.saetze.length} × ${eintrag.ziel}`) : null,
         eintrag.notiz ? ` ${eintrag.notiz}` : null)
       : null,
+    vorschlagZeile(k, u, eintrag, letzte, zeichneSaetze, speichern),
     tabelle,
     el('button', {
       class: 'knopf zweitrangig voll', type: 'button',
@@ -361,6 +363,30 @@ function uebungsKarte(k, t, eintrag, speichern, neu) {
         zeichneSaetze();
       },
     }, icon('plus', 18), 'Satz'));
+}
+
+/** Steigerungsvorschlag aus dem letzten Mal (doppelte Progression) plus Stillstands-Hinweis. */
+function vorschlagZeile(k, u, eintrag, letzte, zeichneSaetze, speichern) {
+  const v = letzte ? steigerung(u, letzte.saetze, eintrag.ziel) : null;
+  const fest = stillstand(u.id, k.alleTage, verzeichnis);
+  if (!v && !fest) return null;
+  const offen = eintrag.saetze.filter((s) => !s.erledigt);
+  const uebernehmen = v && (v.kg != null || v.sek != null) && offen.length ? el('button', {
+    class: 'chip', type: 'button',
+    onclick: (e) => {
+      for (const s of offen) {
+        if (v.kg != null) s.kg = v.kg;
+        if (v.sek != null) s.sek = v.sek;
+        if (v.art === 'mehrGewicht' && v.wdh) s.wdh = v.wdh;
+      }
+      speichern();
+      zeichneSaetze();
+      e.currentTarget.replaceWith(el('span', { class: 'leise klein' }, '✓ übernommen'));
+    },
+  }, 'Übernehmen') : null;
+  return el('div', { class: 'vorschlag-zeile' },
+    v ? el('p', { class: 'klein' }, el('span', { class: 'vorschlag-pfeil' }, v.art === 'mehrWdh' ? '↗ ' : '⬆ '), v.text, ' ', uebernehmen) : null,
+    fest ? el('p', { class: 'klein warnung' }, episch('Brom: Seit 4 Einheiten kein Fortschritt. Eine leichtere Woche (Deload) oder eine Variante bricht die Mauer.', 'Seit 4 Einheiten kein Fortschritt – Deload-Woche oder Übungsvariante probieren.')) : null);
 }
 
 /** Untere Grenze aus einem Ziel wie „8–12“ oder „45–60 s“. */

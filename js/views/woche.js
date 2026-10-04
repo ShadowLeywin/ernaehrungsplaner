@@ -72,6 +72,10 @@ function zeichne(k) {
         el('strong', {}, `${datumKurz.format(k.montagDatum)} – ${datumKurz.format(sonntag)}`),
         wochenVersatz ? el('div', {}, el('button', { class: 'chip', type: 'button', style: 'min-height:30px;padding:3px 12px;margin-top:4px', onclick: () => { wochenVersatz = 0; lade(k.wurzel); } }, 'Diese Woche')) : null),
       el('button', { class: 'knopf-klein', type: 'button', 'aria-label': 'Nächste Woche', onclick: () => { wochenVersatz += 1; lade(k.wurzel); } }, icon('weiter', 22))),
+    el('div', { class: 'chips woche-links' },
+      el('a', { class: 'chip', href: '#/angebote' }, icon('angebote', 16), k.angebote.length ? `Angebote (${k.angebote.length})` : 'Angebote'),
+      el('a', { class: 'chip', href: '#/vorlieben' }, icon('lebensmittel', 16), 'Vorlieben'),
+      el('a', { class: 'chip', href: '#/rezepte' }, icon('rezepte', 16), 'Rezepte')),
     el('div', { class: 'knopfreihe' },
       el('a', { class: 'knopf', href: `#/einkauf/${k.montag}` }, icon('einkauf', 18), 'Einkaufsliste'),
       el('button', {

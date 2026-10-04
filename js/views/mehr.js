@@ -3,19 +3,12 @@ import { el } from '../ui.js';
 import { icon } from '../icons.js';
 import { episch } from '../darstellung.js';
 
+// Einkauf, Angebote und Vorlieben liegen im Wochenplan, Fortschritt und Körper im Training.
 const GRUPPEN = () => [
   [episch('Taverne & Vorrat', 'Ernährung'), [
     ['rezepte', 'rezepte', episch('Rezeptbuch', 'Rezepte'), 'Bewertet & eintragbar'],
     ['mealprep', 'mealprep', 'Meal-Prep', 'Portionen rechnen'],
-    ['einkauf', 'einkauf', 'Einkauf', 'Liste aus dem Plan'],
-    ['angebote', 'angebote', 'Angebote', 'Märkte der Woche'],
-    ['vorlieben', 'lebensmittel', 'Vorlieben', 'Obst & Gemüse 0–10'],
     ['lebensmittel', 'lebensmittel', 'Lebensmittel', 'Suchen & Barcode'],
-  ]],
-  [episch('Übungsplatz', 'Training'), [
-    ['fortschritt', 'hoch', 'Fortschritt', 'Rekorde & Verlauf'],
-    ['koerper', 'koerper', 'Körper', 'Muskeln & Übungen'],
-    ['gewicht', 'gewicht', 'Gewicht', 'Verlauf & Anpassung'],
   ]],
   [episch('Heldenreise', 'Spiel & Erinnerung'), [
     ['held', 'schild', episch('Heldenbogen', 'Charakter'), 'Werte, Level, Ränge'],
@@ -23,9 +16,10 @@ const GRUPPEN = () => [
     ['freunde', 'freunde', 'Freunde', 'Rangkarten vergleichen'],
     ['tagebuch', 'buch', 'Tagebuch', 'Chronik deiner Tage'],
   ]],
-  ['Einstellungen', [
+  ['Körper & Einstellungen', [
+    ['gewicht', 'gewicht', 'Gewicht', 'Verlauf & Anpassung'],
     ['einstellungen', 'einstellungen', 'Profil', 'Ziele, Sport, Design'],
-    ['backup', 'backup', 'Backup', 'Sichern & laden'],
+    ['backup', 'backup', 'Backup', 'Sichern & teilen'],
   ]],
 ];
 

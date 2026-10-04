@@ -10,7 +10,7 @@ import {
   eintragNaehrwerte, mahlzeitSumme, tagesNaehrwerte, gemueseObstGramm,
   wochenSchluessel, wochenDurchschnitt, neueEintragsId,
 } from '../logic/tag.js';
-import { lese, anzahl } from '../db.js';
+import { lese, anzahl, schreibe } from '../db.js';
 import { backupErinnerungFaellig } from '../logic/backup.js';
 import { durchschnitt, anpassungsVorschlag } from '../logic/gewicht.js';
 import { holeGewichtsReihe } from './gewicht.js';
@@ -22,6 +22,7 @@ import { uebungsVerzeichnis, zusatzKcal, zielMitZusatz } from '../logic/training
 const uebungsVerzeichnisCache = uebungsVerzeichnis(UEBUNGEN);
 import { balkenZeile, zaehlerInhalt } from './zaehler.js';
 import { oeffneMemoDialog } from './memo-dialog.js';
+import { kopiereMahlzeit, vorlageAusMahlzeit, eintraegeAusVorlage } from '../logic/schnell.js';
 import { spracheVerfuegbar, spracheErlaubt, setzeSpracheErlaubt } from '../sprache.js';
 import { episch } from '../darstellung.js';
 import { ERNAEHRUNGSWEISEN, UNVERTRAEGLICHKEITEN, DIAETEN, diaetMakros } from '../logic/ernaehrungsweise.js';
@@ -49,9 +50,10 @@ function lade(wurzel) {
   Promise.all([
     holeProfil(), holeLebensmittel(), holeTag(datumSchluessel(datum)),
     lese('einstellungen', 'letztesBackup'), anzahl('tage'), holeGewichtsReihe(),
+    holeTag(datumSchluessel(new Date(datum.getFullYear(), datum.getMonth(), datum.getDate() - 1))), lese('einstellungen', 'mahlzeitVorlagen'),
   ])
-    .then(([profil, daten, tag, letztesBackup, anzahlTage, gewichte]) => zeichne(wurzel, {
-      profil, lebensmittel: daten.lebensmittel, tag, datum, gewichte, wurzel,
+    .then(([profil, daten, tag, letztesBackup, anzahlTage, gewichte, gestern, mahlzeitVorlagen]) => zeichne(wurzel, {
+      profil, lebensmittel: daten.lebensmittel, tag, datum, gewichte, wurzel, gestern, mahlzeitVorlagen: mahlzeitVorlagen ?? [],
       backupFaellig: backupErinnerungFaellig(letztesBackup, anzahlTage > 0),
     }))
     .catch((fehler) => setze(wurzel, el('p', { class: 'warnung' }, fehler.message)));
@@ -90,7 +92,7 @@ function zeichne(wurzel, kontext) {
     wasserKarte(profil, typ, tag, () => speichereTag(tag)),
     profil.morningStack.aktiv ? morningStackKarte(profil, lebensmittel, fix, tag, aendern) : null,
     supplementKarte(profil, tag, aendern),
-    ...profil.mahlzeiten.map((m) => mahlzeitKarte(m, ziele.find((z) => z.id === m.id), tag, lebensmittel, aendern)),
+    ...profil.mahlzeiten.map((m) => mahlzeitKarte(m, ziele.find((z) => z.id === m.id), tag, lebensmittel, aendern, kontext)),
     el('section', { class: 'karte' },
       el('div', { class: 'zeile' },
         el('h2', {}, episch('Vorratsbuch', 'Zähler')),
@@ -282,7 +284,7 @@ function memoKarte({ tag, profil, lebensmittel, wurzel }, aendern) {
   icon('weiter', 20));
 }
 
-function mahlzeitKarte(mahlzeit, ziel, tag, lebensmittel, aendern) {
+function mahlzeitKarte(mahlzeit, ziel, tag, lebensmittel, aendern, kontext) {
   const eintraege = tag.eintraege.filter((e) => e.mahlzeit === mahlzeit.id);
   const summe = mahlzeitSumme(tag, mahlzeit.id, lebensmittel);
   const name = (id) => lebensmittel.find((l) => l.id === id)?.name ?? `Unbekannt (${id})`;
@@ -330,7 +332,37 @@ function mahlzeitKarte(mahlzeit, ziel, tag, lebensmittel, aendern) {
       }))
       : null,
     eintraege.length ? el('p', { class: 'leise klein' }, `Ziel: ${makroText(ziel)} · Ist: ${makroText(summe)}`) : null,
-    el('button', { class: 'knopf zweitrangig voll', type: 'button', onclick: hinzufuegen }, icon('plus', 18), 'Lebensmittel'));
+    el('button', { class: 'knopf zweitrangig voll', type: 'button', onclick: hinzufuegen }, icon('plus', 18), 'Lebensmittel'),
+    schnellLeiste(mahlzeit, tag, eintraege, aendern, kontext));
+}
+
+/** Gestern kopieren, Vorlage einfügen, Mahlzeit als Vorlage speichern. */
+function schnellLeiste(mahlzeit, tag, eintraege, aendern, kontext) {
+  const gestern = kopiereMahlzeit(kontext.gestern, mahlzeit.id, mahlzeit.id, neueEintragsId);
+  const vorlagen = kontext.mahlzeitVorlagen;
+  const bereich = el('div');
+  const mitMenge = eintraege.filter((e) => e.gramm > 0);
+  const speichereVorlagen = (liste) => schreibe('einstellungen', 'mahlzeitVorlagen', liste).then(() => { kontext.mahlzeitVorlagen = liste; });
+  const zeigeVorlagen = () => setze(bereich, el('div', { class: 'chips' },
+    ...vorlagen.map((v) => el('span', { class: 'chip-gruppe' },
+      el('button', { class: 'chip', type: 'button', onclick: () => { tag.eintraege.push(...eintraegeAusVorlage(v, mahlzeit.id, neueEintragsId)); aendern(); } }, `＋ ${v.name}`),
+      el('button', { class: 'chip chip-x', type: 'button', 'aria-label': `Vorlage ${v.name} löschen`, onclick: () => speichereVorlagen(vorlagen.filter((x) => x.id !== v.id)).then(() => aendern()) }, '×')))));
+  const zeigeSpeichern = () => {
+    const name = el('input', { type: 'text', value: mahlzeit.name, 'aria-label': 'Name der Vorlage' });
+    setze(bereich, el('div', { class: 'manuell' }, name, el('button', {
+      class: 'knopf zweitrangig', type: 'button',
+      onclick: () => {
+        const v = vorlageAusMahlzeit(tag, mahlzeit.id, neueEintragsId(), name.value);
+        if (v) speichereVorlagen([...vorlagen, v]).then(() => aendern());
+      },
+    }, 'Speichern')));
+  };
+  const chips = [
+    gestern.length && !eintraege.length ? el('button', { class: 'chip', type: 'button', onclick: () => { tag.eintraege.push(...gestern); aendern(); } }, `↺ Wie gestern (${gestern.length})`) : null,
+    vorlagen.length ? el('button', { class: 'chip', type: 'button', onclick: zeigeVorlagen }, `Vorlagen (${vorlagen.length})`) : null,
+    mitMenge.length ? el('button', { class: 'chip', type: 'button', onclick: zeigeSpeichern }, '☆ Als Vorlage') : null,
+  ].filter(Boolean);
+  return chips.length ? el('div', { class: 'schnell-leiste' }, el('div', { class: 'chips' }, ...chips), bereich) : null;
 }
 
 function wasserKarte(profil, typ, tag, speichern) {

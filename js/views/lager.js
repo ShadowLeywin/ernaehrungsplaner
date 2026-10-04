@@ -13,6 +13,7 @@ import { uebungsVerzeichnis, zusatzKcal, zielMitZusatz } from '../logic/training
 import { vorlagenFuerTag, erledigteVorlagen } from '../logic/vorlagen.js';
 import { holeGewichtsReihe } from './gewicht.js';
 import { ladeSpielstand } from '../spiel.js';
+import { feuerSerie, feuerStufe, istAktiv } from '../logic/feuer.js';
 import { rangName } from '../logic/raenge.js';
 import { rangEmblem } from './emblem.js';
 import { bromMarkup, bromAn } from './brom.js';
@@ -43,11 +44,17 @@ async function lade(wurzel) {
   const ist = tagesNaehrwerte(tag, profil, daten.lebensmittel);
 
   const heldPlatz = el('div');
-  ladeSpielstand().then((spiel) => setze(heldPlatz, heldKachel(spiel))).catch(() => {});
-  const offen = vorlagenFuerTag(vorlagen ?? [], jetzt).filter((v) => !erledigteVorlagen(tag).has(v.id));
+  const feuerKarte = lagerfeuer(profil, typ, notiz, jetzt, bromSpruch(vorlagenFuerTag(vorlagen ?? [], jetzt).filter((v) => !erledigteVorlagen(tag).has(v.id)), ist, typ, jetzt));
+  ladeSpielstand().then((spiel) => {
+    setze(heldPlatz, heldKachel(spiel));
+    // Feuer wächst mit der Serie aktiver Tage (heute schon mitgezählt, falls etwas eingetragen ist)
+    const aktive = spiel.tage.filter(istAktiv).map((t) => t.datum);
+    if (istAktiv(tag)) aktive.push(tag.datum);
+    zeigeFeuerStufe(feuerKarte, feuerSerie(aktive));
+  }).catch(() => {});
 
   setze(wurzel,
-    lagerfeuer(profil, typ, notiz, jetzt, bromSpruch(offen, ist, typ, jetzt)),
+    feuerKarte,
     heldPlatz,
     el('div', { class: 'hub-kacheln' },
       ernaehrungsKachel(typ, ist),
@@ -75,6 +82,19 @@ function bromSpruch(offen, ist, typ, jetzt) {
   return 'Ruhe gehört zur Arbeit. Die Glut hält auch ohne dich.';
 }
 
+/** Größe des Feuers und Serien-Anzeige setzen. */
+function zeigeFeuerStufe(karte, serie) {
+  const stufe = feuerStufe(serie);
+  karte.querySelector('.feuer-szene')?.setAttribute('data-stufe', String(stufe.index));
+  const platz = karte.querySelector('.feuer-serie');
+  if (!platz) return;
+  setze(platz,
+    el('span', { class: 'marke feuer-marke' }, `🔥 ${serie} ${serie === 1 ? 'Tag' : 'Tage'} · ${episch(stufe.episch, stufe.name)}`),
+    el('span', { class: 'leise klein' }, stufe.naechste
+      ? ` noch ${stufe.naechste.ab - serie} bis ${episch(stufe.naechste.episch, stufe.naechste.name)}`
+      : ` ${stufe.text}`));
+}
+
 function heldKachel(spiel) {
   return el('a', { class: 'karte held-kachel', href: '#/held' },
     el('div', { class: 'level-kreis klein' }, el('span', {}, 'Lvl'), el('strong', {}, String(spiel.level.level))),
@@ -90,6 +110,7 @@ function lagerfeuer(profil, typ, notiz, jetzt, spruch) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('viewBox', '0 0 360 190');
   svg.setAttribute('class', 'feuer-szene');
+  svg.setAttribute('data-stufe', '3');
   svg.setAttribute('aria-hidden', 'true');
   const funken = Array.from({ length: 10 }, (_, i) => {
     const x = 165 + ((i * 37) % 32);
@@ -131,7 +152,8 @@ function lagerfeuer(profil, typ, notiz, jetzt, spruch) {
       el('div', { class: 'chips' },
         el('span', { class: 'marke' }, typ.name),
         notiz ? el('span', { class: 'marke' }, notiz) : null,
-        typ.extraKcal ? el('span', { class: 'marke' }, `+${zahl(typ.extraKcal)} kcal Training`) : null)));
+        typ.extraKcal ? el('span', { class: 'marke' }, `+${zahl(typ.extraKcal)} kcal Training`) : null),
+      el('p', { class: 'feuer-serie' })));
 }
 
 function kachel(href, iconName, titel, ...inhalt) {

@@ -1,6 +1,6 @@
 // Service Worker: hält die App-Dateien offline vor.
 // Bei jeder Änderung an App-Dateien VERSION erhöhen, sonst sehen installierte Apps die Änderung nicht.
-const VERSION = 'v28';
+const VERSION = 'v31';
 const CACHE = `ernaehrung-${VERSION}`;
 
 // Alle Dateien der App-Hülle. Neue Dateien hier eintragen.
@@ -83,6 +83,10 @@ const DATEIEN = [
   './js/off-abfrage.js',
   './js/views/scanner.js',
   './js/views/brom-figur.js',
+  './js/logic/schnell.js',
+  './js/logic/progression.js',
+  './js/logic/feuer.js',
+  './js/logic/verschluesselung.js',
   './data/lebensmittel.json',
   './icons/icon-192.png',
   './icons/icon-512.png',

@@ -5,6 +5,8 @@ import { sucheLebensmittel } from '../lebensmittel.js';
 import { naehrwerteFuerMenge, KATEGORIEN } from '../logic/naehrstoffe.js';
 import { pruefeLebensmittel } from '../logic/ernaehrungsweise.js';
 import { oeffneScanner } from './scanner.js';
+import { lese, schreibe } from '../db.js';
+import { merkeZuletzt, schalteFavorit } from '../logic/schnell.js';
 
 /**
  * optionen: { lebensmittel, titel, eintrag?, beiSpeichern(lebensmittelId, gramm), beiLoeschen?,
@@ -15,6 +17,16 @@ import { oeffneScanner } from './scanner.js';
 export function oeffneEintragDialog(optionen) {
   const dialog = el('dialog', { class: 'dialog' });
   const schliessen = () => { dialog.close(); dialog.remove(); };
+  // Favoriten und zuletzt Gegessenes (geräteübergreifend im Backup)
+  let favoriten = [];
+  let zuletzt = [];
+  const geladen = Promise.all([lese('einstellungen', 'favoriten'), lese('einstellungen', 'zuletzt')])
+    .then(([f, z]) => { favoriten = f ?? []; zuletzt = z ?? []; })
+    .catch(() => {});
+  const merke = (id, gramm) => {
+    zuletzt = merkeZuletzt(zuletzt, id, gramm);
+    schreibe('einstellungen', 'zuletzt', zuletzt).catch(() => {});
+  };
   dialog.addEventListener('cancel', (e) => { e.preventDefault(); schliessen(); });
   document.body.append(dialog);
 
@@ -41,8 +53,11 @@ export function oeffneEintragDialog(optionen) {
         .filter(({ p }) => p.passt || !nurPassende)
         .sort((a, b) => Number(b.p.passt) - Number(a.p.passt))
         .slice(0, 60);
-      setze(liste, ...treffer.map(({ lm, p }) => el('li', { class: `${optionen.beiOhneMenge ? 'mit-plus' : ''}${p.passt ? '' : ' unpassend'}` },
-        el('button', { type: 'button', class: 'auswahl-eintrag', onclick: () => zeigeMenge(lm, lm.stueckG ?? 100) },
+      const nachId = new Map(optionen.lebensmittel.map((l) => [l.id, l]));
+      const letzteMenge = new Map(zuletzt.map((z) => [z.id, z.gramm]));
+      const ohneSuche = !suche.value.trim();
+      const zeile = ({ lm, p }, merkGramm) => el('li', { class: `${optionen.beiOhneMenge ? 'mit-plus' : ''}${p.passt ? '' : ' unpassend'}` },
+        el('button', { type: 'button', class: 'auswahl-eintrag', onclick: () => zeigeMenge(lm, merkGramm ?? letzteMenge.get(lm.id) ?? lm.stueckG ?? 100) },
           el('span', {}, lm.name, lm.marke ? el('span', { class: 'leise' }, ` · ${lm.marke}`) : null,
             ...[...p.gruende, ...p.hinweise].map((g) => el('span', { class: `marke${p.gruende.includes(g) ? ' warn' : ''}`, style: 'margin-left:6px' }, g))),
           el('span', { class: 'leise klein' }, `${KATEGORIEN[lm.kategorie] ?? 'Eigenes'} · ${zahl(lm.je100g.kcal)} kcal/100 g`)),
@@ -55,7 +70,15 @@ export function oeffneEintragDialog(optionen) {
             knopf.classList.add('an');
             hinweis.textContent = `${lm.name} eingetragen – Menge später im Mengen-Memo.`;
           },
-        }, icon('plus', 18)) : null)));
+        }, icon('plus', 18)) : null);
+      const abschnitt = (titel, eintraege) => (eintraege.length ? [el('li', { class: 'auswahl-titel' }, titel), ...eintraege] : []);
+      const mitPruefung = (lm) => ({ lm, p: pruefung(lm) });
+      setze(liste,
+        ...(ohneSuche ? abschnitt('★ Favoriten', favoriten.map((id) => nachId.get(id)).filter(Boolean).map((lm) => zeile(mitPruefung(lm)))) : []),
+        ...(ohneSuche ? abschnitt('Zuletzt gegessen', zuletzt.filter((z) => nachId.has(z.id) && !favoriten.includes(z.id)).slice(0, 12)
+          .map((z) => zeile(mitPruefung(nachId.get(z.id)), z.gramm))) : []),
+        ...(ohneSuche && (favoriten.length || zuletzt.length) ? [el('li', { class: 'auswahl-titel' }, 'Alle')] : []),
+        ...treffer.map((t) => zeile(t)));
     };
     const eingeschraenkt = (optionen.einstellung?.weise ?? 'alles') !== 'alles' || optionen.einstellung?.unvertraeglich?.length;
     const filterKnopf = eingeschraenkt ? el('button', {
@@ -76,6 +99,7 @@ export function oeffneEintragDialog(optionen) {
       filterKnopf);
     setze(dialog, kopf(optionen.titel), el('div', { class: 'dialog-inhalt' }, suche, extern, hinweis, liste));
     zeigeTreffer();
+    geladen.then(() => { if (liste.isConnected) zeigeTreffer(); });
     suche.focus();
   };
 
@@ -99,6 +123,7 @@ export function oeffneEintragDialog(optionen) {
     };
     speichern.addEventListener('click', () => {
       if (gramm() <= 0) return;
+      merke(lm.id, gramm());
       optionen.beiSpeichern(lm.id, gramm());
       schliessen();
     });
@@ -109,8 +134,19 @@ export function oeffneEintragDialog(optionen) {
       ...[50, 100, 150, 200, 250].map((g) => [`${g} g`, g]),
     ];
 
+    const stern = el('button', {
+      type: 'button', class: 'knopf-klein stern', 'aria-label': 'Favorit',
+      'aria-pressed': String(favoriten.includes(lm.id)),
+      onclick: () => {
+        favoriten = schalteFavorit(favoriten, lm.id);
+        stern.setAttribute('aria-pressed', String(favoriten.includes(lm.id)));
+        schreibe('einstellungen', 'favoriten', favoriten).catch(() => {});
+      },
+    }, icon('stern', 20));
+    const kopfZeile = kopf(lm.name, optionen.eintrag ? null : zeigeAuswahl);
+    kopfZeile.insertBefore(stern, kopfZeile.lastChild);
     setze(dialog,
-      kopf(lm.name, optionen.eintrag ? null : zeigeAuswahl),
+      kopfZeile,
       el('div', { class: 'dialog-inhalt' },
         el('label', { class: 'feld' }, el('span', {}, 'Menge (g)'), menge),
         el('div', { class: 'chips' }, ...schnell.map(([text, g]) => el('button', {
