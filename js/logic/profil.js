@@ -56,6 +56,8 @@ export function standardProfil() {
     // Entweder `zutaten` aus der Lebensmitteldatenbank oder `naehrwerte` pro Tagesportion.
     supplements: [],
     mahlzeiten: structuredClone(STANDARD_MAHLZEITEN),
+    // Ernährungsweise, Unverträglichkeiten und Diät – getrennte Listen (js/logic/ernaehrungsweise.js)
+    ernaehrung: { weise: 'alles', unvertraeglich: [], diaet: 'keine', fensterVon: '12:00', fensterBis: '20:00' },
   };
 }
 
@@ -111,6 +113,7 @@ export function vervollstaendigeProfil(gespeichert) {
   profil.koerper = { ...standard.koerper, ...gespeichert.koerper };
   profil.ziel = { ...standard.ziel, ...gespeichert.ziel };
   profil.makroRegeln = { ...standard.makroRegeln, ...gespeichert.makroRegeln };
+  profil.ernaehrung = { ...standard.ernaehrung, ...gespeichert.ernaehrung };
   profil.tagestypen = profil.tagestypen.map((t) => ({ aktivitaeten: [], ...t }));
   return profil;
 }

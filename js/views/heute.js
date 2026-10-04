@@ -24,6 +24,7 @@ import { balkenZeile, zaehlerInhalt } from './zaehler.js';
 import { oeffneMemoDialog } from './memo-dialog.js';
 import { spracheVerfuegbar, spracheErlaubt, setzeSpracheErlaubt } from '../sprache.js';
 import { episch } from '../darstellung.js';
+import { ERNAEHRUNGSWEISEN, UNVERTRAEGLICHKEITEN, DIAETEN, diaetMakros } from '../logic/ernaehrungsweise.js';
 
 const datumFormat = new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
 const uhrzeitFormat = new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit' });
@@ -31,9 +32,10 @@ const uhrzeitFormat = new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute
 // Bleibt beim Wechsel zwischen Reitern erhalten; beim Neustart der App wieder heute
 let angezeigtesDatum = null;
 let zaehlerModus = 'tag';
+let kontextEinstellung = {};
 
 export const heute = {
-  titel: 'Ernährung',
+  get titel() { return episch('Taverne', 'Ernährung'); },
   einstellungen: ernaehrungsEinstellungen,
   render() {
     const wurzel = el('div');
@@ -59,6 +61,7 @@ const makroText = (w) => `${zahl(Math.round(w.kcal ?? 0))} kcal · P ${zahl(Math
 
 function zeichne(wurzel, kontext) {
   const { profil, lebensmittel, tag, datum } = kontext;
+  kontextEinstellung = profil.ernaehrung ?? {};
   const { typ: planTyp, notiz } = tagestypFuerDatum(profil, datum);
   // Zusatz-Training erhöht das Tagesziel (Hybrid-Regel); geplantes Training steckt im Tagestyp
   const gewichtKg = kontext.gewichte.at(-1)?.kg ?? profil.koerper.gewichtKg ?? 75;
@@ -81,7 +84,7 @@ function zeichne(wurzel, kontext) {
         icon('backup'), el('span', {}, 'Dein letztes Backup ist über eine Woche alt (oder fehlt). Jetzt sichern →'))
       : null,
     datumsLeiste(wurzel, datum),
-    heroKarte(typ, notiz, ist),
+    heroKarte(typ, notiz, ist, profil.ernaehrung?.diaet === 'intervallfasten' ? `${profil.ernaehrung.fensterVon}–${profil.ernaehrung.fensterBis}` : null),
     memoKarte(kontext, aendern),
     gewichtKarte(kontext),
     wasserKarte(profil, typ, tag, () => speichereTag(tag)),
@@ -90,7 +93,7 @@ function zeichne(wurzel, kontext) {
     ...profil.mahlzeiten.map((m) => mahlzeitKarte(m, ziele.find((z) => z.id === m.id), tag, lebensmittel, aendern)),
     el('section', { class: 'karte' },
       el('div', { class: 'zeile' },
-        el('h2', {}, 'Zähler'),
+        el('h2', {}, episch('Vorratsbuch', 'Zähler')),
         el('div', { class: 'umschalter', role: 'group', 'aria-label': 'Zeitraum' },
           ...[['tag', 'Tag'], ['woche', 'Woche Ø']].map(([modus, text]) => el('button', {
             type: 'button',
@@ -155,7 +158,7 @@ const RING_R = 56;
 const RING_U = 2 * Math.PI * RING_R;
 
 /** Kopfkarte: Tagestyp, Kalorien-Ring (übrig) und Makro-Balken. */
-function heroKarte(typ, notiz, ist) {
+function heroKarte(typ, notiz, ist, fenster = null) {
   const SVG = 'http://www.w3.org/2000/svg';
   const kcal = ist.kcal ?? 0;
   const uebrig = Math.round(typ.kcal - kcal);
@@ -189,7 +192,8 @@ function heroKarte(typ, notiz, ist) {
       el('h2', {}, typ.name),
       el('div', { class: 'chips' },
         typ.extraKcal ? el('a', { class: 'marke', href: '#/training' }, `+${zahl(typ.extraKcal)} kcal Training`) : null,
-        notiz ? el('span', { class: 'marke' }, notiz) : null)),
+        notiz ? el('span', { class: 'marke' }, notiz) : null,
+        fenster ? el('span', { class: 'marke' }, `Essensfenster ${fenster}`) : null)),
     el('div', { class: 'hero-mitte' },
       el('div', { class: `ring${drueber ? ' drueber' : ''}`, role: 'img', 'aria-label': `${Math.abs(uebrig)} kcal ${drueber ? 'über dem Ziel' : 'übrig'}` },
         svg,
@@ -285,6 +289,7 @@ function mahlzeitKarte(mahlzeit, ziel, tag, lebensmittel, aendern) {
 
   const bearbeiten = (eintrag) => oeffneEintragDialog({
     lebensmittel,
+    einstellung: kontextEinstellung,
     titel: mahlzeit.name,
     eintrag,
     beiSpeichern: (lebensmittelId, gramm) => { Object.assign(eintrag, { lebensmittelId, gramm }); aendern(); },
@@ -292,6 +297,7 @@ function mahlzeitKarte(mahlzeit, ziel, tag, lebensmittel, aendern) {
   });
   const hinzufuegen = () => oeffneEintragDialog({
     lebensmittel,
+    einstellung: kontextEinstellung,
     titel: mahlzeit.name,
     beiSpeichern: (lebensmittelId, gramm) => {
       tag.eintraege.push({ id: neueEintragsId(), mahlzeit: mahlzeit.id, lebensmittelId, gramm, zeit: new Date().toISOString() });
@@ -376,7 +382,7 @@ function wasserKarte(profil, typ, tag, speichern) {
         }, icon('schliessen', 18))))));
 
     setze(karte,
-      el('h2', { class: 'zeile' }, '💧 Wasser', el('span', { class: 'leise klein' }, `Tag: ${zahl(gesamt)} ml`)),
+      el('h2', { class: 'zeile' }, episch('💧 Quelle', '💧 Wasser'), el('span', { class: 'leise klein' }, `Tag: ${zahl(gesamt)} ml`)),
       balkenZeile(`Bis Mittag (${mittagspause} Uhr)`, bisMittag, ziel, 'ml', bisMittag >= ziel ? 'erreicht' : 'wasser'),
       el('div', { class: 'knopfreihe presets' },
         ...presetsMl.map((ml) => el('button', { class: 'knopf', type: 'button', onclick: () => hinzufuegen(ml) }, `+${zahl(ml)} ml`))),
@@ -407,7 +413,7 @@ function supplementKarte(profil, tag, aendern) {
   if (!aktive.length) return null;
   const genommen = aktive.filter((s) => tag.supplements[s.id]).length;
   return el('section', { class: 'karte' },
-    el('h2', { class: 'zeile' }, '💊 Supplements', el('span', { class: 'leise klein' }, `${genommen} von ${aktive.length}`)),
+    el('h2', { class: 'zeile' }, episch('⚗️ Elixiere', '💊 Supplements'), el('span', { class: 'leise klein' }, `${genommen} von ${aktive.length}`)),
     ...aktive.map((s) => schalter(Boolean(tag.supplements[s.id]), (wert) => {
       tag.supplements[s.id] = wert;
       aendern();
@@ -438,6 +444,7 @@ function ernaehrungsEinstellungen() {
         class: 'knopf zweitrangig', type: 'button',
         onclick: () => { w.presetsMl.push(500); speichern(); zeichneEinstellungen(); },
       }, icon('plus', 18), 'Knopf') : null,
+      ...ernaehrungsweiseBereich(profil, speichern, zeichneEinstellungen),
       el('h2', { class: 'abschnitt' }, 'Spracheingabe'),
       spracheVerfuegbar()
         ? schalter(spracheErlaubt(), (wert) => setzeSpracheErlaubt(wert), 'Diktieren im Mengen-Memo erlauben')
@@ -447,4 +454,46 @@ function ernaehrungsEinstellungen() {
     zeichneEinstellungen();
   });
   return wurzel;
+}
+
+/** Ernährungsweise, Unverträglichkeiten und Diät – drei getrennte Auswahlen. Diät-Makros nur nach Bestätigung. */
+function ernaehrungsweiseBereich(profil, speichern, neuZeichnen) {
+  const e = profil.ernaehrung;
+  const auswahl = (beschriftung, optionen, wert, setzen) => el('label', { class: 'feld' }, el('span', {}, beschriftung),
+    el('select', { onchange: (ev) => { setzen(ev.target.value); speichern(); neuZeichnen(); } },
+      ...Object.entries(optionen).map(([id, o]) => el('option', { value: id, selected: id === wert }, o.name))));
+  const kg = profil.koerper.gewichtKg ?? 75;
+  const vorschlaege = profil.tagestypen.map((t) => ({ t, neu: diaetMakros(t, e.diaet, kg) })).filter((x) => x.neu);
+  const bestaetigen = el('div');
+  return [
+    el('h2', { class: 'abschnitt' }, episch('Speiseregeln der Taverne', 'Ernährungsweise')),
+    auswahl('Ernährungsweise', ERNAEHRUNGSWEISEN, e.weise, (w) => { e.weise = w; }),
+    el('p', { class: 'leise klein' }, ERNAEHRUNGSWEISEN[e.weise]?.text ?? ''),
+    el('p', { class: 'feld', style: 'margin-top:8px' }, el('span', {}, 'Unverträglichkeiten')),
+    ...Object.entries(UNVERTRAEGLICHKEITEN).map(([id, u]) => schalter(e.unvertraeglich.includes(id), (an) => {
+      e.unvertraeglich = an ? [...new Set([...e.unvertraeglich, id])] : e.unvertraeglich.filter((x) => x !== id);
+      speichern();
+    }, u.name)),
+    el('div', { style: 'margin-top:8px' }, auswahl('Diät', DIAETEN, e.diaet, (d) => { e.diaet = d; })),
+    el('p', { class: 'leise klein' }, DIAETEN[e.diaet]?.text ?? ''),
+    e.diaet === 'intervallfasten' ? el('div', { class: 'felder' },
+      el('label', { class: 'feld' }, el('span', {}, 'Essen ab'), el('input', { type: 'time', value: e.fensterVon, oninput: (ev) => { if (ev.target.value) { e.fensterVon = ev.target.value; speichern(); } } })),
+      el('label', { class: 'feld' }, el('span', {}, 'Essen bis'), el('input', { type: 'time', value: e.fensterBis, oninput: (ev) => { if (ev.target.value) { e.fensterBis = ev.target.value; speichern(); } } })))
+      : null,
+    vorschlaege.length ? el('div', { class: 'vorschlag' },
+      el('p', { class: 'klein' }, el('strong', {}, 'Vorschlag für deine Makros (gleiche Kalorien):')),
+      el('ul', { class: 'liste-einfach klein' }, ...vorschlaege.map(({ t, neu }) => el('li', {},
+        `${t.name}: P ${t.protein}→${neu.protein} g · KH ${t.kh}→${neu.kh} g · F ${t.fett}→${neu.fett} g`))),
+      el('button', {
+        class: 'knopf zweitrangig', type: 'button',
+        onclick: () => setze(bestaetigen, el('div', { class: 'knopfreihe' },
+          el('button', {
+            class: 'knopf', type: 'button',
+            onclick: () => { for (const { t, neu } of vorschlaege) Object.assign(t, neu); speichern(); neuZeichnen(); },
+          }, 'Ja, übernehmen'),
+          el('button', { class: 'knopf zweitrangig', type: 'button', onclick: () => setze(bestaetigen) }, 'Abbrechen'))),
+      }, 'Makros übernehmen …'),
+      bestaetigen)
+      : null,
+  ];
 }

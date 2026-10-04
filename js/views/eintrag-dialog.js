@@ -3,10 +3,12 @@ import { el, setze, zahl } from '../ui.js';
 import { icon } from '../icons.js';
 import { sucheLebensmittel } from '../lebensmittel.js';
 import { naehrwerteFuerMenge, KATEGORIEN } from '../logic/naehrstoffe.js';
+import { pruefeLebensmittel } from '../logic/ernaehrungsweise.js';
 
 /**
  * optionen: { lebensmittel, titel, eintrag?, beiSpeichern(lebensmittelId, gramm), beiLoeschen?,
- *             beiOhneMenge?(lebensmittelId) – „+“ in der Liste: ohne Menge eintragen, Dialog bleibt offen (Mengen-Memo) }
+ *             beiOhneMenge?(lebensmittelId) – „+“ in der Liste: ohne Menge eintragen, Dialog bleibt offen (Mengen-Memo),
+ *             einstellung? – Ernährungsweise/Unverträglichkeiten: Unpassendes wird markiert und nach hinten sortiert }
  * Mit `eintrag` startet der Dialog direkt bei der Mengenauswahl.
  */
 export function oeffneEintragDialog(optionen) {
@@ -22,6 +24,7 @@ export function oeffneEintragDialog(optionen) {
     el('h2', {}, titel),
     el('button', { class: 'knopf-klein', type: 'button', 'aria-label': 'Schließen', onclick: schliessen }, icon('schliessen')));
 
+  let nurPassende = true;
   const zeigeAuswahl = () => {
     const liste = el('ul', { class: 'liste auswahl' });
     const suche = el('input', {
@@ -31,10 +34,16 @@ export function oeffneEintragDialog(optionen) {
       oninput: () => zeigeTreffer(),
     });
     const zeigeTreffer = () => {
-      const treffer = sucheLebensmittel(optionen.lebensmittel, suche.value).slice(0, 60);
-      setze(liste, ...treffer.map((lm) => el('li', { class: optionen.beiOhneMenge ? 'mit-plus' : '' },
+      const pruefung = (lm) => pruefeLebensmittel(lm, optionen.einstellung);
+      const treffer = sucheLebensmittel(optionen.lebensmittel, suche.value)
+        .map((lm) => ({ lm, p: pruefung(lm) }))
+        .filter(({ p }) => p.passt || !nurPassende)
+        .sort((a, b) => Number(b.p.passt) - Number(a.p.passt))
+        .slice(0, 60);
+      setze(liste, ...treffer.map(({ lm, p }) => el('li', { class: `${optionen.beiOhneMenge ? 'mit-plus' : ''}${p.passt ? '' : ' unpassend'}` },
         el('button', { type: 'button', class: 'auswahl-eintrag', onclick: () => zeigeMenge(lm, lm.stueckG ?? 100) },
-          el('span', {}, lm.name, lm.marke ? el('span', { class: 'leise' }, ` · ${lm.marke}`) : null),
+          el('span', {}, lm.name, lm.marke ? el('span', { class: 'leise' }, ` · ${lm.marke}`) : null,
+            ...[...p.gruende, ...p.hinweise].map((g) => el('span', { class: `marke${p.gruende.includes(g) ? ' warn' : ''}`, style: 'margin-left:6px' }, g))),
           el('span', { class: 'leise klein' }, `${KATEGORIEN[lm.kategorie] ?? 'Eigenes'} · ${zahl(lm.je100g.kcal)} kcal/100 g`)),
         optionen.beiOhneMenge ? el('button', {
           type: 'button', class: 'knopf-klein plus-schnell', 'aria-label': `${lm.name} ohne Menge eintragen`,
@@ -47,9 +56,14 @@ export function oeffneEintragDialog(optionen) {
           },
         }, icon('plus', 18)) : null)));
     };
+    const eingeschraenkt = (optionen.einstellung?.weise ?? 'alles') !== 'alles' || optionen.einstellung?.unvertraeglich?.length;
+    const filterKnopf = eingeschraenkt ? el('button', {
+      type: 'button', class: `chip${nurPassende ? ' an' : ''}`, 'aria-pressed': String(nurPassende),
+      onclick: () => { nurPassende = !nurPassende; filterKnopf.classList.toggle('an', nurPassende); filterKnopf.setAttribute('aria-pressed', String(nurPassende)); zeigeTreffer(); },
+    }, 'Nur passende') : null;
     const hinweis = el('p', { class: 'leise klein', role: 'status' },
       optionen.beiOhneMenge ? 'Tipp: „+“ trägt ohne Menge ein – Mengen dann gesammelt im Mengen-Memo.' : '');
-    setze(dialog, kopf(optionen.titel), el('div', { class: 'dialog-inhalt' }, suche, hinweis, liste));
+    setze(dialog, kopf(optionen.titel), el('div', { class: 'dialog-inhalt' }, suche, filterKnopf ? el('div', { class: 'chips' }, filterKnopf) : null, hinweis, liste));
     zeigeTreffer();
     suche.focus();
   };

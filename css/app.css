@@ -948,3 +948,4 @@ input.offen { border-color: var(--warnung); background: color-mix(in oklab, var(
 .chronik-liste li { padding: 4px 0 4px 14px; position: relative; }
 .chronik-liste li::before { content: "◆"; position: absolute; left: 0; color: var(--akzent); font-size: 0.6rem; top: 9px; }
 [data-stil=episch] .chronik-liste li { font-style: italic; }
+.auswahl li.unpassend .auswahl-eintrag > span:first-child { opacity: 0.75; }
