@@ -7,6 +7,7 @@ import { MUSKEL_INFO, uebungsBeschreibung } from '../daten/beschreibungen.js';
 import { ladeSpielstand, verzeichnis } from '../spiel.js';
 import { volumenJeMuskel, montagVon, trainierteUebungen } from '../logic/fortschritt.js';
 import { GRUPPEN, rangName } from '../logic/raenge.js';
+import { erholung, belastungenAus } from '../logic/hantel.js';
 import { datumSchluessel } from '../logic/ziele.js';
 
 // Pfade der rechten Körperhälfte (Betrachtersicht, x > 100), Koordinaten als „x,y“; links wird gespiegelt.
@@ -99,7 +100,14 @@ function zeichne(wurzel, s) {
     const gruppe = Object.entries(GRUPPEN).find(([, g]) => g.muskeln.includes(m))?.[0];
     return gruppe ? s.raenge.gruppen[gruppe] : null;
   };
+  const erh = erholung(belastungenAus(s.tage, verzeichnis));
+  s.erholung = erh;
   const muskelWert = (m) => {
+    if (faerbung === 'erholung') {
+      const e = erh[m];
+      if (!e) return { fuellung: '#22c55e', deckkraft: 0.35 };
+      return e.bereit ? { fuellung: '#22c55e', deckkraft: 0.75 } : { fuellung: e.anteil < 0.5 ? '#ef4444' : '#f59e0b', deckkraft: 0.85 };
+    }
     if (faerbung === 'rang') {
       const r = rangVon(m);
       return r ? { fuellung: r.rang.farbe, deckkraft: 0.85 } : { fuellung: 'var(--text-leise)', deckkraft: 0.15 };
@@ -131,10 +139,12 @@ function zeichne(wurzel, s) {
         umschalter([['vorn', 'Vorn'], ['hinten', 'Hinten']], ansicht, (v) => { ansicht = v; }),
         umschalter([['m', 'Mann'], ['w', 'Frau']], geschlecht, (v) => { geschlecht = v; })),
       el('div', { class: 'koerper-buehne' }, bild),
-      umschalter([['volumen', 'Sätze diese Woche'], ['rang', 'Ränge']], faerbung, (v) => { faerbung = v; }),
-      el('p', { class: 'leise klein', style: 'text-align:center' }, faerbung === 'volumen'
-        ? 'Je kräftiger die Farbe, desto mehr Sätze diese Woche (ab 15 Sätzen voll).'
-        : 'Farbe = Rang der Muskelgruppe (letzte 12 Wochen). Grau = noch nicht gewertet.'),
+      umschalter([['volumen', 'Sätze'], ['erholung', 'Erholung'], ['rang', 'Ränge']], faerbung, (v) => { faerbung = v; }),
+      el('p', { class: 'leise klein', style: 'text-align:center' }, {
+        volumen: 'Je kräftiger die Farbe, desto mehr Sätze diese Woche (ab 15 Sätzen voll).',
+        erholung: 'Grün = erholt · Gelb = fast · Rot = braucht noch Ruhe (24–72 h je nach Satzzahl, grobe Faustregel).',
+        rang: 'Farbe = Rang der Muskelgruppe (letzte 12 Wochen). Grau = noch nicht gewertet.',
+      }[faerbung]),
       el('p', { class: 'leise klein', style: 'text-align:center' }, 'Tippe auf einen Muskel.')),
     infoBereich);
   if (gewaehlt) setze(infoBereich, muskelInfo(gewaehlt, volumen[gewaehlt] ?? 0, rangVon(gewaehlt), s));
@@ -151,6 +161,7 @@ function muskelInfo(m, saetze, rang, s) {
     info.latein ? el('p', { class: 'leise klein' }, info.latein) : null,
     el('p', {}, info.text ?? ''),
     rang ? el('p', { class: 'klein' }, `Rang der Gruppe: `, el('strong', {}, rangName(rang))) : null,
+    s.erholung?.[m] ? el('p', { class: 'klein' }, s.erholung[m].bereit ? '✓ Erholt – bereit für Training' : `Noch etwa ${s.erholung[m].rest} h Erholung`) : null,
     el('h3', { class: 'abschnitt' }, episch('Übungen für diesen Muskel', 'Übungen')),
     el('ul', { class: 'liste-einfach uebungs-info' }, ...uebungen.slice(0, 14).map((u) => el('li', {},
       el('details', {},

@@ -12,7 +12,8 @@ export function alleTrainings(tage) {
     .sort((a, b) => a.datum.localeCompare(b.datum) || (a.t.start ?? '').localeCompare(b.t.start ?? ''));
 }
 
-const erledigte = (eintrag) => (eintrag.saetze ?? []).filter((s) => s.erledigt);
+// Aufwärmsätze zählen nicht für Volumen, Rekorde und Ränge
+const erledigte = (eintrag) => (eintrag.saetze ?? []).filter((s) => s.erledigt && s.typ !== 'aufwaermen');
 
 /** Kennzahlen einer Übung innerhalb eines Workouts. kgKoerper: für Körpergewichtsübungen (Last = Körper + Zusatz). */
 export function eintragsLeistung(eintrag, u, kgKoerper = 0) {

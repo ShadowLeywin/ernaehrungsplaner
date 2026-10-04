@@ -12,6 +12,7 @@ import {
 } from '../logic/training.js';
 import { neueRekorde } from '../logic/fortschritt.js';
 import { steigerung, stillstand } from '../logic/progression.js';
+import { SATZ_TYPEN, scheiben, aufwaermSaetze } from '../logic/hantel.js';
 import { episch } from '../darstellung.js';
 import { holeGewichtsReihe } from './gewicht.js';
 import { oeffneUebungDialog } from './uebung-dialog.js';
@@ -38,12 +39,14 @@ export const training = {
 };
 
 async function lade(wurzel) {
-  const [profil, eintraege, gewichte, aktiv, vorlagen] = await Promise.all([
+  const [profil, eintraege, gewichte, aktiv, vorlagen, notizen] = await Promise.all([
     holeProfil(), alleEintraege('tage'), holeGewichtsReihe(), lese('einstellungen', 'aktivesTraining'), lese('einstellungen', 'vorlagen'),
+    lese('einstellungen', 'uebungsNotizen'),
   ]);
   const k = {
     wurzel,
     profil,
+    notizen: notizen ?? {},
     vorlagen: vorlagen ?? [],
     alleTage: eintraege.map(([, t]) => t),
     gewichtKg: gewichte.at(-1)?.kg ?? profil.koerper.gewichtKg ?? 75,
@@ -112,7 +115,7 @@ function zeichneUebersicht(k, tag) {
     fertig.length ? el('h2', { class: 'abschnitt' }, 'Heute erledigt') : null,
     ...fertig.map((t) => trainingKarte(t, k.gewichtKg, () => loesche(t))),
     frueher.length ? el('h2', { class: 'abschnitt' }, 'Letzte Einheiten') : null,
-    ...frueher.map(({ datum, t }) => trainingKarte(t, k.gewichtKg, null, datum)),
+    ...frueher.map(({ datum, t }) => trainingKarte(t, k.gewichtKg, null, datum, t.typ === 'workout' ? () => wiederhole(k, t) : null)),
     !fertig.length && !frueher.length
       ? el('p', { class: 'leise klein', style: 'text-align:center;margin-top:24px' }, `${UEBUNGEN.length} Übungen und Aktivitäten warten auf dich.`)
       : null);
@@ -171,7 +174,24 @@ async function starteVorlage(k, vorlage) {
   zeichneWorkout(k, tag, t);
 }
 
-function trainingKarte(t, gewichtKg, beiLoeschen, datum = null) {
+/** Früheres Workout mit gleichen Übungen und Werten neu starten (Sätze offen). */
+async function wiederhole(k, vorbild) {
+  const datum = datumSchluessel(new Date());
+  const tag = await holeTag(datum);
+  const t = {
+    id: neueId(), typ: 'workout', name: vorbild.name, vorlageId: vorbild.vorlageId, start: new Date().toISOString(), ende: null,
+    intensitaet: vorbild.intensitaet ?? 'mittel', zusatz: standardZusatz(k.profil),
+    uebungen: vorbild.uebungen.map((e) => (e.cardio
+      ? { uebungId: e.uebungId, ziel: e.ziel, cardio: { ...e.cardio } }
+      : { uebungId: e.uebungId, ziel: e.ziel, gruppe: e.gruppe, saetze: e.saetze.map((s) => ({ wdh: s.wdh, kg: s.kg, sek: s.sek, typ: s.typ, erledigt: false })) })),
+  };
+  tag.trainings.push(t);
+  await speichereTag(tag);
+  await schreibe('einstellungen', 'aktivesTraining', { datum, id: t.id });
+  zeichneWorkout(k, tag, t);
+}
+
+function trainingKarte(t, gewichtKg, beiLoeschen, datum = null, beiWiederholen = null) {
   const kcal = kcalTraining(t, verzeichnis, gewichtKg);
   const name = t.typ === 'aktivitaet' ? verzeichnis.get(t.uebungId)?.name ?? 'Aktivität' : t.name;
   const st = t.typ === 'workout' ? statistik(t) : null;
@@ -206,6 +226,7 @@ function trainingKarte(t, gewichtKg, beiLoeschen, datum = null) {
         return el('li', {}, el('strong', {}, u?.name ?? e.uebungId), ` – ${details}`);
       })))
       : null,
+    beiWiederholen ? el('button', { class: 'knopf-text', type: 'button', onclick: beiWiederholen }, '↻ Wiederholen') : null,
     beiLoeschen ? el('button', { class: 'knopf-text', type: 'button', onclick: zeigeLoeschen }, 'Löschen') : null,
     loeschBereich);
 }
@@ -341,11 +362,14 @@ function uebungsKarte(k, t, eintrag, speichern, neu) {
       eintrag.saetze.splice(i, 1);
       speichern();
       zeichneSaetze();
-    }, ersteZahl(eintrag.ziel))),
+    }, ersteZahl(eintrag.ziel), pauseFuer(u.id), zeichneSaetze,
+    eintrag.saetze.slice(0, i + 1).filter((x) => x.typ !== 'aufwaermen').length)),
   );
   zeichneSaetze();
 
-  return el('section', { class: 'karte' },
+  const gruppe = eintrag.gruppe ? el('span', { class: 'marke superset' }, `Superset ${eintrag.gruppe}`) : null;
+  if (gruppe) kopf.firstChild.append(' ', gruppe);
+  return el('section', { class: `karte${eintrag.gruppe ? ' im-superset' : ''}` },
     kopf,
     el('p', { class: 'leise klein' },
       u.muskeln.map((m) => MUSKELN[m]).join(', '),
@@ -355,6 +379,7 @@ function uebungsKarte(k, t, eintrag, speichern, neu) {
         eintrag.notiz ? ` ${eintrag.notiz}` : null)
       : null,
     vorschlagZeile(k, u, eintrag, letzte, zeichneSaetze, speichern),
+    werkzeugLeiste(k, t, u, eintrag, zeichneSaetze, speichern, neu),
     tabelle,
     el('button', {
       class: 'knopf zweitrangig voll', type: 'button',
@@ -367,9 +392,90 @@ function uebungsKarte(k, t, eintrag, speichern, neu) {
     }, icon('plus', 18), 'Satz'));
 }
 
+// Pause je Übung (pro Gerät): z. B. 3 min bei Kniebeugen, 60 s bei Curls
+function ladePausen() {
+  try { return JSON.parse(localStorage.getItem('pauseJeUebung') ?? '{}'); } catch { return {}; }
+}
+function pauseFuer(uebungId) {
+  return ladePausen()[uebungId] ?? ladePause();
+}
+
+/** Werkzeuge einer Übung: Aufwärmsätze, Scheiben-Rechner, Pause, Notiz, Superset. */
+function werkzeugLeiste(k, t, u, eintrag, zeichneSaetze, speichern, neu) {
+  const bereich = el('div', { class: 'werkzeug-bereich' });
+  const ersterKg = eintrag.saetze.find((s) => s.typ !== 'aufwaermen' && s.kg)?.kg;
+  const stange = u.equipment === 'langhantel' || u.equipment === 'smith';
+  const pause = el('button', {
+    class: 'chip', type: 'button', title: 'Pause nach jedem Satz dieser Übung',
+    onclick: () => {
+      const stufen = [45, 60, 90, 120, 180, 240];
+      const jetzt = pauseFuer(u.id);
+      const naechste = stufen[(stufen.indexOf(jetzt) + 1) % stufen.length] ?? 90;
+      const alle = ladePausen();
+      alle[u.id] = naechste;
+      try { localStorage.setItem('pauseJeUebung', JSON.stringify(alle)); } catch { /* egal */ }
+      pause.textContent = `⏱ ${naechste} s`;
+    },
+  }, `⏱ ${pauseFuer(u.id)} s`);
+  const notiz = k.notizen[u.id];
+  const naechsteUebung = t.uebungen[t.uebungen.indexOf(eintrag) + 1];
+  return el('div', {},
+    notiz ? el('p', { class: 'klein uebungs-notiz' }, '📝 ', notiz) : null,
+    el('div', { class: 'chips werkzeuge' },
+      u.art === 'kraft' && ersterKg && !eintrag.saetze.some((s) => s.typ === 'aufwaermen') ? el('button', {
+        class: 'chip', type: 'button',
+        onclick: () => { eintrag.saetze.unshift(...aufwaermSaetze(ersterKg, stange ? 20 : 0)); speichern(); zeichneSaetze(); },
+      }, '🔥 Aufwärmen') : null,
+      stange ? el('button', { class: 'chip', type: 'button', onclick: () => setze(bereich, scheibenAnzeige(eintrag)) }, '◎ Scheiben') : null,
+      pause,
+      el('button', { class: 'chip', type: 'button', onclick: () => setze(bereich, notizEingabe(k, u, () => neu())) }, notiz ? '📝 Notiz ändern' : '📝 Notiz'),
+      naechsteUebung && !naechsteUebung.cardio ? el('button', {
+        class: `chip${eintrag.gruppe && eintrag.gruppe === naechsteUebung.gruppe ? ' an' : ''}`, type: 'button',
+        onclick: () => {
+          if (eintrag.gruppe && eintrag.gruppe === naechsteUebung.gruppe) {
+            delete naechsteUebung.gruppe;
+            if (!t.uebungen.some((x) => x !== eintrag && x.gruppe === eintrag.gruppe)) delete eintrag.gruppe;
+          } else {
+            const belegt = new Set(t.uebungen.map((x) => x.gruppe).filter(Boolean));
+            const buchstabe = eintrag.gruppe ?? 'ABCDEFG'.split('').find((b) => !belegt.has(b));
+            eintrag.gruppe = buchstabe;
+            naechsteUebung.gruppe = buchstabe;
+          }
+          speichern();
+          neu();
+        },
+      }, '⛓ Superset mit nächster') : null),
+    bereich);
+}
+
+function scheibenAnzeige(eintrag) {
+  const arbeit = eintrag.saetze.filter((s) => s.typ !== 'aufwaermen');
+  const offen = arbeit.find((s) => !s.erledigt && s.kg) ?? arbeit.find((s) => s.kg);
+  if (!offen) return el('p', { class: 'leise klein' }, 'Erst ein Gewicht eintragen.');
+  const r = scheiben(offen.kg);
+  return el('div', { class: 'scheiben-anzeige' },
+    el('p', { class: 'klein' }, el('strong', {}, `${zahl(offen.kg)} kg`), ' = Stange 20 kg + pro Seite:'),
+    el('div', { class: 'scheiben-reihe' }, ...(r.proSeite.length ? r.proSeite : []).map((kg) => el('span', { class: `scheibe s${String(kg).replace('.', '_')}` }, String(kg).replace('.', ','))),
+      r.proSeite.length ? null : el('span', { class: 'leise klein' }, 'nur die Stange')),
+    r.rest ? el('p', { class: 'warnung klein' }, `${zahl(r.rest)} kg lassen sich mit Standardscheiben nicht genau legen.`) : null);
+}
+
+function notizEingabe(k, u, fertig) {
+  const feld = el('textarea', { class: 'memo-feld', rows: 2, value: k.notizen[u.id] ?? '', placeholder: 'z. B. Griff enger, Sitz auf Stufe 4, Ellenbogen tiefer' });
+  return el('div', {}, feld, el('div', { class: 'knopfreihe' }, el('button', {
+    class: 'knopf zweitrangig', type: 'button',
+    onclick: async () => {
+      const text = feld.value.trim();
+      if (text) k.notizen[u.id] = text; else delete k.notizen[u.id];
+      await schreibe('einstellungen', 'uebungsNotizen', k.notizen);
+      fertig();
+    },
+  }, 'Notiz speichern')));
+}
+
 /** Steigerungsvorschlag aus dem letzten Mal (doppelte Progression) plus Stillstands-Hinweis. */
 function vorschlagZeile(k, u, eintrag, letzte, zeichneSaetze, speichern) {
-  const v = letzte ? steigerung(u, letzte.saetze, eintrag.ziel) : null;
+  const v = letzte ? steigerung(u, letzte.saetze.filter((x) => x.typ !== 'aufwaermen'), eintrag.ziel) : null;
   const fest = stillstand(u.id, k.alleTage, verzeichnis);
   if (!v && !fest) return null;
   const offen = eintrag.saetze.filter((s) => !s.erledigt);
@@ -398,7 +504,7 @@ function ersteZahl(text) {
 }
 
 /** Eine Satzzeile. zielWert dient als Platzhalter und wird beim Abhaken eines leeren Felds übernommen. */
-function satzZeile(u, s, index, speichern, entfernen, zielWert) {
+function satzZeile(u, s, index, speichern, entfernen, zielWert, pauseSek, neuZeichnen, nummer) {
   const eingaben = {};
   const zahlEingabe = (schluessel, beschriftung, platzhalter) => {
     const eingabe = el('input', {
@@ -423,11 +529,27 @@ function satzZeile(u, s, index, speichern, entfernen, zielWert) {
       zeile.classList.toggle('erledigt', s.erledigt);
       haken.setAttribute('aria-pressed', String(s.erledigt));
       speichern();
-      if (s.erledigt) startePause();
+      if (s.erledigt) startePause(s.typ === 'aufwaermen' ? Math.min(60, pauseSek) : pauseSek);
     },
   }, icon('haken', 18));
+  const typ = SATZ_TYPEN[s.typ ?? 'normal'] ?? SATZ_TYPEN.normal;
+  const menue = () => setze(zeile, el('div', { class: 'satz-menue' },
+    el('div', { class: 'chips' }, ...Object.entries(SATZ_TYPEN).map(([id, t]) => el('button', {
+      class: `chip${(s.typ ?? 'normal') === id ? ' an' : ''}`, type: 'button',
+      onclick: () => { if (id === 'normal') delete s.typ; else s.typ = id; speichern(); neuZeichnen(); },
+    }, t.name))),
+    u.art !== 'halten' ? el('div', { class: 'chips' }, el('span', { class: 'leise klein' }, 'Noch im Tank:'),
+      ...[0, 1, 2, 3, 4].map((n) => el('button', {
+        class: `chip${s.rir === n ? ' an' : ''}`, type: 'button',
+        onclick: () => { s.rir = s.rir === n ? undefined : n; speichern(); neuZeichnen(); },
+      }, n === 4 ? '4+' : String(n)))) : null,
+    el('div', { class: 'knopfreihe' },
+      el('button', { class: 'knopf zweitrangig gefahr', type: 'button', onclick: entfernen }, 'Satz entfernen'),
+      el('button', { class: 'knopf zweitrangig', type: 'button', onclick: neuZeichnen }, 'Fertig'))));
   setze(zeile,
-    el('button', { class: 'satz-nr', type: 'button', 'aria-label': `Satz ${index + 1} entfernen`, title: 'Antippen zum Entfernen', onclick: entfernen }, String(index + 1)),
+    el('button', {
+      class: `satz-nr${s.typ ? ` typ-${s.typ}` : ''}`, type: 'button', 'aria-label': `Satz ${index + 1}: ${typ.name}, Optionen`, title: 'Satz-Typ, Reserve, Entfernen', onclick: menue,
+    }, typ.kurz || String(nummer ?? index + 1), s.rir != null ? el('small', {}, `R${s.rir}`) : null),
     u.art === 'halten' ? zahlEingabe('sek', 'Sekunden', zielWert) : zahlEingabe('kg', 'Gewicht', u.art === 'kraft' ? 'kg' : '0'),
     u.art === 'halten' ? el('span') : zahlEingabe('wdh', 'Wiederholungen', zielWert),
     haken);
@@ -457,9 +579,9 @@ function trainingsEinstellungen() {
       'Bildschirm während des Workouts anlassen'));
 }
 
-function startePause() {
+function startePause(sek = null) {
   document.querySelector('.pausen-leiste')?.remove();
-  let gesamt = ladePause();
+  let gesamt = sek ?? ladePause();
   let ende = Date.now() + gesamt * 1000;
   const anzeige = el('strong', {});
   const balken = el('div');

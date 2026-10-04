@@ -62,7 +62,7 @@ export function statistik(training) {
   let volumen = 0;
   for (const e of training.uebungen ?? []) {
     for (const s of e.saetze ?? []) {
-      if (!s.erledigt) continue;
+      if (!s.erledigt || s.typ === 'aufwaermen') continue;
       saetze += 1;
       wdh += s.wdh ?? 0;
       volumen += (s.wdh ?? 0) * (s.kg ?? 0);
