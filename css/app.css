@@ -938,3 +938,13 @@ input.offen { border-color: var(--warnung); background: color-mix(in oklab, var(
 .vergleich td.besser { color: var(--akzent); font-weight: 800; }
 .freund summary { list-style: none; }
 .freund-kopf { display: flex; gap: 12px; align-items: center; cursor: pointer; }
+
+/* ---------- Tagebuch ---------- */
+.skala .chip { min-width: 44px; justify-content: center; font-size: 1.05rem; }
+.chronik-tag summary { cursor: pointer; list-style: none; }
+.chronik-vorschau { margin: 4px 0 0; }
+.chronik-text { white-space: pre-wrap; }
+.chronik-liste { list-style: none; padding: 0; }
+.chronik-liste li { padding: 4px 0 4px 14px; position: relative; }
+.chronik-liste li::before { content: "◆"; position: absolute; left: 0; color: var(--akzent); font-size: 0.6rem; top: 9px; }
+[data-stil=episch] .chronik-liste li { font-style: italic; }
