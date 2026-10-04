@@ -62,7 +62,7 @@ export async function pruefeErfolge() {
   const aktuell = stufenStand(stand.bewertungen);
   if (!gesehen) {
     // Erster Start der Erfolge: Vergangenes nicht einzeln ausrufen, nur zusammenfassen
-    await schreibe('einstellungen', 'erfolgeGesehen', { stufen: aktuell, level: stand.level.level });
+    await schreibe('einstellungen', 'erfolgeGesehen', { stufen: aktuell, level: stand.level.level, auftraege: stand.belohnungen.auftraege, bosse: stand.belohnungen.bosse });
     const anzahl = Object.keys(aktuell).length;
     if (anzahl) {
       zeigeHerold([{ text: episch(`Willkommen in der Halle der Taten! ${anzahl} Erfolge aus deiner Vergangenheit sind verzeichnet. Du stehst auf Stufe ${stand.level.level}.`, `${anzahl} Erfolge aus deinen bisherigen Daten freigeschaltet.`) }]);
@@ -77,8 +77,20 @@ export async function pruefeErfolge() {
   if (stand.level.level > (gesehen.level ?? 1)) {
     meldungen.unshift({ text: episch(`Bei Bart und Amboss – du bist nun Stufe ${stand.level.level}!`, `Level ${stand.level.level} erreicht.`), farbe: 'var(--akzent)' });
   }
+  // Erledigte Aufträge und besiegte Bosse
+  if (stand.belohnungen.auftraege > (gesehen.auftraege ?? stand.belohnungen.auftraege)) {
+    meldungen.push({ text: episch('Auftrag erfüllt! Brom legt dir Erz und Glut auf den Tisch.', 'Wochen-Auftrag erledigt – Belohnung erhalten.'), farbe: '#22c55e' });
+  }
+  if (stand.belohnungen.bosse > (gesehen.bosse ?? stand.belohnungen.bosse)) {
+    meldungen.unshift({ text: episch(`${stand.boss.boss.name} ist gefallen! Die Beute gehört dir.`, `Monats-Ziel „${stand.boss.boss.name}“ geschafft.`), farbe: '#ef4444' });
+  }
   if (meldungen.length) {
-    await schreibe('einstellungen', 'erfolgeGesehen', { stufen: { ...gesehen.stufen, ...aktuell }, level: Math.max(stand.level.level, gesehen.level ?? 1) });
+    await schreibe('einstellungen', 'erfolgeGesehen', {
+      stufen: { ...gesehen.stufen, ...aktuell },
+      level: Math.max(stand.level.level, gesehen.level ?? 1),
+      auftraege: stand.belohnungen.auftraege,
+      bosse: stand.belohnungen.bosse,
+    });
     zeigeHerold(meldungen);
   }
 }
