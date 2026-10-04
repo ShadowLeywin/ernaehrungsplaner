@@ -976,15 +976,18 @@ input.offen { border-color: var(--warnung); background: color-mix(in oklab, var(
 .scanner-video { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--radius-klein); background: #000; margin-bottom: 10px; }
 
 /* Brom: Aura atmet, Glut steigt, Feuerschein flackert */
-.brom-aura { animation: aura-atmen 3.6s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+.brom-aura { animation: aura-atmen 3.6s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+.brom-flamme { transform-box: fill-box; transform-origin: 50% 100%; animation: flackern 1.3s ease-in-out infinite alternate; }
+.brom-aura-kern { animation: aura-kranz 1.6s ease-in-out infinite alternate; }
+.brom-energie { animation: energie 1.8s linear infinite; }
+@keyframes energie { 0% { transform: translateY(6px); opacity: 0; } 30% { opacity: 0.6; } 100% { transform: translateY(-14px); opacity: 0; } }
 @keyframes aura-atmen { from { opacity: 0.65; transform: scale(0.96); } to { opacity: 1; transform: scale(1.04); } }
-.brom-aura-kranz { opacity: 0.55; animation: aura-kranz 2.2s ease-in-out infinite alternate; }
 @keyframes aura-kranz { from { opacity: 0.35; } to { opacity: 0.75; } }
 .brom-randlicht { opacity: 0.75; animation: randlicht 0.9s ease-in-out infinite alternate; }
 @keyframes randlicht { from { opacity: 0.45; } to { opacity: 0.9; } }
 .brom-glut { fill: #ffcf7a; opacity: 0; animation: aufsteigen 4.2s linear infinite; }
 .brom-auge { animation: randlicht 1.3s ease-in-out infinite alternate; }
-@media (prefers-reduced-motion: reduce) { .brom-aura, .brom-aura-kranz, .brom-randlicht, .brom-glut, .brom-auge { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .brom-aura, .brom-flamme, .brom-aura-kern, .brom-energie, .brom-randlicht, .brom-glut, .brom-auge { animation: none; } }
 
 /* ---------- Schnelleintrag ---------- */
 .auswahl-titel { padding: 10px 16px 4px; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--akzent); background: var(--flaeche-2); }
