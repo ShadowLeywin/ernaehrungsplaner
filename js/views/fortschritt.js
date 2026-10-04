@@ -11,6 +11,7 @@ import {
   uebungsVerlauf, rekorde, volumenJeMuskel, wochenUebersicht, trainierteUebungen, montagVon,
 } from '../logic/fortschritt.js';
 import { holeGewichtsReihe } from './gewicht.js';
+import { uebungsBeschreibung } from '../daten/beschreibungen.js';
 
 const verzeichnis = uebungsVerzeichnis(UEBUNGEN);
 const datumKurz = new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'numeric' });
@@ -127,6 +128,7 @@ function uebungsDetail(uebungId, tage, kgKoerper) {
     el('section', { class: 'karte hero' },
       el('h2', {}, u.name),
       el('p', { class: 'leise klein' }, u.muskeln.map((m) => MUSKELN[m]).join(', ')),
+      el('p', { class: 'klein uebung-beschreibung' }, uebungsBeschreibung(u)),
       el('div', { class: 'statistik' },
         u.art === 'kraft' ? stat(kg(rek.e1RM?.wert ?? 0), '1RM geschätzt') : null,
         u.art === 'kraft' ? stat(kg(rek.kg?.wert ?? 0), 'Max. Gewicht') : null,

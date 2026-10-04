@@ -911,3 +911,18 @@ input.offen { border-color: var(--warnung); background: color-mix(in oklab, var(
 .erfolg:not(.erreicht) strong { color: var(--text-leise); }
 .medaille { flex: none; }
 .werte-liste, .rang-liste, .rekordliste { list-style: none; padding: 0; margin: 0; }
+
+/* ---------- Körper ---------- */
+.koerper-karte { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.koerper-schalter { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.koerper-buehne { width: 100%; display: flex; justify-content: center; }
+.koerper-figur { width: min(100%, 260px); height: auto; }
+.k-umriss { fill: color-mix(in oklab, var(--text) 8%, transparent); stroke: color-mix(in oklab, var(--text) 30%, transparent); stroke-width: 1.2; stroke-linejoin: round; }
+.k-muskel { cursor: pointer; stroke: color-mix(in oklab, var(--hintergrund) 60%, transparent); stroke-width: 0.8; transition: fill-opacity 0.2s; outline: none; }
+.k-muskel:hover, .k-muskel:focus-visible { stroke: var(--text); stroke-width: 1.4; }
+.k-muskel.gewaehlt { stroke: var(--text); stroke-width: 2; fill-opacity: 1 !important; }
+.uebungs-info { list-style: none; padding: 0; }
+.uebungs-info li { border-bottom: 1px solid var(--rand); padding: 8px 0; }
+.uebungs-info li:last-child { border-bottom: 0; }
+.uebungs-info summary { cursor: pointer; font-weight: 600; }
+.uebung-beschreibung { margin-top: 8px; }
