@@ -7,6 +7,8 @@ import { ladeSpielstand, verzeichnis } from '../spiel.js';
 import { WERTE } from '../logic/charakter.js';
 import { GRUPPEN, RAENGE, rangName } from '../logic/raenge.js';
 import { rangEmblem, werteNetz } from './emblem.js';
+import { TITEL, waehleTitel, titelName } from '../logic/geschichte.js';
+import { schreibe } from '../db.js';
 
 export const held = {
   get titel() { return episch('Heldenbogen', 'Charakter'); },
@@ -28,6 +30,7 @@ function inhalt(s) {
         el('div', { class: 'level-kreis' }, el('span', {}, 'Lvl'), el('strong', {}, String(level.level))),
         el('div', {},
           el('h2', {}, profil.name || episch('Namenloser Held', 'Du')),
+          s.lager.titel?.aktiv ? el('p', { class: 'held-titel' }, `„${titelName(s.lager.titel.aktiv)}“`) : null,
           el('p', { class: 'held-klasse' }, episch(klasse.episch, klasse.schlicht)),
           el('p', { class: 'leise klein' }, `Stärken: ${WERTE[klasse.haupt].name} · ${WERTE[klasse.neben].name}`))),
       el('div', { class: 'balken xp-balken' }, el('div', { style: `width:${Math.round(level.anteil * 100)}%;background:var(--verlauf)` })),
@@ -67,7 +70,9 @@ function inhalt(s) {
         el('p', { class: 'leise klein' }, 'Jede Übung wird mit einer Spitzenleistung verglichen (z. B. Bankdrücken 2 × Körpergewicht als 1RM, 25 Klimmzüge, 2 Minuten Handstand). Bei Frauen gelten angepasste Werte. Pro Muskelgruppe zählt die beste Leistung der letzten 12 Wochen.'),
         el('div', { class: 'chips' }, ...RAENGE.map((r) => el('span', { class: 'marke', style: `background:color-mix(in oklab, ${r.farbe} 25%, transparent);color:inherit` }, r.name))))),
 
+    titelKarte(s),
     el('div', { class: 'kacheln' },
+      kachel('#/geschichte', 'feuer', episch('Brom erzählt', 'Geschichte'), 'Kapitel nach Level'),
       kachel('#/erfolge', 'pokal', episch('Halle der Taten', 'Erfolge'), `${s.bewertungen.filter((b) => b.stufe >= 0).length} freigeschaltet`),
       kachel('#/koerper', 'koerper', 'Körper', 'Muskeln & Übungen'),
       kachel('#/freunde', 'freunde', episch('Gefährten', 'Freunde'), 'Rangkarte teilen'),
@@ -79,4 +84,28 @@ function kachel(href, iconName, titel, text) {
   return el('a', { class: 'kachel', href },
     el('span', { class: 'kachel-icon' }, icon(iconName)),
     el('div', {}, el('strong', {}, titel), el('br'), el('span', {}, text)));
+}
+
+/** Titel: mit Erz und Glut erwerben, einen davon tragen (erscheint hier und auf der Rangkarte). */
+function titelKarte(s) {
+  const meldung = el('p', { class: 'warnung klein', role: 'alert' });
+  const besitz = s.lager.titel?.besitz ?? [];
+  return el('section', { class: 'karte' },
+    el('div', { class: 'zeile' }, el('h2', {}, episch('Titel', 'Titel')), el('span', { class: 'leise klein' }, `⛏ ${zahl(Math.floor(s.konto.erz))} · 🔥 ${zahl(Math.floor(s.konto.glut))}`)),
+    el('div', { class: 'titel-liste' }, ...TITEL.map((t) => {
+      const hat = besitz.includes(t.id);
+      const aktiv = s.lager.titel?.aktiv === t.id;
+      const gesperrt = s.level.level < t.ab;
+      return el('button', {
+        class: `titel-knopf${aktiv ? ' an' : ''}${hat ? ' besitz' : ''}`, type: 'button', disabled: gesperrt && !hat,
+        onclick: async () => {
+          const r = waehleTitel(s.lager, t.id, s.konto, s.level.level);
+          if (r.fehler) { meldung.textContent = r.fehler; return; }
+          await schreibe('einstellungen', 'lager', r.lager);
+          location.reload();
+        },
+      }, el('strong', {}, t.name), el('span', { class: 'leise klein' },
+        aktiv ? 'getragen' : hat ? 'tragen' : gesperrt ? `ab Level ${t.ab}` : `${t.preis.erz} ⛏ · ${t.preis.glut} 🔥`));
+    })),
+    meldung);
 }

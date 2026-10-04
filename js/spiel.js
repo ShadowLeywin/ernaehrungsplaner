@@ -16,6 +16,7 @@ import { verdient, kontostand, leeresLager, bauXp } from './logic/lagerbau.js';
 import { alleBelohnungen, auftragsStand, bossStand, gruppiere } from './logic/auftraege.js';
 import { datumSchluessel } from './logic/ziele.js';
 import { montagVon } from './logic/fortschritt.js';
+import { neueKapitel } from './logic/geschichte.js';
 import { episch } from './darstellung.js';
 
 export const verzeichnis = uebungsVerzeichnis(UEBUNGEN);
@@ -86,6 +87,9 @@ export async function pruefeErfolge() {
   }));
   if (stand.level.level > (gesehen.level ?? 1)) {
     meldungen.unshift({ text: episch(`Bei Bart und Amboss – du bist nun Stufe ${stand.level.level}!`, `Level ${stand.level.level} erreicht.`), farbe: 'var(--akzent)' });
+    for (const k of neueKapitel(gesehen.level ?? 1, stand.level.level)) {
+      meldungen.push({ text: episch(`Neues Kapitel am Feuer: „${k.titel}“`, `Neues Kapitel: ${k.titel}`), farbe: '#f2c14e' });
+    }
   }
   // Erledigte Aufträge und besiegte Bosse
   if (stand.belohnungen.auftraege > (gesehen.auftraege ?? stand.belohnungen.auftraege)) {

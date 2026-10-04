@@ -9,6 +9,7 @@ import { erstelleKarte, kodiereKarte, dekodiereKarte, codeAusLink } from '../log
 import { RAENGE, GRUPPEN, STUFEN_TEXT } from '../logic/raenge.js';
 import { WERTE, klassenName } from '../logic/charakter.js';
 import { rangEmblem } from './emblem.js';
+import { titelName } from '../logic/geschichte.js';
 
 const datumKurz = new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'numeric', year: 'numeric' });
 
@@ -72,7 +73,7 @@ async function lade(wurzel) {
       el('h2', {}, 'Karte eines Freundes öffnen'),
       el('div', { class: 'manuell' }, linkFeld, el('button', { class: 'knopf zweitrangig', type: 'button', onclick: oeffnen }, 'Öffnen')),
       fehler,
-      el('p', { class: 'leise klein' }, 'Datenschutz: Eine Rangkarte enthält nur Name, Level, Klasse, Ränge, Werte und die Anzahl der Erfolge – kein Gewicht, keine Ernährung. Sie wird nirgends hochgeladen, sondern steckt im Link.')));
+      el('p', { class: 'leise klein' }, 'Datenschutz: Eine Rangkarte enthält nur Name, Titel, Level, Klasse, Ränge, Werte, die Anzahl der Erfolge und deine Monatswerte fürs Duell (Workouts, Tonnen, Klimmzüge, aktive Tage) – kein Gewicht, keine Ernährung. Sie wird nirgends hochgeladen, sondern steckt im Link.')));
 }
 
 function zurueck() {
@@ -87,6 +88,7 @@ function kartenAnsicht(k, titel) {
       rangEmblem(alsRang(k.gesamt), 72),
       el('div', {},
         el('h2', {}, k.name || episch('Namenloser Held', 'Ohne Namen')),
+        k.titel && titelName(k.titel) ? el('p', { class: 'held-titel' }, `„${titelName(k.titel)}“`) : null,
         el('p', { class: 'held-klasse' }, `${episch(kEpisch, kSchlicht)} · Lvl ${k.level}`),
         el('p', { class: 'leise klein' }, `Gesamtrang: ${rangText(k.gesamt)} · ${k.erfolge} Erfolge${k.datum ? ` · Stand ${datumKurz.format(new Date(`${k.datum}T12:00:00`))}` : ''}`))),
     el('div', { class: 'rangkarte-gruppen' }, ...Object.entries(GRUPPEN).map(([id, g]) => el('div', { class: 'rk-gruppe' },
@@ -101,7 +103,18 @@ function vergleich(ich, freund) {
     el('td', { class: a > b ? 'besser' : '' }, String(a)),
     el('td', { class: b > a ? 'besser' : '' }, String(b)));
   const rangWert = (r) => (r ? RAENGE.findIndex((x) => x.id === r.rangId) * 3 + (r.stufe ? 3 - r.stufe : 3) : -1);
-  return el('section', { class: 'karte' },
+  const duell = ich.duell && freund.duell && ich.duell.monat === freund.duell.monat ? el('section', { class: 'karte duell' },
+    el('h2', {}, episch(`⚔ Duell im ${monatsName(ich.duell.monat)}`, `Monatsvergleich ${monatsName(ich.duell.monat)}`)),
+    el('table', { class: 'tabelle vergleich' },
+      el('thead', {}, el('tr', {}, el('th', {}, ''), el('th', {}, 'Du'), el('th', {}, freund.name || 'Freund'))),
+      el('tbody', {},
+        zeile('Workouts', ich.duell.workouts, freund.duell.workouts),
+        zeile('Tonnen bewegt', ich.duell.tonnen, freund.duell.tonnen),
+        zeile('Klimmzüge', ich.duell.klimmzuege, freund.duell.klimmzuege),
+        zeile('Aktive Tage', ich.duell.aktiveTage, freund.duell.aktiveTage))),
+    el('p', { class: 'leise klein' }, `Stand der Karte vom ${freund.datum ?? '?'} – für den aktuellen Stand neue Karten austauschen.`))
+    : freund.duell ? el('p', { class: 'leise klein' }, 'Das Monats-Duell erscheint, wenn beide Karten aus demselben Monat sind.') : null;
+  return el('div', {}, duell, el('section', { class: 'karte' },
     el('h2', {}, 'Vergleich'),
     el('table', { class: 'tabelle vergleich' },
       el('thead', {}, el('tr', {}, el('th', {}, ''), el('th', {}, 'Du'), el('th', {}, freund.name || 'Freund'))),
@@ -112,8 +125,11 @@ function vergleich(ich, freund) {
           el('td', {}, g.name),
           el('td', { class: rangWert(ich.gruppen[id]) > rangWert(freund.gruppen[id]) ? 'besser' : '' }, rangText(ich.gruppen[id])),
           el('td', { class: rangWert(freund.gruppen[id]) > rangWert(ich.gruppen[id]) ? 'besser' : '' }, rangText(freund.gruppen[id])))),
-        zeile('Erfolge', ich.erfolge, freund.erfolge))));
+        zeile('Erfolge', ich.erfolge, freund.erfolge)))));
 }
+
+const MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+const monatsName = (m) => MONATE[Number(m.slice(5, 7)) - 1] ?? m;
 
 function freundZeile(f, eigene, beiLoeschen) {
   const loeschen = el('div');

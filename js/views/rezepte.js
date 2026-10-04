@@ -16,6 +16,7 @@ import { skaliereRezept } from '../logic/vorschlaege.js';
 let artFilter = null;
 let sortierung = 'note';
 let suche = '';
+let vorrat = null; // Set der vorhandenen Zutaten (null = Filter aus)
 
 export const rezepte = {
   get titel() { return episch('Rezeptbuch', 'Rezepte'); },
@@ -69,12 +70,15 @@ function noteText(note) {
 
 function zeichneListe(k) {
   const begriffe = normalisiere(suche).split(/\s+/).filter(Boolean);
+  const abdeckung = (r) => (vorrat ? r.zutaten.filter((z) => vorrat.has(z.lebensmittelId)).length / Math.max(1, r.zutaten.length) : 1);
   const sichtbar = k.liste
     .filter((r) => !artFilter || r.art === artFilter)
+    .filter((r) => !vorrat || abdeckung(r) > 0)
     .filter((r) => begriffe.every((b) => normalisiere(`${r.name} ${r.tags.join(' ')}`).includes(b)))
     .sort((a, b) => (sortierung === 'note' ? (gesamtNote(b) ?? 0) - (gesamtNote(a) ?? 0)
       : sortierung === 'protein' ? (proPortion(b, k.daten.basis).protein ?? 0) - (proPortion(a, k.daten.basis).protein ?? 0)
-        : a.name.localeCompare(b.name)));
+        : a.name.localeCompare(b.name)))
+    .sort((a, b) => abdeckung(b) - abdeckung(a));
   const sucheFeld = el('input', {
     type: 'search', value: suche, placeholder: 'Name oder Tag suchen …', 'aria-label': 'Rezepte suchen',
     oninput: (e) => { suche = e.target.value; clearTimeout(sucheFeld.t); sucheFeld.t = setTimeout(() => { zeichneListe(k); document.querySelector('.rezept-suche')?.focus(); }, 250); },
@@ -87,6 +91,7 @@ function zeichneListe(k) {
       el('button', { class: 'knopf', type: 'button', onclick: () => bearbeite(k, neuesRezept(neueId(), artFilter ?? 'gericht'), true) }, icon('plus', 18), 'Neues Rezept'),
       el('a', { class: 'knopf zweitrangig', href: '#/mealprep' }, icon('mealprep', 18), 'Meal-Prep')),
     k.liste.length ? sucheFeld : null,
+    k.liste.length ? vorratBereich(k) : null,
     k.liste.length ? el('div', { class: 'chips scroll', style: 'margin:10px 0' },
       chip('Alle', !artFilter, () => { artFilter = null; zeichneListe(k); }),
       ...Object.entries(REZEPT_ARTEN).map(([id, a]) => chip(episch(a.episch, a.name), artFilter === id, () => { artFilter = id; zeichneListe(k); }))) : null,
@@ -107,6 +112,7 @@ function zeichneListe(k) {
         el('p', { class: 'leise klein' },
           `${episch(REZEPT_ARTEN[r.art]?.episch, REZEPT_ARTEN[r.art]?.name)} · ${zahl(Math.round(p.kcal ?? 0))} kcal · ${zahl(Math.round(p.protein ?? 0))} g Protein pro Portion`),
         el('div', { class: 'chips' },
+          vorrat ? el('span', { class: `marke${abdeckung(r) === 1 ? ' angebot-marke' : ''}` }, `${r.zutaten.filter((z) => vorrat.has(z.lebensmittelId)).length}/${r.zutaten.length} Zutaten da`) : null,
           ...r.tags.slice(0, 4).map((t) => el('span', { class: 'marke' }, t)),
           passt ? null : el('span', { class: 'marke warn' }, 'passt nicht zur Ernährungsweise'),
           r.wiederEssen ? null : el('span', { class: 'marke warn' }, 'nicht wieder')));
@@ -192,4 +198,25 @@ function zutatenKarte(k, r, nachId) {
     el('div', { class: 'zeile' }, el('h2', {}, 'Zutaten'),
       el('label', { class: 'klein portionen-wahl' }, 'für ', feld, ' Portionen')),
     liste, info, speichern);
+}
+
+/** „Was kann ich kochen?“ – vorhandene Zutaten antippen, Rezepte nach Abdeckung sortieren. */
+function vorratBereich(k) {
+  const nachId = new Map(k.daten.basis.map((l) => [l.id, l]));
+  const zutaten = [...new Set(k.liste.flatMap((r) => r.zutaten.map((z) => z.lebensmittelId)))]
+    .filter((id) => nachId.has(id))
+    .sort((a, b) => nachId.get(a).name.localeCompare(nachId.get(b).name));
+  return el('details', { class: 'vorrat-filter', open: Boolean(vorrat) },
+    el('summary', { class: 'klein' }, vorrat ? `Was kann ich kochen? (${vorrat.size} Zutaten da)` : 'Was kann ich kochen?'),
+    el('div', { class: 'chips' },
+      ...zutaten.map((id) => el('button', {
+        class: `chip${vorrat?.has(id) ? ' an' : ''}`, type: 'button',
+        onclick: () => {
+          vorrat ??= new Set();
+          if (vorrat.has(id)) vorrat.delete(id); else vorrat.add(id);
+          if (!vorrat.size) vorrat = null;
+          zeichneListe(k);
+        },
+      }, nachId.get(id).name)),
+      vorrat ? el('button', { class: 'chip', type: 'button', onclick: () => { vorrat = null; zeichneListe(k); } }, '× zurücksetzen') : null));
 }

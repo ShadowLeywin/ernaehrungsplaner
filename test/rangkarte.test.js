@@ -38,3 +38,15 @@ test('Code aus Link', () => {
   assert.equal(codeAusLink('abc'), 'abc');
   assert.equal(codeAusLink('hallo welt'), null);
 });
+
+test('Monats-Duell auf der Karte', () => {
+  const mitDuell = {
+    ...stand,
+    tage: [{ datum: '2026-10-02', wasser: [{ ml: 1 }], trainings: [{ typ: 'workout', ende: 'x', uebungen: [{ uebungId: 'klimmzuege', saetze: [{ wdh: 10, erledigt: true }, { wdh: 5, erledigt: true, typ: 'aufwaermen' }] }] }] }],
+    kennzahlen: [{ datum: '2026-10-02', workouts: 1, volumenKg: 2500 }],
+    lager: { titel: { aktiv: 'eisenfaust' } },
+  };
+  const k = dekodiereKarte(kodiereKarte(erstelleKarte(mitDuell, 'X', new Date('2026-10-04T10:00:00Z'))));
+  assert.deepEqual(k.duell, { monat: '2026-10', workouts: 1, tonnen: 2.5, klimmzuege: 10, aktiveTage: 1 });
+  assert.equal(k.titel, 'eisenfaust');
+});

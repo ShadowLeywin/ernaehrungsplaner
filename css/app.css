@@ -1163,3 +1163,18 @@ input.offen { border-color: var(--warnung); background: color-mix(in oklab, var(
 [data-stil=schlicht] .tagesimpuls { font-style: normal; }
 .dialog.tour { height: auto; max-width: min(440px, calc(100% - 32px)); border-radius: var(--radius); border: 1px solid color-mix(in oklab, var(--akzent) 40%, var(--rand)); }
 .dialog.tour::backdrop { background: rgb(0 0 0 / 0.6); }
+
+/* ---------- Geschichte, Titel, Rückblick ---------- */
+.geschichte-kopf, .rueckblick-kopf { display: flex; gap: 14px; align-items: center; }
+.kapitel summary { cursor: pointer; list-style: none; }
+.kapitel-text { white-space: pre-wrap; font-style: italic; line-height: 1.6; margin-top: 10px; }
+.kapitel.gesperrt { opacity: 0.5; }
+.held-titel { margin: 0; font-style: italic; color: var(--text-leise); }
+.titel-liste { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 8px 0; }
+.titel-knopf { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 12px; border-radius: var(--radius-klein); border: 1px solid var(--rand); background: var(--flaeche-2); color: inherit; text-align: left; font: inherit; cursor: pointer; }
+.titel-knopf.besitz { border-color: color-mix(in oklab, var(--akzent) 40%, var(--rand)); }
+.titel-knopf.an { border-color: var(--akzent); box-shadow: 0 0 0 1px var(--akzent); }
+.titel-knopf:disabled { opacity: 0.45; cursor: default; }
+.vorrat-filter { margin: 8px 0; }
+.vorrat-filter .chips { margin-top: 8px; }
+.duell { border-color: color-mix(in oklab, #ef4444 40%, var(--rand)); }

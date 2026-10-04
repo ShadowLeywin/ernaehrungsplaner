@@ -3,6 +3,31 @@
 // (kein Gewicht, keine Ernährung, keine Einträge). Fremde Karten werden streng geprüft (reine Funktionen).
 import { RAENGE, GRUPPEN } from './raenge.js';
 import { WERTE } from './charakter.js';
+import { FAMILIEN } from './spielstand.js';
+import { istAktiv } from './feuer.js';
+
+/** Werte des laufenden Monats für das Duell: [monat, workouts, tonnen×10, klimmzüge, aktive Tage] */
+export function monatsDuell(stand, monat) {
+  const tage = (stand.tage ?? []).filter((t) => t.datum.startsWith(monat));
+  const k = (stand.kennzahlen ?? []).filter((x) => x.datum.startsWith(monat));
+  let klimmzuege = 0;
+  for (const tag of tage) {
+    for (const t of tag.trainings ?? []) {
+      if (t.typ !== 'workout' || !t.ende) continue;
+      for (const e of t.uebungen ?? []) {
+        if (!FAMILIEN.klimmzug.includes(e.uebungId)) continue;
+        klimmzuege += (e.saetze ?? []).filter((x) => x.erledigt && x.typ !== 'aufwaermen').reduce((sum, x) => sum + (x.wdh ?? 0), 0);
+      }
+    }
+  }
+  return [
+    monat,
+    k.reduce((sum, x) => sum + x.workouts, 0),
+    Math.round(k.reduce((sum, x) => sum + x.volumenKg, 0) / 100),
+    klimmzuege,
+    tage.filter(istAktiv).length,
+  ];
+}
 
 export const KARTEN_VERSION = 1;
 const RANG_IDS = RAENGE.map((r) => r.id);
@@ -20,6 +45,8 @@ export function erstelleKarte(stand, name, heute = new Date()) {
     w: Object.keys(WERTE).map((id) => stand.werte[id]),
     e: stand.bewertungen.filter((b) => b.stufe >= 0).length,
     d: heute.toISOString().slice(0, 10),
+    h: monatsDuell(stand, heute.toISOString().slice(0, 7)),
+    t: stand.lager?.titel?.aktiv ?? null,
   };
 }
 
@@ -63,7 +90,15 @@ export function dekodiereKarte(code) {
     if (werte.includes(null)) return null;
     const gruppen = {};
     for (const g of Object.keys(GRUPPEN)) gruppen[g] = pruefeRang(roh.m?.[g] ?? null);
+    // Monats-Duell (optional)
+    let duell = null;
+    if (Array.isArray(roh.h) && roh.h.length === 5 && /^\d{4}-\d{2}$/.test(roh.h[0])) {
+      const z = roh.h.slice(1).map((x) => ganzzahl(x, 0, 100000));
+      if (!z.includes(null)) duell = { monat: roh.h[0], workouts: z[0], tonnen: z[1] / 10, klimmzuege: z[2], aktiveTage: z[3] };
+    }
     return {
+      duell,
+      titel: typeof roh.t === 'string' ? roh.t.slice(0, 40) : null,
       name: typeof roh.n === 'string' ? roh.n.slice(0, 30) : '',
       level,
       klasse: typeof roh.k === 'string' ? roh.k.slice(0, 40) : '',

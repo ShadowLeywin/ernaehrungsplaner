@@ -23,6 +23,8 @@ import { angebote } from './views/angebote.js';
 import { ausbau } from './views/ausbau.js';
 import { masse } from './views/masse.js';
 import { aktion } from './views/aktion.js';
+import { geschichte } from './views/geschichte.js';
+import { rueckblick } from './views/rueckblick.js';
 import { zeigeTour, tourGesehen } from './views/tour.js';
 import { pruefeSpaeter } from './spiel.js';
 import { oeffnePanel, schnellEinstellungen } from './views/panel.js';
@@ -34,7 +36,7 @@ wendeDarstellungAn();
 document.querySelectorAll('.nav-icon[data-icon]').forEach((platz) => platz.append(icon(platz.dataset.icon, 22)));
 
 const ansichten = {
-  mehr, heute, einstellungen, lebensmittel, backup, einrichtung, gewicht, training, lager, fortschritt, held, erfolge, koerper, freunde, tagebuch, rezepte, mealprep, woche, einkauf, vorlieben, angebote, ausbau, masse, aktion };
+  mehr, heute, einstellungen, lebensmittel, backup, einrichtung, gewicht, training, lager, fortschritt, held, erfolge, koerper, freunde, tagebuch, rezepte, mealprep, woche, einkauf, vorlieben, angebote, ausbau, masse, aktion, geschichte, rueckblick };
 
 // Ohne Profil nur Einrichtung und Backup (zum Wiederherstellen) erlauben
 const wache = (name) => (istEingerichtet() || name === 'backup' ? null : 'einrichtung');

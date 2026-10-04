@@ -15,6 +15,8 @@ const GRUPPEN = () => [
     ['erfolge', 'pokal', 'Erfolge', 'Stufen & Geheimes'],
     ['freunde', 'freunde', 'Freunde', 'Rangkarten vergleichen'],
     ['tagebuch', 'buch', 'Tagebuch', 'Chronik deiner Tage'],
+    ['geschichte', 'feuer', episch('Brom erzählt', 'Geschichte'), 'Kapitel nach Level'],
+    ['rueckblick', 'stern', 'Rückblick', 'Monat & Jahr'],
   ]],
   ['Körper & Einstellungen', [
     ['gewicht', 'gewicht', 'Gewicht', 'Verlauf & Anpassung'],

@@ -64,3 +64,11 @@ test('Monatsdurchschnitte und Monatsbericht mit Vormonat', () => {
   nahe(b.gegenVormonat, 0.54, 0.01);
   assert.equal(monatsBericht(reihe, '2026-08'), null);
 });
+
+import { PROGRAMME } from '../js/daten/programme.js';
+import { UEBUNGEN as ALLE } from '../js/daten/uebungen.js';
+
+test('Programme nutzen nur vorhandene Übungen', () => {
+  const ids = new Set(ALLE.map((x) => x.id));
+  for (const p of PROGRAMME) for (const v of p.vorlagen) for (const e of v.uebungen) assert.ok(ids.has(e.uebungId), e.uebungId);
+});

@@ -14,6 +14,7 @@ import { neueRekorde } from '../logic/fortschritt.js';
 import { steigerung, stillstand } from '../logic/progression.js';
 import { SATZ_TYPEN, scheiben, aufwaermSaetze } from '../logic/hantel.js';
 import { zeigeHinweis } from './hinweis.js';
+import { PROGRAMME } from '../daten/programme.js';
 import { episch } from '../darstellung.js';
 import { holeGewichtsReihe } from './gewicht.js';
 import { oeffneUebungDialog } from './uebung-dialog.js';
@@ -189,8 +190,36 @@ function vorlagenBereich(k, tag) {
       el('button', {
         class: 'knopf zweitrangig voll', type: 'button',
         onclick: () => bearbeiteVorlage(k, { id: neueId(), name: '', tage: [], uhrzeit: '', uebungen: [] }),
-      }, icon('plus', 18), 'Neue Vorlage')),
+      }, icon('plus', 18), 'Neue Vorlage'),
+      el('button', { class: 'knopf zweitrangig voll', type: 'button', style: 'margin-top:8px', onclick: () => oeffneProgramme(k) }, icon('liste', 18), 'Fertiges Programm hinzufügen')),
   ];
+}
+
+/** Fertige Programme (PPL, Ganzkörper, Calisthenics) als Vorlagen übernehmen. */
+function oeffneProgramme(k) {
+  const dialog = el('dialog', { class: 'dialog' });
+  const schliessen = () => { dialog.close(); dialog.remove(); };
+  dialog.addEventListener('cancel', (e) => { e.preventDefault(); schliessen(); });
+  setze(dialog,
+    el('div', { class: 'dialog-kopf' }, el('h2', {}, 'Programme'),
+      el('button', { class: 'knopf-klein', type: 'button', 'aria-label': 'Schließen', onclick: schliessen }, icon('schliessen'))),
+    el('div', { class: 'dialog-inhalt' },
+      el('p', { class: 'leise klein' }, 'Die Vorlagen werden zu deinen hinzugefügt und lassen sich danach frei anpassen (Tage, Übungen, Sätze).'),
+      ...PROGRAMME.map((p) => el('section', { class: 'karte' },
+        el('h2', {}, p.name),
+        el('p', { class: 'leise klein' }, p.text),
+        el('ul', { class: 'liste-einfach klein' }, ...p.vorlagen.map((v) => el('li', {}, `${v.name}: ${v.tage.map((t) => WOCHENTAGE[t].slice(0, 2)).join(', ')} · ${v.uebungen.length} Übungen`))),
+        el('button', {
+          class: 'knopf', type: 'button',
+          onclick: () => {
+            const neu = p.vorlagen.map((v) => ({ id: neueId(), name: v.name, tage: [...v.tage], uhrzeit: '', notiz: '', uebungen: structuredClone(v.uebungen) }));
+            schliessen();
+            speichereVorlagen(k, [...k.vorlagen, ...neu]);
+            zeigeHinweis(`${neu.length} Vorlagen hinzugefügt`);
+          },
+        }, 'Hinzufügen')))));
+  document.body.append(dialog);
+  dialog.showModal();
 }
 
 async function starteVorlage(k, vorlage) {
