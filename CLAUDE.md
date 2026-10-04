@@ -1,6 +1,6 @@
-# FORGE – Ernährungsplaner (PWA)
+# FORGEBORN – Ernährung & Training (PWA)
 
-App-Name: **FORGE**, Slogan „Fuel. Train. Grow.“, Logo: Flamme. Standard-Thema „Glut“ (orange → rot). Das Repo heißt weiterhin `ernaehrungsplaner` (die URL bleibt gleich).
+App-Name: **FORGEBORN**, Slogan „Fuel. Train. Grow.“, Logo: Schatten eines Zwergenschmieds schlägt mit dem Hammer auf eine Flamme auf dem Amboss, in der Flamme leuchtet der Ziel-Körper (`tools/icons_erzeugen.py`). Lizenz: GPL-3.0, Open Source mit Spenden. Standard-Thema „Glut“ (orange → rot). Das Repo heißt weiterhin `ernaehrungsplaner` (die URL bleibt gleich).
 
 ## Ziel
 Progressive Web App für ein Samsung-Handy: offline-fähig, komplett deutsch, alle Daten lokal auf dem Gerät. Später sollen Freunde die App nutzen können, jeder mit eigenen lokalen Daten (kein gemeinsames Backend).
@@ -87,7 +87,7 @@ Alle folgenden Märkte sind relevant:
 - Gewicht: täglich morgens manuell eintragen (Health Connect ist für Web-Apps nicht zugänglich). Wochendurchschnitt; wöchentlicher Anpassungsvorschlag ab 2 Wochen Daten, max. ±150 kcal/Tag pro Woche, nur mit Bestätigung.
 - Training: Übungsdatenbank in `js/daten/uebungen.js` (Gym, Calisthenics, Cardio, Sport, Mobility, Alltag; MET nach 2024 Adult Compendium). kcal netto = (MET − 1) × kg × h; Kraft-Einheiten über Dauer × Intensität. Hybrid-Regel: geplantes Training steckt im Tagestyp, Training mit `zusatz: true` erhöht das Tagesziel (Protein fest, KH/Fett im Verhältnis). Navigation: Heute · Training · Rezepte · Woche · Mehr.
 - Bedienung: Zahnrad immer oben rechts; öffnet Seiten-Einstellungen (`ansicht.einstellungen`) plus Darstellung. Stil-Schalter „Episch / Schlicht“ (pro Gerät, `data-stil`, Texte über `episch()`), Startseite „Lager“ (Hub mit Lagerfeuer). Navigation: Lager · Ernährung · Training · Woche · Mehr.
-- RPG-Ebene (geplant, P2–P9): Erfolge mit Stufen Bronze → Silber → Gold → Platin → Obsidian → Legendär plus geheime Erfolge; Charakter-Werte (Stärke, Ausdauer, Tempo, Beweglichkeit, Willenskraft, Disziplin), Level, Klasse nach Stärken; Ränge Schlacke → Legende (Bestleistung der letzten 12 Wochen, körpergewichtsbezogen); Freunde per geteilter Rangkarte (kein Server); Tagebuch episch/schlicht; Ernährungsweisen (vegan, vegetarisch, pescetarisch …) und Diäten (keto, low carb …) als getrennte Listen. Maskottchen „Brom“: sehr muskulöser Schmied in normaler Alltagskleidung, respektvoll und knapp, nie Push-Nachrichten, abschaltbar.
+- RPG-Ebene (geplant, P2–P9): Erfolge mit Stufen Bronze → Silber → Gold → Platin → Obsidian → Legendär plus geheime Erfolge; Charakter-Werte (Stärke, Ausdauer, Tempo, Beweglichkeit, Willenskraft, Disziplin), Level, Klasse nach Stärken; Ränge Schlacke → Legende (Bestleistung der letzten 12 Wochen, körpergewichtsbezogen); Freunde per geteilter Rangkarte (kein Server); Tagebuch episch/schlicht; Ernährungsweisen (vegan, vegetarisch, pescetarisch …) und Diäten (keto, low carb …) als getrennte Listen. Maskottchen „Brom“: Mischung aus Schmied und Zwerg, gedrungen und sehr muskulös, Vollbart, normale Alltagskleidung, respektvoll und knapp, nie Push-Nachrichten, abschaltbar.
 - Später: Capacitor-App (Android, evtl. iOS), zunächst nur für den Nutzer; Open Source mit Spenden geplant, Repo bleibt vorerst öffentlich.
 - Bewertung: Obst/Gemüse 0–10 (0 = nie). Rezepte: Gesamtnote 1–10, Teilnoten Geschmack, Sättigung, Aufwand, Preis, dazu Tags, Geschmacksbeschreibung, Vorteile, Notiz, „wieder essen“. Geschmack und Vorteile werden immer beschrieben.
 

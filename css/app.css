@@ -59,7 +59,8 @@ a { color: var(--akzent); }
   color: transparent;
   padding-right: 0.08em; /* kursives E nicht abschneiden */
 }
-.wortmarke-text.gross { font-size: 2.4rem; margin: 0; display: block; }
+.wortmarke-text.gross { font-size: 2.2rem; margin: 0; display: block; }
+.logo-bild { display: block; margin: 0 auto 14px; border-radius: 28px; box-shadow: 0 12px 34px color-mix(in oklab, var(--akzent) 40%, transparent); }
 .slogan {
   margin: 2px 0 14px;
   font-size: 0.8rem;

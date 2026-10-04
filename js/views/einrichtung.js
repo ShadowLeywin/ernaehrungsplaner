@@ -88,8 +88,8 @@ function schrittGueltig() {
 function willkommen(geh) {
   return [
     el('section', { class: 'karte willkommen hero' },
-      el('div', { class: 'logo' }, icon('flamme-voll', 44)),
-      el('h2', { class: 'wortmarke-text gross' }, 'FORGE'),
+      el('img', { class: 'logo-bild', src: './icons/icon-192.png', alt: '', width: 112, height: 112 }),
+      el('h2', { class: 'wortmarke-text gross' }, 'FORGEBORN'),
       el('p', { class: 'slogan' }, 'Fuel. Train. Grow.'),
       el('p', {}, 'Ernährung und Training nach deinen Zielen – offline, alle Daten bleiben auf deinem Handy.'),
       el('p', { class: 'leise klein' }, 'Die Einrichtung dauert ca. 2 Minuten. Alles lässt sich später in den Einstellungen ändern.'),

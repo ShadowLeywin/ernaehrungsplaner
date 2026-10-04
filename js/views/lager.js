@@ -18,9 +18,9 @@ const datumFormat = new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'nu
 
 export const lager = {
   titel: 'Lager',
-  kopf: () => el('span', { class: 'wortmarke', 'aria-label': 'FORGE' },
+  kopf: () => el('span', { class: 'wortmarke', 'aria-label': 'FORGEBORN' },
     icon('flamme-voll', 30),
-    el('span', { class: 'wortmarke-text' }, 'FORGE')),
+    el('span', { class: 'wortmarke-text' }, 'FORGEBORN')),
   render() {
     const wurzel = el('div');
     lade(wurzel);

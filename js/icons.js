@@ -31,7 +31,7 @@ const ICONS = {
   weiter: [['path', { d: 'M9 5l7 7-7 7' }]],
   schliessen: [['path', { d: 'M6 6l12 12M18 6 6 18' }]],
   plus: [['path', { d: 'M12 5v14M5 12h14' }]],
-  // FORGE-Flamme (gleiche Form wie das App-Icon, Raster 100 → 24)
+  // FORGEBORN-Flamme (gleiche Form wie das App-Icon, Raster 100 → 24)
   flamme: [['path', { d: FLAMME_AUSSEN, transform: 'scale(0.24)', 'stroke-width': 8 }]],
   'flamme-voll': [['path', {
     d: `${FLAMME_AUSSEN} ${FLAMME_KERN}`, transform: 'scale(0.24)', fill: 'currentColor', stroke: 'none', 'fill-rule': 'evenodd',
