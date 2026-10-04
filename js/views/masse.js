@@ -117,26 +117,37 @@ function verlaufKarte(tage, neu) {
 function fotoKarte(fotos, neu) {
   let pose = 'vorn';
   const status = el('p', { class: 'leise klein', role: 'status' });
-  const auswahl = el('input', {
-    type: 'file', accept: 'image/*', capture: 'environment', hidden: true,
+  // Zwei Eingaben: Kamera (capture) und Galerie (ohne capture – sonst öffnet Android nur die Kamera)
+  const eingabe = (kamera) => el('input', {
+    type: 'file', accept: 'image/*', hidden: true, ...(kamera ? { capture: 'environment' } : {}),
     onchange: async (e) => {
       const datei = e.target.files?.[0];
       if (!datei) return;
       status.textContent = 'Speichere …';
-      await speichereFoto(datei, datumSchluessel(new Date()), pose);
+      // Aus der Galerie: Aufnahmedatum der Datei übernehmen (ältere Fotos landen am richtigen Tag)
+      const datum = kamera || !datei.lastModified ? new Date() : new Date(datei.lastModified);
+      await speichereFoto(datei, datumSchluessel(datum), pose);
       neu();
     },
   });
+  const kamera = eingabe(true);
+  const galerie = eingabe(false);
+  const posen = el('div', { class: 'umschalter', role: 'group', 'aria-label': 'Pose' });
+  const zeichnePosen = () => setze(posen, ...[['vorn', 'Vorn'], ['seite', 'Seite'], ['hinten', 'Hinten']].map(([id, text]) => el('button', {
+    class: pose === id ? 'aktiv' : '', type: 'button', 'aria-pressed': String(pose === id),
+    onclick: () => { pose = id; zeichnePosen(); },
+  }, text)));
+  zeichnePosen();
   const urls = new Map(fotos.map((f) => [f.id, URL.createObjectURL(f.blob)]));
   const vergleich = vergleichsAnsicht(fotos, urls);
   return el('section', { class: 'karte' },
     el('h2', {}, '📸 Fortschrittsfotos'),
     el('p', { class: 'leise klein' }, 'Bleiben nur auf diesem Handy (nicht im Backup, nie im Internet). Gleiches Licht, gleiche Pose, gleiche Uhrzeit – dann siehst du echten Fortschritt.'),
-    el('div', { class: 'chips' }, ...[['vorn', 'Vorn'], ['seite', 'Seite'], ['hinten', 'Hinten']].map(([id, text]) => el('button', {
-      class: 'chip', type: 'button',
-      onclick: () => { pose = id; auswahl.click(); },
-    }, icon('kamera', 16), text))),
-    auswahl,
+    posen,
+    el('div', { class: 'knopfreihe' },
+      el('button', { class: 'knopf', type: 'button', onclick: () => kamera.click() }, icon('kamera', 18), 'Foto aufnehmen'),
+      el('button', { class: 'knopf zweitrangig', type: 'button', onclick: () => galerie.click() }, icon('liste', 18), 'Aus Galerie')),
+    kamera, galerie,
     status,
     vergleich,
     fotos.length ? el('div', { class: 'foto-raster' }, ...fotos.map((f) => el('figure', { class: 'foto' },

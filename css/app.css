@@ -482,7 +482,7 @@ body[data-route=einrichtung] .navigation { display: none; }
 .dialog[open] { animation: hochfahren 0.22s cubic-bezier(.2,.8,.2,1); }
 @keyframes hochfahren { from { transform: translateY(24px); opacity: 0; } }
 .dialog::backdrop { background: rgb(0 0 0 / 0.55); backdrop-filter: blur(3px); }
-@media (min-width: 600px) { .dialog { height: auto; max-height: 85vh; border-radius: var(--radius); } }
+@media (min-width: 600px) { .dialog { height: fit-content; max-height: 85vh; border-radius: var(--radius); } }
 .dialog-kopf {
   position: sticky;
   top: 0;
@@ -1160,7 +1160,7 @@ input.offen { border-color: var(--warnung); background: color-mix(in oklab, var(
 .tour .knopfreihe { justify-content: center; }
 .tagesimpuls { margin: 16px 4px 8px; padding: 12px 16px; border-left: 3px solid var(--akzent); font-style: italic; color: var(--text); }
 [data-stil=schlicht] .tagesimpuls { font-style: normal; }
-.dialog.tour { height: auto; max-width: min(440px, calc(100% - 32px)); border-radius: var(--radius); border: 1px solid color-mix(in oklab, var(--akzent) 40%, var(--rand)); }
+.dialog.tour { height: fit-content; max-width: min(440px, calc(100% - 32px)); border-radius: var(--radius); border: 1px solid color-mix(in oklab, var(--akzent) 40%, var(--rand)); }
 .dialog.tour::backdrop { background: rgb(0 0 0 / 0.6); }
 
 /* ---------- Geschichte, Titel, Rückblick ---------- */
