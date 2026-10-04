@@ -1,6 +1,6 @@
 // Service Worker: hält die App-Dateien offline vor.
 // Bei jeder Änderung an App-Dateien VERSION erhöhen, sonst sehen installierte Apps die Änderung nicht.
-const VERSION = 'v19';
+const VERSION = 'v20';
 const CACHE = `ernaehrung-${VERSION}`;
 
 // Alle Dateien der App-Hülle. Neue Dateien hier eintragen.
@@ -52,6 +52,15 @@ const DATEIEN = [
   './js/views/memo-dialog.js',
   './js/logic/fortschritt.js',
   './js/views/fortschritt.js',
+  './js/logic/raenge.js',
+  './js/logic/spielstand.js',
+  './js/logic/erfolge.js',
+  './js/logic/charakter.js',
+  './js/spiel.js',
+  './js/views/brom.js',
+  './js/views/emblem.js',
+  './js/views/held.js',
+  './js/views/erfolge.js',
   './data/lebensmittel.json',
   './icons/icon-192.png',
   './icons/icon-512.png',

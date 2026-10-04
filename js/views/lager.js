@@ -12,6 +12,10 @@ import { UEBUNGEN } from '../daten/uebungen.js';
 import { uebungsVerzeichnis, zusatzKcal, zielMitZusatz } from '../logic/training.js';
 import { vorlagenFuerTag, erledigteVorlagen } from '../logic/vorlagen.js';
 import { holeGewichtsReihe } from './gewicht.js';
+import { ladeSpielstand } from '../spiel.js';
+import { rangName } from '../logic/raenge.js';
+import { rangEmblem } from './emblem.js';
+import { bromSvg, bromAn } from './brom.js';
 
 const verzeichnis = uebungsVerzeichnis(UEBUNGEN);
 const datumFormat = new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -38,8 +42,13 @@ async function lade(wurzel) {
   const typ = zielMitZusatz(planTyp, zusatzKcal(tag, verzeichnis, gewichtKg));
   const ist = tagesNaehrwerte(tag, profil, daten.lebensmittel);
 
+  const heldPlatz = el('div');
+  ladeSpielstand().then((spiel) => setze(heldPlatz, heldKachel(spiel))).catch(() => {});
+  const offen = vorlagenFuerTag(vorlagen ?? [], jetzt).filter((v) => !erledigteVorlagen(tag).has(v.id));
+
   setze(wurzel,
-    lagerfeuer(profil, typ, notiz, jetzt),
+    lagerfeuer(profil, typ, notiz, jetzt, bromSpruch(offen, ist, typ, jetzt)),
+    heldPlatz,
     el('div', { class: 'hub-kacheln' },
       ernaehrungsKachel(typ, ist),
       trainingsKachel(vorlagen ?? [], tag, jetzt),
@@ -57,7 +66,26 @@ function begruessung(profil) {
 }
 
 /** Lagerfeuer als animiertes SVG: Holzscheite, drei Flammenschichten, aufsteigende Funken, Glühen. */
-function lagerfeuer(profil, typ, notiz, jetzt) {
+/** Ein kurzer, respektvoller Satz von Brom – nie drängend. */
+function bromSpruch(offen, ist, typ, jetzt) {
+  const stunde = jetzt.getHours();
+  if (offen.length) return `„${offen[0].name}“ steht heute an. Der Amboss ist heiß, wenn du es bist.`;
+  if (stunde >= 17 && (ist.protein ?? 0) < typ.protein * 0.7) return 'Ein Schmied ohne Protein ist wie Eisen ohne Glut. Noch etwas Eiweiß heute?';
+  if (stunde < 11) return 'Guten Morgen. Ein Schluck Wasser zuerst – dann sehen wir weiter.';
+  return 'Ruhe gehört zur Arbeit. Die Glut hält auch ohne dich.';
+}
+
+function heldKachel(spiel) {
+  return el('a', { class: 'karte held-kachel', href: '#/held' },
+    el('div', { class: 'level-kreis klein' }, el('span', {}, 'Lvl'), el('strong', {}, String(spiel.level.level))),
+    el('div', { class: 'held-kachel-text' },
+      el('strong', {}, episch(spiel.klasse.episch, spiel.klasse.schlicht)),
+      el('div', { class: 'balken mini' }, el('div', { style: `width:${Math.round(spiel.level.anteil * 100)}%;background:var(--verlauf)` })),
+      el('span', { class: 'leise klein' }, spiel.raenge.gesamt ? `Rang: ${rangName(spiel.raenge.gesamt)}` : `${spiel.bewertungen.filter((b) => b.stufe >= 0).length} Erfolge`)),
+    rangEmblem(spiel.raenge.gesamt, 40));
+}
+
+function lagerfeuer(profil, typ, notiz, jetzt, spruch) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('viewBox', '0 0 360 190');
   svg.setAttribute('class', 'feuer-szene');
@@ -92,8 +120,10 @@ function lagerfeuer(profil, typ, notiz, jetzt) {
     </g>
     <g class="funken">${funken}</g>`;
 
+  const mitBrom = bromAn() && document.documentElement.dataset.stil !== 'schlicht';
   return el('section', { class: 'karte lagerfeuer' },
-    svg,
+    el('div', { class: 'feuer-buehne' }, svg, mitBrom ? el('div', { class: 'lager-brom' }, bromSvg(66)) : null),
+    mitBrom ? el('p', { class: 'brom-spruch' }, el('strong', {}, 'Brom: '), spruch) : null,
     el('div', { class: 'lager-text' },
       el('p', { class: 'lager-gruss' }, begruessung(profil)),
       el('p', { class: 'leise klein' }, datumFormat.format(jetzt)),

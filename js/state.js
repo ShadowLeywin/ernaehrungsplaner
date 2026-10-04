@@ -35,4 +35,11 @@ export async function holeTag(schluessel) {
 
 export const holeTage = (schluesselListe) => Promise.all(schluesselListe.map(holeTag));
 
-export const speichereTag = (tag) => schreibe('tage', tag.datum, tag);
+// Beobachter, z. B. für die Erfolgsprüfung (main.js registriert sie – vermeidet zyklische Importe)
+const beobachter = [];
+export const beiTagGespeichert = (fn) => beobachter.push(fn);
+
+export async function speichereTag(tag) {
+  await schreibe('tage', tag.datum, tag);
+  beobachter.forEach((fn) => fn(tag));
+}

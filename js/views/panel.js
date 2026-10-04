@@ -1,7 +1,8 @@
 // Einstellungs-Panel, das von unten hereinfährt. Wird vom Zahnrad oben rechts auf jeder Seite geöffnet.
-import { el, setze } from '../ui.js';
+import { el, setze, schalter } from '../ui.js';
 import { icon } from '../icons.js';
 import { THEMEN, MODI, STILE, ladeDarstellung, speichereDarstellung } from '../darstellung.js';
+import { bromAn, setzeBromAn } from './brom.js';
 
 export function oeffnePanel(titel, inhalt, beiSchliessen) {
   const dialog = el('dialog', { class: 'panel' });
@@ -59,6 +60,8 @@ export function schnellEinstellungen() {
   return el('div', {},
     el('h2', { class: 'abschnitt' }, 'Darstellung'),
     darstellungAuswahl(),
+    el('div', { style: 'margin-top:12px' },
+      schalter(bromAn(), setzeBromAn, 'Brom, der Herold', el('span', { class: 'leise klein' }, ' – verkündet Erfolge in der App (nie als Push-Nachricht)'))),
     el('div', { class: 'knopfreihe', style: 'margin-top:16px' },
       el('a', { class: 'knopf zweitrangig', href: '#/einstellungen' }, icon('einstellungen', 18), 'Profil & Ziele'),
       el('a', { class: 'knopf zweitrangig', href: '#/backup' }, icon('backup', 18), 'Backup')));

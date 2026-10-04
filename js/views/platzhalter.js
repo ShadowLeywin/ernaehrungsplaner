@@ -14,6 +14,12 @@ function platzhalter(titel, iconName, text, reiter) {
 }
 
 const MEHR = [
+  ['held', 'schild', 'Charakter', 'Werte, Level, Ränge'],
+  ['erfolge', 'pokal', 'Erfolge', 'Stufen & Geheimes'],
+  ['koerper', 'koerper', 'Körper', 'Muskeln & Übungen'],
+  ['freunde', 'freunde', 'Freunde', 'Rangkarten vergleichen'],
+  ['tagebuch', 'buch', 'Tagebuch', 'Chronik deiner Tage'],
+  ['fortschritt', 'hoch', 'Fortschritt', 'Rekorde & Verlauf'],
   ['gewicht', 'gewicht', 'Gewicht', 'Verlauf & Anpassung'],
   ['rezepte', 'rezepte', 'Rezepte', 'Kommt bald'],
   ['lebensmittel', 'lebensmittel', 'Lebensmittel', 'Nährwerte suchen'],
