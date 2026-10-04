@@ -1031,8 +1031,8 @@ input.offen { border-color: var(--warnung); background: color-mix(in oklab, var(
 /* ---------- Bild-Szene (KI-Artwork) ---------- */
 .lagerfeuer.mit-bild .lager-text { z-index: 2; background: linear-gradient(180deg, rgb(0 0 0 / 0.72), rgb(0 0 0 / 0.25) 70%, transparent); color: #fff4ec; padding-bottom: 28px; }
 .lagerfeuer.mit-bild .lager-text .leise { color: #e6d2c6; }
-.bild-szene { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: #0b0706; }
-.szene-hg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 40% 60%; animation: szene-atmen 18s ease-in-out infinite alternate; }
+.bild-szene { position: relative; aspect-ratio: 2 / 1; overflow: hidden; background: #0b0706; }
+.szene-hg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 40% 70%; animation: szene-atmen 18s ease-in-out infinite alternate; }
 @keyframes szene-atmen { from { transform: scale(1.02); } to { transform: scale(1.07) translate(-0.6%, -0.4%); } }
 .szene-licht {
   position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen;
@@ -1178,3 +1178,7 @@ input.offen { border-color: var(--warnung); background: color-mix(in oklab, var(
 .vorrat-filter { margin: 8px 0; }
 .vorrat-filter .chips { margin-top: 8px; }
 .duell { border-color: color-mix(in oklab, #ef4444 40%, var(--rand)); }
+
+.szene-brom.brom-stehend { height: 94%; right: 5%; bottom: -2%; filter: drop-shadow(-8px 0 16px rgb(255 140 50 / 0.35)) brightness(0.92) sepia(0.12); }
+/* Text über der Szene: oben kräftiger abdunkeln, damit er auf jedem Bild lesbar ist */
+.lagerfeuer.mit-bild .lager-text { background: linear-gradient(180deg, rgb(0 0 0 / 0.8), rgb(0 0 0 / 0.35) 75%, transparent); }

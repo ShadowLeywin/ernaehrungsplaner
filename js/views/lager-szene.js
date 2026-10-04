@@ -4,9 +4,11 @@
 import { findeBild } from '../bilder.js';
 import { bromSvg } from './brom-figur.js';
 
-// Wo im Hintergrundbild das Feuer sitzt (Anteil von Breite/Höhe) – passend zu den Prompts
-const FEUER_X = 0.42;
-const FEUER_Y = 0.72;
+// Wo im Hintergrundbild das Feuer sitzt (Anteil von Breite/Höhe, Mitte der Flammen) – je Szene vermessen
+const FEUER = {
+  1: [0.385, 0.66], 2: [0.42, 0.72], 3: [0.42, 0.66], 4: [0.381, 0.66], 5: [0.42, 0.72], 6: [0.42, 0.72],
+};
+const STANDARD_FEUER = [0.42, 0.72];
 
 // Plätze der Bauwerke in der Szene (links/unten/Breite in % der Szene), hinten zuerst
 const PLAETZE = {
@@ -41,7 +43,7 @@ async function bautenEbenen(bauten) {
 async function besteSzene(nr) {
   for (let i = nr; i >= 1; i -= 1) {
     const url = await findeBild(`lager/szene-${i}`);
-    if (url) return url;
+    if (url) return { url, nr: i };
   }
   return null;
 }
@@ -51,19 +53,29 @@ async function besteSzene(nr) {
  * optionen: { szeneNr, feuerIndex (0–5), mitBrom, bauten }
  */
 export async function zeigeBildSzene(buehne, { szeneNr, feuerIndex, mitBrom, bauten }) {
-  const hintergrund = await besteSzene(szeneNr);
-  if (!hintergrund || !buehne.isConnected) return false;
-  const bromBild = mitBrom ? await findeBild('brom/sitzend') : null;
+  const gefunden = await besteSzene(szeneNr);
+  if (!gefunden || !buehne.isConnected) return false;
+  // Brom: sitzend (Wunschbild), sonst stehend (freigestellt aus dem Charakterblatt), sonst Zeichnung
+  let bromBild = null;
+  let bromHaltung = null;
+  if (mitBrom) {
+    for (const haltung of ['sitzend', 'stehend']) {
+      bromBild = await findeBild(`brom/${haltung}`);
+      if (bromBild) { bromHaltung = haltung; break; }
+    }
+  }
+  const [feuerX, feuerY] = FEUER[gefunden.nr] ?? STANDARD_FEUER;
 
   const szene = document.createElement('div');
   szene.className = 'bild-szene';
   szene.dataset.feuer = String(feuerIndex);
-  szene.style.setProperty('--feuer-x', `${FEUER_X * 100}%`);
-  szene.style.setProperty('--feuer-y', `${FEUER_Y * 100}%`);
+  szene.dataset.szene = String(gefunden.nr);
+  szene.style.setProperty('--feuer-x', `${feuerX * 100}%`);
+  szene.style.setProperty('--feuer-y', `${feuerY * 100}%`);
 
   const hg = document.createElement('img');
   hg.className = 'szene-hg';
-  hg.src = hintergrund;
+  hg.src = gefunden.url;
   hg.alt = '';
   const licht = document.createElement('div');
   licht.className = 'szene-licht';
@@ -76,7 +88,7 @@ export async function zeigeBildSzene(buehne, { szeneNr, feuerIndex, mitBrom, bau
   if (mitBrom) {
     if (bromBild) {
       const brom = document.createElement('img');
-      brom.className = 'szene-brom';
+      brom.className = `szene-brom brom-${bromHaltung}`;
       brom.src = bromBild;
       brom.alt = 'Brom, der Schmied';
       const aura = document.createElement('div');
@@ -90,12 +102,12 @@ export async function zeigeBildSzene(buehne, { szeneNr, feuerIndex, mitBrom, bau
   }
   szene.append(vignette);
   buehne.replaceChildren(szene);
-  starteFunken(funken, feuerIndex);
+  starteFunken(funken, feuerIndex, feuerX, feuerY);
   return true;
 }
 
 /** Funken steigen aus dem Feuer auf; Anzahl und Höhe wachsen mit der Feuerstufe. */
-function starteFunken(canvas, feuerIndex) {
+function starteFunken(canvas, feuerIndex, feuerX, feuerY) {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const ctx = canvas.getContext('2d');
   const teilchen = [];
@@ -112,8 +124,8 @@ function starteFunken(canvas, feuerIndex) {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   };
   const neu = () => ({
-    x: breite * FEUER_X + (Math.random() - 0.5) * breite * 0.06,
-    y: hoehe * FEUER_Y,
+    x: breite * feuerX + (Math.random() - 0.5) * breite * 0.05,
+    y: hoehe * (feuerY + 0.04),
     vx: (Math.random() - 0.5) * 0.35,
     vy: -(0.5 + Math.random() * (0.6 + feuerIndex * 0.25)),
     leben: 0,
