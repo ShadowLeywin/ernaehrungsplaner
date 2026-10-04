@@ -2,6 +2,11 @@
 import { el, setze, zahl } from '../ui.js';
 import { holeLebensmittel, sucheLebensmittel } from '../lebensmittel.js';
 import { NAEHRSTOFFE, KATEGORIEN, istUnvollstaendig } from '../logic/naehrstoffe.js';
+import { icon } from '../icons.js';
+import { oeffneScanner } from './scanner.js';
+import { loescheEigenesLebensmittel } from '../off-abfrage.js';
+
+const QUELLEN = { usda_sr: 'USDA', off: 'Open Food Facts – mit Packung abgleichen', eigen: 'selbst angelegt', rezept: 'Rezept' };
 
 const GRUPPEN = { makro: 'Makronährstoffe', fett: 'Fettsäuren', vitamin: 'Vitamine', mineral: 'Mineralstoffe' };
 
@@ -39,7 +44,15 @@ function zeichne(wurzel, daten) {
     );
   };
 
-  setze(wurzel, el('div', { class: 'suchleiste' }, suche), liste);
+  const neu = () => holeLebensmittel().then((d) => zeichne(wurzel, d));
+  setze(wurzel,
+    el('div', { class: 'suchleiste' }, suche),
+    el('div', { class: 'chips', style: 'margin:10px 0' },
+      el('button', { class: 'chip', type: 'button', onclick: () => oeffneScanner('barcode', neu) }, icon('barcode', 16), 'Barcode'),
+      el('button', { class: 'chip', type: 'button', onclick: () => oeffneScanner('suche', neu) }, '🌐 Online / Marke'),
+      el('button', { class: 'chip', type: 'button', onclick: () => oeffneScanner('eigen', neu) }, icon('stift', 16), 'Selbst anlegen')),
+    liste);
+  eintragDetails.neu = neu;
   zeigeListe();
 }
 
@@ -53,7 +66,12 @@ function eintragDetails(l) {
       el('p', { class: 'leise klein' },
         'Je 100 g',
         l.stueckG ? ` · 1 Stück ≈ ${l.stueckG} g` : '',
-        ` · Quelle: ${l.quelle === 'usda_sr' ? 'USDA' : 'Richtwert, mit Packung abgleichen'}`),
+        l.marke ? ` · ${l.marke}` : '',
+        ` · Quelle: ${QUELLEN[l.quelle] ?? 'Richtwert, mit Packung abgleichen'}`),
+      l.quelle === 'off' || l.quelle === 'eigen' ? el('button', {
+        class: 'knopf-text gefahr', type: 'button',
+        onclick: async () => { await loescheEigenesLebensmittel(l.id); eintragDetails.neu?.(); },
+      }, 'Aus meinen Lebensmitteln entfernen') : null,
       istUnvollstaendig(w) ? el('p', { class: 'warnung klein' }, 'Mikronährstoffe unvollständig') : null,
       ...Object.entries(GRUPPEN).map(([gruppe, titel]) => naehrstoffTabelle(w, gruppe, titel))));
 }

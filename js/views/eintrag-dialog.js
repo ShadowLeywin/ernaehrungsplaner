@@ -4,6 +4,7 @@ import { icon } from '../icons.js';
 import { sucheLebensmittel } from '../lebensmittel.js';
 import { naehrwerteFuerMenge, KATEGORIEN } from '../logic/naehrstoffe.js';
 import { pruefeLebensmittel } from '../logic/ernaehrungsweise.js';
+import { oeffneScanner } from './scanner.js';
 
 /**
  * optionen: { lebensmittel, titel, eintrag?, beiSpeichern(lebensmittelId, gramm), beiLoeschen?,
@@ -63,7 +64,17 @@ export function oeffneEintragDialog(optionen) {
     }, 'Nur passende') : null;
     const hinweis = el('p', { class: 'leise klein', role: 'status' },
       optionen.beiOhneMenge ? 'Tipp: „+“ trägt ohne Menge ein – Mengen dann gesammelt im Mengen-Memo.' : '');
-    setze(dialog, kopf(optionen.titel), el('div', { class: 'dialog-inhalt' }, suche, filterKnopf ? el('div', { class: 'chips' }, filterKnopf) : null, hinweis, liste));
+    // Neues Lebensmittel von außen: gespeichert, in die Liste übernommen und direkt zur Mengenwahl
+    const vonAussen = (modus) => oeffneScanner(modus, (lm) => {
+      optionen.lebensmittel = [...optionen.lebensmittel.filter((l) => l.id !== lm.id), lm];
+      zeigeMenge(lm, lm.stueckG ?? 100);
+    });
+    const extern = el('div', { class: 'chips' },
+      el('button', { class: 'chip', type: 'button', onclick: () => vonAussen('barcode') }, icon('barcode', 16), 'Barcode'),
+      el('button', { class: 'chip', type: 'button', onclick: () => vonAussen('suche') }, '🌐 Online / Marke'),
+      el('button', { class: 'chip', type: 'button', onclick: () => vonAussen('eigen') }, icon('stift', 16), 'Selbst anlegen'),
+      filterKnopf);
+    setze(dialog, kopf(optionen.titel), el('div', { class: 'dialog-inhalt' }, suche, extern, hinweis, liste));
     zeigeTreffer();
     suche.focus();
   };
