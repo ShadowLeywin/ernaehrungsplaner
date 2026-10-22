@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "erstellt_am": "2026-10-19T10:55:11+02:00",
+  "erstellt_am": "2026-10-22T10:41:09+02:00",
   "kalenderwoche": "2026-W43",
   "zeitraum": {
     "von": "2026-10-19",
@@ -37,17 +37,6 @@
       ],
       "angebote": [
         {
-          "produkt": "Augencreme Q10",
-          "marke": "Jólea",
-          "preis": 1.95,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "drogerie",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
           "produkt": "Bio Nuss Nugat Creme",
           "marke": "Alnatura",
           "preis": 3.99,
@@ -59,31 +48,9 @@
           "gueltig_bis": "2026-10-24"
         },
         {
-          "produkt": "Bodylotion",
-          "marke": "Jólea",
-          "preis": 1.19,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "drogerie",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
           "produkt": "Deospray",
           "marke": "Dove",
           "preis": 1.99,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "drogerie",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
-          "produkt": "Deospray",
-          "marke": "Jólea",
-          "preis": 0.75,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -114,28 +81,6 @@
           "gueltig_bis": "2026-10-24"
         },
         {
-          "produkt": "Duschgel",
-          "marke": "Jólea",
-          "preis": 0.69,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "drogerie",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
-          "produkt": "Duschschaum",
-          "marke": "Jólea",
-          "preis": 2.49,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "drogerie",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
           "produkt": "Eigenmarken Adventskalender",
           "marke": "Netto",
           "preis": 49.9,
@@ -147,97 +92,9 @@
           "gueltig_bis": "2026-10-24"
         },
         {
-          "produkt": "Gesichtscreme Vital",
-          "marke": "Jólea",
-          "preis": 1.95,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "drogerie",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
-          "produkt": "Gesichtsmaske",
-          "marke": "Jólea",
-          "preis": 0.45,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "drogerie",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
-          "produkt": "Haarpflegespray",
-          "marke": "Jólea",
-          "preis": 2.49,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "drogerie",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
-          "produkt": "Haarspray",
-          "marke": "Jólea",
-          "preis": 1.49,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "drogerie",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
-          "produkt": "Handcreme",
-          "marke": "Jólea",
-          "preis": 0.7,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "drogerie",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
           "produkt": "Kombipack Toilettenpapier + Küchentücher",
           "marke": "Favora",
           "preis": 8.99,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "drogerie",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
-          "produkt": "Lippenpflegestift",
-          "marke": "Jólea",
-          "preis": 1.19,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "drogerie",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
-          "produkt": "Matt Paste",
-          "marke": "Jólea",
-          "preis": 1.79,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "drogerie",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
-          "produkt": "Men Rasierschaum",
-          "marke": "Jólea",
-          "preis": 0.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -257,28 +114,6 @@
           "gueltig_bis": "2026-10-24"
         },
         {
-          "produkt": "Mizellen Reinigungstücher",
-          "marke": "Jólea",
-          "preis": 1.29,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "drogerie",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
-          "produkt": "Pump Haarspray",
-          "marke": "Jólea",
-          "preis": 1.45,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "drogerie",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
           "produkt": "Reiniger",
           "marke": "Meister Proper",
           "preis": 2.29,
@@ -290,53 +125,9 @@
           "gueltig_bis": "2026-10-24"
         },
         {
-          "produkt": "Reinigungsmilch",
-          "marke": "Jólea",
-          "preis": 0.99,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "drogerie",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
-          "produkt": "Roll-on",
-          "marke": "Jólea",
-          "preis": 0.6,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "drogerie",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
-          "produkt": "Shampoo",
-          "marke": "Jólea",
-          "preis": 0.95,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "drogerie",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
           "produkt": "Shampoo",
           "marke": "Nivea",
           "preis": 2.49,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "drogerie",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
-          "produkt": "Vaseline",
-          "marke": "Jólea",
-          "preis": 1.29,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -818,6 +609,17 @@
           "gueltig_bis": "2026-10-24"
         },
         {
+          "produkt": "Pfirsich",
+          "marke": "Fuze Tea",
+          "preis": 1.29,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-18",
+          "gueltig_bis": "2026-10-24"
+        },
+        {
           "produkt": "Pils",
           "marke": "Beck's",
           "preis": 3.99,
@@ -986,6 +788,17 @@
           "produkt": "Spezi",
           "marke": "Paulaner",
           "preis": 7.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-18",
+          "gueltig_bis": "2026-10-24"
+        },
+        {
+          "produkt": "Spezialitäten Snack",
+          "marke": "Funny Frisch",
+          "preis": 1.29,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -1324,6 +1137,17 @@
           "gueltig_bis": "2026-10-24"
         },
         {
+          "produkt": "Blätterkrokant Kugeln",
+          "marke": "Santa Claus in Town",
+          "preis": 2.29,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-18",
+          "gueltig_bis": "2026-10-24"
+        },
+        {
           "produkt": "Broccoli",
           "marke": "Heimat",
           "preis": 1.29,
@@ -1391,8 +1215,8 @@
         },
         {
           "produkt": "Chips",
-          "marke": "Funny Frisch",
-          "preis": 1.11,
+          "marke": "Takis",
+          "preis": 2.29,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -1402,8 +1226,8 @@
         },
         {
           "produkt": "Chips",
-          "marke": "Takis",
-          "preis": 2.29,
+          "marke": "Funny Frisch",
+          "preis": 1.11,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -1489,6 +1313,17 @@
           "gueltig_bis": "2026-10-24"
         },
         {
+          "produkt": "Ecksofa Tokio",
+          "marke": "Möbel Punkt",
+          "preis": 649.0,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-18",
+          "gueltig_bis": "2026-10-24"
+        },
+        {
           "produkt": "Edelmarzipan-Praline",
           "marke": "Santa Claus in Town",
           "preis": 1.99,
@@ -1534,17 +1369,6 @@
         },
         {
           "produkt": "Erdnüsse",
-          "marke": "Clarky's",
-          "preis": 0.69,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "haushalt_nonfood",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
-          "produkt": "Erdnüsse",
           "marke": "thisisnobrand123",
           "preis": 1.99,
           "preis_ab": false,
@@ -1552,6 +1376,17 @@
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
           "gueltig_von": "2026-10-21",
+          "gueltig_bis": "2026-10-24"
+        },
+        {
+          "produkt": "Erdnüsse",
+          "marke": "Clarky's",
+          "preis": 0.69,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-18",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -1599,14 +1434,14 @@
           "gueltig_bis": "2026-10-24"
         },
         {
-          "produkt": "Flüssigseife",
-          "marke": "Jólea",
-          "preis": 0.65,
+          "produkt": "Flammkuchenteig vegan",
+          "marke": "Genuss Welt",
+          "preis": 1.19,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -1766,7 +1601,7 @@
         {
           "produkt": "Große Grabschale",
           "marke": "thisisnobrand123",
-          "preis": 9.99,
+          "preis": 11.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -1921,17 +1756,6 @@
           "produkt": "Kekse",
           "marke": "Milka",
           "preis": 1.99,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "haushalt_nonfood",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
-          "produkt": "KFZ-Verbandtasche",
-          "marke": "thisisnobrand123",
-          "preis": 3.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -2152,17 +1976,6 @@
           "produkt": "Mülleimer",
           "marke": "Priva",
           "preis": 4.99,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "haushalt_nonfood",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
-          "produkt": "Nagellack Entferner",
-          "marke": "Jólea",
-          "preis": 1.45,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -2799,7 +2612,7 @@
         },
         {
           "produkt": "Äpfel XXL",
-          "marke": "Heimat",
+          "marke": "thisisnobrand123",
           "preis": 2.29,
           "preis_ab": false,
           "streichpreis": null,
@@ -2944,6 +2757,17 @@
           "produkt": "Bio-Olivenöl",
           "marke": "Alnatura",
           "preis": 5.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-18",
+          "gueltig_bis": "2026-10-24"
+        },
+        {
+          "produkt": "Boxspringbett Leona",
+          "marke": "Juskys",
+          "preis": 599.0,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -3139,6 +2963,17 @@
           "gueltig_bis": "2026-10-24"
         },
         {
+          "produkt": "Erste-Hilfe-Reiseset",
+          "marke": "thisisnobrand123",
+          "preis": 2.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-18",
+          "gueltig_bis": "2026-10-24"
+        },
+        {
           "produkt": "Feinkostsalate",
           "marke": "Genuss Welt",
           "preis": 1.49,
@@ -3151,8 +2986,8 @@
         },
         {
           "produkt": "Feta",
-          "marke": "Olympus Dairy",
-          "preis": 2.22,
+          "marke": "Zeus",
+          "preis": 2.69,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -3162,8 +2997,8 @@
         },
         {
           "produkt": "Feta",
-          "marke": "Zeus",
-          "preis": 2.69,
+          "marke": "Olympus Dairy",
+          "preis": 2.22,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -3469,9 +3304,31 @@
           "gueltig_bis": "2026-10-24"
         },
         {
+          "produkt": "K-Noodles",
+          "marke": "Namdong",
+          "preis": 1.19,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-18",
+          "gueltig_bis": "2026-10-24"
+        },
+        {
           "produkt": "Kaiserbrötchen",
           "marke": "Netto Backstube",
           "preis": 1.0,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-18",
+          "gueltig_bis": "2026-10-24"
+        },
+        {
+          "produkt": "Kinderbett Naya",
+          "marke": "Juskys",
+          "preis": 129.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -3581,7 +3438,7 @@
         {
           "produkt": "Milch-Schnitte",
           "marke": "Ferrero",
-          "preis": 2.49,
+          "preis": 2.69,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -5282,17 +5139,6 @@
           "gueltig_bis": "2026-10-24"
         },
         {
-          "produkt": "Adventskalender Lindt",
-          "marke": "Edeka",
-          "preis": 9.99,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "haushalt_nonfood",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
           "produkt": "Arrangement Allerheiligen",
           "marke": "thisisnobrand123",
           "preis": 14.99,
@@ -5516,6 +5362,17 @@
           "produkt": "Doppelkorn",
           "marke": "Echter Nordhäuser",
           "preis": 5.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-18",
+          "gueltig_bis": "2026-10-24"
+        },
+        {
+          "produkt": "Edeka Adventskalender",
+          "marke": "Lindt",
+          "preis": 9.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -7394,7 +7251,7 @@
           "gueltig_bis": "2026-10-24"
         },
         {
-          "produkt": "Oatly Fiber+Max Balance Whey Protein",
+          "produkt": "Oatly Fiber+Max Balance Whey Protein Vanilla",
           "marke": "thisisnobrand123",
           "preis": 12.99,
           "preis_ab": false,
@@ -8430,17 +8287,6 @@
           "gueltig_bis": "2026-10-24"
         },
         {
-          "produkt": "Damen Thermostrumpfhose",
-          "marke": "Esmara",
-          "preis": 5.49,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "getraenke",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
           "produkt": "Die Limo",
           "marke": "Granini",
           "preis": 1.29,
@@ -8900,6 +8746,17 @@
           "rabatt_prozent": null,
           "kategorie": "getraenke",
           "gueltig_von": "2026-10-10",
+          "gueltig_bis": "2026-10-24"
+        },
+        {
+          "produkt": "Thermo-Strumpfhose",
+          "marke": "Esmara",
+          "preis": 5.49,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-18",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -9444,7 +9301,7 @@
         {
           "produkt": "Birnen",
           "marke": "thisisnobrand123",
-          "preis": 2.22,
+          "preis": 1.95,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -9543,7 +9400,7 @@
         {
           "produkt": "Chinakohl",
           "marke": "thisisnobrand123",
-          "preis": 0.99,
+          "preis": 0.95,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -12988,7 +12845,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "drogerie",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -12999,7 +12856,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "drogerie",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -13879,7 +13736,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "getraenke",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -13956,7 +13813,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "getraenke",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -14066,7 +13923,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "getraenke",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -14488,17 +14345,6 @@
           "gueltig_bis": "2026-10-24"
         },
         {
-          "produkt": "2-Minuten-Rotkohl",
-          "marke": "Kühne",
-          "preis": 1.79,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "haushalt_nonfood",
-          "gueltig_von": "2026-10-18",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
           "produkt": "Adblue",
           "marke": "K-Classic",
           "preis": 4.99,
@@ -14561,7 +14407,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -14869,7 +14715,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -15001,7 +14847,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -15012,7 +14858,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -15463,7 +15309,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -15474,7 +15320,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -15485,7 +15331,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -15969,7 +15815,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -16244,7 +16090,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -16501,6 +16347,17 @@
           "gueltig_bis": "2026-10-24"
         },
         {
+          "produkt": "2-Minuten-Rotkohl",
+          "marke": "Kühne",
+          "preis": 1.79,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-18",
+          "gueltig_bis": "2026-10-24"
+        },
+        {
           "produkt": "Activia",
           "marke": "Danone",
           "preis": 1.49,
@@ -16530,7 +16387,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -16673,7 +16530,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -16706,7 +16563,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -16739,7 +16596,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -16783,7 +16640,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -16827,7 +16684,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -16875,17 +16732,6 @@
           "gueltig_bis": "2026-10-24"
         },
         {
-          "produkt": "Filetsteak",
-          "marke": "K-Purland",
-          "preis": 6.99,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "lebensmittel",
-          "gueltig_von": "2026-10-21",
-          "gueltig_bis": "2026-10-24"
-        },
-        {
           "produkt": "Finello Geriebener Käse",
           "marke": "Arla",
           "preis": 1.29,
@@ -16893,7 +16739,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -16981,7 +16827,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -17047,7 +16893,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -17091,7 +16937,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -17146,7 +16992,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -17212,7 +17058,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -17295,7 +17141,7 @@
         {
           "produkt": "Kräuter",
           "marke": "Frosta",
-          "preis": 2.67,
+          "preis": 0.89,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -17355,7 +17201,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -17652,7 +17498,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -17779,7 +17625,7 @@
         {
           "produkt": "Soße",
           "marke": "Knorr",
-          "preis": 5.97,
+          "preis": 1.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -17817,7 +17663,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
-          "gueltig_von": "2026-10-18",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
@@ -17917,6 +17763,17 @@
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
           "gueltig_von": "2026-10-18",
+          "gueltig_bis": "2026-10-24"
+        },
+        {
+          "produkt": "Wertschätze  Filetsteak",
+          "marke": "K-Purland",
+          "preis": 6.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-21",
           "gueltig_bis": "2026-10-24"
         },
         {
