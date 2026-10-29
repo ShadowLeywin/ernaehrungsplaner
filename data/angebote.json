@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "erstellt_am": "2026-10-26T09:57:41+01:00",
+  "erstellt_am": "2026-10-29T11:02:55+01:00",
   "kalenderwoche": "2026-W44",
   "zeitraum": {
     "von": "2026-10-26",
@@ -395,6 +395,17 @@
         },
         {
           "produkt": "Energy Drink",
+          "marke": "Monster Energy",
+          "preis": 0.88,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Energy Drink",
           "marke": "Booster",
           "preis": 1.0,
           "preis_ab": false,
@@ -403,17 +414,6 @@
           "kategorie": "getraenke",
           "gueltig_von": "2026-10-25",
           "gueltig_bis": "2026-10-31"
-        },
-        {
-          "produkt": "Energy Drink",
-          "marke": "Monster Energy",
-          "preis": 0.88,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "getraenke",
-          "gueltig_von": "2026-10-27",
-          "gueltig_bis": "2026-10-30"
         },
         {
           "produkt": "Gelee-Spezialitäten",
@@ -505,17 +505,6 @@
         },
         {
           "produkt": "Mineralwasser",
-          "marke": "Vitrex",
-          "preis": 1.0,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "getraenke",
-          "gueltig_von": "2026-10-25",
-          "gueltig_bis": "2026-10-31"
-        },
-        {
-          "produkt": "Mineralwasser",
           "marke": "Witaquelle",
           "preis": 3.99,
           "preis_ab": false,
@@ -529,6 +518,17 @@
           "produkt": "Mineralwasser",
           "marke": "Evian",
           "preis": 0.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Mineralwasser",
+          "marke": "Vitrex",
+          "preis": 1.0,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -797,8 +797,8 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "getraenke",
-          "gueltig_von": "2026-10-27",
-          "gueltig_bis": "2026-10-30"
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
         },
         {
           "produkt": "Säfte",
@@ -1193,8 +1193,8 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
-          "gueltig_von": "2026-10-27",
-          "gueltig_bis": "2026-10-30"
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
         },
         {
           "produkt": "Cup Noodles",
@@ -1952,8 +1952,8 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
-          "gueltig_von": "2026-10-27",
-          "gueltig_bis": "2026-10-30"
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
         },
         {
           "produkt": "Metall Aufbewahrungsbox Limani",
@@ -4075,8 +4075,8 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
-          "gueltig_von": "2026-10-27",
-          "gueltig_bis": "2026-10-30"
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
         },
         {
           "produkt": "Weihnachtliches Backzubehör",
@@ -10857,7 +10857,7 @@
         {
           "produkt": "Pak Choi",
           "marke": "thisisnobrand123",
-          "preis": 1.19,
+          "preis": 0.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -11363,7 +11363,7 @@
         {
           "produkt": "Veganes Hack",
           "marke": "Vemondo",
-          "preis": 1.79,
+          "preis": 1.69,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -12628,7 +12628,7 @@
         {
           "produkt": "Süßkartoffeln",
           "marke": "thisisnobrand123",
-          "preis": 1.69,
+          "preis": 1.49,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -12814,14 +12814,14 @@
           "gueltig_bis": "2026-11-07"
         },
         {
-          "titel": "Angebote 2026-10-28 bis 2026-10-30",
-          "gueltig_von": "2026-10-28",
-          "gueltig_bis": "2026-10-30"
-        },
-        {
           "titel": "Angebote 2026-10-28 bis 2026-10-31",
           "gueltig_von": "2026-10-28",
           "gueltig_bis": "2026-10-31"
+        },
+        {
+          "titel": "Angebote 2026-10-28 bis 2026-11-07",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-11-07"
         }
       ],
       "angebote": [
@@ -13068,6 +13068,17 @@
           "gueltig_bis": "2026-11-07"
         },
         {
+          "produkt": "Doppelkeks",
+          "marke": "Oreo",
+          "preis": 0.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "drogerie",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Duschgel",
           "marke": "Palmolive",
           "preis": 0.88,
@@ -13088,6 +13099,17 @@
           "kategorie": "drogerie",
           "gueltig_von": "2026-10-25",
           "gueltig_bis": "2026-11-07"
+        },
+        {
+          "produkt": "Feuchtes Toilettenpapier",
+          "marke": "K-Classic",
+          "preis": 0.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "drogerie",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
         },
         {
           "produkt": "Feuchtigskeitspflegecreme",
@@ -13176,6 +13198,17 @@
           "kategorie": "drogerie",
           "gueltig_von": "2026-10-25",
           "gueltig_bis": "2026-11-07"
+        },
+        {
+          "produkt": "Haarbürsten",
+          "marke": "thisisnobrand123",
+          "preis": 1.0,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "drogerie",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
         },
         {
           "produkt": "Haarglätter 02618",
@@ -13318,7 +13351,18 @@
           "rabatt_prozent": null,
           "kategorie": "drogerie",
           "gueltig_von": "2026-10-28",
-          "gueltig_bis": "2026-10-30"
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Lammfell-Einlegesohlen",
+          "marke": "thisisnobrand123",
+          "preis": 3.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "drogerie",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
         },
         {
           "produkt": "Lilla-Toilettenpapier",
@@ -13464,6 +13508,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Paprikacreme",
+          "marke": "Univer",
+          "preis": 1.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "drogerie",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Permanente Coloration",
           "marke": "Syoss",
           "preis": 4.79,
@@ -13593,7 +13648,7 @@
           "rabatt_prozent": null,
           "kategorie": "drogerie",
           "gueltig_von": "2026-10-28",
-          "gueltig_bis": "2026-10-30"
+          "gueltig_bis": "2026-10-31"
         },
         {
           "produkt": "Slipeinlagen",
@@ -13610,6 +13665,17 @@
           "produkt": "Spülmaschinen-Tabs",
           "marke": "Finish",
           "preis": 11.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "drogerie",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Spülschüssel",
+          "marke": "thisisnobrand123",
+          "preis": 2.0,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -13687,6 +13753,17 @@
           "produkt": "Vollwaschmittel",
           "marke": "Weißer Riese",
           "preis": 11.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "drogerie",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Vollwaschmittel Caps",
+          "marke": "K-Classic",
+          "preis": 3.69,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -13794,6 +13871,17 @@
           "gueltig_bis": "2026-11-07"
         },
         {
+          "produkt": "Zimmerbesen",
+          "marke": "thisisnobrand123",
+          "preis": 2.0,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "drogerie",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Aloe Vera Erfrischungsgetränk",
           "marke": "A'Luna",
           "preis": 0.99,
@@ -13852,6 +13940,17 @@
           "produkt": "BellaCrema",
           "marke": "Melitta",
           "preis": 10.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Bier",
+          "marke": "Budweiser Budvar (CZ)",
+          "preis": 13.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -13959,9 +14058,31 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Caffè Latte Mr. Big XXL",
+          "marke": "Emmi",
+          "preis": 2.22,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Classic",
           "marke": "Karamalz",
           "preis": 4.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Coco-Fleur",
+          "marke": "Henry Lambertz",
+          "preis": 0.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -13989,6 +14110,39 @@
           "rabatt_prozent": null,
           "kategorie": "getraenke",
           "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Damen Kuschelsocken Coca-Cola",
+          "marke": "thisisnobrand123",
+          "preis": 2.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Damen Thermo-Leggings",
+          "marke": "Esmara",
+          "preis": 2.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Damen-Feinstrumpfhose",
+          "marke": "Esmara",
+          "preis": 2.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-28",
           "gueltig_bis": "2026-10-31"
         },
         {
@@ -14124,6 +14278,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Goiss",
+          "marke": "Härtsfelder",
+          "preis": 15.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Gold",
           "marke": "Jacobs",
           "preis": 6.99,
@@ -14234,6 +14399,28 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Herren Retroshorts Coca Cola 3 Stück",
+          "marke": "thisisnobrand123",
+          "preis": 6.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Herren-Weihnachtspullover Coca-Cola",
+          "marke": "thisisnobrand123",
+          "preis": 9.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Heumilch Bergkäse",
           "marke": "Salzburg Milch",
           "preis": 2.49,
@@ -14259,6 +14446,17 @@
           "produkt": "Honigschinken",
           "marke": "Nothwang",
           "preis": 1.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Hundenahrung",
+          "marke": "K-Classic",
+          "preis": 1.29,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -14312,8 +14510,41 @@
         },
         {
           "produkt": "Kaffeepads",
+          "marke": "K-Classic",
+          "preis": 1.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Kaffeepads",
           "marke": "Senseo",
           "preis": 2.22,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Kaffeevollautomat ECAM290.51.B",
+          "marke": "DeLonghi",
+          "preis": 299.0,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Kaffeezubereiter",
+          "marke": "Paris Hilton",
+          "preis": 14.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -14325,6 +14556,17 @@
           "produkt": "Kaiserbraten",
           "marke": "K-Purland",
           "preis": 6.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Kapselkaffeemaschine Tassimo Style TAS112E",
+          "marke": "Bosch",
+          "preis": 29.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -14402,6 +14644,28 @@
           "produkt": "Mineralwasser",
           "marke": "Gerolsteiner",
           "preis": 0.89,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Mineralwasser",
+          "marke": "Aspacher Kloster Quelle",
+          "preis": 3.79,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Mineralwasser",
+          "marke": "Krumbach",
+          "preis": 4.49,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -14509,6 +14773,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Orginal Hell",
+          "marke": "Unterbaarer Bier",
+          "preis": 12.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Original Bacon Scheiben",
           "marke": "Tulip",
           "preis": 1.49,
@@ -14534,6 +14809,17 @@
           "produkt": "Party-Minis Adventskalender",
           "marke": "Gräfs",
           "preis": 9.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-30"
+        },
+        {
+          "produkt": "Pelmeni",
+          "marke": "Dymow",
+          "preis": 4.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -14578,6 +14864,17 @@
           "produkt": "Premium Lager",
           "marke": "Heineken",
           "preis": 4.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Premium Pils",
+          "marke": "Tyskie",
+          "preis": 13.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -14751,6 +15048,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Schweden Pils",
+          "marke": "Schwarzbräu",
+          "preis": 12.49,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Schweine-Tomahawk-Steak",
           "marke": "Willms",
           "preis": 4.99,
@@ -14869,7 +15177,7 @@
           "rabatt_prozent": null,
           "kategorie": "getraenke",
           "gueltig_von": "2026-10-25",
-          "gueltig_bis": "2026-10-31"
+          "gueltig_bis": "2026-10-30"
         },
         {
           "produkt": "Sticks",
@@ -14912,7 +15220,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "getraenke",
-          "gueltig_von": "2026-10-25",
+          "gueltig_von": "2026-10-28",
           "gueltig_bis": "2026-10-31"
         },
         {
@@ -14982,6 +15290,28 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Wasserfilter DLS C002",
+          "marke": "DeLonghi",
+          "preis": 7.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Wasserkocher SWKE 3100",
+          "marke": "SilverCrest",
+          "preis": 19.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Weihnachtsmarkt Adventskalender",
           "marke": "Lindt",
           "preis": 6.99,
@@ -14990,7 +15320,7 @@
           "rabatt_prozent": null,
           "kategorie": "getraenke",
           "gueltig_von": "2026-10-25",
-          "gueltig_bis": "2026-10-31"
+          "gueltig_bis": "2026-10-30"
         },
         {
           "produkt": "Whiskey-Likör",
@@ -15048,6 +15378,28 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "3-in-1-Power Nutri-Mixer CB350EU",
+          "marke": "Ninja-Kitchen",
+          "preis": 149.0,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "5 Minuten Terrine",
+          "marke": "Maggi",
+          "preis": 1.19,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Adventskalender Exit-Das Spiel",
           "marke": "Kosmos",
           "preis": 19.99,
@@ -15056,7 +15408,7 @@
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
           "gueltig_von": "2026-10-25",
-          "gueltig_bis": "2026-10-31"
+          "gueltig_bis": "2026-10-30"
         },
         {
           "produkt": "Adventskalender Grinch",
@@ -15092,6 +15444,39 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Alkaline Batterien",
+          "marke": "Energizer",
+          "preis": 3.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Arbeitshandschuhe",
+          "marke": "thisisnobrand123",
+          "preis": 1.0,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Aufbewahrungskorb Diamond",
+          "marke": "thisisnobrand123",
+          "preis": 2.0,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Aufstrich",
           "marke": "Argeta",
           "preis": 0.99,
@@ -15117,6 +15502,17 @@
           "produkt": "Bad Lufterfrischer",
           "marke": "Febreze",
           "preis": 4.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Badeschwamm",
+          "marke": "thisisnobrand123",
+          "preis": 1.0,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -15268,6 +15664,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Cheftimer",
+          "marke": "thisisnobrand123",
+          "preis": 3.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Choco Smoki Flips",
           "marke": "Stark",
           "preis": 1.49,
@@ -15290,6 +15697,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Comtess Kuchen",
+          "marke": "Bahlsen",
+          "preis": 1.79,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Crunchips",
           "marke": "Lorenz",
           "preis": 0.88,
@@ -15297,7 +15715,29 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
-          "gueltig_von": "2026-10-25",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Damen Boots",
+          "marke": "Esmara",
+          "preis": 19.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Damen-Overkneestrümpfe",
+          "marke": "Esmara",
+          "preis": 2.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
           "gueltig_bis": "2026-10-31"
         },
         {
@@ -15326,6 +15766,61 @@
           "produkt": "Deluxe-Adventskalender One Piece",
           "marke": "thisisnobrand123",
           "preis": 34.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Digitale Löffelwaage",
+          "marke": "SilverCrest",
+          "preis": 4.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Dragees",
+          "marke": "Tic Tac",
+          "preis": 1.49,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Edelstahl-Hackmesser",
+          "marke": "SilverCrest",
+          "preis": 2.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Edelstahlbräter 2-tlg.",
+          "marke": "SilverCrest",
+          "preis": 39.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Edelstahlmesser",
+          "marke": "SilverCrest",
+          "preis": 2.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -15389,6 +15884,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Familienplaner XXL- 2026",
+          "marke": "thisisnobrand123",
+          "preis": 4.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Feinschmecker Suppen vegan",
           "marke": "Knorr",
           "preis": 0.79,
@@ -15411,6 +15917,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Fertiglesebrille",
+          "marke": "thisisnobrand123",
+          "preis": 1.0,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Fix",
           "marke": "Knorr",
           "preis": 0.44,
@@ -15422,9 +15939,31 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Flamingoblume im Keramik- Übertopf",
+          "marke": "thisisnobrand123",
+          "preis": 12.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Flotte Biene Wildblütenhonig",
           "marke": "Langnese",
           "preis": 4.44,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Folienrollen",
+          "marke": "SilverCrest",
+          "preis": 2.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -15444,6 +15983,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Funk-Wetterstation 40918",
+          "marke": "Mebus",
+          "preis": 14.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Gefrierbeutel",
           "marke": "Pely",
           "preis": 0.99,
@@ -15458,6 +16008,17 @@
           "produkt": "Gefüllte Schoko-Kugeln",
           "marke": "K-Winter",
           "preis": 1.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Geschenkpapier",
+          "marke": "Crelando",
+          "preis": 1.49,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -15488,6 +16049,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Grillsauce",
+          "marke": "K-Classic",
+          "preis": 0.79,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Grüne Oliven",
           "marke": "thisisnobrand123",
           "preis": 0.99,
@@ -15510,6 +16082,39 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Herbstheide",
+          "marke": "thisisnobrand123",
+          "preis": 0.88,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Herren Schnürstiefel",
+          "marke": "Esmara",
+          "preis": 17.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Herren Thermo-Socken 2 Paar",
+          "marke": "Esmara",
+          "preis": 2.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Himbeeren",
           "marke": "Driscoll's",
           "preis": 1.79,
@@ -15521,9 +16126,31 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Hochwertiges Frittieröl",
+          "marke": "K-Classic",
+          "preis": 3.33,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Hundenahrung",
           "marke": "Josera",
           "preis": 0.88,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Hüpftier",
+          "marke": "Lupilu",
+          "preis": 9.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -15565,6 +16192,28 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Kalanchoe",
+          "marke": "thisisnobrand123",
+          "preis": 1.79,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Katzengras",
+          "marke": "thisisnobrand123",
+          "preis": 2.49,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Katzennahrung",
           "marke": "Whiskas",
           "preis": 13.79,
@@ -15579,6 +16228,28 @@
           "produkt": "Kaubonbons",
           "marke": "Mentos",
           "preis": 1.29,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Kaufladen-Zubehör",
+          "marke": "Lupilu",
+          "preis": 39.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Kessel Chips",
+          "marke": "Funny Frisch",
+          "preis": 1.49,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -15609,6 +16280,28 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Kinder-SOS-Smartwatch 70900",
+          "marke": "Mebus",
+          "preis": 17.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-11-07"
+        },
+        {
+          "produkt": "Kinder-Stiefel",
+          "marke": "Esmara",
+          "preis": 4.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Kitkat Tafel",
           "marke": "Nestlé",
           "preis": 1.29,
@@ -15631,6 +16324,39 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Klebefilme-Pack",
+          "marke": "thisisnobrand123",
+          "preis": 1.0,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Kleiderbügel",
+          "marke": "thisisnobrand123",
+          "preis": 2.0,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Knopfzellen",
+          "marke": "Varta",
+          "preis": 2.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Knoppers Goodies",
           "marke": "Storck",
           "preis": 1.79,
@@ -15639,6 +16365,28 @@
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
           "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Konfitüre Extra",
+          "marke": "Schwartau",
+          "preis": 1.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Korolewskij Mayonnaise",
+          "marke": "Smak",
+          "preis": 1.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
           "gueltig_bis": "2026-10-31"
         },
         {
@@ -15686,6 +16434,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Kuscheldecke",
+          "marke": "Otto Kern",
+          "preis": 9.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Küchenpapier",
           "marke": "The Papermakers",
           "preis": 3.33,
@@ -15694,7 +16453,18 @@
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
           "gueltig_von": "2026-10-28",
-          "gueltig_bis": "2026-10-30"
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Küchenzubehör-Set",
+          "marke": "Lupilu",
+          "preis": 6.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
         },
         {
           "produkt": "Kürbis",
@@ -15730,6 +16500,50 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Ladegerät 201902",
+          "marke": "Hama",
+          "preis": 24.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Ladegerät 201960",
+          "marke": "Hama",
+          "preis": 7.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Ladegerät 201961",
+          "marke": "Hama",
+          "preis": 12.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Langplaner",
+          "marke": "thisisnobrand123",
+          "preis": 1.4,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Lauchzwiebeln",
           "marke": "thisisnobrand123",
           "preis": 0.49,
@@ -15738,6 +16552,17 @@
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
           "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "LED-Taschenlampe",
+          "marke": "Ansmann",
+          "preis": 4.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
           "gueltig_bis": "2026-10-31"
         },
         {
@@ -15771,6 +16596,17 @@
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
           "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Mako-Satin-Kissenhüllen",
+          "marke": "Otto Kern",
+          "preis": 7.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
           "gueltig_bis": "2026-10-31"
         },
         {
@@ -15818,6 +16654,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Memospiel",
+          "marke": "Lupilu",
+          "preis": 3.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Merci Finest Selection",
           "marke": "Storck",
           "preis": 5.99,
@@ -15848,6 +16695,61 @@
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
           "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Messer-Set mit Schere 4-tlg.",
+          "marke": "Paris Hilton",
+          "preis": 19.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "microSDXC-Karte MR955",
+          "marke": "MediaRange",
+          "preis": 8.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Mikrofaser Badteppich",
+          "marke": "Otto Kern",
+          "preis": 12.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Mikrofaser-Bademantel",
+          "marke": "Otto Kern",
+          "preis": 14.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Mond-Streifenkalender",
+          "marke": "thisisnobrand123",
+          "preis": 1.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
           "gueltig_bis": "2026-10-31"
         },
         {
@@ -15936,7 +16838,7 @@
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
           "gueltig_von": "2026-10-28",
-          "gueltig_bis": "2026-10-30"
+          "gueltig_bis": "2026-10-31"
         },
         {
           "produkt": "Orangen",
@@ -15964,6 +16866,17 @@
           "produkt": "Party-Box",
           "marke": "Haribo",
           "preis": 3.69,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Pastasauce",
+          "marke": "K-Classic",
+          "preis": 1.19,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -16002,6 +16915,17 @@
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
           "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Powerbank",
+          "marke": "Hama",
+          "preis": 12.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
           "gueltig_bis": "2026-10-31"
         },
         {
@@ -16093,6 +17017,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Santokumesser",
+          "marke": "Paris Hilton",
+          "preis": 6.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Satsumas",
           "marke": "thisisnobrand123",
           "preis": 2.49,
@@ -16126,6 +17061,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Scheren-Set",
+          "marke": "thisisnobrand123",
+          "preis": 2.0,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Schlagsahne",
           "marke": "K-Classic",
           "preis": 0.77,
@@ -16134,6 +17080,28 @@
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
           "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Schminktisch",
+          "marke": "Lupilu",
+          "preis": 39.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Schneidebrett",
+          "marke": "Paris Hilton",
+          "preis": 9.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
           "gueltig_bis": "2026-10-31"
         },
         {
@@ -16170,9 +17138,53 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Schwarzwälder Schinken XXL",
+          "marke": "K-Classic",
+          "preis": 2.49,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Sekundenkleber",
+          "marke": "thisisnobrand123",
+          "preis": 2.0,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Sonnenblumenkerne",
           "marke": "Monarch",
           "preis": 1.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "SoundbarHW- B410GF/ZG",
+          "marke": "Samsung",
+          "preis": 74.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Spielküche",
+          "marke": "Lupilu",
+          "preis": 39.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -16192,6 +17204,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Sprühflasche",
+          "marke": "thisisnobrand123",
+          "preis": 1.0,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Star Wars  Adventskalender 75456",
           "marke": "LEGO",
           "preis": 24.99,
@@ -16200,6 +17223,17 @@
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
           "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Stirnlampe HD70B",
+          "marke": "Ansmann",
+          "preis": 4.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
           "gueltig_bis": "2026-10-31"
         },
         {
@@ -16225,6 +17259,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Tablett",
+          "marke": "thisisnobrand123",
+          "preis": 1.0,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Tafelapfel",
           "marke": "thisisnobrand123",
           "preis": 0.99,
@@ -16236,9 +17281,119 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Tassen",
+          "marke": "Paris Hilton",
+          "preis": 7.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Tischquerkalender",
+          "marke": "thisisnobrand123",
+          "preis": 4.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Tortilla-Chips",
+          "marke": "K-Classic",
+          "preis": 1.09,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Trinkflasche",
+          "marke": "Paris Hilton",
+          "preis": 19.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "TV-Wandhalterung WM2451",
+          "marke": "OneForAll",
+          "preis": 17.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "TWS-In-Ear-Kopfhörer",
+          "marke": "Grundig",
+          "preis": 7.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "UHD-Smart-TV GU58U8079HUXZG",
+          "marke": "Samsung",
+          "preis": 399.0,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Ultra-Klumpstreu XXL",
           "marke": "K-Classic",
           "preis": 3.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "USB-Ladekabel",
+          "marke": "Fontastic",
+          "preis": 3.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "USB-Stick",
+          "marke": "MediaRange",
+          "preis": 8.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Vakuumierer SV 125",
+          "marke": "SilverCrest",
+          "preis": 17.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -16255,6 +17410,17 @@
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
           "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Wandplander",
+          "marke": "thisisnobrand123",
+          "preis": 1.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
           "gueltig_bis": "2026-10-31"
         },
         {
@@ -16288,7 +17454,7 @@
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
           "gueltig_von": "2026-10-25",
-          "gueltig_bis": "2026-10-31"
+          "gueltig_bis": "2026-10-30"
         },
         {
           "produkt": "Winterglück Waffeln",
@@ -16299,6 +17465,39 @@
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
           "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Wochentimer",
+          "marke": "thisisnobrand123",
+          "preis": 3.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Wärmeplüschtier",
+          "marke": "thisisnobrand123",
+          "preis": 4.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Würze XXL",
+          "marke": "Maggi",
+          "preis": 3.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-10-28",
           "gueltig_bis": "2026-10-31"
         },
         {
@@ -16354,7 +17553,7 @@
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
           "gueltig_von": "2026-10-25",
-          "gueltig_bis": "2026-10-31"
+          "gueltig_bis": "2026-10-30"
         },
         {
           "produkt": "Adventskalender mit Bio-Snacks",
@@ -16365,7 +17564,7 @@
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
           "gueltig_von": "2026-10-25",
-          "gueltig_bis": "2026-10-31"
+          "gueltig_bis": "2026-10-30"
         },
         {
           "produkt": "Allgäuer Emmentaler",
@@ -16387,6 +17586,17 @@
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
           "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Alpenveilchen",
+          "marke": "thisisnobrand123",
+          "preis": 2.49,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-28",
           "gueltig_bis": "2026-10-31"
         },
         {
@@ -16434,6 +17644,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Beerenmischung XXL",
+          "marke": "K-Classic",
+          "preis": 3.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Bergfex",
           "marke": "Schärdinger",
           "preis": 1.49,
@@ -16467,9 +17688,31 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Bio Pommes Frites",
+          "marke": "K-Bio",
+          "preis": 1.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Bio Popcorn",
           "marke": "Heimatgut",
           "preis": 1.39,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Bio Rusti Vegan",
+          "marke": "Slooow",
+          "preis": 2.29,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -16486,7 +17729,7 @@
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
           "gueltig_von": "2026-10-25",
-          "gueltig_bis": "2026-10-30"
+          "gueltig_bis": "2026-10-31"
         },
         {
           "produkt": "Bio-Dinkel-Nudeln",
@@ -16508,7 +17751,18 @@
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
           "gueltig_von": "2026-10-25",
-          "gueltig_bis": "2026-10-30"
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Blinys",
+          "marke": "Dovgan",
+          "preis": 2.69,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
         },
         {
           "produkt": "Brötchen zum Selberbacken",
@@ -16577,6 +17831,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Chicken Nuggets XXL",
+          "marke": "K-Classic",
+          "preis": 1.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Chicken Wings XXL",
           "marke": "Sprehe",
           "preis": 4.29,
@@ -16585,6 +17850,39 @@
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
           "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Chrysanthemen",
+          "marke": "thisisnobrand123",
+          "preis": 1.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Chrysanthemen",
+          "marke": "thisisnobrand123",
+          "preis": 2.29,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Chrysanthemen Mix Strauß",
+          "marke": "thisisnobrand123",
+          "preis": 3.79,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-28",
           "gueltig_bis": "2026-10-31"
         },
         {
@@ -16621,6 +17919,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Dekochrysanthemen",
+          "marke": "thisisnobrand123",
+          "preis": 3.49,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Die Ofenfrische Pizza",
           "marke": "Dr. Oetker",
           "preis": 1.79,
@@ -16646,6 +17955,17 @@
           "produkt": "Eclair Schoko-Vanille",
           "marke": "Kaufland Bäckerei",
           "preis": 0.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Edelstahl-Pfanne",
+          "marke": "SilverCrest",
+          "preis": 17.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -16706,6 +18026,28 @@
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
           "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Fertiggericht",
+          "marke": "Frosta",
+          "preis": 2.22,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Fertiggerichte",
+          "marke": "Frosta",
+          "preis": 2.22,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-28",
           "gueltig_bis": "2026-10-31"
         },
         {
@@ -16816,6 +18158,17 @@
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
           "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Frottier-Handtuch",
+          "marke": "Otto Kern",
+          "preis": 6.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-28",
           "gueltig_bis": "2026-10-31"
         },
         {
@@ -16940,6 +18293,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Holz-Spielzeug",
+          "marke": "Lupilu",
+          "preis": 3.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Hundesnack",
           "marke": "Dokas",
           "preis": 3.99,
@@ -16970,6 +18334,17 @@
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
           "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Jersey-Spannbetttuch",
+          "marke": "Otto Kern",
+          "preis": 9.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-28",
           "gueltig_bis": "2026-10-31"
         },
         {
@@ -17025,7 +18400,7 @@
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
           "gueltig_von": "2026-10-25",
-          "gueltig_bis": "2026-10-31"
+          "gueltig_bis": "2026-10-30"
         },
         {
           "produkt": "Knoppers Milch-Haselnuss-Schnitte",
@@ -17094,6 +18469,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Lachsfilet XXL",
+          "marke": "K-Classic",
+          "preis": 7.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Lammnackenkarree",
           "marke": "K-Favourites",
           "preis": 12.49,
@@ -17138,6 +18524,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Mako-Satin Bettwäsche Set",
+          "marke": "Otto Kern",
+          "preis": 19.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Maultaschen",
           "marke": "Bürger",
           "preis": 1.49,
@@ -17146,6 +18543,17 @@
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
           "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Mobiler Backofen SBM 2250",
+          "marke": "SilverCrest",
+          "preis": 79.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-25",
           "gueltig_bis": "2026-10-31"
         },
         {
@@ -17193,6 +18601,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Müsli",
+          "marke": "Kölln",
+          "preis": 2.29,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Nimm2 Lachgummi",
           "marke": "Storck",
           "preis": 1.59,
@@ -17223,6 +18642,17 @@
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
           "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Orchidee",
+          "marke": "thisisnobrand123",
+          "preis": 10.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-28",
           "gueltig_bis": "2026-10-31"
         },
         {
@@ -17479,6 +18909,28 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Seelachs-Portionsfilet XXL",
+          "marke": "K-Classic",
+          "preis": 5.49,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Spargelstangen",
+          "marke": "K-Classic",
+          "preis": 1.59,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Speisekartoffeln",
           "marke": "thisisnobrand123",
           "preis": 0.79,
@@ -17493,6 +18945,17 @@
           "produkt": "Speisekartoffeln",
           "marke": "thisisnobrand123",
           "preis": 2.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Spritzgebäck",
+          "marke": "K-Classic",
+          "preis": 1.59,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -17567,6 +19030,17 @@
           "gueltig_bis": "2026-10-31"
         },
         {
+          "produkt": "Unsere Goldstücke XXL",
+          "marke": "Coppenrath & Wiese",
+          "preis": 2.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-28",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
           "produkt": "Veganer Brotaufstrich",
           "marke": "NOA",
           "preis": 1.89,
@@ -17586,12 +19060,23 @@
           "rabatt_prozent": null,
           "kategorie": "lebensmittel",
           "gueltig_von": "2026-10-25",
-          "gueltig_bis": "2026-10-30"
+          "gueltig_bis": "2026-10-31"
         },
         {
           "produkt": "Veganes Wurstersatzprodukt",
           "marke": "Rügenwalder Mühle",
           "preis": 1.79,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-10-25",
+          "gueltig_bis": "2026-10-31"
+        },
+        {
+          "produkt": "Vegeta Würzmischung mit Gemüse",
+          "marke": "Podravka",
+          "preis": 2.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
