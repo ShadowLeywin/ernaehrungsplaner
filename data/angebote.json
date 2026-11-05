@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "erstellt_am": "2026-11-02T12:10:00+01:00",
+  "erstellt_am": "2026-11-05T12:00:34+01:00",
   "kalenderwoche": "2026-W45",
   "zeitraum": {
     "von": "2026-11-02",
@@ -994,6 +994,17 @@
           "gueltig_bis": "2026-11-07"
         },
         {
+          "produkt": "Allzweckmüllbeutel",
+          "marke": "Priva",
+          "preis": 1.49,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-01",
+          "gueltig_bis": "2026-11-07"
+        },
+        {
           "produkt": "Alufolie",
           "marke": "Priva",
           "preis": 1.75,
@@ -1247,6 +1258,28 @@
           "gueltig_bis": "2026-11-07"
         },
         {
+          "produkt": "Cheez It Snap'd",
+          "marke": "Kellogg's",
+          "preis": 1.79,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-01",
+          "gueltig_bis": "2026-11-07"
+        },
+        {
+          "produkt": "Chicken-Nuggets",
+          "marke": "Hofmaier",
+          "preis": 1.59,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-01",
+          "gueltig_bis": "2026-11-07"
+        },
+        {
           "produkt": "Christmas LED Balkonvorhang",
           "marke": "Dekor",
           "preis": 14.99,
@@ -1412,6 +1445,17 @@
           "gueltig_bis": "2026-11-07"
         },
         {
+          "produkt": "Freshmatic Nachfüller",
+          "marke": "Airwick",
+          "preis": 8.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-01",
+          "gueltig_bis": "2026-11-07"
+        },
+        {
           "produkt": "Frikadellen",
           "marke": "Hofmaier",
           "preis": 2.99,
@@ -1464,6 +1508,17 @@
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
           "gueltig_von": "2026-11-01",
+          "gueltig_bis": "2026-11-07"
+        },
+        {
+          "produkt": "Großköpfige Hochland Rosen",
+          "marke": "thisisnobrand123",
+          "preis": 4.44,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-04",
           "gueltig_bis": "2026-11-07"
         },
         {
@@ -1731,6 +1786,17 @@
           "gueltig_bis": "2026-11-07"
         },
         {
+          "produkt": "Kokosraspel",
+          "marke": "Backfee",
+          "preis": 1.19,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-01",
+          "gueltig_bis": "2026-11-07"
+        },
+        {
           "produkt": "Konfitüre",
           "marke": "Bonne Maman",
           "preis": 1.99,
@@ -1907,9 +1973,31 @@
           "gueltig_bis": "2026-11-07"
         },
         {
+          "produkt": "Magic Moments Kleine Winterfreuden",
+          "marke": "Trendhaus",
+          "preis": 2.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-01",
+          "gueltig_bis": "2026-11-07"
+        },
+        {
           "produkt": "Maker Kit Programmieren lernen mit KI",
           "marke": "Franzis",
           "preis": 39.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-01",
+          "gueltig_bis": "2026-11-07"
+        },
+        {
+          "produkt": "Mandeln",
+          "marke": "Backfee",
+          "preis": 1.25,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -2040,17 +2128,6 @@
         },
         {
           "produkt": "Pfefferbeißer",
-          "marke": "Chiemgauer Fleisch & Wurstwaren",
-          "preis": 2.99,
-          "preis_ab": false,
-          "streichpreis": null,
-          "rabatt_prozent": null,
-          "kategorie": "haushalt_nonfood",
-          "gueltig_von": "2026-11-04",
-          "gueltig_bis": "2026-11-07"
-        },
-        {
-          "produkt": "Pfefferbeißer",
           "marke": "Hofmaier",
           "preis": 1.49,
           "preis_ab": false,
@@ -2058,6 +2135,17 @@
           "rabatt_prozent": null,
           "kategorie": "haushalt_nonfood",
           "gueltig_von": "2026-11-01",
+          "gueltig_bis": "2026-11-07"
+        },
+        {
+          "produkt": "Pfefferbeißer",
+          "marke": "Chiemgauer Fleisch & Wurstwaren",
+          "preis": 2.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-04",
           "gueltig_bis": "2026-11-07"
         },
         {
@@ -2086,6 +2174,17 @@
           "produkt": "Pizza Margherita",
           "marke": "Netto Backstube",
           "preis": 0.79,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-01",
+          "gueltig_bis": "2026-11-07"
+        },
+        {
+          "produkt": "Premium Fertiggericht",
+          "marke": "Genuss Welt",
+          "preis": 2.69,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -2303,6 +2402,28 @@
           "gueltig_bis": "2026-11-07"
         },
         {
+          "produkt": "Vegetarische Schnitzel",
+          "marke": "Valess",
+          "preis": 2.49,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-04",
+          "gueltig_bis": "2026-11-07"
+        },
+        {
+          "produkt": "Walnusskerne",
+          "marke": "Backfee",
+          "preis": 2.49,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-01",
+          "gueltig_bis": "2026-11-07"
+        },
+        {
           "produkt": "Weihnachts-Bärchen",
           "marke": "Santa Claus in Town",
           "preis": 1.49,
@@ -2372,6 +2493,28 @@
           "produkt": "Wärmekissen",
           "marke": "Dekor",
           "preis": 6.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-01",
+          "gueltig_bis": "2026-11-07"
+        },
+        {
+          "produkt": "Wärmepflaster",
+          "marke": "SOS",
+          "preis": 3.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-01",
+          "gueltig_bis": "2026-11-07"
+        },
+        {
+          "produkt": "Wärmeplaster",
+          "marke": "TerraTherm",
+          "preis": 4.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -2820,6 +2963,17 @@
           "gueltig_bis": "2026-11-07"
         },
         {
+          "produkt": "Geflügel-Frikadellenbällchen",
+          "marke": "Hofmaier",
+          "preis": 2.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-11-01",
+          "gueltig_bis": "2026-11-07"
+        },
+        {
           "produkt": "Geflügelsalami",
           "marke": "Bille",
           "preis": 1.29,
@@ -3049,6 +3203,17 @@
           "kategorie": "lebensmittel",
           "gueltig_von": "2026-11-01",
           "gueltig_bis": "2026-11-07"
+        },
+        {
+          "produkt": "Junge Ente küchenfertig",
+          "marke": "thisisnobrand123",
+          "preis": 4.49,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-11-05",
+          "gueltig_bis": "2026-11-06"
         },
         {
           "produkt": "Katzennahrung",
@@ -3406,6 +3571,17 @@
           "produkt": "Pfirsiche Halbe Frucht",
           "marke": "Beste Ernte",
           "preis": 20.0,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-11-01",
+          "gueltig_bis": "2026-11-07"
+        },
+        {
+          "produkt": "Pflanzliche Leberkäse Art Vegan",
+          "marke": "Greenforce",
+          "preis": 2.49,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -8507,6 +8683,17 @@
           "gueltig_bis": "2026-11-14"
         },
         {
+          "produkt": "Highland Peated Single Malt Scotch Whisky 20 Jahre",
+          "marke": "Ben Bracken",
+          "preis": 54.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-31",
+          "gueltig_bis": "2026-11-14"
+        },
+        {
           "produkt": "Highland Single Grain Scotch Whisky 18 Jahre",
           "marke": "The Targe",
           "preis": 34.99,
@@ -8540,6 +8727,17 @@
           "gueltig_bis": "2026-11-07"
         },
         {
+          "produkt": "Highland Single Malt Scotch Whisky Peated & Smoky 17 Jahre",
+          "marke": "Ben Bracken",
+          "preis": 47.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-31",
+          "gueltig_bis": "2026-11-14"
+        },
+        {
           "produkt": "Identità Primitivo di Manduria",
           "marke": "thisisnobrand123",
           "preis": 6.99,
@@ -8549,6 +8747,17 @@
           "kategorie": "getraenke",
           "gueltig_von": "2026-10-24",
           "gueltig_bis": "2026-11-07"
+        },
+        {
+          "produkt": "Islay Single Malt Scotch Whisky 18 Jahre",
+          "marke": "Ben Bracken",
+          "preis": 64.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-31",
+          "gueltig_bis": "2026-11-14"
         },
         {
           "produkt": "Jo Bio Rosé-Cuvée",
@@ -8923,6 +9132,17 @@
           "kategorie": "getraenke",
           "gueltig_von": "2026-10-24",
           "gueltig_bis": "2026-11-07"
+        },
+        {
+          "produkt": "Speyside Single Malt Scotch Whisky 27Y",
+          "marke": "Ben Bracken",
+          "preis": 69.99,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-10-31",
+          "gueltig_bis": "2026-11-14"
         },
         {
           "produkt": "Spezialitäten Snack",
@@ -9972,7 +10192,7 @@
         {
           "produkt": "Grapefruit",
           "marke": "thisisnobrand123",
-          "preis": 0.59,
+          "preis": 0.45,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -11072,7 +11292,7 @@
         {
           "produkt": "Pilates-Reformer",
           "marke": "Crivit",
-          "preis": 120.0,
+          "preis": 111.0,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -11127,7 +11347,7 @@
         {
           "produkt": "Porree",
           "marke": "thisisnobrand123",
-          "preis": 0.49,
+          "preis": 0.45,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -13989,7 +14209,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "getraenke",
-          "gueltig_von": "2026-11-01",
+          "gueltig_von": "2026-11-04",
           "gueltig_bis": "2026-11-07"
         },
         {
@@ -14242,7 +14462,7 @@
           "streichpreis": null,
           "rabatt_prozent": null,
           "kategorie": "getraenke",
-          "gueltig_von": "2026-11-01",
+          "gueltig_von": "2026-11-04",
           "gueltig_bis": "2026-11-07"
         },
         {
@@ -17458,9 +17678,9 @@
           "gueltig_bis": "2026-11-07"
         },
         {
-          "produkt": "Hähnchen-Schenkel XXL",
+          "produkt": "Hähnchen-Ministeaks",
           "marke": "K-Purland",
-          "preis": 5.99,
+          "preis": 3.79,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -17469,9 +17689,9 @@
           "gueltig_bis": "2026-11-07"
         },
         {
-          "produkt": "Hähnchenbrust-Innenfilet",
+          "produkt": "Hähnchen-Schenkel XXL",
           "marke": "K-Purland",
-          "preis": 3.79,
+          "preis": 5.99,
           "preis_ab": false,
           "streichpreis": null,
           "rabatt_prozent": null,
@@ -18421,9 +18641,334 @@
       "haendler": "dm-drogerie markt",
       "ort": "Lauingen (Donau)",
       "quelle": "https://www.marktguru.de/r/dm",
-      "fehler": "Keine Angebote bei marktguru gefunden",
-      "prospekte": [],
-      "angebote": []
+      "prospekte": [
+        {
+          "titel": "Angebote 2026-11-03 bis 2026-11-24",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        }
+      ],
+      "angebote": [
+        {
+          "produkt": "Beauty Longevity Tagesfluid",
+          "marke": "Balea",
+          "preis": 7.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "drogerie",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Creme Ölbad",
+          "marke": "Fenjal",
+          "preis": 3.65,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "drogerie",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Fußcreme",
+          "marke": "Balea",
+          "preis": 0.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "drogerie",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Handcreme",
+          "marke": "Balea",
+          "preis": 0.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "drogerie",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Handcreme Blush Harmony",
+          "marke": "Balea",
+          "preis": 0.45,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "drogerie",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Nagelpflegeöl Aprikosenkern-Öl & Sanddornextrakt",
+          "marke": "Alverde Naturkosmetik",
+          "preis": 2.45,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "drogerie",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Schaumbad Milch & Honig",
+          "marke": "Balea",
+          "preis": 1.25,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "drogerie",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Totes Meer Badesalz",
+          "marke": "Mivolis",
+          "preis": 2.65,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "drogerie",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Wohlfühl Schaumbad",
+          "marke": "SauBär",
+          "preis": 0.85,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "drogerie",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Bio 7 Tage Shot Ingwer Kurkuma",
+          "marke": "dmBio",
+          "preis": 2.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Bio Wintertee",
+          "marke": "dmBio",
+          "preis": 1.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Immun Smoothie",
+          "marke": "Mivolis",
+          "preis": 0.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Ingwer & Kurkuma Shot",
+          "marke": "Voelkel",
+          "preis": 1.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "getraenke",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Batterien Power Alkaline Mignon AA",
+          "marke": "Paradies",
+          "preis": 2.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Duftkerze",
+          "marke": "dm home",
+          "preis": 7.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Foto Lichterkette",
+          "marke": "Paradies",
+          "preis": 5.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Geschenkset Sweet Cranberry",
+          "marke": "Alverde Naturkosmetik",
+          "preis": 3.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Geschenkset Warm Wishes",
+          "marke": "Alverde Naturkosmetik",
+          "preis": 3.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Kaugummi Immun",
+          "marke": "ZOHI",
+          "preis": 1.35,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Papiertüten",
+          "marke": "Profissimo",
+          "preis": 2.25,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Pastateller",
+          "marke": "thisisnobrand123",
+          "preis": 7.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Raumduft Apfel-Zimt",
+          "marke": "Profissimo",
+          "preis": 2.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Serviette Wünsch Dir Was",
+          "marke": "Profissimo",
+          "preis": 0.85,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "VoltaHeat Wärmepflaster",
+          "marke": "Voltaren",
+          "preis": 6.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "haushalt_nonfood",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Auflaufform",
+          "marke": "thisisnobrand123",
+          "preis": 14.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Bio Fertiggericht  Butter Chicken Curry",
+          "marke": "Tressbrüder",
+          "preis": 2.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Lip Butter",
+          "marke": "Alverde Naturkosmetik",
+          "preis": 3.25,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Protein Cookie",
+          "marke": "Sportness",
+          "preis": 0.95,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        },
+        {
+          "produkt": "Protein Riegel",
+          "marke": "Sportness",
+          "preis": 0.85,
+          "preis_ab": false,
+          "streichpreis": null,
+          "rabatt_prozent": null,
+          "kategorie": "lebensmittel",
+          "gueltig_von": "2026-11-03",
+          "gueltig_bis": "2026-11-24"
+        }
+      ]
     }
   ]
 }
