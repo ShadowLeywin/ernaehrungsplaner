@@ -9,3 +9,6 @@ backup-*.json
 
 # Werkzeuge
 node_modules/
+
+# Backups der App (enthalten persönliche Daten)
+elan-backup-*.json

@@ -1,0 +1,12 @@
+{
+  "name": "elan",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Nur für Tests und Werkzeuge. Die App selbst braucht keinen Build-Schritt und keine Abhängigkeiten.",
+  "scripts": {
+    "test": "node --test",
+    "start": "node tools/server.cjs",
+    "pruefen": "node tools/pruefe-app.cjs"
+  }
+}
