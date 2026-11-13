@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="de" data-modus="hell">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="theme-color" content="#f5f9ec">
+  <meta name="description" content="Elan: Ernährung und Health-Daten im Blick. Offline, alle Daten bleiben auf deinem Gerät.">
+  <title>Elan</title>
+  <script>
+    // Hell oder dunkel sofort setzen, damit beim Start nichts aufblitzt (gleiche Logik wie js/darstellung.js)
+    try {
+      var m = localStorage.getItem('elan.darstellung') || 'system';
+      var dunkel = m === 'dunkel' || (m !== 'hell' && matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.dataset.modus = dunkel ? 'dunkel' : 'hell';
+    } catch (e) { /* Standard bleibt hell */ }
+  </script>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="preload" href="./schrift/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="./css/app.css">
+  <script type="module" src="./js/main.js"></script>
+</head>
+<body>
+  <span id="offline" class="offline" hidden>offline</span>
+
+  <main id="inhalt" class="inhalt">
+    <noscript>Elan braucht JavaScript.</noscript>
+  </main>
+
+  <div id="hinweis" class="hinweis-ort" role="status" aria-live="polite"></div>
+
+  <nav class="navigation" aria-label="Hauptnavigation">
+    <a href="#/heute" data-route="heute">
+      <span class="nav-bild"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/></svg></span>
+      Heute
+    </a>
+    <a href="#/zutaten" data-route="zutaten">
+      <span class="nav-bild"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c0-8 5-14 14-14 0 9-6 14-14 14zM5 19l8-8"/></svg></span>
+      Zutaten
+    </a>
+    <a href="#/mehr" data-route="mehr">
+      <span class="nav-bild"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9M15 5v4M9 15v4"/></svg></span>
+      Mehr
+    </a>
+  </nav>
+</body>
+</html>
