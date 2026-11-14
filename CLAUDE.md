@@ -26,6 +26,8 @@ Regeln und Wissen für jede Claude-Session in diesem Repo. Erst lesen, dann arbe
 | Zielwerte | neutrale Startwerte im Code, alles in der App einstellbar |
 | Netz | nur auf ausdrücklichen Knopfdruck (Open Food Facts). Der Import ruft keine fremden Seiten ab |
 | Name | „Elan“ steht nur in `js/logik/schema.js`, `manifest.webmanifest`, `index.html` |
+| Version | bleibt 1.0.0, bis Léon zufrieden ist. Jede sichtbare Änderung bekommt trotzdem einen Eintrag in `js/daten/neuigkeiten.js` (Was ist neu) |
+| Design | ruhige Karten auf hellem Grund, Einstellungen als gruppiertes Menü mit Unterseiten, Eintragen mit möglichst wenigen Tipps |
 
 ## Arbeitsschleife (jede Runde)
 
@@ -74,7 +76,7 @@ Léon kann mehrere Runden am Stück freigeben („mach durch bis …“). Dann d
 | `js/speicher.js` | Datenzugriff für die Ansichten |
 | `js/ansichten/` | je Seite eine Datei, baut DOM-Elemente |
 | `js/ui.js` | `el`, `svg`, `haenge`, `blatt`, `hinweis`, `bestaetige`, `feld` |
-| `js/router.js` | Hash-Router (`#/heute`, `#/woche`, `#/rezepte`, `#/health`, `#/mehr`; `#/zutaten` ohne eigenen Platz in der Leiste) |
+| `js/router.js` | Hash-Router (`#/heute`, `#/woche`, `#/rezepte`, `#/health`, `#/mehr/<unterseite>`, `#/willkommen`; `#/zutaten` ohne eigenen Platz in der Leiste) |
 | `sw.js` | Service Worker, Cache zuerst |
 | `data/zutaten-basis.json` | mitgelieferte Zutaten, nur lesen |
 | `test/` | Unit-Tests und Beispieldaten |
@@ -82,6 +84,9 @@ Léon kann mehrere Runden am Stück freigeben („mach durch bis …“). Dann d
 | `android/` | Android-Projekt (Capacitor); `www/` entsteht beim Bau |
 | `js/plattform.js` | Datei geben, Text teilen, JSON holen: im Browser und in der App |
 | `data/referenzwerte.json` | Referenzwerte der DGE mit Quelle und Abrufdatum |
+| `js/daten/neuigkeiten.js` | Patchnotes und Funktionsliste für „Was ist neu“ und „Über Elan“ |
+| `js/ansichten/willkommen.js` | Ersteinrichtung beim ersten Start (Gerät merkt sich `elan.eingerichtet`) |
+| `.github/workflows/apk.yml` | baut das APK auf GitHub, Release bei hinterlegtem Schlüssel |
 
 ## Konventionen
 
@@ -100,7 +105,8 @@ Léon kann mehrere Runden am Stück freigeben („mach durch bis …“). Dann d
 1. `VERSION` in `sw.js` erhöhen, sonst sehen installierte Geräte die Änderung nicht.
 2. Neue Dateien in `DATEIEN` in `sw.js` eintragen (`test/projekt.test.js` prüft das).
 3. Datenmodell geändert: `SCHEMA_VERSION` erhöhen, Migration in `js/db.js` anhängen, Backup-Migration in `js/logik/backup.js` ergänzen, `docs/DATENMODELL.md` nachziehen.
-4. Neue Fassung: `APP_VERSION` in `js/logik/schema.js` und `version` in `package.json` gleich setzen. Sie bestimmt auch die Version des APK.
+4. Neue Fassung: `APP_VERSION` in `js/logik/schema.js` und `version` in `package.json` gleich setzen, nur mit Léons Freigabe. Sie bestimmt den Namen des APK; der `versionCode` zählt Commits.
+5. Sichtbare Änderung: Eintrag in `js/daten/neuigkeiten.js` ergänzen.
 
 ## Befehle
 

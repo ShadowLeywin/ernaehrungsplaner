@@ -38,6 +38,24 @@ export const STANDARD_WOCHE = ['gym', 'calisthenics', 'gym', 'calisthenics', 'gy
 
 const istTagestyp = (id) => TAGESTYPEN.some((t) => t.id === id);
 
+/**
+ * Ein Ziel auf eine neue Energiemenge umrechnen: Eiweiß bleibt, Kohlenhydrate und Fett teilen sich
+ * den Rest im bisherigen Verhältnis ihrer Energie. Ballaststoffe bleiben. Ergebnis auf ganze Gramm gerundet.
+ */
+export function skaliereZiel(ziel, kcal) {
+  const ausEiweiss = 4 * ziel.protein;
+  const rest = Math.max(0, kcal - ausEiweiss);
+  const khKcal = 4 * ziel.kh;
+  const fettKcal = 9 * ziel.fett;
+  const anteilKh = khKcal + fettKcal > 0 ? khKcal / (khKcal + fettKcal) : 0.6;
+  return {
+    ...ziel,
+    kcal,
+    kh: Math.round((rest * anteilKh) / 4),
+    fett: Math.round((rest * (1 - anteilKh)) / 9),
+  };
+}
+
 /** Gespeicherte Ziele mit den Startwerten auffüllen; ungültige Zahlen fallen auf den Startwert zurück. */
 export function bereinigeZiele(roh) {
   const ziele = {};

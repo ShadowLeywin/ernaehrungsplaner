@@ -39,6 +39,17 @@ export function sucheZutaten(zutaten, begriff, limit = 60) {
   return treffer.slice(0, limit).map((t) => t.zutat);
 }
 
+/**
+ * Zuletzt eingetragen, mit der Menge vom letzten Mal: Map zutatId → Gramm.
+ * Wer morgens immer 80 g Haferflocken isst, braucht so nur noch einen Tipp.
+ */
+export function letzteMengen(eintraege) {
+  const mengen = new Map();
+  const sortiert = [...eintraege].sort((a, b) => String(b.erstellt).localeCompare(String(a.erstellt)));
+  for (const e of sortiert) if (e.zutatId && e.gramm > 0 && !mengen.has(e.zutatId)) mengen.set(e.zutatId, e.gramm);
+  return mengen;
+}
+
 /** Die zuletzt eingetragenen Zutaten, jede nur einmal, neueste zuerst. */
 export function zuletztVerwendet(eintraege, limit = 8) {
   const gesehen = new Set();

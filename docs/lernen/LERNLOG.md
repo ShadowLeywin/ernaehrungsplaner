@@ -162,3 +162,14 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Fehler im Test:** `getAttribute('open')` liefert bei offenem Bereich eine leere Zeichenkette, die in JavaScript als „falsch“ gilt. Lösung: auf `=== null` prüfen. Zweimal zuvor: Testschritte in falscher Reihenfolge nach einem Umbau.
 - **Fachbegriffe:** APK, Capacitor, Signierschlüssel, versionCode, Intent-Filter, Edge-to-Edge, Drosselung (Rate Limit).
 - **Zum Auftrag:** Geholfen hat die klare Ansage „als APK“. Widerspruch zur alten Entscheidung „PWA statt APK“ ist damit von dir aufgehoben; beides läuft jetzt aus einem Code.
+
+## Session 13, Runde 1: Aufbau und Design nach Vorbildern (14.11.2026)
+
+- **Was und warum:** Recherche, wie gute Ernährungs-Apps aufgebaut sind: wenig Tipps beim Eintragen, kurze Einrichtung, Einstellungen in Gruppen. Umgesetzt: Menü „Mehr“ mit Unterseiten, „Über Elan“, „Was ist neu“, Eintragen mit einem Tipp, Wasser auf „Heute“, Ersteinrichtung, Karten-Design. Dazu der automatische APK-Bau auf GitHub (Léons Ja).
+- **Befehle:** `git rev-list --count HEAD` (zählt Commits, wird zur Baunummer im versionCode) · `node tools/pruefe-app.cjs` (jetzt 115 Kriterien).
+- **Entscheidung:** Version bleibt 1.0.0 (Léons Wunsch), der versionCode zählt trotzdem hoch. Verworfen: gleichen versionCode behalten; manche Android-Versionen verweigern dann das Update.
+- **Entscheidung 2:** Eintragen mit einem Tipp nimmt die Menge vom letzten Mal und bietet Rückgängig statt einer Rückfrage. Eine Bestätigung kostete wieder einen Tipp.
+- **Entscheidung 3:** Die Ersteinrichtung merkt sich das Gerät (localStorage), nicht das Backup; wer Daten hat, sieht sie nicht.
+- **Fehler:** Der Hauptknopf der Einrichtung lag auf kleinen Handys unter dem Rand. Aufgefallen im Bild, nicht im Test. Lösung: Knöpfe unten festheften. Im Test: `seite.url()` endet ohne `#` nicht auf `#/heute`; Prüfung auf „nicht willkommen“ umgestellt.
+- **Fachbegriffe:** Onboarding, Reibung (Friction), Informationsarchitektur, `position: sticky`, Baunummer.
+- **Zum Auftrag:** Geholfen hat „vor allem Design und Struktur“. Gefehlt haben Beispiele, welche Apps du gut findest; ich habe mich an MacroFactor, Cronometer und den Android-Richtlinien orientiert.

@@ -403,6 +403,49 @@ input[type='time'] { appearance: none; -webkit-appearance: none; }
   .segment-voll, .blatt[open] { animation: none; }
 }
 
+.zeile-schnell { display: flex; align-items: center; gap: 0.5rem; padding-right: 0.625rem; }
+.zeile-schnell > .zeile { flex: 1; min-width: 0; padding-right: 0; }
+.chip.schnell { background: var(--limette-blass); border-color: transparent; color: var(--blatt); font-weight: 700; white-space: nowrap; }
+
+/* ---------- Karten: ruhige Flächen statt Linien ---------- */
+
+.karte, .uebersicht { padding: 1.125rem 1rem; border-radius: 1.25rem; background: var(--flaeche); }
+.uebersicht { padding-top: 1.25rem; }
+.wasser-kopf { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; }
+.wasser-kopf h2 { font-size: 1.0625rem; }
+.wasser-stand { color: var(--tinte-leise); font-size: 0.9375rem; }
+.wasser-karte > * + * { margin-top: 0.625rem; }
+.wasser-karte .balken { display: block; }
+.wasser-karte .balken-voll { background: var(--heidelbeere); transition: width 0.25s ease-out; }
+
+.slots { display: grid; gap: 0.75rem; }
+.slot { padding: 0.875rem 1rem; border-top: 0; border-radius: 1.25rem; background: var(--flaeche); }
+.slot .eintraege { margin-top: 0.375rem; background: transparent; border-radius: 0; }
+.slot .eintraege li { border-top: 1px solid var(--linie); }
+.slot .eintrag { padding-left: 0; padding-right: 0; }
+.slot .rund.plus { background: var(--limette); color: #14241a; }
+
+/* ---------- Ersteinrichtung ---------- */
+
+body:has(.seite-willkommen) .navigation { display: none; }
+.willkommen { padding-top: 0.75rem; }
+.willkommen h1 { font-size: 2rem; }
+.willkommen .gross { font-size: 1.125rem; line-height: 1.5; }
+.schritt-punkte { display: flex; gap: 0.375rem; }
+.schritt-punkte span { width: 2rem; height: 0.375rem; border-radius: 999px; background: var(--linie); }
+.schritt-punkte span.an { background: var(--blatt); }
+.vorteile { display: grid; gap: 0.625rem; }
+.vorteile li { padding: 0.875rem 1rem; border-radius: 1rem; background: var(--flaeche); }
+.vorteile li { font-size: 0.9375rem; padding: 0.75rem 1rem; }
+.willkommen h1 { font-size: 1.75rem; }
+/* Die Knöpfe bleiben unten sichtbar, egal wie lang der Text ist; Hauptknopf oben */
+.willkommen .knopfreihe {
+  position: sticky; bottom: 0; flex-direction: column-reverse; align-items: stretch;
+  margin-top: 1rem; padding: 1.25rem 0 calc(1rem + var(--rand-bottom));
+  background: linear-gradient(to bottom, transparent, var(--papier) 1.25rem);
+}
+.willkommen .knopfreihe .knopf { width: 100%; }
+
 /* ---------- Mehr: Menü und Unterseiten ---------- */
 
 .menuegruppe { margin-top: 1.5rem !important; }

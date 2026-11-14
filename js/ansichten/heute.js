@@ -24,10 +24,11 @@ export async function zeigeHeute(wurzel, [parameter]) {
   const heute = isoDatum();
   const datum = istGueltig(parameter) ? parameter : heute;
   const woche = wochenTage(datum);
-  const [eintraege, ziele, wochenplan, tag, slots, wochenEintraege, vortag, plan, letztesBackup, anzahlEintraege, referenz] = await Promise.all([
+  const [eintraege, ziele, wochenplan, tag, slots, wochenEintraege, vortag, plan, letztesBackup, anzahlEintraege, referenz, wasserHeute, gesundheit] = await Promise.all([
     speicher.eintraegeAm(datum), speicher.ladeZiele(), speicher.ladeWoche(), speicher.holeTag(datum), speicher.ladeSlots(),
     speicher.eintraegeZwischen(woche[0], woche[6]), speicher.eintraegeAm(verschiebe(datum, -1)), speicher.planAm(datum),
     speicher.einstellung('letztesBackup'), speicher.anzahlEintraege(), speicher.ladeReferenz(),
+    speicher.messungenZwischen(datum, datum), speicher.ladeGesundheit(),
   ]);
   const lautPlan = tagestypFuer(datum, wochenplan, null);
   const typ = tagestypFuer(datum, wochenplan, tag);
@@ -42,6 +43,7 @@ export async function zeigeHeute(wurzel, [parameter]) {
     tagestypWahl(datum, typ, lautPlan),
     geplantHinweis(plan.filter((p) => !p.uebernommen), datum),
     uebersicht(ist, ziel, slots, kcalJeSlot),
+    wasserKarte(datum, wasserHeute.filter((m) => m.art === 'wasser'), gesundheit.wasserZielMl),
     alleNaehrwerte(eintraege, wochenEintraege, woche, referenz),
     eintraege.length === 0 && !plan.some((p) => !p.uebernommen) ? el('p', { class: 'leer' }, 'Noch nichts eingetragen. Tippe bei einer Mahlzeit auf das Plus.') : null,
     el('div', { class: 'slots' }, slots.map((slot) => slotBereich({
@@ -101,6 +103,28 @@ function backupErinnerung({ faellig, tage }) {
       ? 'Du hast noch kein Backup. Deine Einträge liegen nur in diesem Browser.'
       : `Dein letztes Backup ist ${tage} Tage her.`),
     el('a', { class: 'textlink', href: '#/mehr/backup' }, 'Zum Backup'));
+}
+
+/** Wasser zählen, ohne die Seite zu wechseln. Ändert sich an Ort und Stelle, die Seite wird nicht neu gezeichnet. */
+function wasserKarte(datum, eintraege, zielMl) {
+  const stand = el('span', { class: 'wasser-stand' });
+  const fuellung = el('span', { class: 'balken-voll' });
+  const zeige = () => {
+    const summe = eintraege.reduce((s, m) => s + m.wert, 0);
+    stand.textContent = `${zahl(summe)} von ${zahl(zielMl)} ml`;
+    fuellung.style.width = `${Math.min(100, (summe / zielMl) * 100).toFixed(1)}%`;
+  };
+  const trinke = async (ml) => {
+    const neu = await speicher.speichereMessung({ art: 'wasser', datum, wert: ml });
+    eintraege.push(neu);
+    zeige();
+    hinweis(`${ml} ml Wasser.`, { aktion: 'Rückgängig', beiAktion: async () => { await speicher.loescheMessung(neu.id); eintraege.splice(eintraege.indexOf(neu), 1); zeige(); } });
+  };
+  zeige();
+  return el('section', { class: 'karte wasser-karte', 'aria-label': 'Wasser' },
+    el('div', { class: 'wasser-kopf' }, el('h2', {}, 'Wasser'), stand),
+    el('span', { class: 'balken' }, fuellung),
+    el('div', { class: 'chips' }, [250, 500].map((ml) => el('button', { type: 'button', class: 'chip', onclick: () => trinke(ml) }, `+ ${ml} ml`))));
 }
 
 /* ---------- Übersicht: Tagesscheibe und Makros ---------- */

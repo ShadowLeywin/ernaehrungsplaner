@@ -18,6 +18,9 @@ Elan ist eine Ernährungs- und Health-App als Android-App und PWA aus demselben 
 
 ## Bedienung
 
+- „Mehr“ ist ein gruppiertes Menü mit Unterseiten (Ziele und Tagebuch, Lebensmittel, Daten, App), darin „Über Elan“ und „Was ist neu“.
+- Beim ersten Start führt eine kurze Einrichtung in drei Schritten zum ersten Eintrag.
+- Eintragen braucht möglichst wenige Tipps: Zuletzt Gegessenes mit einem Tipp und der Menge vom letzten Mal; Wasser direkt auf „Heute“.
 - Fünf Seiten seit 0.6: Heute, Woche, Rezepte, Health, Mehr. Zutaten und Mag-Liste sind über „Rezepte“ und „Mehr“ erreichbar; man braucht sie selten direkt, weil die Suche beim Eintragen alles findet.
 - Signatur der App ist die **Tagesscheibe**: sechs Segmente wie eine aufgeschnittene Zitrusfrucht, eines je Mahlzeit. Breite = Anteil am Tagesziel, Füllung = gegessen.
 - Fruchtfarben je Makro: Eiweiß Grapefruit, Kohlenhydrate Zitrone, Fett Avocado, Ballaststoffe Heidelbeere.
@@ -41,12 +44,23 @@ Elan ist eine Ernährungs- und Health-App als Android-App und PWA aus demselben 
 - Netzabrufe nur auf Knopfdruck. Gesendet wird ein Suchbegriff oder Barcode, nie etwas aus Tagebuch oder Health.
 - Backups sind Dateien beim Nutzer. `.gitignore` sperrt sie für das Repo.
 
+## Vorbilder für Aufbau und Bedienung
+
+| Muster | Woher | Umsetzung in Elan |
+|---|---|---|
+| Reibung beim Eintragen ist der Hauptgrund aufzuhören; man misst Tipps je Mahlzeit | Vergleiche von MacroFactor und Cronometer, Ratgeber zu Ernährungs-Apps | Eintragen mit einem Tipp aus „Zuletzt“, Rückgängig statt Rückfrage |
+| Kurze Einrichtung, schnell zum ersten Eintrag | Ratgeber zu Onboarding von Ernährungs-Apps | drei Schritte, überspringbar, Backup einspielen gleich am Anfang |
+| Viele Einstellungen in Gruppen und Unterseiten, Wichtiges zuerst | Android-Designrichtlinien zu Einstellungen | Menü „Mehr“ mit vier Gruppen |
+| Navigationsleiste mit drei bis fünf Zielen | Android-Richtlinien zu Navigation | fünf Ziele: Heute, Woche, Rezepte, Health, Mehr |
+
 ## Annahmen [A]
 
 - [A] Name „Elan“ gilt, bis Léon einen anderen wählt.
 - [A] Fünf Hauptseiten sind die Obergrenze für die untere Leiste.
 
 ## Quellen (mit Datum)
+
+- [MacroFactor vs Cronometer](https://macrofactor.com/macrofactor-vs-cronometer/) (Herstellerangabe), [Fitia: was einen Kalorienzähler einfach macht](https://fitia.app/learn/article/what-makes-calorie-counter-simple-easy-app-2026/), [Android: Einstellungen](https://developer.android.com/design/ui/mobile/guides/patterns/settings), [Android: Layout- und Navigationsmuster](https://developer.android.google.cn/design/ui/mobile/guides/layout-and-content/layout-and-nav-patterns?hl=en), abgerufen 14.11.2026.
 
 - Startauftrag „Session 0“ von Léon, 13.11.2026.
 - Lizenz der Schrift: `schrift/LIZENZ-OFL.txt` (SIL Open Font License 1.1), Paket `@fontsource-variable/bricolage-grotesque` 5.3.0, abgerufen 13.11.2026.

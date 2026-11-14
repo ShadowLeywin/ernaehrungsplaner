@@ -6,7 +6,9 @@ import { zeigeHealth } from './ansichten/health.js';
 import { zeigeHeute } from './ansichten/heute.js';
 import { zeigeMehr } from './ansichten/mehr.js';
 import { zeigeRezepte } from './ansichten/rezepte.js';
+import { istEingerichtet, merkeEingerichtet, zeigeWillkommen } from './ansichten/willkommen.js';
 import { zeigeWoche } from './ansichten/woche.js';
+import * as speicher from './speicher.js';
 import { zeigeZutaten } from './ansichten/zutaten.js';
 import { route, starte } from './router.js';
 import { hinweis } from './ui.js';
@@ -27,6 +29,14 @@ route('rezepte', zeigeRezepte);
 route('zutaten', zeigeZutaten);
 route('health', zeigeHealth);
 route('mehr', zeigeMehr);
+route('willkommen', zeigeWillkommen);
+
+// Erster Start: kurze Einrichtung. Wer schon Einträge hat (zum Beispiel nach einem Update), sieht sie nicht.
+const startseite = ['', '#', '#/', '#/heute'].includes(location.hash);
+if (!istEingerichtet() && startseite) {
+  if ((await speicher.anzahlEintraege().catch(() => 0)) > 0) merkeEingerichtet();
+  else history.replaceState(null, '', `${location.pathname}${location.search}#/willkommen`);
+}
 starte(document.getElementById('inhalt'), 'heute');
 
 /* ---------- Offline-Anzeige ---------- */

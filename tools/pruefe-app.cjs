@@ -19,8 +19,10 @@ const ergebnisse = [];
 const pruefe = (kriterium, ok, beleg = '') => { ergebnisse.push({ kriterium, ok: Boolean(ok), beleg: String(beleg) }); };
 const bild = async (seite, name, ganz = true) => { if (BILDER) await seite.screenshot({ path: path.join(BILDER, `${name}.png`), fullPage: ganz }); };
 
-async function neueSeite(browser, optionen = {}) {
+async function neueSeite(browser, { einrichtung = false, ...optionen } = {}) {
   const kontext = await browser.newContext({ ...devices['Galaxy S9+'], locale: 'de-DE', timezoneId: 'Europe/Berlin', acceptDownloads: true, ...optionen });
+  // Die Ersteinrichtung hat einen eigenen Lauf; alle anderen Läufe starten wie ein eingerichtetes Gerät
+  if (!einrichtung) await kontext.addInitScript(() => { try { localStorage.setItem('elan.eingerichtet', '1'); } catch { /* egal */ } });
   const seite = await kontext.newPage();
   const fehler = [];
   const fremd = new Set();
@@ -146,6 +148,17 @@ async function hauptlauf(browser) {
   const menge = await seite.locator('#f-gramm').inputValue();
   await seite.getByRole('button', { name: 'Eintragen' }).click();
   await seite.locator('dialog').waitFor({ state: 'detached' });
+  await seite.getByRole('button', { name: 'Zu Morgensnack hinzufügen' }).click();
+  const schnell = seite.locator('dialog .chip.schnell').first();
+  const schnellText = await schnell.innerText();
+  const vorherAnzahl = await seite.locator('#slot-morgensnack .eintrag').count();
+  await schnell.click();
+  await seite.locator('dialog').waitFor({ state: 'detached' });
+  await seite.locator('#slot-morgensnack .eintrag').first().waitFor();
+  const meldung = await seite.locator('.hinweis span').innerText();
+  await seite.getByRole('button', { name: 'Rückgängig' }).click();
+  await seite.locator('#slot-morgensnack .eintrag').waitFor({ state: 'detached' });
+  pruefe('Zuletzt Gegessenes mit einem Tipp eintragen, mit Rückgängig', vorherAnzahl === 0 && /^\+ [\d,]+ g$/.test(schnellText) && meldung.includes('eingetragen'), `„${schnellText}“ → „${meldung}“ → Rückgängig entfernt den Eintrag`);
   pruefe('Eigene Zutat mit Portion eintragen', menge === '35' && (await seite.locator('#slot-abendsnack .eintrag-kcal').innerText()) === '140 kcal', `Liste zeigt „${zuletzt}“, 1 Riegel = ${menge} g = ${await seite.locator('#slot-abendsnack .eintrag-kcal').innerText()}`);
 
   /* Ziele */
@@ -1140,6 +1153,47 @@ async function appLauf(browser) {
   await kontext.close();
 }
 
+async function willkommenLauf(browser) {
+  const { kontext, seite, fehler } = await neueSeite(browser, { einrichtung: true });
+  await seite.goto(URL_APP, { waitUntil: 'networkidle' });
+  await seite.locator('.willkommen h1').waitFor();
+  const start = `${seite.url().split('#')[1]}: ${await seite.locator('h1').innerText()}, Leiste ${await seite.locator('.navigation').isVisible() ? 'sichtbar' : 'ausgeblendet'}`;
+  await bild(seite, '25-willkommen', false);
+  await seite.getByRole('button', { name: 'Los geht’s' }).click();
+  await seite.locator('#f-start-gym').fill('3000');
+  await seite.getByRole('button', { name: 'Weiter' }).click();
+  await seite.locator('#f-start-geschlecht').selectOption('m');
+  await seite.locator('#f-start-alter').selectOption('25');
+  await seite.getByRole('button', { name: 'Fertig' }).click();
+  await seite.locator('.slot').first().waitFor();
+  const ziel = seite.url().split('#')[1];
+  await seite.goto(`${URL_APP}#/mehr/ziele`);
+  await seite.locator('#f-ziel-kcal').waitFor();
+  const ziele = `${await seite.locator('#f-ziel-kcal').inputValue()} kcal, Eiweiß ${await seite.locator('#f-ziel-protein').inputValue()} g, KH ${await seite.locator('#f-ziel-kh').inputValue()} g, Fett ${await seite.locator('#f-ziel-fett').inputValue()} g`;
+  const passt = (await seite.locator('.bereich').first().innerText()).includes('passt zum Energieziel');
+  await seite.goto(`${URL_APP}#/mehr/referenz`);
+  const gruppe = `${await seite.locator('#f-ref-geschlecht').inputValue()}/${await seite.locator('#f-ref-alter').inputValue()}`;
+  await seite.goto(URL_APP, { waitUntil: 'networkidle' });
+  await seite.locator('.slot').first().waitFor();
+  pruefe('Ersteinrichtung: drei Schritte, Ziele umgerechnet, Gruppe gespeichert, nur einmal', start.startsWith('/willkommen') && start.includes('ausgeblendet') && ziel === '/heute' && ziele.startsWith('3000 kcal, Eiweiß 150') && passt && gruppe === 'm/25' && !seite.url().includes('willkommen'),
+    `${start}; danach ${ziel}; Gym ${ziele}, Makros passen: ${passt}; Gruppe ${gruppe}; zweiter Start ohne Einrichtung`);
+  await kontext.close();
+
+  // Wer schon Einträge hat (Update von einer älteren Fassung), sieht keine Einrichtung
+  const zweit = await neueSeite(browser, { einrichtung: true });
+  await zweit.seite.goto(`${URL_APP}manifest.webmanifest`);
+  await zweit.seite.evaluate(() => new Promise((ok) => {
+    const a = indexedDB.open('elan', 1);
+    a.onupgradeneeded = () => { const db = a.result; db.createObjectStore('zutaten', { keyPath: 'id' }); db.createObjectStore('eintraege', { keyPath: 'id' }).createIndex('datum', 'datum'); db.createObjectStore('tage', { keyPath: 'datum' }); db.createObjectStore('einstellungen', { keyPath: 'schluessel' }); };
+    a.onsuccess = () => { const t = a.result.transaction('eintraege', 'readwrite'); t.objectStore('eintraege').put({ id: 'alt', datum: '2026-01-01', slot: 'mittag', name: 'Apfel', gramm: 100, je100: { kcal: 52 } }); t.oncomplete = () => { a.result.close(); ok(); }; };
+  }));
+  await zweit.seite.goto(URL_APP, { waitUntil: 'networkidle' });
+  await zweit.seite.locator('.slot').first().waitFor();
+  pruefe('Ersteinrichtung entfällt, wenn schon Daten da sind', zweit.seite.url().endsWith('#/heute') || !zweit.seite.url().includes('willkommen'), zweit.seite.url().split('#')[1] || '/');
+  pruefe('Einrichtungs-Lauf ohne Konsolenfehler', fehler.length === 0 && zweit.fehler.length === 0, [...fehler, ...zweit.fehler].slice(0, 3).join(' | ') || '0 Fehler');
+  await zweit.kontext.close();
+}
+
 async function migrationsLauf(browser) {
   const { kontext, seite, fehler } = await neueSeite(browser);
   // Datenbank im Aufbau von Schema-Version 1 anlegen, bevor die App sie öffnet (Seite ohne App-Code, gleiche Herkunft)
@@ -1205,6 +1259,7 @@ async function migrationsLauf(browser) {
     await angebotLauf(browser);
     await feinschliffLauf(browser);
     await appLauf(browser);
+    await willkommenLauf(browser);
     await migrationsLauf(browser);
     await offlineLauf(browser);
     await dunkelLauf(browser);
