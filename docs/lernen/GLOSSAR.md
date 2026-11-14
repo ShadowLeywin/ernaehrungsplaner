@@ -26,3 +26,7 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | Maskierbares Icon | Ein Icon mit Rand, das das System rund oder eckig zuschneiden darf. | `icons/icon-maskable-512.png` |
 | GitHub Pages | Ein Dienst, der die Dateien eines Repos als Webseite ausliefert. | `README.md`, `.nojekyll` |
 | Pull Request | Ein Vorschlag, die Änderungen eines Branches in einen anderen zu übernehmen. | Lernlog, Runde 3 |
+| Fixture | Eine feste Beispieldatei, mit der ein Test immer dieselben Daten bekommt. | `test/daten/backup-v1.json` |
+| Adapter | Eine kleine Funktion, die ein Ding so verpackt, dass anderer Code es wie etwas Bekanntes behandeln kann. | `rezeptAlsZutat()` in `js/logik/rezepte.js` |
+| `onupgradeneeded` | Das Ereignis, in dem die IndexedDB ihren Aufbau ändern darf; nur dort laufen Migrationen. | `oeffne()` in `js/db.js` |
+| Entität | Eine Art von Ding, das die App speichert, mit eigenem Speicher und Schlüssel. | Tabelle in `docs/DATENMODELL.md` |

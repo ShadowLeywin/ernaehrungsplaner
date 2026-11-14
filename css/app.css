@@ -169,11 +169,14 @@ h2 { font-size: 1.1875rem; line-height: 1.25; font-weight: 680; letter-spacing: 
 /* ---------- Felder ---------- */
 
 .feld label, .gruppe legend { display: block; font-size: 0.875rem; font-weight: 620; margin-bottom: 0.25rem; }
-.gruppe legend { font-size: 1.0625rem; font-weight: 680; }
+.gruppe legend { font-size: 1.0625rem; font-weight: 680; padding: 0; }
 .gruppe > * + * { margin-top: 0.625rem; }
 .eingabe { position: relative; display: flex; align-items: center; }
 .eingabe .einheit { position: absolute; right: 0.875rem; color: var(--tinte-leise); font-size: 0.875rem; pointer-events: none; }
 .eingabe input { padding-right: 3.25rem; }
+textarea { display: block; width: 100%; padding: 0.625rem 0.875rem; font: inherit; color: inherit; line-height: 1.4; resize: vertical; border: 1.5px solid var(--linie); border-radius: 0.75rem; background: var(--flaeche); }
+textarea::placeholder { color: var(--tinte-leise); opacity: 1; }
+textarea:focus-visible { outline: none; border-color: var(--blatt); box-shadow: 0 0 0 3px var(--limette-blass); }
 input:not([type='file']), select {
   width: 100%; min-height: 3rem; padding: 0 0.875rem;
   border: 1.5px solid var(--linie); border-radius: 0.75rem; background: var(--flaeche);
@@ -265,6 +268,32 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--b
 .naehrwerte .unterzeile th { padding-left: 1rem; color: var(--tinte-leise); }
 .naehrwerte .unterzeile td { color: var(--tinte-leise); }
 .aufklappen summary { min-height: 2.75rem; display: flex; align-items: center; font-weight: 620; color: var(--blatt); cursor: pointer; }
+
+/* ---------- Rezepte ---------- */
+
+.knopfreihe.links { justify-content: flex-start; }
+.knopf svg { flex: none; }
+
+.rezeptzeilen { display: grid; gap: 0.5rem; }
+.rezeptzeile { display: grid; grid-template-columns: minmax(0, 1fr) 6.5rem 2.75rem; align-items: center; gap: 0.5rem; }
+.rezeptzeile .fehlertext { grid-column: 1 / -1; }
+.rezeptzeile input[aria-invalid='true'] { border-color: var(--warnung); }
+
+.schritt-liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+.schritt { display: grid; gap: 0.25rem; padding: 0.875rem; border-radius: 0.875rem; background: var(--limette-blass); }
+.schritt label { font-weight: 680; }
+.schritt .nebenlabel { margin-top: 0.5rem; font-size: 0.875rem; font-weight: 620; }
+.schritt .textlink { justify-self: start; min-height: 2.5rem; padding: 0.25rem 0; }
+
+/* Zubereitung ist eine echte Abfolge, deshalb nummeriert */
+.schritte { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.125rem; counter-reset: schritt; }
+.schritte > li { position: relative; padding-left: 2.5rem; counter-increment: schritt; }
+.schritte > li::before {
+  content: counter(schritt); position: absolute; left: 0; top: 0; width: 1.75rem; height: 1.75rem;
+  display: grid; place-items: center; border-radius: 50%; background: var(--limette); color: #14241a; font-weight: 720; font-size: 0.9375rem;
+}
+.prinzip { margin-top: 0.5rem; padding: 0.625rem 0.875rem; border-radius: 0.75rem; background: var(--limette-blass); font-size: 0.9375rem; }
+.prinzip strong { display: block; font-size: 0.8125rem; font-weight: 700; color: var(--blatt); }
 
 /* ---------- Mehr ---------- */
 

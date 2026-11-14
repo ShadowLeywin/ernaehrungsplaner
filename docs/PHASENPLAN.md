@@ -28,16 +28,18 @@ Eine Session hat genau ein Ziel. Jede endet mit grünen Tests und einem Eintrag 
 
 Module: 1 (Zutaten), 3 (Tagebuch), 9 (Export: Backup).
 
-### Session 2: Rezepte
+### Session 2: Rezepte (erledigt, Version 0.2)
 
 Ziel: Ein Rezept anlegen und als Portion ins Tagebuch eintragen.
 
-| Abnahmekriterium | Testbefehl |
+| Abnahmekriterium | Beleg |
 |---|---|
-| Rezept mit Zutaten, Portionenzahl und Schritten speichern; je Schritt ein Feld „Prinzip dahinter“ | `pruefe-app.cjs` |
-| Nährwerte je Portion und je 100 g werden aus den Zutaten berechnet | `npm test` (`rezepte.test.js`) |
-| Eine Portion landet mit einem Tipp im Tagebuch | `pruefe-app.cjs` |
-| Schema-Version 2, Migration läuft mit Daten aus Version 1; altes Backup wird angehoben | `npm test`, `pruefe-app.cjs` mit Backup aus 0.1 |
+| Rezept mit Zutaten, Portionenzahl und Schritten speichern; je Schritt ein Feld „Prinzip dahinter“ | `pruefe-app.cjs`: „Rezept anlegen“ |
+| Nährwerte je Portion und je 100 g werden aus den Zutaten berechnet | `npm test`: `rezepte.test.js`, 8 Tests |
+| Eine Portion landet mit einem Tipp im Tagebuch | `pruefe-app.cjs`: „Eine Portion landet im Tagebuch“ |
+| Schema-Version 2, Migration läuft mit Daten aus Version 1; altes Backup wird angehoben | `pruefe-app.cjs`: zwei Migrations-Kriterien; `npm test`: Backup aus Version 1 |
+
+Noch offen aus dieser Session: Schritte umsortieren, Rezept kopieren.
 
 Module: 2.
 
@@ -176,5 +178,6 @@ Jede Session hat eine Tabelle mit prüfbaren Kriterien und einem Testbefehl.
 
 ## Quellen (mit Datum)
 
-- Testausgaben vom 13.11.2026: `npm test` (59 von 59), `node tools/pruefe-app.cjs` (33 von 33).
+- Testausgaben vom 13.11.2026 (Version 0.1): `npm test` 59 von 59, `node tools/pruefe-app.cjs` 33 von 33.
+- Testausgaben vom 14.11.2026 (Version 0.2): `npm test` 69 von 69, `node tools/pruefe-app.cjs` 45 von 45.
 - BLS 4.0 kostenfrei: [heise](https://heise.de/-11123877), [Agrolab](https://agrolab.com/en/news/food-news/6105-bls-datenbank-radar-01-26-en.html), abgerufen 13.11.2026.

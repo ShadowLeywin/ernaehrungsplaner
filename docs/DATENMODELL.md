@@ -1,6 +1,6 @@
 # Datenmodell
 
-Stand: Schema-Version 1 (App 0.1.0). Maßgeblich im Code: `js/logik/schema.js` und `js/db.js`.
+Stand: Schema-Version 2 (App 0.2.0). Maßgeblich im Code: `js/logik/schema.js` und `js/db.js`.
 
 ## Grundsätze
 
@@ -10,24 +10,28 @@ Stand: Schema-Version 1 (App 0.1.0). Maßgeblich im Code: `js/logik/schema.js` u
 - Nährwerte gelten immer je 100 g.
 - Darstellung (hell/dunkel) liegt je Gerät im `localStorage` und gehört nicht ins Backup.
 
-## Entitäten heute (Version 1)
+## Entitäten heute (Version 2)
 
 | Speicher | Schlüssel | Felder | Index |
 |---|---|---|---|
 | `zutaten` | `id` | `name`, `marke`, `kategorie`, `quelle` (`eigen`, `off`), `quelleId`, `je100` (Nährwerte), `portionen` [{`name`, `gramm`}], `unvollstaendig`, `geaendert` | – |
-| `eintraege` | `id` | `datum` (JJJJ-MM-TT), `slot`, `zutatId`, `name`, `marke`, `gramm`, `je100` (Kopie), `erstellt` | `datum` |
+| `eintraege` | `id` | `datum` (JJJJ-MM-TT), `slot`, `zutatId`, `name`, `marke`, `gramm`, `je100` (Kopie), `erstellt`; bei Rezepten zusätzlich `rezeptId` | `datum` |
 | `tage` | `datum` | `tagestyp` (nur bei Abweichung vom Wochenplan) | – |
 | `einstellungen` | `schluessel` | `wert`; Schlüssel: `ziele`, `woche`, `letztesBackup` | – |
+| `rezepte` (ab 2) | `id` | `name`, `portionen`, `zutaten` [{`zutatId`, `name`, `marke`, `gramm`, `je100` (Kopie)}], `schritte` [{`text`, `prinzip`}], `erstellt`, `geaendert` | – |
 
-Kennungen: Basis-Zutaten `basis:<name>`, eigene `eigen:<uuid>`, Open Food Facts `off:<barcode>`.
+Kennungen: Basis-Zutaten `basis:<name>`, eigene `eigen:<uuid>`, Open Food Facts `off:<barcode>`. Ein Rezept erscheint im Tagebuch als `rezept:<id>`.
 
 ## Beziehungen
 
 ```
 Zutat (Datei oder Speicher) 1 ── n Eintrag n ── 1 Tag (über datum)
+Zutat n ── m Rezept (über rezepte.zutaten), Rezept 1 ── n Eintrag (über rezeptId)
 Tagestyp (gym | calisthenics | rest) ── Ziel (in einstellungen.ziele)
 Wochentag ── Tagestyp (in einstellungen.woche), Tag kann abweichen
 ```
+
+**Wie rechnet ein Rezept?** `rezeptWerte()` in `js/logik/rezepte.js` summiert die Zutaten und teilt durch die Portionen. Für das Tagebuch wird das Rezept wie eine Zutat verpackt (`rezeptAlsZutat()`): Werte je 100 g plus eine Portion in Gramm.
 
 **Warum speichert ein Eintrag eine Kopie der Nährwerte?** Wer eine Zutat später ändert oder löscht, verändert sonst rückwirkend alte Tage. Mit der Kopie bleibt die Vergangenheit stabil. Preis: etwas mehr Speicher je Eintrag.
 
@@ -53,19 +57,19 @@ Wochentag ── Tagestyp (in einstellungen.woche), Tag kann abweichen
 ## Backup-Format
 
 ```json
-{ "app": "elan", "schemaVersion": 1, "erstelltAm": "2026-11-13T10:00:00.000Z",
-  "daten": { "zutaten": [], "eintraege": [], "tage": [], "einstellungen": [] } }
+{ "app": "elan", "schemaVersion": 2, "erstelltAm": "2026-11-13T10:00:00.000Z",
+  "daten": { "zutaten": [], "eintraege": [], "tage": [], "einstellungen": [], "rezepte": [] } }
 ```
 
-Einspielen ersetzt alle vier Speicher in einer einzigen Transaktion. Bricht sie ab, bleibt der alte Stand vollständig.
+Einspielen ersetzt alle Speicher in einer einzigen Transaktion. Bricht sie ab, bleibt der alte Stand vollständig.
 
 ## Geplante Entitäten
 
 | Modul | Speicher (geplant) | Kernfelder | Ab Version |
 |---|---|---|---|
 | 1 Zutaten | `zutaten` (vorhanden) | zusätzlich Quelle `usda`, `bls` | – |
-| 2 Rezepte | `rezepte` | `name`, `portionen`, `zutaten` [{`zutatId`, `gramm`}], `schritte` [{`text`, `prinzip`}], `gewichtGekocht` | 2 |
-| 3 Tagebuch | `eintraege`, `tage` (vorhanden) | Eintrag zusätzlich `rezeptId`, `portionen`; Einstellung `slotAnteile` | 2 |
+| 2 Rezepte | `rezepte` (vorhanden seit 2) | offen: `gewichtGekocht` für den Meal-Prep-Modus | 3 |
+| 3 Tagebuch | `eintraege`, `tage` (vorhanden) | Einstellung `slotAnteile` | – |
 | 4 Wochenplan | `plan` | `datum`, `slot`, `rezeptId` oder `zutatId`, `menge` | 3 |
 | 4 Einkaufsliste | `einkauf` | `zutatId`, `gramm`, `erledigt`, `woche` | 3 |
 | 4 Meal-Prep | Felder an `rezepte` | `haltbarTage`, `einfrierbar`, `portionGramm` | 3 |

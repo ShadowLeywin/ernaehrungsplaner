@@ -3,9 +3,9 @@
 
 export const APP_NAME = 'Elan';
 export const APP_KENNUNG = 'elan';
-export const APP_VERSION = '0.1.0';
+export const APP_VERSION = '0.2.0';
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 /** Speicher (Object Stores) und ihr Schlüsselfeld. */
 export const STORES = {
@@ -13,4 +13,5 @@ export const STORES = {
   eintraege: 'id', // Tagebuch: eine gegessene Menge in einem Slot
   tage: 'datum', // Angaben je Tag, z. B. abweichender Tagestyp
   einstellungen: 'schluessel', // Ziele, Wochenplan, letztes Backup
+  rezepte: 'id', // ab Version 2: Zutaten mit Mengen, Portionen, Schritte mit "Prinzip dahinter"
 };

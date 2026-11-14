@@ -162,7 +162,7 @@ async function hauptlauf(browser) {
   const datei = path.join(os.tmpdir(), `elan-test-${Date.now()}.json`);
   await download.saveAs(datei);
   const backup = JSON.parse(fs.readFileSync(datei, 'utf8'));
-  pruefe('Backup speichern', backup.app === 'elan' && backup.schemaVersion === 1 && backup.daten.eintraege.length === 4 && backup.daten.zutaten.length === 2,
+  pruefe('Backup speichern', backup.app === 'elan' && backup.schemaVersion === 2 && Array.isArray(backup.daten.rezepte) && backup.daten.eintraege.length === 4 && backup.daten.zutaten.length === 2,
     `${download.suggestedFilename()}: ${backup.daten.eintraege.length} Einträge, ${backup.daten.zutaten.length} Zutaten, ${backup.daten.einstellungen.length} Einstellungen`);
 
   await seite.goto(`${URL_APP}#/heute`);
@@ -268,6 +268,142 @@ async function dunkelLauf(browser) {
   await kontext.close();
 }
 
+async function rezeptLauf(browser) {
+  const { kontext, seite, fehler } = await neueSeite(browser);
+  await seite.goto(`${URL_APP}#/rezepte`, { waitUntil: 'networkidle' });
+  pruefe('Rezepte: leere Liste lädt zum Anlegen ein', (await seite.locator('.leer').innerText()).includes('Noch kein Rezept'), await seite.locator('.leer').innerText());
+
+  await seite.getByRole('link', { name: 'Neues Rezept' }).click();
+  await seite.getByRole('button', { name: 'Rezept speichern' }).click();
+  const pflicht = await seite.locator('.fehlertext').allInnerTexts();
+  pruefe('Rezept: leeres Formular zeigt Pflichtfehler', pflicht.length === 2, pflicht.join(' | '));
+
+  await seite.locator('#f-name').fill('Testchili');
+  for (const [begriff, menge] of [['bohnen', '800'], ['reis', '400']]) {
+    await seite.getByRole('button', { name: 'Zutat hinzufügen' }).click();
+    await seite.locator('dialog input[type=search]').fill(begriff);
+    await seite.locator('dialog .zeilen .zeile').first().click();
+    await seite.locator('dialog').waitFor({ state: 'detached' });
+    await seite.locator('.gramm-eingabe').last().fill(menge);
+  }
+  const summe = await seite.locator('#rezept-summe').innerText();
+  await seite.locator('#f-schritt-0').fill('Alles 20 Minuten köcheln.');
+  await seite.locator('#f-prinzip-0').fill('Lange Hitze macht Hülsenfrüchte weich.');
+  await seite.getByRole('button', { name: 'Schritt hinzufügen' }).click();
+  await seite.locator('#f-schritt-1').fill('Abschmecken.');
+  await bild(seite, '08-rezept-formular');
+  await seite.getByRole('button', { name: 'Rezept speichern' }).click();
+  await seite.locator('h1', { hasText: 'Testchili' }).waitFor();
+  const kcalText = await seite.locator('table.naehrwerte td').first().innerText();
+  const kcalPortion = Number(kcalText.replace(/[^\d]/g, ''));
+  pruefe('Rezept anlegen: Zutaten, Portionen, Schritte mit Prinzip', (await seite.locator('.schritte > li').count()) === 2 && (await seite.locator('.prinzip').count()) === 1 && kcalPortion > 0,
+    `Formular: „${summe}“ → Detail: ${kcalText} je Portion, 2 Schritte, 1 Prinzip`);
+  await bild(seite, '09-rezept-detail');
+
+  await seite.getByRole('button', { name: 'Portion eintragen' }).click();
+  const portionGramm = await seite.locator('#f-gramm').inputValue();
+  await seite.getByRole('button', { name: 'Für heute eintragen' }).click();
+  await seite.getByRole('button', { name: 'Zum Tagebuch' }).click();
+  await seite.locator('.eintrag').first().waitFor();
+  const eintrag = (await seite.locator('.eintrag').first().innerText()).replace(/\n/g, ' | ');
+  const kcalEintrag = Number((await seite.locator('.eintrag-kcal').first().innerText()).replace(/[^\d]/g, ''));
+  pruefe('Eine Portion landet im Tagebuch mit den Werten des Rezepts', Math.abs(kcalEintrag - kcalPortion) <= 1 && eintrag.includes('Rezept'), `${portionGramm} g vorbelegt → ${eintrag}`);
+
+  await seite.getByRole('button', { name: 'Zu Abendsnack hinzufügen' }).click();
+  await seite.locator('dialog input[type=search]').fill('testchili');
+  const marke = await seite.locator('dialog .zeilen .zeile small').first().innerText();
+  await seite.locator('dialog .zeilen .zeile').first().click();
+  await seite.getByRole('button', { name: /½ Portion/ }).click();
+  await seite.getByRole('button', { name: 'Eintragen', exact: true }).click();
+  await seite.locator('dialog').waitFor({ state: 'detached' });
+  const halb = Number((await seite.locator('#slot-abendsnack .eintrag-kcal').innerText()).replace(/[^\d]/g, ''));
+  pruefe('Rezept ist im Tagebuch suchbar, halbe Portion möglich', marke === 'Rezept' && Math.abs(halb * 2 - kcalPortion) <= 2, `Kennzeichnung „${marke}“, ½ Portion = ${halb} kcal`);
+
+  await seite.goto(`${URL_APP}#/rezepte`);
+  await seite.locator('.zeilen a.zeile').first().click();
+  await seite.getByRole('link', { name: 'Bearbeiten' }).click();
+  await seite.locator('#f-portionen').fill('2');
+  await seite.getByRole('button', { name: 'Rezept speichern' }).click();
+  await seite.locator('table.naehrwerte').waitFor();
+  const doppelt = Number((await seite.locator('table.naehrwerte td').first().innerText()).replace(/[^\d]/g, ''));
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.locator('.eintrag').first().waitFor();
+  const alt = Number((await seite.locator('.eintrag-kcal').first().innerText()).replace(/[^\d]/g, ''));
+  pruefe('Rezept ändern: neue Werte im Rezept, alte Einträge bleiben stabil', Math.abs(doppelt - kcalPortion * 2) <= 2 && alt === kcalEintrag, `je Portion ${kcalPortion} → ${doppelt} kcal, alter Eintrag weiter ${alt} kcal`);
+
+  await seite.goto(`${URL_APP}#/rezepte`);
+  await seite.locator('.zeilen a.zeile').first().click();
+  await seite.getByRole('button', { name: 'Löschen' }).click();
+  await seite.locator('dialog').getByRole('button', { name: 'Löschen' }).click();
+  await seite.locator('.leer').waitFor();
+  await seite.getByRole('button', { name: 'Rückgängig' }).click();
+  await seite.locator('.zeilen a.zeile').waitFor();
+  pruefe('Rezept löschen und zurückholen', (await seite.locator('.zeilen a.zeile').count()) === 1, 'nach Rückgängig wieder 1 Rezept');
+
+  const id = (await seite.locator('.zeilen a.zeile').getAttribute('href')).split('/').pop();
+  const mass = [];
+  const unsinn = [];
+  for (const [route, warteAuf] of [['rezepte', '.zeilen'], [`rezepte/${id}`, '.schritte'], [`rezepte/${id}/bearbeiten`, '#f-schritt-0'], ['rezepte/neu', '#f-name']]) {
+    await seite.goto(`${URL_APP}#/${route}`);
+    await seite.locator(warteAuf).first().waitFor();
+    const b = await seite.evaluate(() => ({ inhalt: document.documentElement.scrollWidth, fenster: window.innerWidth }));
+    mass.push(`${route.replace(id, '…')} ${b.inhalt}/${b.fenster}`);
+    if (b.inhalt > b.fenster) unsinn.push(`${route} zu breit`);
+    if (/\b(null|undefined|NaN)\b/.test(await seite.locator('body').innerText())) unsinn.push(`${route}: null/undefined/NaN im Text`);
+  }
+  pruefe('Rezeptseiten: kein seitliches Rollen, kein „null“ im Text', unsinn.length === 0, unsinn.join(' | ') || mass.join(', '));
+  pruefe('Rezept-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
+  await kontext.close();
+}
+
+async function migrationsLauf(browser) {
+  const { kontext, seite, fehler } = await neueSeite(browser);
+  // Datenbank im Aufbau von Schema-Version 1 anlegen, bevor die App sie öffnet (Seite ohne App-Code, gleiche Herkunft)
+  await seite.goto(`${URL_APP}manifest.webmanifest`);
+  await seite.evaluate(() => new Promise((ok, nein) => {
+    const anfrage = indexedDB.open('elan', 1);
+    anfrage.onupgradeneeded = () => {
+      const db = anfrage.result;
+      db.createObjectStore('zutaten', { keyPath: 'id' });
+      db.createObjectStore('eintraege', { keyPath: 'id' }).createIndex('datum', 'datum');
+      db.createObjectStore('tage', { keyPath: 'datum' });
+      db.createObjectStore('einstellungen', { keyPath: 'schluessel' });
+    };
+    anfrage.onsuccess = () => {
+      const db = anfrage.result;
+      const d = new Date();
+      const heute = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const t = db.transaction('eintraege', 'readwrite');
+      t.objectStore('eintraege').put({ id: 'alt-1', datum: heute, slot: 'mittag', zutatId: 'basis:apfel', name: 'Apfel', marke: '', gramm: 170, je100: { kcal: 52 }, erstellt: d.toISOString() });
+      t.oncomplete = () => { db.close(); ok(); };
+      t.onerror = () => nein(t.error);
+    };
+    anfrage.onerror = () => nein(anfrage.error);
+  }));
+  await seite.goto(URL_APP, { waitUntil: 'networkidle' });
+  await seite.locator('.eintrag').waitFor();
+  const stand = await seite.evaluate(async () => {
+    const info = (await indexedDB.databases()).find((d) => d.name === 'elan');
+    const speicher = await new Promise((ok) => { const a = indexedDB.open('elan'); a.onsuccess = () => { const n = [...a.result.objectStoreNames]; a.result.close(); ok(n); }; });
+    return { version: info.version, speicher };
+  });
+  pruefe('Migration: Datenbank aus Version 1 wird angehoben, Einträge bleiben', stand.version === 2 && stand.speicher.includes('rezepte') && (await seite.locator('.eintrag').count()) === 1,
+    `Version ${stand.version}, Speicher ${stand.speicher.join(', ')}, alter Eintrag: ${(await seite.locator('.eintrag').innerText()).replace(/\n/g, ' | ')}`);
+
+  await seite.goto(`${URL_APP}#/mehr`);
+  await seite.locator('#f-backup-datei').setInputFiles(path.resolve(__dirname, '..', 'test', 'daten', 'backup-v1.json'));
+  const frage = await seite.locator('dialog p').innerText();
+  await seite.getByRole('button', { name: 'Alles ersetzen' }).click();
+  await seite.locator('.hinweis', { hasText: 'Backup eingespielt' }).waitFor();
+  await seite.goto(`${URL_APP}#/heute/2026-11-01`);
+  await seite.locator('.eintrag').waitFor();
+  const typ = await seite.locator('.wahl-knopf[aria-pressed=true]').innerText();
+  pruefe('Backup aus Version 1 lässt sich einspielen', (await seite.locator('.eintrag-name').innerText()).includes('Beispielmüsli') && typ === 'Rest',
+    `„${frage.slice(0, 70)}…“ → Eintrag ${(await seite.locator('.eintrag-name').innerText()).split('\n')[0]}, Tagestyp ${typ}`);
+  pruefe('Migrations-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
+  await kontext.close();
+}
+
 (async () => {
   if (BILDER) fs.mkdirSync(BILDER, { recursive: true });
   const server = await starte(PORT);
@@ -275,6 +411,8 @@ async function dunkelLauf(browser) {
   let abbruch = null;
   try {
     await hauptlauf(browser);
+    await rezeptLauf(browser);
+    await migrationsLauf(browser);
     await offlineLauf(browser);
     await dunkelLauf(browser);
   } catch (fehler) {
