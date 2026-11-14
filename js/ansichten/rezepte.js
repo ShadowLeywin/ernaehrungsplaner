@@ -9,7 +9,7 @@ import { gehe, neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { bestaetige, el, feld, gramm, haenge, hinweis, icon, zahl } from '../ui.js';
 import { oeffneRezeptPortion, waehleZutat } from './eintrag.js';
-import { nimmEntwurf, zeigeImport } from './import.js';
+import { nimmEntwurf, setzeEntwurf, zeigeImport } from './import.js';
 
 const adresse = (id, anhang = '') => `#/rezepte/${encodeURIComponent(id)}${anhang}`;
 const portionenText = (n) => `${zahl(n, 1)} ${n === 1 ? 'Portion' : 'Portionen'}`;
@@ -95,6 +95,11 @@ function detail(wurzel, rezept) {
       s.prinzip ? el('div', { class: 'prinzip' }, el('strong', {}, 'Prinzip dahinter'), el('p', {}, s.prinzip)) : null))) : null,
     el('div', { class: 'knopfreihe' },
       el('button', { type: 'button', class: 'knopf leise', onclick: loeschen }, 'Löschen'),
+      el('button', {
+        type: 'button', class: 'knopf leise',
+        // Die Kopie hat keine id: Sie wird beim Speichern ein eigenes Rezept
+        onclick: () => { const { id, erstellt, geaendert, ...rest } = rezept; setzeEntwurf({ ...rest, name: `${rezept.name} (Kopie)`.slice(0, 80) }); gehe('/rezepte/neu'); },
+      }, 'Kopieren'),
       el('a', { class: 'knopf leise', href: adresse(rezept.id, '/bearbeiten') }, 'Bearbeiten')));
 }
 
@@ -110,6 +115,7 @@ function formular(wurzel, vorlage) {
   const titel = vorlage?.id ? 'Rezept bearbeiten' : 'Neues Rezept';
   document.title = `${titel} – ${APP_NAME}`;
   const alsText = (wert) => String(wert).replace('.', ',');
+  // Eingaben aus Import oder Kopie wie ein vorhandenes Rezept ins Formular legen
   const eingabe = {
     name: vorlage?.name ?? '',
     portionen: vorlage ? alsText(vorlage.portionen) : '4',
@@ -166,9 +172,12 @@ function formular(wurzel, vorlage) {
       el('label', { for: `f-prinzip-${i}`, class: 'nebenlabel' }, 'Prinzip dahinter (freiwillig)'),
       el('textarea', { id: `f-prinzip-${i}`, rows: 2, placeholder: 'Warum funktioniert das?', maxlength: 600, oninput: (e) => { s.prinzip = e.target.value; } }, s.prinzip),
       fehler.schritt?.[i] ? el('p', { class: 'fehlertext' }, fehler.schritt[i]) : null,
-      eingabe.schritte.length > 1
-        ? el('button', { type: 'button', class: 'textlink', onclick: () => { eingabe.schritte.splice(i, 1); zeichne(); } }, `Schritt ${i + 1} entfernen`)
-        : null);
+      eingabe.schritte.length > 1 ? el('div', { class: 'linkreihe' },
+        i > 0 ? el('button', {
+          type: 'button', class: 'textlink',
+          onclick: () => { [eingabe.schritte[i - 1], eingabe.schritte[i]] = [eingabe.schritte[i], eingabe.schritte[i - 1]]; zeichne(); },
+        }, `Schritt ${i + 1} nach oben`) : null,
+        el('button', { type: 'button', class: 'textlink', onclick: () => { eingabe.schritte.splice(i, 1); zeichne(); } }, `Schritt ${i + 1} entfernen`)) : null);
 
     wurzel.replaceChildren(
       el('a', { class: 'zurueck', href: vorlage?.id ? adresse(vorlage.id) : '#/rezepte' }, icon('zurueck', 18), 'Abbrechen'),

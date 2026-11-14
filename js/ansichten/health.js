@@ -3,7 +3,7 @@
 
 import { formatKurz, formatLang, isoDatum, istGueltig, relativ, verschiebe } from '../logik/datum.js';
 import {
-  ARTEN, artVon, gewichtsTrend, letzterWert, linienPunkte, pruefeGesundheit, pruefeMesswert, tagesSumme, tagesWert, verlauf,
+  ARTEN, artVon, gewichtsTrend, letzterWert, linienPunkte, pruefeGesundheit, pruefeMesswert, tagesSumme, tagesWert, verlauf, verlaufJeTag,
 } from '../logik/gesundheit.js';
 import { APP_NAME } from '../logik/schema.js';
 import { neuZeichnen } from '../router.js';
@@ -48,6 +48,7 @@ export async function zeigeHealth(wurzel, [parameter]) {
     wasser(datum, messungen, ziele),
     supplementBereich(datum, supplements, tag),
     masseBereich(datum, messungen),
+    verlaufBereich(datum, messungen),
     zielBereich(ziele));
 }
 
@@ -230,6 +231,26 @@ function masseBereich(datum, messungen) {
   };
   zeichne();
   return bereich;
+}
+
+/* ---------- Verläufe ---------- */
+
+function verlaufBereich(datum, messungen) {
+  // Tageswerte über 30 Tage, Körpermaße über ein halbes Jahr (sie ändern sich langsam)
+  const reihen = ARTEN.filter((a) => a.id !== 'gewicht').map((art) => ({ art, tage: art.gruppe === 'mass' ? 180 : 30 }))
+    .map(({ art, tage }) => ({ art, tage, punkte: verlaufJeTag(messungen, art.id, datum, tage) }))
+    .filter((r) => r.punkte.length >= 2);
+  return el('details', { class: 'bereich aufklappen', id: 'verlaeufe', open: aufgeklappt.has('verlaeufe') ? true : null, ontoggle: (e) => { if (e.target.open) aufgeklappt.add('verlaeufe'); else aufgeklappt.delete('verlaeufe'); } },
+    el('summary', {}, 'Verläufe'),
+    reihen.length === 0 ? el('p', { class: 'leer' }, 'Sobald es von einem Wert zwei Einträge gibt, erscheint hier seine Linie.') : null,
+    reihen.map(({ art, tage, punkte }) => {
+      const werte = punkte.map((p) => p.wert);
+      const einheit = art.einheit ? ` ${art.einheit}` : '';
+      return el('figure', { class: 'verlauf' },
+        el('figcaption', {}, el('strong', {}, art.name), ` ${punkte.length} Werte in ${tage} Tagen, von ${zahl(Math.min(...werte), art.stellen)} bis ${zahl(Math.max(...werte), art.stellen)}${einheit}, zuletzt ${zahl(werte.at(-1), art.stellen)}${einheit}`),
+        svg('svg', { viewBox: '0 0 300 48', role: 'img', 'aria-label': `Verlauf ${art.name}`, preserveAspectRatio: 'none' },
+          svg('polyline', { points: linienPunkte(werte, 300, 48, 6), fill: 'none', 'stroke-width': 3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' })));
+    }));
 }
 
 /* ---------- Ziele ---------- */

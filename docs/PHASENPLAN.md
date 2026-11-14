@@ -143,16 +143,19 @@ Die App ruft beim Import keine fremden Seiten ab.
 
 Module: 8, 9 (Coach-Export).
 
-### Session 10: Politur und Offline-Tests
+### Session 10: Politur und Offline-Tests (teilweise, Version 0.10)
 
 Ziel: Die App fühlt sich am Handy fertig an.
 
-| Abnahmekriterium | Testbefehl |
+| Abnahmekriterium | Stand |
 |---|---|
-| Alle Seiten bei 320 px ohne seitliches Rollen, Tippflächen ab 40 px | `pruefe-app.cjs` |
-| Update einer installierten App zeigt „Neue Version“ und verliert keine Daten | `pruefe-app.cjs` mit zwei Versionen |
-| Flugmodus-Test am echten Gerät nach Checkliste | manuell, Protokoll im Lernlog |
-| Barcode per Kamera, falls der Browser es unterstützt | am Handy manuell |
+| Alle Seiten bei 320 px ohne seitliches Rollen, Tippflächen ab 40 px | erledigt: je Lauf ein Kriterium in `pruefe-app.cjs` |
+| Verläufe für Wasser, Schlaf, Schritte und Maße | erledigt: `pruefe-app.cjs`: „Verläufe“ |
+| Erinnerung an das Backup | erledigt: `npm test`: `backupFaellig()`; `pruefe-app.cjs`: „Backup-Erinnerung“ |
+| Rezept kopieren, Schritte umsortieren | erledigt: `pruefe-app.cjs`: „Rezept kopieren“ |
+| Update einer installierten App zeigt „Neue Version“ und verliert keine Daten | **offen**: Test mit zwei Versionen fehlt |
+| Flugmodus-Test am echten Gerät nach Checkliste | **offen**: `docs/AUFGABEN-LEON.md`, Punkt A6 |
+| Barcode per Kamera | **offen**: braucht ein echtes Gerät |
 
 Module: alle.
 
@@ -199,4 +202,5 @@ Jede Session hat eine Tabelle mit prüfbaren Kriterien und einem Testbefehl.
 - Testausgaben vom 14.11.2026 (Version 0.7): `npm test` 113 von 113, `node tools/pruefe-app.cjs` 83 von 83.
 - Testausgaben vom 14.11.2026 (Version 0.8): `npm test` 130 von 130, `node tools/pruefe-app.cjs` 91 von 91.
 - Testausgaben vom 14.11.2026 (Version 0.9): `npm test` 136 von 136, `node tools/pruefe-app.cjs` 98 von 98.
+- Testausgaben vom 14.11.2026 (Version 0.10): `npm test` 138 von 138, `node tools/pruefe-app.cjs` 103 von 103.
 - BLS 4.0 kostenfrei: [heise](https://heise.de/-11123877), [Agrolab](https://agrolab.com/en/news/food-news/6105-bls-datenbank-radar-01-26-en.html), abgerufen 13.11.2026.

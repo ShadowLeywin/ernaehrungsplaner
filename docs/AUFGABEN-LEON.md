@@ -1,6 +1,6 @@
 # Aufgaben für Léon
 
-Was nur du erledigen kannst, während Claude pausiert. Von oben nach unten, ein Punkt nach dem anderen. Stand: Version 0.9, 14.11.2026.
+Was nur du erledigen kannst, während Claude pausiert. Von oben nach unten, ein Punkt nach dem anderen. Stand: Version 0.10, 14.11.2026.
 
 **So antwortest du:** Schreib die Nummer und was passiert ist, zum Beispiel „A3 geht, A4: Knopf verdeckt“ oder „B2: MIT“.
 

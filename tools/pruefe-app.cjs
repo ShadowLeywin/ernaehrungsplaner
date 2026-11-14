@@ -973,6 +973,89 @@ async function angebotLauf(browser) {
   await kontext.close();
 }
 
+async function feinschliffLauf(browser) {
+  // Alle Werte in diesem Lauf sind erfunden.
+  const { kontext, seite, fehler } = await neueSeite(browser);
+  await seite.goto(URL_APP, { waitUntil: 'networkidle' });
+  await seite.locator('.slot').first().waitFor();
+  const schreibe = (saetze) => seite.evaluate((liste) => new Promise((ok, nein) => {
+    const zwei = (n) => String(n).padStart(2, '0');
+    const tag = (zurueck) => { const d = new Date(); d.setHours(12); d.setDate(d.getDate() - zurueck); return `${d.getFullYear()}-${zwei(d.getMonth() + 1)}-${zwei(d.getDate())}`; };
+    const a = indexedDB.open('elan');
+    a.onsuccess = () => {
+      const t = a.result.transaction([...new Set(liste.map((x) => x.store))], 'readwrite');
+      for (const { store, satz, vorTagen, feld = 'datum' } of liste) t.objectStore(store).put(vorTagen === undefined ? satz : { ...satz, [feld]: tag(vorTagen) });
+      t.oncomplete = () => { a.result.close(); ok(); };
+      t.onerror = () => nein(t.error);
+    };
+  }), saetze);
+  const eintrag = (n) => ({ store: 'eintraege', vorTagen: 0, satz: { id: `t${n}`, slot: 'mittag', zutatId: 'basis:apfel', name: 'Apfel', marke: '', gramm: 100, je100: { kcal: 52, protein: 0.3 }, erstellt: `2026-01-01T0${n}:00:00Z` } });
+  const messung = (art, vorTagen, wert, zusatz = '') => ({ store: 'messungen', vorTagen, satz: { id: `${art}|${vorTagen}${zusatz}`, art, wert } });
+
+  await schreibe([1, 2, 3, 4].map(eintrag));
+  await seite.reload({ waitUntil: 'networkidle' });
+  await seite.locator('.eintrag').first().waitFor();
+  const beiVier = await seite.locator('.backup-erinnerung').count();
+  await schreibe([eintrag(5)]);
+  await seite.reload({ waitUntil: 'networkidle' });
+  await seite.locator('.backup-erinnerung').waitFor();
+  const ohneBackup = await seite.locator('.backup-erinnerung p').innerText();
+  await schreibe([{ store: 'einstellungen', vorTagen: 20, feld: 'wert', satz: { schluessel: 'letztesBackup' } }]);
+  await seite.reload({ waitUntil: 'networkidle' });
+  await seite.locator('.backup-erinnerung').waitFor();
+  const altesBackup = await seite.locator('.backup-erinnerung p').innerText();
+  await schreibe([{ store: 'einstellungen', vorTagen: 0, feld: 'wert', satz: { schluessel: 'letztesBackup' } }]);
+  await seite.reload({ waitUntil: 'networkidle' });
+  await seite.locator('.eintrag').first().waitFor();
+  pruefe('Backup-Erinnerung: erst ab fünf Einträgen, ohne Backup oder nach 14 Tagen, sonst still', beiVier === 0 && ohneBackup.includes('noch kein Backup') && altesBackup === 'Dein letztes Backup ist 20 Tage her.' && (await seite.locator('.backup-erinnerung').count()) === 0,
+    `4 Einträge: nichts; 5 Einträge: „${ohneBackup}“; danach „${altesBackup}“; frisches Backup: nichts`);
+
+  await schreibe([
+    messung('schlaf', 2, 7), messung('schlaf', 1, 6.5), messung('schlaf', 0, 8),
+    messung('wasser', 1, 500, 'a'), messung('wasser', 1, 750, 'b'), messung('wasser', 0, 2000),
+    messung('mass:taille', 60, 86), messung('mass:taille', 0, 84.5),
+    messung('schritte', 0, 9000),
+  ]);
+  await seite.goto(`${URL_APP}#/health`);
+  await seite.locator('#verlaeufe summary').click();
+  await seite.locator('#verlaeufe .verlauf').first().waitFor();
+  const linien = await seite.locator('#verlaeufe figcaption').allInnerTexts();
+  pruefe('Verläufe für Wasser, Schlaf und Maße; ein einzelner Wert ergibt keine Linie', linien.length === 3 && linien.some((t) => t.startsWith('Wasser') && t.includes('von 1.250 bis 2.000 ml')) && linien.some((t) => t.startsWith('Taille') && t.includes('180 Tagen')) && !linien.some((t) => t.startsWith('Schritte')),
+    linien.join(' | '));
+  await bild(seite, '23-verlaeufe');
+
+  await schreibe([{ store: 'rezepte', satz: { id: 'test-kopie', name: 'Testsuppe', portionen: 2, zutaten: [{ zutatId: 'basis:apfel', name: 'Apfel', marke: '', gramm: 300, je100: { kcal: 52 } }], schritte: [{ text: 'Erster Schritt.' }, { text: 'Zweiter Schritt.', prinzip: 'Erfundenes Prinzip.' }] } }]);
+  await seite.goto(`${URL_APP}#/rezepte/test-kopie`);
+  await seite.getByRole('button', { name: 'Kopieren' }).click();
+  await seite.locator('#f-schritt-1').waitFor();
+  const kopieName = await seite.locator('#f-name').inputValue();
+  await seite.getByRole('button', { name: 'Schritt 2 nach oben' }).click();
+  const getauscht = `${await seite.locator('#f-schritt-0').inputValue()} / ${await seite.locator('#f-prinzip-0').inputValue()} / ${await seite.locator('#f-schritt-1').inputValue()}`;
+  await seite.getByRole('button', { name: 'Rezept speichern' }).click();
+  await seite.locator('.schritte').waitFor();
+  await seite.goto(`${URL_APP}#/rezepte`);
+  await seite.locator('.zeilen a.zeile').first().waitFor();
+  const namen = await seite.locator('.zeilen .zeile-name').evaluateAll((z) => z.map((x) => x.firstChild.textContent));
+  pruefe('Rezept kopieren und Schritte umsortieren', kopieName === 'Testsuppe (Kopie)' && getauscht === 'Zweiter Schritt. / Erfundenes Prinzip. / Erster Schritt.' && namen.join() === 'Testsuppe,Testsuppe (Kopie)',
+    `Formular: ${kopieName}; nach „nach oben“: ${getauscht}; Liste: ${namen.join(', ')}`);
+
+  const unsinn = [];
+  await schreibe([{ store: 'einstellungen', vorTagen: 20, feld: 'wert', satz: { schluessel: 'letztesBackup' } }]);
+  for (const [route, warteAuf, oeffne] of [['heute', '.backup-erinnerung', null], ['health', '#verlaeufe', '#verlaeufe summary'], ['rezepte/test-kopie/bearbeiten', '#f-schritt-1', null]]) {
+    await seite.goto(`${URL_APP}#/${route}`);
+    await seite.locator(warteAuf).first().waitFor();
+    if (oeffne && !(await seite.locator('#verlaeufe').getAttribute('open'))) await seite.locator(oeffne).click();
+    const b = await seite.evaluate(() => ({ inhalt: document.documentElement.scrollWidth, fenster: window.innerWidth }));
+    if (b.inhalt > b.fenster) unsinn.push(`${route} zu breit (${b.inhalt})`);
+    if (/\b(null|undefined|NaN)\b/.test(await seite.locator('body').innerText())) unsinn.push(`${route}: null/undefined/NaN im Text`);
+    const klein = await seite.evaluate(() => [...document.querySelectorAll('button, a, select, summary, textarea, input:not([type=checkbox]):not([type=file])')].filter((e) => e.offsetParent && !e.closest('svg')).map((e) => ({ t: (e.getAttribute('aria-label') || e.textContent).trim().slice(0, 22), h: Math.round(e.getBoundingClientRect().height) })).filter((e) => e.h < 40));
+    if (klein.length) unsinn.push(`${route}: Tippflächen unter 40 px ${JSON.stringify(klein)}`);
+  }
+  pruefe('Feinschliff: Breite, Text, Tippflächen', unsinn.length === 0, unsinn.join(' | ') || 'drei Seiten in Ordnung');
+  pruefe('Feinschliff-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
+  await kontext.close();
+}
+
 async function migrationsLauf(browser) {
   const { kontext, seite, fehler } = await neueSeite(browser);
   // Datenbank im Aufbau von Schema-Version 1 anlegen, bevor die App sie öffnet (Seite ohne App-Code, gleiche Herkunft)
@@ -1036,6 +1119,7 @@ async function migrationsLauf(browser) {
     await befundLauf(browser);
     await importLauf(browser);
     await angebotLauf(browser);
+    await feinschliffLauf(browser);
     await migrationsLauf(browser);
     await offlineLauf(browser);
     await dunkelLauf(browser);

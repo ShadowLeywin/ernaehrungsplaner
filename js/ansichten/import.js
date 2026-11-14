@@ -11,6 +11,11 @@ export const GETEILT_SCHLUESSEL = 'elan.geteilt';
 
 // Der Entwurf wandert einmalig von hier ins Rezeptformular
 let entwurf = null;
+/** Ein Rezept ohne id als Vorlage für das Formular hinterlegen (Import, Kopie) */
+export function setzeEntwurf(rezept) {
+  entwurf = rezept;
+}
+
 export function nimmEntwurf() {
   const e = entwurf;
   entwurf = null;

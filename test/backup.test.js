@@ -88,3 +88,12 @@ test('ein Backup aus Schema-Version 2 behält seine Rezepte und bekommt einen le
   assert.equal(p.daten.rezepte.length, 1);
   assert.deepEqual(p.daten.plan, []);
 });
+
+test('backupFaellig: erst ab fünf Einträgen, dann ohne Backup oder nach mehr als 14 Tagen', async () => {
+  const { backupFaellig } = await import('../js/logik/backup.js');
+  assert.deepEqual(backupFaellig(null, '2026-11-14', 4), { faellig: false, tage: null });
+  assert.deepEqual(backupFaellig(null, '2026-11-14', 5), { faellig: true, tage: null });
+  assert.deepEqual(backupFaellig('2026-10-25', '2026-11-14', 50), { faellig: true, tage: 20 });
+  assert.deepEqual(backupFaellig('2026-10-31', '2026-11-14', 50), { faellig: false, tage: 14 });
+  assert.deepEqual(backupFaellig('2026-11-14', '2026-11-14', 50), { faellig: false, tage: 0 });
+});
