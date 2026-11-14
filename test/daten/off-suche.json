@@ -1,0 +1,43 @@
+{
+  "_hinweis": "Nachgebildete Antwort im Format von Open Food Facts (cgi/search.pl). Erfundene Produkte, nicht live abgerufen.",
+  "count": 4,
+  "page": 1,
+  "page_size": 20,
+  "products": [
+    {
+      "code": "4000000000017",
+      "product_name": "Skyr Nature",
+      "product_name_de": "Skyr Natur",
+      "brands": "Beispielhof, Andere Marke",
+      "quantity": "450 g",
+      "serving_quantity": "150",
+      "nutriments": {
+        "energy-kcal_100g": 63,
+        "energy_100g": 264,
+        "proteins_100g": 11,
+        "carbohydrates_100g": 4,
+        "sugars_100g": 4,
+        "fat_100g": 0.2,
+        "saturated-fat_100g": 0.1,
+        "salt_100g": 0.13
+      }
+    },
+    {
+      "code": "4000000000024",
+      "product_name": "Haferdrink ungesüßt",
+      "brands": "Beispielmühle",
+      "nutriments": { "energy-kj_100g": 176, "fat_100g": 1.5, "sodium_100g": 0.04 }
+    },
+    {
+      "code": "4000000000031",
+      "product_name": "",
+      "brands": "Ohne Name",
+      "nutriments": { "energy-kcal_100g": 100 }
+    },
+    {
+      "code": "4000000000048",
+      "product_name": "Ohne Energie",
+      "nutriments": { "proteins_100g": 5 }
+    }
+  ]
+}
