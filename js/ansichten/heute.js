@@ -6,6 +6,7 @@ import { MAKROS, NAEHRSTOFFE, fuerMenge, luecken, summeEintraege } from '../logi
 import { fuellRadius, segmente, sektorPfad } from '../logik/scheibe.js';
 import { APP_NAME } from '../logik/schema.js';
 import { alsEintraege } from '../logik/plan.js';
+import { prozent } from '../logik/referenz.js';
 import { kopiereEintraege, wochenSchnitt, wochenTage } from '../logik/woche.js';
 import { TAGESTYPEN, fortschritt, tagestypFuer } from '../logik/ziele.js';
 import { gehe, neuZeichnen } from '../router.js';
@@ -23,10 +24,10 @@ export async function zeigeHeute(wurzel, [parameter]) {
   const heute = isoDatum();
   const datum = istGueltig(parameter) ? parameter : heute;
   const woche = wochenTage(datum);
-  const [eintraege, ziele, wochenplan, tag, slots, wochenEintraege, vortag, plan, letztesBackup, anzahlEintraege] = await Promise.all([
+  const [eintraege, ziele, wochenplan, tag, slots, wochenEintraege, vortag, plan, letztesBackup, anzahlEintraege, referenz] = await Promise.all([
     speicher.eintraegeAm(datum), speicher.ladeZiele(), speicher.ladeWoche(), speicher.holeTag(datum), speicher.ladeSlots(),
     speicher.eintraegeZwischen(woche[0], woche[6]), speicher.eintraegeAm(verschiebe(datum, -1)), speicher.planAm(datum),
-    speicher.einstellung('letztesBackup'), speicher.anzahlEintraege(),
+    speicher.einstellung('letztesBackup'), speicher.anzahlEintraege(), speicher.ladeReferenz(),
   ]);
   const lautPlan = tagestypFuer(datum, wochenplan, null);
   const typ = tagestypFuer(datum, wochenplan, tag);
@@ -41,7 +42,7 @@ export async function zeigeHeute(wurzel, [parameter]) {
     tagestypWahl(datum, typ, lautPlan),
     geplantHinweis(plan.filter((p) => !p.uebernommen), datum),
     uebersicht(ist, ziel, slots, kcalJeSlot),
-    alleNaehrwerte(eintraege, wochenEintraege, woche),
+    alleNaehrwerte(eintraege, wochenEintraege, woche, referenz),
     eintraege.length === 0 && !plan.some((p) => !p.uebernommen) ? el('p', { class: 'leer' }, 'Noch nichts eingetragen. Tippe bei einer Mahlzeit auf das Plus.') : null,
     el('div', { class: 'slots' }, slots.map((slot) => slotBereich({
       slot, datum, eintraege: imSlot(eintraege, slot), vortag: imSlot(vortag, slot), kcal: kcalJeSlot[slot.id], zielKcal: ziel.kcal * slot.anteil,
@@ -149,7 +150,7 @@ function makroZeile(id, ist, ziel) {
 
 /* ---------- Alle Nährwerte: Tag oder Wochenschnitt ---------- */
 
-function alleNaehrwerte(eintraege, wochenEintraege, woche) {
+function alleNaehrwerte(eintraege, wochenEintraege, woche, referenz) {
   const proWoche = ansicht.modus === 'woche';
   const quelle = proWoche ? wochenEintraege : eintraege;
   const { tage, schnitt } = wochenSchnitt(wochenEintraege);
@@ -161,7 +162,8 @@ function alleNaehrwerte(eintraege, wochenEintraege, woche) {
     .filter((n) => n.gruppe === gruppe && typeof werte[n.id] === 'number')
     .map((n) => el('tr', { class: n.unter ? 'unterzeile' : null },
       el('th', { scope: 'row' }, n.name),
-      el('td', {}, `${fehlt.has(n.id) ? 'mind. ' : ''}${zahl(werte[n.id], n.id === 'kcal' ? 0 : stellen(werte[n.id]))} ${n.einheit}`)));
+      el('td', {}, `${fehlt.has(n.id) ? 'mind. ' : ''}${zahl(werte[n.id], n.id === 'kcal' ? 0 : stellen(werte[n.id]))} ${n.einheit}`),
+      referenz.gruppe ? el('td', { class: 'anteil' }, referenz.werte[n.id] ? `${prozent(werte[n.id], referenz.werte[n.id].wert)} %` : '') : null));
   const makros = zeilen('makro');
   const mikros = zeilen('mikro');
 
@@ -184,7 +186,9 @@ function alleNaehrwerte(eintraege, wochenEintraege, woche) {
       makros.length ? el('table', { class: 'naehrwerte' }, el('caption', {}, 'Makronährstoffe'), el('tbody', {}, makros)) : null,
       mikros.length ? el('table', { class: 'naehrwerte' }, el('caption', {}, 'Vitamine und Mineralstoffe'), el('tbody', {}, mikros)) : null,
       fehlt.size && (makros.length || mikros.length) ? el('p', { class: 'klein' }, '„mind.“ steht dort, wo bei mindestens einer Zutat der Wert fehlt. Die echte Menge liegt dann höher.') : null,
-      el('p', { class: 'klein' }, 'Referenzwerte zum Vergleich folgen in einer späteren Version.')));
+      referenz.gruppe
+        ? el('p', { class: 'klein' }, `Prozent: Anteil am Referenzwert der DGE für deine Gruppe (Stand ${referenz.daten.stand}). Er gilt als Schnitt über längere Zeit, nicht für jeden einzelnen Tag. Einstellbar unter „Mehr“.`)
+        : el('p', { class: 'klein' }, el('a', { class: 'textlink', href: '#/mehr' }, 'Referenzgruppe wählen'), ', dann siehst du den Anteil am Referenzwert der DGE.')));
 }
 
 /* ---------- Slots ---------- */

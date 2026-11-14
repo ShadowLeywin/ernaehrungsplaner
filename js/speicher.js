@@ -3,6 +3,7 @@
 import * as db from './db.js';
 import { erstelleBackup } from './logik/backup.js';
 import { bereinigeGesundheit, messungId } from './logik/gesundheit.js';
+import { bereinigeGruppe, werteFuer } from './logik/referenz.js';
 import { rezeptAlsZutat } from './logik/rezepte.js';
 import { bereinigeWoche, bereinigeZiele, slotsMitAnteilen } from './logik/ziele.js';
 
@@ -11,6 +12,26 @@ import { bereinigeWoche, bereinigeZiele, slotsMitAnteilen } from './logik/ziele.
 let basis;
 
 /** Mitgelieferte Zutaten (data/zutaten-basis.json). Nur lesen, einmal laden. */
+let referenzwerte;
+
+/** Referenzwerte der DGE (data/referenzwerte.json). Nur lesen, einmal laden. */
+export function ladeReferenzwerte() {
+  referenzwerte ??= fetch('./data/referenzwerte.json')
+    .then((antwort) => {
+      if (!antwort.ok) throw new Error(`Referenzwerte nicht geladen (HTTP ${antwort.status})`);
+      return antwort.json();
+    })
+    .catch((fehler) => { referenzwerte = undefined; throw fehler; });
+  return referenzwerte;
+}
+
+/** Referenzwerte für die eingestellte Gruppe; leer, solange keine Gruppe gewählt ist */
+export async function ladeReferenz() {
+  const [daten, roh] = await Promise.all([ladeReferenzwerte().catch(() => null), einstellung('referenzgruppe')]);
+  const gruppe = bereinigeGruppe(roh, daten);
+  return { daten, gruppe, werte: werteFuer(daten, gruppe) };
+}
+
 export function ladeBasis() {
   basis ??= fetch('./data/zutaten-basis.json')
     .then((antwort) => {

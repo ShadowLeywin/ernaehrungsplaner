@@ -197,6 +197,19 @@ async function hauptlauf(browser) {
   pruefe('Alle Nährwerte des Tages, Lücken sind gekennzeichnet', zeilenTag > 15 && tagText.includes('Vitamin C') && tagText.includes('mind.'), `${zeilenTag} Zeilen, z. B. ${tagText.match(/Vitamin C\s+[^\n]+/)?.[0].replace(/\s+/g, ' ')}`);
   await seite.getByRole('button', { name: 'Wochenschnitt' }).click();
   await seite.locator('.alle-naehrwerte .klein', { hasText: 'Schnitt je Tag' }).waitFor();
+  const ohneGruppe = await seite.locator('.alle-naehrwerte').innerText();
+  await seite.goto(`${URL_APP}#/mehr`);
+  await seite.locator('#f-ref-geschlecht').selectOption('w');
+  await seite.locator('#f-ref-alter').selectOption('25');
+  await seite.locator('.hinweis', { hasText: 'Referenzgruppe gespeichert' }).waitFor();
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.locator('.alle-naehrwerte summary').waitFor();
+  if ((await seite.locator('.alle-naehrwerte').getAttribute('open')) === null) await seite.locator('.alle-naehrwerte summary').click();
+  await seite.getByRole('button', { name: 'Wochenschnitt' }).click();
+  const vitC = (await seite.locator('.alle-naehrwerte tr', { hasText: 'Vitamin C' }).innerText()).replace(/\s+/g, ' ');
+  const anteile = await seite.locator('.alle-naehrwerte td.anteil').count();
+  pruefe('Referenzwerte: ohne Gruppe ein Hinweis, mit Gruppe Prozent je Nährstoff', ohneGruppe.includes('Referenzgruppe wählen') && /Vitamin C .* \d+ %/.test(vitC) && anteile > 20,
+    `Gruppe Frau 25–50: „${vitC}“, ${anteile} Zeilen mit Anteil`);
   pruefe('Wochenschnitt über Tage mit Einträgen', (await seite.locator('.alle-naehrwerte').getAttribute('open')) !== null, (await seite.locator('.alle-naehrwerte .klein').first().innerText()));
   await bild(seite, '10-alle-naehrwerte');
   await seite.getByRole('button', { name: 'Dieser Tag' }).click();
@@ -1056,6 +1069,70 @@ async function feinschliffLauf(browser) {
   await kontext.close();
 }
 
+async function appLauf(browser) {
+  // Bildet die Android-App nach: window.Capacitor mit isNativePlatform() und nativePromise(), das jeden Aufruf mitschreibt.
+  const { kontext, seite, fehler, fremd } = await neueSeite(browser);
+  await kontext.addInitScript((offAntwort) => {
+    window.__aufrufe = [];
+    window.Capacitor = {
+      isNativePlatform: () => true,
+      getPlatform: () => 'android',
+      nativePromise: async (plugin, methode, optionen) => {
+        window.__aufrufe.push({ plugin, methode, optionen });
+        if (plugin === 'Filesystem' && methode === 'writeFile') return { uri: `file:///data/cache/${optionen.path}` };
+        if (plugin === 'CapacitorHttp') return { status: 200, data: offAntwort, headers: {} };
+        return {};
+      },
+    };
+    // Capacitor setzt diese Werte, sobald die Seite steht; vorher gibt es noch kein <html>
+    document.addEventListener('readystatechange', () => {
+      document.documentElement.style.setProperty('--safe-area-inset-top', '32px');
+      document.documentElement.style.setProperty('--safe-area-inset-bottom', '24px');
+    }, { once: true });
+  }, JSON.parse(OFF_BEISPIEL));
+  await seite.goto(`${URL_APP}#/mehr`, { waitUntil: 'networkidle' });
+  await seite.locator('#f-ziel-kcal').waitFor();
+  const texte = await seite.locator('.seite').innerText();
+  pruefe('App: Texte passen zur App, „Speicher schützen“ entfällt', texte.includes('Deine Daten liegen nur in dieser App') && !texte.includes('Speicher schützen'), 'Backup-Text für die App, Abschnitt „Speicher“ ausgeblendet');
+
+  await seite.getByRole('button', { name: 'Backup speichern' }).click();
+  await seite.locator('.hinweis', { hasText: 'Backup erstellt' }).waitFor();
+  const backupAufrufe = await seite.evaluate(() => window.__aufrufe.map((a) => `${a.plugin}.${a.methode}`));
+  const datei = await seite.evaluate(() => window.__aufrufe.find((a) => a.methode === 'writeFile').optionen);
+  const geteilt = await seite.evaluate(() => window.__aufrufe.find((a) => a.plugin === 'Share').optionen);
+  const inhalt = JSON.parse(datei.data);
+  pruefe('App: Backup wird als Datei angelegt und über das Teilen-Menü abgelegt', backupAufrufe.join() === 'Filesystem.writeFile,Share.share' && datei.directory === 'CACHE' && inhalt.app === 'elan' && geteilt.files[0] === `file:///data/cache/${datei.path}`,
+    `${backupAufrufe.join(' → ')}; Datei ${datei.path}, Schema ${inhalt.schemaVersion}`);
+
+  await seite.evaluate(() => { window.__aufrufe = []; });
+  await seite.getByRole('button', { name: 'Bericht erstellen' }).click();
+  await seite.locator('#f-coach-text').waitFor();
+  await seite.locator('#coach-ausgabe').getByRole('button', { name: 'Teilen' }).click();
+  await seite.waitForFunction(() => window.__aufrufe.some((a) => a.plugin === 'Share'));
+  const coach = await seite.evaluate(() => window.__aufrufe.find((a) => a.plugin === 'Share').optionen);
+  pruefe('App: Coach-Bericht über das native Teilen-Menü', coach.text.startsWith('Wochenbericht ') && coach.title === 'Wochenbericht', `Share.share mit ${coach.text.split('\n').length} Zeilen Text`);
+
+  await seite.evaluate(() => { window.__aufrufe = []; });
+  await seite.goto(`${URL_APP}#/zutaten`);
+  await seite.locator('input[type=search]').fill('skyr');
+  await seite.getByRole('button', { name: /bei Open Food Facts suchen/ }).click();
+  await seite.getByRole('button', { name: 'Übernehmen' }).first().waitFor();
+  const http = await seite.evaluate(() => window.__aufrufe.filter((a) => a.plugin === 'CapacitorHttp').map((a) => a.optionen.url));
+  pruefe('App: Open Food Facts über natives HTTP, nicht über fetch', http.length === 1 && http[0].startsWith('https://world.openfoodfacts.org/') && !fremd.has('world.openfoodfacts.org'),
+    `1 Aufruf CapacitorHttp.request, kein fetch an fremde Server (${[...fremd].join(', ') || 'keiner'})`);
+
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.locator('.slot').first().waitFor();
+  const abstaende = await seite.evaluate(() => ({
+    oben: parseFloat(getComputedStyle(document.querySelector('.inhalt')).paddingTop),
+    unten: parseFloat(getComputedStyle(document.querySelector('.navigation')).paddingBottom),
+  }));
+  pruefe('App: Abstand zu Status- und Gestenleiste aus den Werten von Capacitor', abstaende.oben >= 32 && abstaende.unten >= 24, `oben ${abstaende.oben} px, unten ${abstaende.unten} px (vorgegeben 32 und 24)`);
+  await bild(seite, '24-app-heute');
+  pruefe('App-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
+  await kontext.close();
+}
+
 async function migrationsLauf(browser) {
   const { kontext, seite, fehler } = await neueSeite(browser);
   // Datenbank im Aufbau von Schema-Version 1 anlegen, bevor die App sie öffnet (Seite ohne App-Code, gleiche Herkunft)
@@ -1120,6 +1197,7 @@ async function migrationsLauf(browser) {
     await importLauf(browser);
     await angebotLauf(browser);
     await feinschliffLauf(browser);
+    await appLauf(browser);
     await migrationsLauf(browser);
     await offlineLauf(browser);
     await dunkelLauf(browser);
