@@ -22,12 +22,12 @@ Regeln und Wissen für jede Claude-Session in diesem Repo. Erst lesen, dann arbe
 | Signatur | Signierschlüssel nie ins Repo; `android/keystore.properties` ist ausgeschlossen |
 | Plattform | Unterschiede Browser/App nur in `js/plattform.js` |
 | Hosting | GitHub Pages aus `main`, alle Pfade relativ (`./`) |
-| Schrift | selbst gehostet (`schrift/`), keine Abrufe bei Schriftdiensten |
+| Schrift | selbst gehostet (`schrift/`), keine Abrufe bei Schriftdiensten. Keine Apple-Schrift (SF Pro): Lizenz nur für Apple-Plattformen |
 | Zielwerte | neutrale Startwerte im Code, alles in der App einstellbar |
 | Netz | nur auf ausdrücklichen Knopfdruck (Open Food Facts). Der Import ruft keine fremden Seiten ab |
 | Name | „Elan“ steht nur in `js/logik/schema.js`, `manifest.webmanifest`, `index.html` |
 | Version | bleibt 1.0.0, bis Léon zufrieden ist. Jede sichtbare Änderung bekommt trotzdem einen Eintrag in `js/daten/neuigkeiten.js` (Was ist neu) |
-| Design | ruhige Karten auf hellem Grund, Einstellungen als gruppiertes Menü mit Unterseiten, Eintragen mit möglichst wenigen Tipps |
+| Design | Standard „Glut“: dunkel, im Stil von iOS, Akzent Glutrot, Schrift Inter; „Zitrus“ (hell, Fruchtfarben) bleibt wählbar. Thema über `data-thema`, Modus über `data-modus` (`js/darstellung.js`). Karten, Einstellungen als gruppiertes Menü, Eintragen mit möglichst wenigen Tipps |
 
 ## Arbeitsschleife (jede Runde)
 

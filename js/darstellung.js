@@ -1,34 +1,62 @@
-// Hell, dunkel oder wie das System. Gilt je Gerät (localStorage), gehört nicht ins Backup.
+// Thema (Glut oder Zitrus) und Modus (hell, dunkel, wie das Handy). Gilt je Gerät (localStorage), gehört nicht ins Backup.
 // Dieselbe Logik steht als kurzes Skript in index.html, damit beim Start nichts aufblitzt.
 
-const SCHLUESSEL = 'elan.darstellung';
+import { setzeSystemleisten } from './plattform.js';
+
+const SCHLUESSEL_MODUS = 'elan.darstellung';
+const SCHLUESSEL_THEMA = 'elan.thema';
 const dunkelFrage = matchMedia('(prefers-color-scheme: dark)');
 
-export const MODI = [
-  { id: 'system', name: 'Wie das Handy' },
-  { id: 'hell', name: 'Hell' },
-  { id: 'dunkel', name: 'Dunkel' },
+export const THEMEN = [
+  { id: 'glut', name: 'Glut' },
+  { id: 'zitrus', name: 'Zitrus' },
 ];
 
-export function leseDarstellung() {
+export const MODI = [
+  { id: 'dunkel', name: 'Dunkel' },
+  { id: 'hell', name: 'Hell' },
+  { id: 'system', name: 'Wie das Handy' },
+];
+
+// Glut ist als dunkles Design gedacht; wer nie etwas gewählt hat, sieht es dunkel.
+const STANDARD = { thema: 'glut', modus: 'dunkel' };
+
+// Farbe der Statusleiste je Thema und Modus, passend zum Seitengrund in css/app.css
+const STATUSFARBE = {
+  glut: { hell: '#f2f2f7', dunkel: '#000000' },
+  zitrus: { hell: '#f5f9ec', dunkel: '#0f1812' },
+};
+
+function lies(schluessel, erlaubt, standard) {
   try {
-    const wert = localStorage.getItem(SCHLUESSEL);
-    return MODI.some((m) => m.id === wert) ? wert : 'system';
+    const wert = localStorage.getItem(schluessel);
+    return erlaubt.some((x) => x.id === wert) ? wert : standard;
   } catch {
-    return 'system'; // z. B. privates Fenster ohne Speicherzugriff
+    return standard; // z. B. privates Fenster ohne Speicherzugriff
   }
 }
 
-function wendeAn(modus) {
+export const leseDarstellung = () => lies(SCHLUESSEL_MODUS, MODI, STANDARD.modus);
+export const leseThema = () => lies(SCHLUESSEL_THEMA, THEMEN, STANDARD.thema);
+
+function wendeAn() {
+  const modus = leseDarstellung();
+  const thema = leseThema();
   const dunkel = modus === 'dunkel' || (modus === 'system' && dunkelFrage.matches);
-  document.documentElement.dataset.modus = dunkel ? 'dunkel' : 'hell';
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dunkel ? '#0f1812' : '#f5f9ec');
+  const wurzel = document.documentElement;
+  wurzel.dataset.thema = thema;
+  wurzel.dataset.modus = dunkel ? 'dunkel' : 'hell';
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', STATUSFARBE[thema][dunkel ? 'dunkel' : 'hell']);
+  setzeSystemleisten(dunkel);
 }
 
-export function setzeDarstellung(modus) {
-  try { localStorage.setItem(SCHLUESSEL, modus); } catch { /* dann gilt es nur bis zum Neuladen */ }
-  wendeAn(modus);
+function merke(schluessel, wert) {
+  try { localStorage.setItem(schluessel, wert); } catch { /* dann gilt es nur bis zum Neuladen */ }
+  wendeAn();
 }
 
-dunkelFrage.addEventListener('change', () => wendeAn(leseDarstellung()));
-wendeAn(leseDarstellung());
+export const setzeDarstellung = (modus) => merke(SCHLUESSEL_MODUS, modus);
+export const setzeThema = (thema) => merke(SCHLUESSEL_THEMA, thema);
+
+dunkelFrage.addEventListener('change', wendeAn);
+wendeAn();

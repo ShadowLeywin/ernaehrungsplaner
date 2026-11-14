@@ -7,6 +7,18 @@ const cap = () => globalThis.Capacitor;
 export const istApp = () => Boolean(cap()?.isNativePlatform?.());
 const nativ = (plugin, methode, optionen) => cap().nativePromise(plugin, methode, optionen);
 
+/**
+ * Farbe der Symbole in Status- und Navigationsleiste passend zum Design. Ohne diesen Aufruf richtet sich
+ * Android nach dem Handy: helles Handy, dunkles Glut ergäbe dunkle Symbole auf Schwarz.
+ * 'DARK' heißt bei Capacitor: helle Symbole für dunklen Grund.
+ */
+export function setzeSystemleisten(dunkel) {
+  if (!istApp()) return;
+  try {
+    nativ('SystemBars', 'setStyle', { style: dunkel ? 'DARK' : 'LIGHT' }).catch(() => {});
+  } catch { /* ältere App ohne Plugin: Leisten bleiben wie vom System */ }
+}
+
 /** Bricht der Nutzer das Teilen-Menü ab, ist das kein Fehler. */
 const abgebrochen = (fehler) => fehler?.name === 'AbortError' || /cancel/i.test(String(fehler?.message ?? fehler));
 

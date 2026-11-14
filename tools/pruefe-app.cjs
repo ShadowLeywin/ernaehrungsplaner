@@ -55,6 +55,22 @@ async function hauptlauf(browser) {
   pruefe('Tagesscheibe hat sechs Segmente', (await seite.locator('.scheibe .segment').count()) === 6);
   await bild(seite, '01-heute-leer');
 
+  /* Glut: Standard-Design, Ring-Kacheln, Plus-Knopf */
+  const darstellung = await seite.evaluate(() => `${document.documentElement.dataset.thema}/${document.documentElement.dataset.modus}`);
+  pruefe('Standard-Design ist Glut, dunkel', darstellung === 'glut/dunkel', darstellung);
+  await seite.locator('.kachel.makro-wasser').click();
+  await seite.locator('.kachel.makro-wasser .kachel-wert', { hasText: '250 ml' }).waitFor();
+  await seite.getByRole('button', { name: 'Rückgängig' }).click();
+  await seite.locator('.kachel.makro-wasser .kachel-wert', { hasText: /^0 ml$/ }).waitFor();
+  pruefe('Wasser-Ring zählt mit einem Tipp, Rückgängig nimmt es zurück', (await seite.locator('.kacheln .kachel').count()) === 6, `${await seite.locator('.kacheln .kachel').count()} Kacheln, Wasser wieder ${await seite.locator('.kachel.makro-wasser .kachel-wert').innerText()}`);
+  await seite.getByRole('button', { name: 'Essen erfassen' }).click();
+  await seite.locator('dialog .zeilen .zeile').first().click();
+  const vorbelegt = await seite.locator('#f-slot').inputValue();
+  const erwartet = await seite.evaluate(() => { const h = new Date().getHours(); return h < 10 ? 'fruehstueck' : h < 12 ? 'morgensnack' : h < 15 ? 'mittag' : h < 18 ? 'nachmittagssnack' : h < 21 ? 'abend' : 'abendsnack'; });
+  pruefe('Plus-Knopf öffnet das Eintragen mit der Mahlzeit zur Uhrzeit', vorbelegt === erwartet, `vorbelegt ${vorbelegt}, erwartet ${erwartet}`);
+  await seite.keyboard.press('Escape');
+  await seite.locator('dialog').waitFor({ state: 'detached' });
+
   /* Tagebuch */
   const name = await trageEin(seite, 'Frühstück', 'hafer', 80);
   const eintrag = seite.locator('#slot-fruehstueck .eintrag');
@@ -1114,6 +1130,9 @@ async function appLauf(browser) {
   const texte = await seite.locator('.seite').innerText();
   pruefe('App: Texte passen zur App, „Speicher schützen“ entfällt', texte.includes('Deine Daten liegen nur in dieser App') && !texte.includes('Speicher schützen'), 'Backup-Text für die App, Abschnitt „Speicher“ ausgeblendet');
 
+  const leisten = await seite.evaluate(() => window.__aufrufe.filter((a) => a.plugin === 'SystemBars').map((a) => a.optionen.style));
+  pruefe('App: Symbole der Systemleisten hell auf dunklem Glut', leisten.length > 0 && leisten.every((s) => s === 'DARK'), `SystemBars.setStyle: ${leisten.join(', ') || 'kein Aufruf'}`);
+  await seite.evaluate(() => { window.__aufrufe = []; });
   await seite.getByRole('button', { name: 'Backup speichern' }).click();
   await seite.locator('.hinweis', { hasText: 'Backup erstellt' }).waitFor();
   const backupAufrufe = await seite.evaluate(() => window.__aufrufe.map((a) => `${a.plugin}.${a.methode}`));
@@ -1145,7 +1164,8 @@ async function appLauf(browser) {
   await seite.locator('.slot').first().waitFor();
   const abstaende = await seite.evaluate(() => ({
     oben: parseFloat(getComputedStyle(document.querySelector('.inhalt')).paddingTop),
-    unten: parseFloat(getComputedStyle(document.querySelector('.navigation')).paddingBottom),
+    // Abstand der Tippflächen zum unteren Rand: Innenabstand der Leiste plus ihr Abstand zum Rand (Glut schwebt)
+    unten: (() => { const n = document.querySelector('.navigation'); return innerHeight - n.getBoundingClientRect().bottom + parseFloat(getComputedStyle(n).paddingBottom); })(),
   }));
   pruefe('App: Abstand zu Status- und Gestenleiste aus den Werten von Capacitor', abstaende.oben >= 32 && abstaende.unten >= 24, `oben ${abstaende.oben} px, unten ${abstaende.unten} px (vorgegeben 32 und 24)`);
   await bild(seite, '24-app-heute');

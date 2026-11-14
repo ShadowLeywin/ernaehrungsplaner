@@ -8,7 +8,7 @@ import { APP_NAME } from '../logik/schema.js';
 import { alsEintraege } from '../logik/plan.js';
 import { prozent } from '../logik/referenz.js';
 import { kopiereEintraege, wochenSchnitt, wochenTage } from '../logik/woche.js';
-import { TAGESTYPEN, fortschritt, tagestypFuer } from '../logik/ziele.js';
+import { TAGESTYPEN, fortschritt, slotFuerUhrzeit, tagestypFuer } from '../logik/ziele.js';
 import { gehe, neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { blatt, el, gramm, haenge, hinweis, icon, svg, zahl } from '../ui.js';
@@ -43,27 +43,36 @@ export async function zeigeHeute(wurzel, [parameter]) {
     tagestypWahl(datum, typ, lautPlan),
     geplantHinweis(plan.filter((p) => !p.uebernommen), datum),
     uebersicht(ist, ziel, slots, kcalJeSlot),
-    wasserKarte(datum, wasserHeute.filter((m) => m.art === 'wasser'), gesundheit.wasserZielMl),
-    alleNaehrwerte(eintraege, wochenEintraege, woche, referenz),
+    kacheln(ist, ziel, datum, wasserHeute.filter((m) => m.art === 'wasser'), gesundheit.wasserZielMl),
     eintraege.length === 0 && !plan.some((p) => !p.uebernommen) ? el('p', { class: 'leer' }, 'Noch nichts eingetragen. Tippe bei einer Mahlzeit auf das Plus.') : null,
-    el('div', { class: 'slots' }, slots.map((slot) => slotBereich({
-      slot, datum, eintraege: imSlot(eintraege, slot), vortag: imSlot(vortag, slot), kcal: kcalJeSlot[slot.id], zielKcal: ziel.kcal * slot.anteil,
-    }))),
+    el('section', { class: 'karte mahlzeiten', 'aria-label': 'Mahlzeiten' },
+      el('h2', { class: 'kartentitel' }, 'Mahlzeiten'),
+      el('div', { class: 'slots' }, slots.map((slot) => slotBereich({
+        slot, datum, eintraege: imSlot(eintraege, slot), vortag: imSlot(vortag, slot), kcal: kcalJeSlot[slot.id], zielKcal: ziel.kcal * slot.anteil,
+      })))),
+    alleNaehrwerte(eintraege, wochenEintraege, woche, referenz),
     eintraege.length ? el('div', { class: 'knopfreihe' },
       el('button', { type: 'button', class: 'knopf leise', onclick: () => oeffneTagKopieren(datum, heute, eintraege) }, 'Diesen Tag kopieren')) : null,
     backupErinnerung(backupFaellig(letztesBackup, heute, anzahlEintraege)),
+    // Schnell eintragen: der Slot passt zur Uhrzeit und lässt sich im Blatt noch ändern
+    el('button', {
+      type: 'button', class: 'fab', 'aria-label': 'Essen erfassen',
+      onclick: () => oeffneZutatWahl({ datum, slot: slotFuerUhrzeit(new Date().getHours()), beiFertig: neuZeichnen }),
+    }, icon('plus', 28)),
   );
 }
 
 function kopf(datum, heute) {
   const nah = relativ(datum, heute);
+  // Großer Titel links, Datum klein darüber, Blättern rechts: so lesen sich Tagesansichten auf iOS
   return el('header', { class: 'tageskopf' },
-    el('a', { class: 'rund', href: `#/heute/${verschiebe(datum, -1)}`, 'aria-label': 'Einen Tag zurück' }, icon('zurueck')),
     el('div', { class: 'tagestitel' },
+      nah ? el('p', { class: 'ueberzeile' }, formatLang(datum)) : null,
       el('h1', {}, nah ?? formatLang(datum)),
-      nah ? el('p', {}, formatLang(datum)) : null,
       datum !== heute ? el('a', { class: 'textlink', href: '#/heute' }, 'Zu heute') : null),
-    el('a', { class: 'rund', href: `#/heute/${verschiebe(datum, 1)}`, 'aria-label': 'Einen Tag weiter' }, icon('vor')));
+    el('div', { class: 'blaettern' },
+      el('a', { class: 'rund', href: `#/heute/${verschiebe(datum, -1)}`, 'aria-label': 'Einen Tag zurück' }, icon('zurueck')),
+      el('a', { class: 'rund', href: `#/heute/${verschiebe(datum, 1)}`, 'aria-label': 'Einen Tag weiter' }, icon('vor'))));
 }
 
 function tagestypWahl(datum, typ, lautPlan) {
@@ -105,40 +114,19 @@ function backupErinnerung({ faellig, tage }) {
     el('a', { class: 'textlink', href: '#/mehr/backup' }, 'Zum Backup'));
 }
 
-/** Wasser zählen, ohne die Seite zu wechseln. Ändert sich an Ort und Stelle, die Seite wird nicht neu gezeichnet. */
-function wasserKarte(datum, eintraege, zielMl) {
-  const stand = el('span', { class: 'wasser-stand' });
-  const fuellung = el('span', { class: 'balken-voll' });
-  const zeige = () => {
-    const summe = eintraege.reduce((s, m) => s + m.wert, 0);
-    stand.textContent = `${zahl(summe)} von ${zahl(zielMl)} ml`;
-    fuellung.style.width = `${Math.min(100, (summe / zielMl) * 100).toFixed(1)}%`;
-  };
-  const trinke = async (ml) => {
-    const neu = await speicher.speichereMessung({ art: 'wasser', datum, wert: ml });
-    eintraege.push(neu);
-    zeige();
-    hinweis(`${ml} ml Wasser.`, { aktion: 'Rückgängig', beiAktion: async () => { await speicher.loescheMessung(neu.id); eintraege.splice(eintraege.indexOf(neu), 1); zeige(); } });
-  };
-  zeige();
-  return el('section', { class: 'karte wasser-karte', 'aria-label': 'Wasser' },
-    el('div', { class: 'wasser-kopf' }, el('h2', {}, 'Wasser'), stand),
-    el('span', { class: 'balken' }, fuellung),
-    el('div', { class: 'chips' }, [250, 500].map((ml) => el('button', { type: 'button', class: 'chip', onclick: () => trinke(ml) }, `+ ${ml} ml`))));
-}
-
-/* ---------- Übersicht: Tagesscheibe und Makros ---------- */
+/* ---------- Übersicht: Kalorien-Karte mit Tagesscheibe ---------- */
 
 function uebersicht(ist, ziel, slots, kcalJeSlot) {
   const kcal = fortschritt(ist.kcal ?? 0, ziel.kcal);
   return el('section', { class: 'uebersicht', 'aria-label': 'Tagesstand' },
+    el('div', { class: kcal.ueber ? 'kcal-gross ueber' : 'kcal-gross' },
+      el('span', { class: 'kartentitel' }, 'Energie'),
+      el('strong', {}, zahl(Math.abs(kcal.rest))),
+      el('span', { class: 'kcal-rest' }, kcal.ueber ? 'kcal drüber' : 'kcal übrig'),
+      el('p', { class: 'kcal-zeile' }, `${zahl(ist.kcal ?? 0)} von ${zahl(ziel.kcal)} kcal gegessen`)),
     el('div', { class: 'scheibe-rahmen' },
       tagesscheibe(slots, kcalJeSlot, ziel.kcal),
-      el('div', { class: kcal.ueber ? 'scheibe-mitte ueber' : 'scheibe-mitte' },
-        el('strong', {}, zahl(Math.abs(kcal.rest))),
-        el('span', {}, kcal.ueber ? 'kcal drüber' : 'kcal übrig'))),
-    el('p', { class: 'kcal-zeile' }, `${zahl(ist.kcal ?? 0)} von ${zahl(ziel.kcal)} kcal gegessen`),
-    el('ul', { class: 'makros' }, MAKROS.map((id) => makroZeile(id, ist[id] ?? 0, ziel[id]))));
+      el('div', { class: 'scheibe-mitte' }, el('span', {}, `${zahl(Math.round(kcal.anteil * 100))} %`))));
 }
 
 function tagesscheibe(slots, kcalJeSlot, zielKcal) {
@@ -163,13 +151,74 @@ function springeZu(ereignis, slotId) {
   document.getElementById(`slot-${slotId}`)?.scrollIntoView({ behavior: sanft ? 'smooth' : 'auto', block: 'start' });
 }
 
-function makroZeile(id, ist, ziel) {
+/* ---------- Kacheln: ein Ring je Makro, dazu Wasser und alle Nährwerte ---------- */
+
+// Weiche Trennstellen, damit lange Wörter in schmalen Kacheln an der richtigen Stelle umbrechen
+const KACHEL_NAME = { kh: 'Kohlen\u00ADhydrate', ballaststoffe: 'Ballast\u00ADstoffe' };
+const EMOJI = { protein: '🥚', kh: '🍞', fett: '🥑', ballaststoffe: '🥦', wasser: '💧', alle: '📊' };
+
+/** Ring wie bei Aktivitäts-Apps: pathLength=100, damit der Strich direkt in Prozent angegeben wird. */
+function ring(anteil, emoji) {
+  const prozent = Math.max(0, Math.min(1, anteil)) * 100;
+  return el('span', { class: 'ring' },
+    svg('svg', { viewBox: '0 0 64 64', 'aria-hidden': 'true' },
+      svg('circle', { class: 'ring-grund', cx: 32, cy: 32, r: 27, pathLength: 100 }),
+      prozent > 0.5 ? svg('circle', { class: 'ring-voll', cx: 32, cy: 32, r: 27, pathLength: 100, 'stroke-dasharray': `${prozent.toFixed(1)} 100` }) : null),
+    el('span', { class: 'ring-bild', 'aria-hidden': 'true' }, emoji));
+}
+
+function kacheln(ist, ziel, datum, wasser, wasserZielMl) {
+  return el('section', { class: 'kacheln', 'aria-label': 'Makros' },
+    MAKROS.map((id) => makroKachel(id, ist[id] ?? 0, ziel[id])),
+    wasserKachel(datum, wasser, wasserZielMl),
+    el('button', { type: 'button', class: 'kachel kachel-alle', onclick: zeigeAlleNaehrwerte },
+      ring(0, EMOJI.alle),
+      el('strong', { class: 'kachel-wert' }, 'Alle'),
+      el('span', { class: 'kachel-ziel' }, 'Vitamine, Mineralstoffe'),
+      el('span', { class: 'kachel-name' }, 'Nährwerte')));
+}
+
+function makroKachel(id, ist, ziel) {
   const stand = fortschritt(ist, ziel);
-  return el('li', { class: `makro makro-${id}${stand.ueber ? ' ueber' : ''}` },
-    el('span', { class: 'makro-name' }, nameVon(id)),
-    el('span', { class: 'makro-wert' }, `${gramm(ist)} von ${zahl(ziel)} g`),
-    el('span', { class: 'balken', role: 'progressbar', 'aria-label': nameVon(id), 'aria-valuemin': 0, 'aria-valuemax': Math.round(ziel), 'aria-valuenow': Math.round(ist) },
-      el('span', { class: 'balken-voll', style: `width:${Math.min(100, stand.anteil * 100).toFixed(1)}%` })));
+  return el('div', {
+    class: `kachel makro-${id}${stand.ueber ? ' ueber' : ''}`, role: 'progressbar', 'aria-label': nameVon(id),
+    'aria-valuemin': 0, 'aria-valuemax': Math.round(ziel), 'aria-valuenow': Math.round(ist), 'aria-valuetext': `${gramm(ist)} von ${zahl(ziel)} g`,
+  },
+  ring(stand.anteil, EMOJI[id]),
+  el('strong', { class: 'kachel-wert' }, `${gramm(ist)} g`),
+  el('span', { class: 'kachel-ziel' }, `von ${zahl(ziel)} g`),
+  el('span', { class: 'kachel-name' }, KACHEL_NAME[id] ?? nameVon(id)));
+}
+
+/** Wasser zählen mit einem Tipp. Ändert sich an Ort und Stelle, die Seite wird nicht neu gezeichnet. */
+function wasserKachel(datum, eintraege, zielMl) {
+  const knopf = el('button', { type: 'button', class: 'kachel makro-wasser' });
+  const zeige = () => {
+    const summe = eintraege.reduce((s, m) => s + m.wert, 0);
+    knopf.setAttribute('aria-label', `Wasser: ${zahl(summe)} von ${zahl(zielMl)} ml. Tippen für 250 ml mehr`);
+    knopf.replaceChildren();
+    haenge(knopf,
+      ring(zielMl > 0 ? summe / zielMl : 0, EMOJI.wasser),
+      el('strong', { class: 'kachel-wert' }, `${zahl(summe)} ml`),
+      el('span', { class: 'kachel-ziel' }, `von ${zahl(zielMl)} ml`),
+      el('span', { class: 'kachel-name' }, 'Wasser ', el('span', { class: 'kachel-plus' }, '+250')));
+  };
+  knopf.addEventListener('click', async () => {
+    const neu = await speicher.speichereMessung({ art: 'wasser', datum, wert: 250 });
+    eintraege.push(neu);
+    zeige();
+    hinweis('250 ml Wasser.', { aktion: 'Rückgängig', beiAktion: async () => { await speicher.loescheMessung(neu.id); eintraege.splice(eintraege.indexOf(neu), 1); zeige(); } });
+  });
+  zeige();
+  return knopf;
+}
+
+function zeigeAlleNaehrwerte() {
+  const details = document.querySelector('.alle-naehrwerte');
+  if (!details) return;
+  details.open = true;
+  const sanft = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  details.scrollIntoView({ behavior: sanft ? 'smooth' : 'auto', block: 'start' });
 }
 
 /* ---------- Alle Nährwerte: Tag oder Wochenschnitt ---------- */
@@ -217,6 +266,8 @@ function alleNaehrwerte(eintraege, wochenEintraege, woche, referenz) {
 
 /* ---------- Slots ---------- */
 
+const SLOT_EMOJI = { fruehstueck: '☕', morgensnack: '🍎', mittag: '🍝', nachmittagssnack: '🍌', abend: '🥗', abendsnack: '🥛' };
+
 function slotBereich({ slot, datum, eintraege, vortag, kcal, zielKcal }) {
   const stand = zielKcal > 0 ? `${zahl(kcal)} von ${zahl(zielKcal)} kcal` : `${zahl(kcal)} kcal`;
   const wieVortag = async () => {
@@ -226,7 +277,8 @@ function slotBereich({ slot, datum, eintraege, vortag, kcal, zielKcal }) {
   };
   return el('section', { class: 'slot', id: `slot-${slot.id}` },
     el('div', { class: 'slot-kopf' },
-      el('div', {},
+      el('span', { class: 'slot-bild', 'aria-hidden': 'true' }, SLOT_EMOJI[slot.id] ?? '🍽️'),
+      el('div', { class: 'slot-text' },
         el('h2', {}, slot.name),
         el('p', { class: 'slot-stand' }, `${stand}${slot.hinweis ? `, ${slot.hinweis}` : ''}`)),
       el('button', {

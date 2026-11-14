@@ -173,3 +173,13 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Fehler:** Der Hauptknopf der Einrichtung lag auf kleinen Handys unter dem Rand. Aufgefallen im Bild, nicht im Test. Lösung: Knöpfe unten festheften. Im Test: `seite.url()` endet ohne `#` nicht auf `#/heute`; Prüfung auf „nicht willkommen“ umgestellt.
 - **Fachbegriffe:** Onboarding, Reibung (Friction), Informationsarchitektur, `position: sticky`, Baunummer.
 - **Zum Auftrag:** Geholfen hat „vor allem Design und Struktur“. Gefehlt haben Beispiele, welche Apps du gut findest; ich habe mich an MacroFactor, Cronometer und den Android-Richtlinien orientiert.
+
+## Session 13, Runde 2: Design „Glut“ im Apple-Stil (14.11.2026)
+
+- **Was und warum:** Léon schickte Bilder einer dunklen Fitness-App und wünschte „Apple-Style“. Neues Standard-Design Glut: dunkel, iOS-Systemfarben, Schrift Inter, Ring-Kacheln, Mahlzeiten-Karte, Plus-Knopf, Leiste aus Glas. Zitrus bleibt wählbar.
+- **Befehle:** `npm pack @fontsource-variable/inter` (holt das Schriftpaket ohne Installation) · `BILDER=… node tools/pruefe-app.cjs` (118 Kriterien, Bilder ansehen).
+- **Entscheidung:** Inter statt SF Pro; die Apple-Schrift darf nur auf Apple-Geräten genutzt werden. Verworfen: Archivo Kursiv wie in den Bildern; passt nicht zum Apple-Stil.
+- **Entscheidung 2:** Thema (`data-thema`) und Modus (`data-modus`) getrennt; Glut überschreibt nur Variablen und wenige Regeln am Ende von `css/app.css`.
+- **Fehler:** Im Laborwert-Blatt schlug der Klick fehl („element is not stable“ und „form intercepts pointer events“). Ursache: Der größere Titel machte die Seite 15 px zu breit, das Handy zoomte heraus. Lösung: Seitenkopf darf umbrechen. Eingegrenzt durch Ausblenden Element für Element.
+- **Fachbegriffe:** Design-Token, `backdrop-filter`, `pathLength`, weiches Trennzeichen (`\u00AD`), Layout-Viewport.
+- **Zum Auftrag:** Geholfen haben die Bilder. Gefehlt hat, ob Glut auch hell sein soll; Annahme [A]: dunkel als Standard, hell wählbar.
