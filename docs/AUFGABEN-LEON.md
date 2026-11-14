@@ -23,8 +23,8 @@ Adresse: https://shadowleywin.github.io/ernaehrungsplaner/
 | A11 | Woche → an zwei Tagen etwas einplanen → „Einkaufsliste“ → „Offene Posten teilen“ | Teilen-Menü öffnet sich mit der Liste als Text |
 | A12 | Health → Gewicht eintragen (ein Wert reicht) → „Tageswerte speichern“ | Wert bleibt nach dem Neuladen stehen |
 | A13 | Mehr → Darstellung → „Dunkel“ | Alles bleibt lesbar |
-| A15 | Rezepte → „Zutaten und Mag-Liste“ → eine Zutat öffnen → „Angebot eintragen“ (Markt, Preis) | Angebot steht bei der Zutat; plane die Zutat ein, dann steht es auch in der Einkaufsliste |
-| A14 | Zwei Minuten frei herumtippen | Notiere alles, was hakt, zu klein ist oder unklar heißt |
+| A14 | Rezepte → „Zutaten und Mag-Liste“ → eine Zutat öffnen → „Angebot eintragen“ (Markt, Preis) | Angebot steht bei der Zutat; plane die Zutat ein, dann steht es auch in der Einkaufsliste |
+| A15 | Zwei Minuten frei herumtippen | Notiere alles, was hakt, zu klein ist oder unklar heißt |
 
 ## B. Entscheidungen (zusammen etwa 5 Minuten)
 
