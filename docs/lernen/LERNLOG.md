@@ -74,3 +74,14 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Fehler 2:** Der Browser-Test brach ab, weil ein Selektor plötzlich zwei Auswahlleisten traf. Lösung: Selektor über `aria-label` eindeutig machen.
 - **Fachbegriffe:** Bereichsabfrage (`IDBKeyRange.bound`), Selektor, Untergrenze, Plausibilitätstest, `<details>`.
 - **Zum Auftrag:** Geholfen hat, dass der Phasenplan Kriterien hatte; so war klar, was „fertig“ heißt. Gefehlt hat der Netzzugang zu `dge.de`.
+
+## Session 4, Runde 1: Wochenplan und Einkaufsliste (14.11.2026)
+
+- **Was und warum:** Seite „Woche“ zum Vormerken, Einkaufsliste daraus berechnet, Übernahme ins Tagebuch. Die Liste wird nie gespeichert, nur die Häkchen und eigene Posten; so kann sie nicht vom Plan abweichen.
+- **Befehle:** `sed -i "s/alt/neu/" datei` (Text in einer Datei ersetzen) · `node tools/pruefe-app.cjs 2>&1 | grep -E "FEHLER|ABBRUCH|Kriterien"` (nur das Wichtige zeigen).
+- **Entscheidung:** Plan-Posten haben dieselbe Form wie Tagebuch-Einträge. Dadurch funktionieren Suche, Mengen-Blatt und Summen ohne zweite Fassung. Verworfen: eigenes Format mit Verweis auf Rezept und Portionen.
+- **Fehler 1:** Ein Test erwartete Schema-Version 2 und schlug bei Version 3 fehl, zum zweiten Mal dieselbe Art Fehler. Lösung an der Wurzel: Der Test liest die Nummer jetzt aus `schema.js`.
+- **Fehler 2:** Der Test tippte „Spülmittel“, aber der Posten erschien nicht. Ursache: Nach jedem Häkchen wurde die ganze Liste neu gezeichnet und das Eingabefeld ersetzt. Lösung: Ein Häkchen ändert nur seine Zeile und den Zähler.
+- **Fehler 3:** Der Knopf „Rückgängig“ im Hinweis war unter 40 px hoch. Gefunden, weil die Tippflächen-Prüfung jetzt auch auf den neuen Seiten läuft.
+- **Fachbegriffe:** abgeleitete Daten, Wettlauf (Race Condition), Zustand an Ort und Stelle ändern, Web Share API, Zwischenablage.
+- **Zum Auftrag:** Geholfen hat der Phasenplan mit je einem Ziel. Gefehlt hat nichts; die nächsten Schritte standen fest.

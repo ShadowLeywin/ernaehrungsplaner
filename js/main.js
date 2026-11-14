@@ -4,11 +4,13 @@ import './darstellung.js';
 import { zeigeHeute } from './ansichten/heute.js';
 import { zeigeMehr } from './ansichten/mehr.js';
 import { zeigeRezepte } from './ansichten/rezepte.js';
+import { zeigeWoche } from './ansichten/woche.js';
 import { zeigeZutaten } from './ansichten/zutaten.js';
 import { route, starte } from './router.js';
 import { hinweis } from './ui.js';
 
 route('heute', zeigeHeute);
+route('woche', zeigeWoche);
 route('rezepte', zeigeRezepte);
 route('zutaten', zeigeZutaten);
 route('mehr', zeigeMehr);

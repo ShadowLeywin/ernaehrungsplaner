@@ -10,6 +10,8 @@ const DATEN = {
   tage: [{ datum: '2026-11-13', tagestyp: 'rest' }],
   einstellungen: [{ schluessel: 'woche', wert: ['gym'] }],
   rezepte: [{ id: 'r1', name: 'Testeintopf', portionen: 2, zutaten: [], schritte: [] }],
+  plan: [{ id: 'p1', datum: '2026-11-14', slot: 'abend', gramm: 100, je100: { kcal: 400 } }],
+  einkauf: [{ id: '2026-11-09|eigen:1', woche: '2026-11-09', erledigt: true }],
 };
 
 test('Backup enthält Kennung, Schema-Version, Zeitpunkt und alle Speicher', () => {
@@ -26,7 +28,7 @@ test('Hin und zurück: ein erstelltes Backup besteht die Prüfung unverändert',
   const p = pruefeBackup(kopie);
   assert.equal(p.ok, true);
   assert.deepEqual(p.daten, DATEN);
-  assert.deepEqual(p.anzahl, { zutaten: 1, eintraege: 1, tage: 1, einstellungen: 1, rezepte: 1 });
+  assert.deepEqual(p.anzahl, { zutaten: 1, eintraege: 1, tage: 1, einstellungen: 1, rezepte: 1, plan: 1, einkauf: 1 });
 });
 
 test('fremde und kaputte Dateien werden abgelehnt', () => {
@@ -65,6 +67,8 @@ test('ein Backup aus Schema-Version 1 wird angehoben: Rezepte kommen leer dazu, 
   const p = pruefeBackup(alt);
   assert.equal(p.ok, true);
   assert.deepEqual(p.daten.rezepte, []);
+  assert.deepEqual(p.daten.plan, []);
+  assert.deepEqual(p.daten.einkauf, []);
   assert.deepEqual(p.daten.eintraege, alt.daten.eintraege);
   assert.equal(p.anzahl.zutaten, 1);
 });
@@ -72,4 +76,11 @@ test('ein Backup aus Schema-Version 1 wird angehoben: Rezepte kommen leer dazu, 
 test('für jede ältere Schema-Version gibt es eine Backup-Migration', async () => {
   const { BACKUP_MIGRATIONEN } = await import('../js/logik/backup.js');
   for (let v = 1; v < SCHEMA_VERSION; v += 1) assert.equal(typeof BACKUP_MIGRATIONEN[v], 'function', `Version ${v}`);
+});
+
+test('ein Backup aus Schema-Version 2 behält seine Rezepte und bekommt einen leeren Plan', () => {
+  const p = pruefeBackup({ app: 'elan', schemaVersion: 2, daten: { rezepte: [{ id: 'r1', name: 'Testeintopf' }] } });
+  assert.equal(p.ok, true);
+  assert.equal(p.daten.rezepte.length, 1);
+  assert.deepEqual(p.daten.plan, []);
 });

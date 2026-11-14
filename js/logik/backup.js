@@ -10,6 +10,8 @@ import { APP_KENNUNG, SCHEMA_VERSION, STORES } from './schema.js';
 export const BACKUP_MIGRATIONEN = {
   // Version 1 kannte noch keine Rezepte
   1: (daten) => ({ ...daten, rezepte: [] }),
+  // Version 2 kannte noch keinen Wochenplan
+  2: (daten) => ({ ...daten, plan: [], einkauf: [] }),
 };
 
 export function erstelleBackup(daten, jetzt = new Date()) {

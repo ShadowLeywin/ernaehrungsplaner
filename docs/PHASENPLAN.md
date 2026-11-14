@@ -57,15 +57,16 @@ Ziel: Mikronährstoffe für Tag und Woche sehen.
 
 Module: 3.
 
-### Session 4: Wochenplan und Einkaufsliste
+### Session 4: Wochenplan und Einkaufsliste (erledigt, Version 0.4)
 
 Ziel: Aus einer geplanten Woche entsteht eine Einkaufsliste.
 
-| Abnahmekriterium | Testbefehl |
+| Abnahmekriterium | Beleg |
 |---|---|
-| Rezepte und Zutaten auf Tage und Slots planen | `pruefe-app.cjs` |
-| Einkaufsliste summiert gleiche Zutaten und lässt sich abhaken | `npm test`, `pruefe-app.cjs` |
-| Geplantes mit einem Tipp ins Tagebuch übernehmen | `pruefe-app.cjs` |
+| Rezepte und Zutaten auf Tage und Slots planen | `pruefe-app.cjs`: „Mahlzeiten einplanen“ |
+| Einkaufsliste löst Rezepte auf, summiert gleiche Zutaten und lässt sich abhaken | `npm test`: `plan.test.js`, 8 Tests; `pruefe-app.cjs`: drei Kriterien |
+| Geplantes mit einem Tipp ins Tagebuch übernehmen | `pruefe-app.cjs`: „Geplantes ins Tagebuch übernehmen“ |
+| Schema-Version 3 mit Migration | `pruefe-app.cjs`: Migration von Version 1 auf 3; `npm test`: Backup aus Version 2 |
 
 Module: 4 (Wochenplan, Einkauf).
 
@@ -182,4 +183,5 @@ Jede Session hat eine Tabelle mit prüfbaren Kriterien und einem Testbefehl.
 - Testausgaben vom 13.11.2026 (Version 0.1): `npm test` 59 von 59, `node tools/pruefe-app.cjs` 33 von 33.
 - Testausgaben vom 14.11.2026 (Version 0.2): `npm test` 69 von 69, `node tools/pruefe-app.cjs` 45 von 45.
 - Testausgaben vom 14.11.2026 (Version 0.3): `npm test` 79 von 79, `node tools/pruefe-app.cjs` 50 von 50.
+- Testausgaben vom 14.11.2026 (Version 0.4): `npm test` 88 von 88, `node tools/pruefe-app.cjs` 59 von 59.
 - BLS 4.0 kostenfrei: [heise](https://heise.de/-11123877), [Agrolab](https://agrolab.com/en/news/food-news/6105-bls-datenbank-radar-01-26-en.html), abgerufen 13.11.2026.

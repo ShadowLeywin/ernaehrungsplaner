@@ -9,7 +9,7 @@ Elan ist eine Ernährungs- und Health-App als PWA: offline, deutsch, alle Daten 
 | 1 | Zutaten | lokale Datenbank, eigene Zutaten, Suche bei Open Food Facts | 0.1: vorhanden. Offen: USDA-Suche, BLS 4.0, Barcode per Kamera |
 | 2 | Rezepte | anlegen und ändern, Portionen, Nährwerte automatisch, je Schritt ein Feld „Prinzip dahinter“ | 0.2: vorhanden. Offen: Schritte umsortieren, Rezept kopieren |
 | 3 | Tagebuch | 6 Slots, Makros, Ballaststoffe, Ziele je Tagestyp | 0.3: vorhanden, mit allen Nährwerten für Tag und Wochenschnitt, Kopieren, einstellbaren Anteilen. Offen: Referenzwerte |
-| 4 | Wochenplan, Einkauf, Meal-Prep | Woche planen, Einkaufsliste automatisch, Portionen, Haltbarkeit, Einfrieren | geplant, Sessions 4 und 5 |
+| 4 | Wochenplan, Einkauf, Meal-Prep | Woche planen, Einkaufsliste automatisch, Portionen, Haltbarkeit, Einfrieren | 0.4: Wochenplan und Einkaufsliste vorhanden. Offen: Meal-Prep (Session 5) |
 | 5 | Angebote | Angebote bei den Zutaten zeigen | geplant, Session 6; Datenquelle ungeklärt |
 | 6 | Mag-Liste | je Obst und Gemüse: J (roh und gekocht), R (nur roh), K (nur gekocht), N (nein), S (Sonderfall); steuert Vorschläge | geplant, Session 5 |
 | 7 | Health | Gewicht mit 7-Tage-Schnitt gegen Wochenziel, Maße, Laborwerte, Schlaf, Wasser, Supplements, Symptome mit Bezug zu Mahlzeiten, Schritte | geplant, Sessions 7 und 8 |
@@ -18,7 +18,7 @@ Elan ist eine Ernährungs- und Health-App als PWA: offline, deutsch, alle Daten 
 
 ## Bedienung
 
-- Vier Seiten in 0.2: Heute, Rezepte, Zutaten, Mehr. Ziel sind fünf: Heute, Rezepte, Woche, Health, Mehr (Zutaten wandern unter Rezepte oder Mehr).
+- Fünf Seiten in 0.4: Heute, Woche, Rezepte, Zutaten, Mehr. Mehr als fünf passen nicht in die untere Leiste; Health braucht deshalb einen Platz unter „Mehr“ oder ersetzt „Zutaten“ (Zutaten wandern dann unter Rezepte).
 - Signatur der App ist die **Tagesscheibe**: sechs Segmente wie eine aufgeschnittene Zitrusfrucht, eines je Mahlzeit. Breite = Anteil am Tagesziel, Füllung = gegessen.
 - Fruchtfarben je Makro: Eiweiß Grapefruit, Kohlenhydrate Zitrone, Fett Avocado, Ballaststoffe Heidelbeere.
 - Über dem Ziel liegen ist kein Fehler: kein Rot, nur ein dunkleres Grün.

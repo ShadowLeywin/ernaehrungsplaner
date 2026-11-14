@@ -78,6 +78,18 @@ export function speichereEintrag(eintrag) {
 
 export const loescheEintrag = (id) => db.loesche('eintraege', id);
 
+/* ---------- Wochenplan und Einkaufsliste ---------- */
+
+export const planAm = (datum) => db.nachIndex('plan', 'datum', datum);
+export const planZwischen = (von, bis) => db.imBereich('plan', 'datum', von, bis);
+export const speicherePlan = (posten) => db.speichere('plan', { ...posten, id: posten.id ?? crypto.randomUUID(), erstellt: posten.erstellt ?? new Date().toISOString() });
+export const loeschePlan = (id) => db.loesche('plan', id);
+
+/** Häkchen und eigene Posten einer Woche; woche ist das Datum des Montags. */
+export const einkaufDerWoche = (woche) => db.nachIndex('einkauf', 'woche', woche);
+export const speichereEinkauf = (satz) => db.speichere('einkauf', { ...satz, id: satz.id ?? crypto.randomUUID() });
+export const loescheEinkauf = (id) => db.loesche('einkauf', id);
+
 /* ---------- Tage ---------- */
 
 export const holeTag = (datum) => db.hole('tage', datum);
