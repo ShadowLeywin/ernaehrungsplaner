@@ -9,12 +9,15 @@ import { gehe, neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { bestaetige, el, feld, gramm, haenge, hinweis, icon, zahl } from '../ui.js';
 import { oeffneRezeptPortion, waehleZutat } from './eintrag.js';
+import { nimmEntwurf, zeigeImport } from './import.js';
 
 const adresse = (id, anhang = '') => `#/rezepte/${encodeURIComponent(id)}${anhang}`;
 const portionenText = (n) => `${zahl(n, 1)} ${n === 1 ? 'Portion' : 'Portionen'}`;
 
 export async function zeigeRezepte(wurzel, teile) {
-  if (teile[0] === 'neu') return formular(wurzel, null);
+  if (teile[0] === 'import') return zeigeImport(wurzel);
+  // Ein Entwurf aus dem Import füllt das Formular vor, hat aber noch keine id
+  if (teile[0] === 'neu') return formular(wurzel, nimmEntwurf());
   if (teile[0]) {
     const rezept = await speicher.holeRezept(teile[0]);
     if (!rezept) return nichtGefunden(wurzel);
@@ -32,7 +35,9 @@ async function liste(wurzel) {
     el('header', { class: 'seitenkopf' },
       el('h1', {}, 'Rezepte'),
       el('a', { class: 'knopf klein', href: '#/rezepte/neu' }, icon('plus', 18), 'Neues Rezept')),
-    el('a', { class: 'textlink', href: '#/zutaten' }, 'Zutaten und Mag-Liste'),
+    el('div', { class: 'linkreihe' },
+      el('a', { class: 'textlink', href: '#/rezepte/import' }, 'Rezept importieren'),
+      el('a', { class: 'textlink', href: '#/zutaten' }, 'Zutaten und Mag-Liste')),
     rezepte.length
       ? el('ul', { class: 'zeilen' }, rezepte.map((r) => {
         const w = rezeptWerte(r);
@@ -102,7 +107,7 @@ function nichtGefunden(wurzel) {
 /* ---------- Formular ---------- */
 
 function formular(wurzel, vorlage) {
-  const titel = vorlage ? 'Rezept bearbeiten' : 'Neues Rezept';
+  const titel = vorlage?.id ? 'Rezept bearbeiten' : 'Neues Rezept';
   document.title = `${titel} – ${APP_NAME}`;
   const alsText = (wert) => String(wert).replace('.', ',');
   const eingabe = {
@@ -138,7 +143,7 @@ function formular(wurzel, vorlage) {
         (erstes?.closest('.feld, .rezeptzeile, .schritt')?.querySelector('input, textarea') ?? erstes)?.focus?.();
         return;
       }
-      const gespeichert = await speicher.speichereRezept({ ...(vorlage ? { id: vorlage.id, erstellt: vorlage.erstellt } : {}), ...pruefung.rezept });
+      const gespeichert = await speicher.speichereRezept({ ...(vorlage?.id ? { id: vorlage.id, erstellt: vorlage.erstellt } : {}), ...pruefung.rezept });
       hinweis('Rezept gespeichert.');
       gehe(adresse(gespeichert.id).slice(1));
     };
@@ -166,7 +171,7 @@ function formular(wurzel, vorlage) {
         : null);
 
     wurzel.replaceChildren(
-      el('a', { class: 'zurueck', href: vorlage ? adresse(vorlage.id) : '#/rezepte' }, icon('zurueck', 18), 'Abbrechen'),
+      el('a', { class: 'zurueck', href: vorlage?.id ? adresse(vorlage.id) : '#/rezepte' }, icon('zurueck', 18), 'Abbrechen'),
       el('h1', {}, titel),
       el('form', { class: 'stapel', novalidate: true, onsubmit: speichern },
         feld({ name: 'name', beschriftung: 'Name', value: eingabe.name, fehler: fehler.name, maxlength: 80, oninput: (e) => { eingabe.name = e.target.value; } }),

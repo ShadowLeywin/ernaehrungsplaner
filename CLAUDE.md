@@ -7,7 +7,7 @@ Regeln und Wissen für jede Claude-Session in diesem Repo. Erst lesen, dann arbe
 - **Was:** Progressive Web App für Android/Chrome, komplett deutsch, offline-first.
 - **Umfang:** nur Ernährung und Health-Daten. Kein Trainingslog; der Tagestyp (Gym, Calisthenics, Rest) bestimmt nur die Ziele.
 - **Nutzer:** Léon baut privat. Später nutzen Freunde die App, jeder mit eigenen lokalen Daten.
-- **Stand:** Version 0.7 (Tagebuch, Wochenplan mit Einkaufsliste, Rezepte mit Meal-Prep, Zutaten mit Mag-Liste, Health mit Laborwerten und Symptomen, Ziele, Backup), Schema-Version 6. Plan: `docs/PHASENPLAN.md`.
+- **Stand:** Version 0.8 (Tagebuch, Wochenplan mit Einkaufsliste, Rezepte mit Meal-Prep und Import, Zutaten mit Mag-Liste, Health mit Laborwerten und Symptomen, Ziele, Backup, Coach-Export), Schema-Version 6. Offen: Angebote, Referenzwerte, Tests am Handy. Plan: `docs/PHASENPLAN.md`.
 
 ## Feste Entscheidungen (gelten, bis Léon widerspricht)
 
@@ -21,7 +21,7 @@ Regeln und Wissen für jede Claude-Session in diesem Repo. Erst lesen, dann arbe
 | Hosting | GitHub Pages aus `main`, alle Pfade relativ (`./`) |
 | Schrift | selbst gehostet (`schrift/`), keine Abrufe bei Schriftdiensten |
 | Zielwerte | neutrale Startwerte im Code, alles in der App einstellbar |
-| Netz | nur auf ausdrücklichen Knopfdruck (Open Food Facts) |
+| Netz | nur auf ausdrücklichen Knopfdruck (Open Food Facts). Der Import ruft keine fremden Seiten ab |
 | Name | „Elan“ steht nur in `js/logik/schema.js`, `manifest.webmanifest`, `index.html` |
 
 ## Arbeitsschleife (jede Runde)
@@ -86,6 +86,7 @@ Léon kann mehrere Runden am Stück freigeben („mach durch bis …“). Dann d
 - Eingaben mit Komma erlauben (`parseZahl`), Felder mit `inputmode="decimal"`.
 - Tippflächen mindestens 40 px hoch, kein seitliches Rollen bei 320 px Breite.
 - Eine Eingabe des Nutzers nie durch Neuzeichnen der ganzen Seite gefährden: Häkchen und Zähler an Ort und Stelle ändern, Getipptes in einem Entwurf halten (siehe `entwurf` in `js/ansichten/health.js`).
+- Automatische Zuordnungen (Import) nur bei ganzen Wörtern; lieber kein Treffer als ein falscher Nährwert.
 - Tests nie an feste Listen binden, die mit dem Projekt wachsen (Schema-Nummer, Speicher): aus `js/logik/schema.js` ableiten.
 
 ## Pflichten bei jeder Änderung an App-Dateien
@@ -109,4 +110,4 @@ Lokal ist der Service Worker aus. Mit `?sw=1` in der Adresse läuft er wie auf d
 
 ## Doku
 
-`docs/KONZEPT.md` (neun Module, Technik), `docs/DATENMODELL.md`, `docs/PHASENPLAN.md`, `docs/OFFENE-FRAGEN.md`, `docs/IST-ANALYSE.md` (alter Stand, verworfen).
+`docs/KONZEPT.md` (neun Module, Technik), `docs/DATENMODELL.md`, `docs/PHASENPLAN.md`, `docs/OFFENE-FRAGEN.md`, `docs/COACH-PROMPT.md`, `docs/IST-ANALYSE.md` (alter Stand, verworfen).

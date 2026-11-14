@@ -805,6 +805,88 @@ async function befundLauf(browser) {
   await kontext.close();
 }
 
+async function importLauf(browser) {
+  const { kontext, seite, fehler } = await neueSeite(browser, { permissions: ['clipboard-read', 'clipboard-write'] });
+  const beispiel = (name) => fs.readFileSync(path.resolve(__dirname, '..', 'test', 'daten', name), 'utf8');
+  await seite.goto(`${URL_APP}#/rezepte`, { waitUntil: 'networkidle' });
+  await seite.getByRole('link', { name: 'Rezept importieren' }).click();
+  await seite.locator('#f-import-text').waitFor();
+  await seite.getByRole('button', { name: 'Rezept erkennen' }).click();
+  const leerMeldung = await seite.locator('#import-ergebnis').innerText();
+  await seite.locator('#f-import-text').fill('https://example.org/rezept/123');
+  await seite.getByRole('button', { name: 'Rezept erkennen' }).click();
+  const nurAdresse = await seite.locator('#import-ergebnis').innerText();
+  pruefe('Import: leeres Feld und bloße Adresse werden erklärt, nichts wird abgerufen', leerMeldung.includes('Füge zuerst') && nurAdresse.includes('ruft keine fremden Seiten ab'), `„${leerMeldung}“ | „${nurAdresse.slice(0, 60)}…“`);
+
+  await seite.locator('#f-import-text').fill(beispiel('rezept-text.txt'));
+  await seite.getByRole('button', { name: 'Rezept erkennen' }).click();
+  await seite.locator('#import-ergebnis h2').waitFor();
+  const zeilen = await seite.locator('#import-ergebnis .zeile').evaluateAll((z) => z.map((x) => x.innerText.replace(/\n+/g, ' → ')));
+  const kopfzeile = await seite.locator('#import-ergebnis .klein').first().innerText();
+  pruefe('Import aus Text: Name, Portionen, Zutaten zugeordnet, Unsicheres markiert', (await seite.locator('#import-ergebnis h2').innerText()) === 'Linsen-Eintopf' && zeilen.length === 7 && kopfzeile.includes('4 Portionen') && kopfzeile.includes('3 Schritte') && zeilen.some((z) => z.includes('geschätzt')) && zeilen.some((z) => z.includes('nicht gefunden')),
+    `${kopfzeile} Beispiele: ${zeilen.slice(0, 2).join(' ; ')} ; ${zeilen.find((z) => z.includes('nicht gefunden'))}`);
+  await bild(seite, '19-import');
+
+  await seite.getByRole('button', { name: 'Ins Rezeptformular übernehmen' }).click();
+  await seite.locator('#f-schritt-2').waitFor();
+  const uebernommen = { name: await seite.locator('#f-name').inputValue(), portionen: await seite.locator('#f-portionen').inputValue(), zutaten: await seite.locator('.rezeptzeile').count(), schritt: await seite.locator('#f-schritt-0').inputValue() };
+  // Mengen, die der Import nicht kennt, trägt der Nutzer im Formular nach
+  for (const feld of await seite.locator('.gramm-eingabe').all()) if (!(await feld.inputValue())) await feld.fill('50');
+  await seite.getByRole('button', { name: 'Rezept speichern' }).click();
+  await seite.locator('.schritte').waitFor();
+  pruefe('Import landet als Entwurf im Rezeptformular und lässt sich speichern', uebernommen.name === 'Linsen-Eintopf' && uebernommen.portionen === '4' && uebernommen.zutaten >= 3 && (await seite.locator('.schritte > li').count()) === 3,
+    `Formular: ${uebernommen.name}, ${uebernommen.portionen} Portionen, ${uebernommen.zutaten} Zutaten, erster Schritt „${uebernommen.schritt.slice(0, 40)}…“; gespeichert mit 3 Schritten`);
+
+  await seite.goto(`${URL_APP}#/rezepte/import`);
+  await seite.locator('#f-import-text').fill(beispiel('rezept-schema.html'));
+  await seite.getByRole('button', { name: 'Rezept erkennen' }).click();
+  await seite.locator('#import-ergebnis h2').waitFor();
+  const schema = await seite.locator('#import-ergebnis .klein').first().innerText();
+  pruefe('Import aus Schema.org-Daten eines eingefügten Seitenquelltexts', (await seite.locator('#import-ergebnis h2').innerText()) === 'Haferbrei mit Apfel & Zimt' && schema.includes('Rezeptdaten der Seite') && schema.includes('2 Portionen'), schema);
+
+  // Android "Teilen": Die App wird mit Parametern geöffnet
+  const geteilt = `${URL_APP}?titel=${encodeURIComponent('Schnelles Müsli')}&text=${encodeURIComponent('80 g Haferflocken\n1 Banane\n200 ml Milch\nAlles in eine Schale geben und fünf Minuten quellen lassen.')}`;
+  await seite.goto(geteilt, { waitUntil: 'networkidle' });
+  await seite.locator('#import-ergebnis h2').waitFor();
+  const adresse = await seite.evaluate(() => `${location.search}|${location.hash}`);
+  const manifest = await seite.evaluate(async () => (await fetch(document.querySelector('link[rel=manifest]').href)).json());
+  pruefe('Share Target: geteilter Text öffnet den Import und wird sofort erkannt', adresse === '|#/rezepte/import' && (await seite.locator('#import-ergebnis h2').innerText()) === 'Schnelles Müsli' && manifest.share_target?.params?.text === 'text',
+    `Adresse aufgeräumt („${adresse}“), erkannt: ${await seite.locator('#import-ergebnis h2').innerText()}, ${await seite.locator('#import-ergebnis .klein').first().innerText()}`);
+
+  /* Coach-Export */
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.locator('.slot').first().waitFor();
+  await trageEin(seite, 'Frühstück', 'haferflocken', 80);
+  await trageEin(seite, 'Mittagessen', 'reis', 200);
+  await seite.goto(`${URL_APP}#/mehr`);
+  await seite.getByRole('button', { name: 'Bericht erstellen' }).click();
+  await seite.locator('#f-coach-text').waitFor();
+  const bericht = await seite.locator('#f-coach-text').inputValue();
+  await seite.getByRole('button', { name: 'Bericht kopieren' }).click();
+  await seite.locator('.hinweis', { hasText: 'Bericht kopiert' }).waitFor();
+  const kopie = await seite.evaluate(() => navigator.clipboard.readText());
+  await seite.getByRole('button', { name: 'Letzte Woche' }).click();
+  await seite.waitForFunction((alt) => document.getElementById('f-coach-text').value !== alt, bericht);
+  const letzte = await seite.locator('#f-coach-text').inputValue();
+  pruefe('Coach-Export: Wochenbericht als Text, kopierbar, Woche wählbar', bericht.startsWith('Wochenbericht ') && bericht.includes('ERNÄHRUNG') && bericht.includes('Schnitt je Tag aus 1 Tag') && kopie === bericht && letzte.includes('Keine Einträge in dieser Woche'),
+    `${bericht.split('\n').length} Zeilen, z. B. „${bericht.split('\n').find((z) => z.startsWith('- Energie'))}“; letzte Woche: „Keine Einträge …“`);
+  await bild(seite, '20-coach');
+
+  const unsinn = [];
+  for (const [route, warteAuf] of [['rezepte/import', '#f-import-text'], ['mehr', '#f-ziel-kcal']]) {
+    await seite.goto(`${URL_APP}#/${route}`);
+    await seite.locator(warteAuf).first().waitFor();
+    const b = await seite.evaluate(() => ({ inhalt: document.documentElement.scrollWidth, fenster: window.innerWidth }));
+    if (b.inhalt > b.fenster) unsinn.push(`${route} zu breit (${b.inhalt})`);
+    if (/\b(null|undefined|NaN)\b/.test(await seite.locator('body').innerText())) unsinn.push(`${route}: null/undefined/NaN im Text`);
+    const klein = await seite.evaluate(() => [...document.querySelectorAll('button, a, select, summary, textarea, input:not([type=checkbox]):not([type=file])')].filter((e) => e.offsetParent).map((e) => ({ t: (e.getAttribute('aria-label') || e.textContent).trim().slice(0, 18), h: Math.round(e.getBoundingClientRect().height) })).filter((e) => e.h < 40));
+    if (klein.length) unsinn.push(`${route}: Tippflächen unter 40 px ${JSON.stringify(klein)}`);
+  }
+  pruefe('Import und Mehr: Breite, Text, Tippflächen', unsinn.length === 0, unsinn.join(' | ') || 'beide Seiten in Ordnung');
+  pruefe('Import-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
+  await kontext.close();
+}
+
 async function migrationsLauf(browser) {
   const { kontext, seite, fehler } = await neueSeite(browser);
   // Datenbank im Aufbau von Schema-Version 1 anlegen, bevor die App sie öffnet (Seite ohne App-Code, gleiche Herkunft)
@@ -866,6 +948,7 @@ async function migrationsLauf(browser) {
     await vorkochLauf(browser);
     await healthLauf(browser);
     await befundLauf(browser);
+    await importLauf(browser);
     await migrationsLauf(browser);
     await offlineLauf(browser);
     await dunkelLauf(browser);

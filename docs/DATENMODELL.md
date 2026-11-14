@@ -1,6 +1,6 @@
 # Datenmodell
 
-Stand: Schema-Version 6 (App 0.7.0). Maßgeblich im Code: `js/logik/schema.js` und `js/db.js`.
+Stand: Schema-Version 6 (App 0.8.0). Maßgeblich im Code: `js/logik/schema.js` und `js/db.js`.
 
 ## Grundsätze
 

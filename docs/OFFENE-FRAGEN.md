@@ -22,6 +22,9 @@ Jede Frage hat eine Empfehlung. Léon entscheidet.
 | Installation auf dem Startbildschirm | braucht ein echtes Gerät | Léon am Handy |
 | Verhalten der Bildschirmtastatur im Mengen-Blatt | Emulator hat keine Tastatur | Léon am Handy |
 | Backup-Datei speichern und wieder auswählen unter Android | Dateidialog des Systems | Léon am Handy |
+| „Teilen“ aus einer anderen App nach Elan (Share Target) | geht nur mit installierter App auf einem echten Gerät | Léon am Handy |
+| „Teilen“ der Einkaufsliste und des Coach-Berichts | Teilen-Menü des Systems | Léon am Handy |
+| Coach-Prompt mit einem echten KI-Chat | braucht Léons Urteil, ob die Antwort hilft | Léon |
 
 ## Annahmen [A]
 
