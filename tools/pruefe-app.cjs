@@ -81,10 +81,10 @@ async function hauptlauf(browser) {
   pruefe('Eintrag löschen und zurückholen', nachLoeschen === 2 && (await seite.locator('.eintrag').count()) === 3, `nach Löschen ${nachLoeschen}, nach Rückgängig ${await seite.locator('.eintrag').count()}`);
 
   const vorher = await seite.locator('.kcal-zeile').innerText();
-  const gedrueckt = await seite.locator('.wahl-knopf[aria-pressed=true]').innerText();
-  await seite.locator('.wahl-knopf[aria-pressed=false]').last().click();
+  const gedrueckt = await seite.locator('[aria-label=Tagestyp] .wahl-knopf[aria-pressed=true]').innerText();
+  await seite.locator('[aria-label=Tagestyp] .wahl-knopf[aria-pressed=false]').last().click();
   await seite.waitForFunction((alt) => document.querySelector('.kcal-zeile')?.textContent !== alt, vorher);
-  pruefe('Tagestyp wechseln ändert das Ziel', true, `${gedrueckt}: ${vorher} → ${await seite.locator('.wahl-knopf[aria-pressed=true]').innerText()}: ${await seite.locator('.kcal-zeile').innerText()}`);
+  pruefe('Tagestyp wechseln ändert das Ziel', true, `${gedrueckt}: ${vorher} → ${await seite.locator('[aria-label=Tagestyp] .wahl-knopf[aria-pressed=true]').innerText()}: ${await seite.locator('.kcal-zeile').innerText()}`);
   await bild(seite, '02-heute-gefuellt');
 
   await seite.getByRole('link', { name: 'Einen Tag zurück' }).click();
@@ -185,6 +185,55 @@ async function hauptlauf(browser) {
   await seite.getByRole('button', { name: 'Verstanden' }).click();
   pruefe('Fremde Datei wird abgelehnt, Daten bleiben', ablehnung.includes('nicht aus dieser App'), ablehnung);
   fs.rmSync(datei);
+
+  /* Alle Nährwerte, Wochenschnitt, Kopieren, Anteile */
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.locator('.eintrag').first().waitFor();
+  await seite.locator('.alle-naehrwerte summary').click();
+  const zeilenTag = await seite.locator('.alle-naehrwerte tr').count();
+  const tagText = await seite.locator('.alle-naehrwerte').innerText();
+  pruefe('Alle Nährwerte des Tages, Lücken sind gekennzeichnet', zeilenTag > 15 && tagText.includes('Vitamin C') && tagText.includes('mind.'), `${zeilenTag} Zeilen, z. B. ${tagText.match(/Vitamin C\s+[^\n]+/)?.[0].replace(/\s+/g, ' ')}`);
+  await seite.getByRole('button', { name: 'Wochenschnitt' }).click();
+  await seite.locator('.alle-naehrwerte .klein', { hasText: 'Schnitt je Tag' }).waitFor();
+  pruefe('Wochenschnitt über Tage mit Einträgen', (await seite.locator('.alle-naehrwerte').getAttribute('open')) !== null, (await seite.locator('.alle-naehrwerte .klein').first().innerText()));
+  await bild(seite, '10-alle-naehrwerte');
+  await seite.getByRole('button', { name: 'Dieser Tag' }).click();
+  await seite.locator('.alle-naehrwerte summary').click();
+
+  const heuteAnzahl = await seite.locator('.eintrag').count();
+  await seite.getByRole('link', { name: 'Einen Tag weiter' }).click();
+  await seite.locator('h1', { hasText: 'Morgen' }).waitFor();
+  const chip = seite.locator('#slot-fruehstueck .wie-vortag');
+  const chipText = await chip.innerText();
+  await chip.click();
+  await seite.locator('#slot-fruehstueck .eintrag').waitFor();
+  pruefe('Leere Mahlzeit: „Wie am Vortag“ übernimmt die Einträge', (await seite.locator('#slot-fruehstueck .eintrag').count()) === 1, chipText);
+
+  await seite.getByRole('link', { name: 'Zu heute' }).click();
+  await seite.locator('h1', { hasText: 'Heute' }).waitFor();
+  await seite.getByRole('button', { name: 'Diesen Tag kopieren' }).click();
+  const zielTag = await seite.locator('#f-kopierziel').inputValue();
+  await seite.getByRole('button', { name: 'Kopieren', exact: true }).click();
+  const kopiert = await seite.locator('.hinweis span').innerText();
+  await seite.getByRole('button', { name: 'Hingehen' }).click();
+  await seite.locator('h1', { hasText: 'Morgen' }).waitFor();
+  await seite.locator('.eintrag').first().waitFor();
+  pruefe('Ganzen Tag kopieren', (await seite.locator('.eintrag').count()) === heuteAnzahl + 1, `Ziel ${zielTag}: „${kopiert}“ → ${await seite.locator('.eintrag').count()} Einträge (1 war schon da)`);
+
+  await seite.goto(`${URL_APP}#/mehr`);
+  await seite.locator('#f-anteil-morgensnack').fill('0');
+  const zuWenig = await seite.locator('#anteile-stand').innerText();
+  await seite.getByRole('button', { name: 'Anteile speichern' }).click();
+  const nichtGespeichert = (await seite.locator('.hinweis', { hasText: 'Anteile gespeichert' }).count()) === 0;
+  await seite.locator('#f-anteil-fruehstueck').fill('33');
+  await seite.getByRole('button', { name: 'Anteile speichern' }).click();
+  await seite.locator('.hinweis', { hasText: 'Anteile gespeichert' }).waitFor();
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.locator('.eintrag').first().waitFor();
+  const segmenteJetzt = await seite.locator('.scheibe .segment').count();
+  const snack = await seite.locator('#slot-morgensnack .slot-stand').innerText();
+  pruefe('Anteile der Mahlzeiten einstellbar, Summe 100 % wird erzwungen', nichtGespeichert && zuWenig.includes('fehlen 8') && segmenteJetzt === 5 && snack === '0 kcal',
+    `„${zuWenig}“ → nicht gespeichert; nach Korrektur ${segmenteJetzt} Segmente, Morgensnack zeigt „${snack}“`);
 
   /* Layout */
   await seite.goto(`${URL_APP}#/heute`);
@@ -397,7 +446,7 @@ async function migrationsLauf(browser) {
   await seite.locator('.hinweis', { hasText: 'Backup eingespielt' }).waitFor();
   await seite.goto(`${URL_APP}#/heute/2026-11-01`);
   await seite.locator('.eintrag').waitFor();
-  const typ = await seite.locator('.wahl-knopf[aria-pressed=true]').innerText();
+  const typ = await seite.locator('[aria-label=Tagestyp] .wahl-knopf[aria-pressed=true]').innerText();
   pruefe('Backup aus Version 1 lässt sich einspielen', (await seite.locator('.eintrag-name').innerText()).includes('Beispielmüsli') && typ === 'Rest',
     `„${frage.slice(0, 70)}…“ → Eintrag ${(await seite.locator('.eintrag-name').innerText()).split('\n')[0]}, Tagestyp ${typ}`);
   pruefe('Migrations-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');

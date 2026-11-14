@@ -8,11 +8,11 @@ Jede Frage hat eine Empfehlung. Léon entscheidet.
 | 2 | Angebote: weiter über marktguru? | Die frühere Action nutzte eine inoffizielle Schnittstelle und las Zugangsschlüssel aus der Webseite. Nutzungsbedingungen dazu nicht gefunden [offen]. Bricht, sobald die Seite sich ändert [vermutet] | Nicht automatisiert weiterführen, bis geklärt. Alternativen: Anbieter um Erlaubnis fragen; Angebote von Hand an einer Zutat notieren; Datei selbst pflegen und importieren | Session 6 |
 | 3 | USDA-Suche: wie mit dem API-Schlüssel umgehen? | Ein Schlüssel im Client-Code ist für jeden lesbar. USDA verlangt einen Schlüssel je Nutzer [vermutet, Doku war nicht abrufbar] | Kein Schlüssel im Repo. Variante A: jeder Nutzer trägt seinen eigenen Schlüssel in der App ein (liegt nur lokal, nicht im Backup). Variante B: auf Live-Suche verzichten und Daten vorab als Datei aufbereiten. Empfehlung: B, zusammen mit Frage 1 | USDA-Teil von Modul 1 |
 | 4 | Lizenz des Repos? | Früher GPL-3.0, beim Neuaufbau entfernt. Ohne Lizenzdatei darf niemand den Code weiterverwenden | MIT, wenn Freunde frei weiterbauen sollen; GPL-3.0, wenn Ableger offen bleiben müssen; keine, wenn es privat bleiben soll | nichts |
-| 5 | Referenzwerte für Mikronährstoffe? | Noch keine im Code | D-A-CH-Referenzwerte der DGE mit Quelle und Datum als Datei; Obergrenzen der EFSA. Vor Session 3 nachschlagen | Session 3 |
+| 5 | Referenzwerte für Mikronährstoffe? | Noch keine im Code. Die Seite der DGE war am 14.11.2026 aus der Arbeitsumgebung nicht erreichbar; aus dem Gedächtnis werden keine Gesundheitswerte eingebaut | Léon erlaubt `www.dge.de` in den Netzwerk-Einstellungen der Umgebung, oder liefert die Tabelle als Datei. Dann als `data/referenzwerte.json` mit Quelle und Datum | Vergleich in „Alle Nährwerte“ |
 | 6 | Open Food Facts: Limits und Pflichten? | Nutzung nur auf Knopfdruck. Limits (etwa 10 Suchen je Minute) und Lizenz ODbL [vermutet, Doku war nicht abrufbar]. Live nicht getestet, nur mit Beispieldaten | Am Handy testen. Doku bei nächster Gelegenheit nachschlagen und hier belegen | nichts |
 | 7 | Name „Elan“? | Annahme, weil kein Name genannt wurde | bestätigen oder ändern (drei Stellen, siehe `CLAUDE.md`) | nichts |
 | 8 | Alte Daten der früheren App im Browser? | Die frühere App nutzte auf derselben Adresse die Datenbank `ernaehrungsplaner`. Elan fasst sie nicht an | So lassen. Wer aufräumen will: App-Daten im Browser löschen | nichts |
-| 9 | Startwerte für Ziele und Slot-Anteile? | Neutrale Zahlen im Code, in der App änderbar. Slot-Anteile noch nicht einstellbar | reicht bis Session 3 | nichts |
+| 9 | Startwerte für Ziele und Slot-Anteile? | Neutrale Zahlen im Code, beides in der App änderbar (seit 0.3) | erledigt | nichts |
 
 ## Was nicht getestet werden konnte
 

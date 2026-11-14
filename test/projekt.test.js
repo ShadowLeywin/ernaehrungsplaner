@@ -74,3 +74,12 @@ test('Basis-Zutaten: Energie passt grob zu den Makros', () => {
   }).map((z) => `${z.name}: ${z.je100.kcal} kcal, aus Makros ${Math.round(kcalAusMakros(z.je100))}`);
   assert.deepEqual(auffaellig, []);
 });
+
+test('Basis-Zutaten: EPA + DHA (in mg) ist nie mehr als Omega-3 gesamt (in g)', () => {
+  // Fängt vertauschte Einheiten ab: EPA und DHA sind ein Teil von Omega-3.
+  const { zutaten } = JSON.parse(lies('data/zutaten-basis.json'));
+  const einheit = NAEHRSTOFFE.find((n) => n.id === 'epaDha').einheit;
+  assert.equal(einheit, 'mg');
+  const falsch = zutaten.filter((z) => (z.je100.epaDha ?? 0) / 1000 > (z.je100.omega3 ?? 0) + 0.05).map((z) => z.name);
+  assert.deepEqual(falsch, []);
+});

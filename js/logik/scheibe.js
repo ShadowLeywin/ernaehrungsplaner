@@ -44,6 +44,7 @@ export function segmente(slots, kcalJeSlot, zielKcal, luecke = 4) {
     const ist = kcalJeSlot[slot.id] ?? 0;
     const ziel = zielKcal * slot.anteil;
     const anteil = ziel > 0 ? ist / ziel : 0;
-    return { id: slot.id, start, ende, ist, ziel, anteil, ueber: anteil > 1.05 };
+    // Ein Slot mit 0 % (oder weniger Breite als die Lücke) hat kein Segment; seine Einträge zählen trotzdem zum Tag
+    return { id: slot.id, start, ende, ist, ziel, anteil, ueber: anteil > 1.05, sichtbar: ende - start >= 1 };
   });
 }
