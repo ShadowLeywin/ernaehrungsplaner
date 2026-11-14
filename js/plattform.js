@@ -19,6 +19,38 @@ export function setzeSystemleisten(dunkel) {
   } catch { /* ältere App ohne Plugin: Leisten bleiben wie vom System */ }
 }
 
+/* ---------- Vibration beim Tippen ---------- */
+
+const SCHLUESSEL_VIBRATION = 'elan.vibration';
+
+/** Vibration an oder aus; gilt je Gerät. Standard: an. */
+export function vibrationAn() {
+  try { return localStorage.getItem(SCHLUESSEL_VIBRATION) !== 'aus'; } catch { return true; }
+}
+
+export function setzeVibration(an) {
+  try { localStorage.setItem(SCHLUESSEL_VIBRATION, an ? 'an' : 'aus'); } catch { /* gilt dann nur bis zum Neuladen */ }
+}
+
+/**
+ * Kurzes Tippgefühl. art 'leicht' (Wasser, Häkchen) oder 'erfolg' (etwas eingetragen).
+ * App: Plugin Haptics (nutzt den Vibrationsmotor wie native Apps). Browser: navigator.vibrate, falls vorhanden.
+ * Wartet nie und wirft nie: Fehlt die Vibration, geht alles andere normal weiter.
+ */
+export function tippGefuehl(art = 'leicht') {
+  if (!vibrationAn()) return;
+  try {
+    if (istApp()) {
+      const aufruf = art === 'erfolg'
+        ? nativ('Haptics', 'notification', { type: 'SUCCESS' })
+        : nativ('Haptics', 'impact', { style: 'LIGHT' });
+      aufruf.catch(() => {});
+    } else {
+      navigator.vibrate?.(art === 'erfolg' ? [12, 60, 18] : 10);
+    }
+  } catch { /* ohne Vibration weiter */ }
+}
+
 /** Bricht der Nutzer das Teilen-Menü ab, ist das kein Fehler. */
 const abgebrochen = (fehler) => fehler?.name === 'AbortError' || /cancel/i.test(String(fehler?.message ?? fehler));
 

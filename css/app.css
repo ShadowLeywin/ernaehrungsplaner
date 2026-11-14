@@ -542,6 +542,19 @@ body:has(.seite-willkommen) .navigation { display: none; }
   background: var(--flaeche-2); font-size: 1.125rem; line-height: 1;
 }
 
+/* Health: Gewicht auf einen Blick, wie die Kalorien-Karte auf „Heute“ */
+.gewicht-karte > * + * { margin-top: 0.5rem; }
+.gewicht-kopf { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.gewicht-zeile { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.25rem 0.875rem; }
+.gewicht-zahl { font-size: 3rem; line-height: 1; font-weight: 760; letter-spacing: -0.04em; }
+.gewicht-zahl span { font-size: 1.125rem; font-weight: 600; letter-spacing: 0; color: var(--tinte-leise); }
+.gewicht-aenderung { font-size: 1.0625rem; font-weight: 700; color: var(--tinte-leise); white-space: nowrap; }
+.trend-pille { flex: none; padding: 0.125rem 0.625rem; border-radius: 999px; font-size: 0.8125rem; font-weight: 700; }
+/* Kein Rot: Abweichungen vom Plan sind ein Hinweis, kein Fehler */
+.trend-pille.imZiel { background: var(--limette-blass); color: var(--blatt); }
+.trend-pille.darueber, .trend-pille.darunter { background: color-mix(in srgb, var(--zitrone) 22%, transparent); color: var(--tinte); }
+.gewicht-karte .verlauf svg { height: 4.5rem; }
+
 /* Rezepte: Karten mit Symbol auf Farbton statt Foto */
 .rezeptliste { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; background: none; border-radius: 0; overflow: visible; }
 .rezeptliste li + li { border-top: 0; }

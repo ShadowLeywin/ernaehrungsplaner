@@ -9,6 +9,7 @@ import { alsEintraege } from '../logik/plan.js';
 import { prozent } from '../logik/referenz.js';
 import { kopiereEintraege, wochenSchnitt, wochenTage } from '../logik/woche.js';
 import { TAGESTYPEN, fortschritt, slotFuerUhrzeit, tagestypFuer } from '../logik/ziele.js';
+import { tippGefuehl } from '../plattform.js';
 import { gehe, neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { blatt, el, gramm, haenge, hinweis, icon, svg, zahl } from '../ui.js';
@@ -209,6 +210,7 @@ function wasserKachel(datum, eintraege, zielMl) {
       el('span', { class: 'kachel-name' }, 'Wasser ', el('span', { class: 'kachel-plus' }, '+250')));
   };
   knopf.addEventListener('click', async () => {
+    tippGefuehl();
     const neu = await speicher.speichereMessung({ art: 'wasser', datum, wert: 250 });
     eintraege.push(neu);
     zeige();

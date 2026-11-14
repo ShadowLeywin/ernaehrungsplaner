@@ -3,9 +3,10 @@
 
 import { formatKurz, formatLang, isoDatum, istGueltig, relativ, verschiebe } from '../logik/datum.js';
 import {
-  ARTEN, artVon, gewichtsTrend, letzterWert, linienPunkte, pruefeGesundheit, pruefeMesswert, tagesSumme, tagesWert, verlauf, verlaufJeTag,
+  ARTEN, artVon, gewichtsTrend, letzterWert, linienPunkte, pruefeGesundheit, pruefeMesswert, tagesSumme, tagesWert, trendRichtung, verlauf, verlaufJeTag,
 } from '../logik/gesundheit.js';
 import { APP_NAME } from '../logik/schema.js';
+import { tippGefuehl } from '../plattform.js';
 import { neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { el, feld, haenge, hinweis, icon, mitBild, svg, zahl } from '../ui.js';
@@ -44,6 +45,7 @@ export async function zeigeHealth(wurzel, [parameter]) {
     el('div', { class: 'knopfreihe mitte' },
       el('a', { class: 'knopf leise klein', href: '#/health/labor' }, 'Laborwerte'),
       el('a', { class: 'knopf leise klein', href: '#/health/symptome' }, 'Symptome')),
+    gewichtKarte(datum, messungen, ziele),
     tageswerte(datum, messungen, ziele),
     wasser(datum, messungen, ziele),
     supplementBereich(datum, supplements, tag),
@@ -88,8 +90,6 @@ function messFeld(artId, messungen, datum, fehler, zusatz = {}) {
 function tageswerte(datum, messungen, ziele) {
   const bereich = el('section', { class: 'bereich erster' });
   const zeichne = (fehler = null) => {
-    const trend = gewichtsTrend(messungen, datum, ziele.wochenzielKg);
-    const punkte = verlauf(messungen, 'gewicht', datum, 30);
     const schlaf = tagesWert(messungen, 'schlaf', datum);
     const schritte = tagesWert(messungen, 'schritte', datum);
     bereich.replaceChildren(
@@ -105,8 +105,6 @@ function tageswerte(datum, messungen, ziele) {
         },
       },
       messFeld('gewicht', messungen, datum, fehler),
-      el('p', { class: 'klein', id: 'gewicht-trend' }, trendText(trend, ziele.wochenzielKg)),
-      punkte.length >= 2 ? verlaufslinie(punkte) : null,
       el('div', { class: 'raster' }, messFeld('schlaf', messungen, datum, fehler), messFeld('schritte', messungen, datum, fehler, { inputmode: 'numeric' })),
       el('p', { class: 'klein' }, [
         schlaf !== null ? `Schlaf: ${zahl(schlaf, 1)} von ${zahl(ziele.schlafZielH, 1)} h.` : null,
@@ -116,6 +114,28 @@ function tageswerte(datum, messungen, ziele) {
   };
   zeichne();
   return bereich;
+}
+
+/**
+ * Gewicht auf einen Blick, wie die Kalorien-Karte auf „Heute“: großer 7-Tage-Schnitt, Pfeil zur Vorwoche,
+ * Stand gegen das Wochenziel, Verlauf. Die App bewertet nicht, sie vergleicht nur mit deinem Ziel.
+ */
+function gewichtKarte(datum, messungen, ziele) {
+  const trend = gewichtsTrend(messungen, datum, ziele.wochenzielKg);
+  const punkte = verlauf(messungen, 'gewicht', datum, 30);
+  const richtung = trendRichtung(trend.aenderung);
+  const pfeil = { hoch: '↑', runter: '↓', gleich: '→' }[richtung];
+  const stand = { imZiel: 'im Ziel', darueber: 'über Plan', darunter: 'unter Plan' }[trend.status];
+  return el('section', { class: 'karte gewicht-karte', 'aria-label': 'Gewicht' },
+    el('div', { class: 'gewicht-kopf' },
+      el('span', { class: 'kartentitel' }, 'Gewicht · Schnitt 7 Tage'),
+      stand ? el('span', { class: `trend-pille ${trend.status}` }, stand) : null),
+    el('div', { class: 'gewicht-zeile' },
+      el('strong', { class: 'gewicht-zahl' }, trend.schnitt !== null ? zahl(trend.schnitt, 1) : '–', el('span', {}, ' kg')),
+      trend.aenderung !== null ? el('span', { class: `gewicht-aenderung ${richtung}`, 'aria-label': `${mitVorzeichen(trend.aenderung)} kg zur Vorwoche` },
+        `${pfeil} ${mitVorzeichen(trend.aenderung)} kg`) : null),
+    punkte.length >= 2 ? verlaufslinie(punkte) : null,
+    el('p', { class: 'klein', id: 'gewicht-trend' }, trendText(trend, ziele.wochenzielKg)));
 }
 
 function trendText(trend, ziel) {
@@ -149,7 +169,7 @@ function wasser(datum, messungen, ziele) {
     fuellung.style.width = `${Math.min(100, (summe / ziele.wasserZielMl) * 100).toFixed(1)}%`;
     zurueck.hidden = eintraege.length === 0;
   };
-  const trinke = async (ml) => { eintraege.push(await speicher.speichereMessung({ art: 'wasser', datum, wert: ml })); zeige(); };
+  const trinke = async (ml) => { tippGefuehl(); eintraege.push(await speicher.speichereMessung({ art: 'wasser', datum, wert: ml })); zeige(); };
   zurueck.addEventListener('click', async () => { await speicher.loescheMessung(eintraege.pop().id); zeige(); });
   zeige();
   return el('section', { class: 'bereich makro-wasser' },
@@ -178,6 +198,7 @@ function supplementBereich(datum, supplements, tag) {
         el('input', {
           type: 'checkbox', checked: genommen.has(s.id) ? true : null,
           onchange: async (e) => {
+            if (e.target.checked) tippGefuehl();
             if (e.target.checked) genommen.add(s.id); else genommen.delete(s.id);
             e.target.closest('.haken').classList.toggle('erledigt', e.target.checked);
             await speicher.setzeSupplementGenommen(datum, s.id, e.target.checked);

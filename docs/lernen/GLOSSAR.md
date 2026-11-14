@@ -69,3 +69,4 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | Layout-Viewport | Die Breite, mit der der Handy-Browser die Seite anlegt; ist die Seite breiter, zoomt er heraus. | Seitenkopf in `css/app.css` |
 | `color-mix()` | CSS-Funktion, die zwei Farben mischt, hier eine Farbe mit Durchsichtigkeit zu einer Tönung. | `.slot-bild` im Blatt-Teil von `css/app.css` |
 | Streuwert (Hash) | Eine aus einem Text berechnete Zahl; gleicher Text gibt immer dieselbe Zahl. | `streuwert()` in `js/logik/rezeptbild.js` |
+| Haptik | Rückmeldung über den Vibrationsmotor, zum Beispiel ein kurzes Antippen beim Speichern. | `tippGefuehl()` in `js/plattform.js` |

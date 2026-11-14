@@ -107,6 +107,15 @@ export function gewichtsTrend(messungen, datum, wochenzielKg = 0) {
   return { status, schnitt: jetzt.schnitt, anzahl: jetzt.anzahl, anzahlDavor: davor.anzahl, aenderung, abweichung };
 }
 
+/**
+ * Richtung einer Änderung für einen Pfeil: 'hoch', 'runter' oder 'gleich'.
+ * Unter 0,05 kg gilt als gleich, damit Rundungsrauschen keinen Pfeil erzeugt.
+ */
+export function trendRichtung(aenderung, schwelle = 0.05) {
+  if (typeof aenderung !== 'number' || !Number.isFinite(aenderung) || Math.abs(aenderung) < schwelle) return 'gleich';
+  return aenderung > 0 ? 'hoch' : 'runter';
+}
+
 /** Werte einer Art der letzten tage Tage, alt nach neu: [{ datum, wert }] */
 export function verlauf(messungen, artId, datum, tage = 30) {
   const von = verschiebe(datum, -(tage - 1));
