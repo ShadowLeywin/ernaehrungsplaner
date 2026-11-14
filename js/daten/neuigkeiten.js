@@ -5,15 +5,15 @@ export const NEUIGKEITEN = [
   {
     version: '1.0.0',
     datum: '2026-11-14',
-    titel: 'Neues Design: Glut',
+    titel: 'Neues Design: Blatt',
     punkte: [
-      'Neues Standard-Design „Glut“: dunkel, klar, im Stil von iOS, mit Akzent in Glutrot.',
+      'Neues Standard-Design „Blatt“: schlicht im Stil von iOS, in Elans Grün, dunkel oder hell.',
       '„Heute“ neu geordnet: große Kalorien-Karte mit Tagesscheibe, darunter je ein Ring für Eiweiß, Kohlenhydrate, Fett, Ballaststoffe und Wasser.',
       'Wasser mit einem Tipp auf den Ring zählen, mit „Rückgängig“.',
       'Alle Mahlzeiten in einer Karte, jede mit eigenem Symbol.',
       'Runder Plus-Knopf unten rechts: trägt in die Mahlzeit ein, die zur Uhrzeit passt.',
-      'Schwebende Leiste mit Glaseffekt, Einstellungen mit farbigen Symbolen wie auf dem iPhone.',
-      'Das helle Zitrus-Design gibt es weiter unter Mehr → Darstellung.',
+      'Mehr Farbe: jede Mahlzeit und jeder Nährwert hat einen eigenen Farbton, Einstellungen mit farbigen Symbolen wie auf dem iPhone.',
+      'Das erste Design „Zitrus“ gibt es weiter unter Mehr → Darstellung.',
     ],
   },
   {

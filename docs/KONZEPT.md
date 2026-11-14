@@ -22,10 +22,10 @@ Elan ist eine Ernährungs- und Health-App als Android-App und PWA aus demselben 
 - Beim ersten Start führt eine kurze Einrichtung in drei Schritten zum ersten Eintrag.
 - Eintragen braucht möglichst wenige Tipps: Zuletzt Gegessenes mit einem Tipp und der Menge vom letzten Mal; Wasser direkt auf „Heute“.
 - Fünf Seiten seit 0.6: Heute, Woche, Rezepte, Health, Mehr. Zutaten und Mag-Liste sind über „Rezepte“ und „Mehr“ erreichbar; man braucht sie selten direkt, weil die Suche beim Eintragen alles findet.
-- Zwei Designs: **Glut** (Standard, dunkel, im Stil von iOS: große Titel, gruppierte Listen mit farbigen Symbolen, schwebende Leiste mit Glas, Ringe je Nährwert) und **Zitrus** (das erste, helle Design). Beide in hell und dunkel.
+- Zwei Designs: **Blatt** (Standard, schlicht im Stil von iOS, in Elans Grün: große Titel, gruppierte Listen mit farbigen Symbolen, ruhige Leiste ohne Glas, Ringe je Nährwert, Farbton je Mahlzeit) und **Zitrus** (das erste, helle Design). Beide in hell und dunkel.
 - „Heute“: Kalorien-Karte mit Tagesscheibe, sechs Kacheln (Eiweiß, Kohlenhydrate, Fett, Ballaststoffe, Wasser zum Antippen, alle Nährwerte), eine Karte mit allen Mahlzeiten, Plus-Knopf für die Mahlzeit zur Uhrzeit.
 - Signatur der App ist die **Tagesscheibe**: sechs Segmente wie eine aufgeschnittene Zitrusfrucht, eines je Mahlzeit. Breite = Anteil am Tagesziel, Füllung = gegessen.
-- Farben je Makro: in Zitrus Fruchtfarben (Eiweiß Grapefruit, Kohlenhydrate Zitrone, Fett Avocado, Ballaststoffe Heidelbeere), in Glut die Systemfarben von iOS (Eiweiß Pink, Kohlenhydrate Gelb, Fett Blau, Ballaststoffe Grün, Wasser Cyan).
+- Farben je Makro: in Zitrus Fruchtfarben (Eiweiß Grapefruit, Kohlenhydrate Zitrone, Fett Avocado, Ballaststoffe Heidelbeere), in Blatt kräftige Töne nach iOS (Eiweiß Pink, Kohlenhydrate Gelb, Fett Blau, Ballaststoffe Lila, Wasser Cyan); Grün bleibt dem Akzent vorbehalten.
 - Über dem Ziel liegen ist kein Fehler: kein Rot, nur ein dunkleres Grün.
 
 ## Technik-Empfehlung
@@ -38,7 +38,7 @@ Elan ist eine Ernährungs- und Health-App als Android-App und PWA aus demselben 
 | Hosting | GitHub Pages | kostenlos, HTTPS, aus dem Repo | Cloudflare Pages oder Netlify: gleiche Leistung, zusätzliches Konto |
 | Android-App | Capacitor 8 | packt die vorhandene Web-App, keine zweite Codebasis, native Plugins für Teilen und Dateien | Trusted Web Activity: kleiner, braucht aber eine Datei auf der Domain-Wurzel, die GitHub Pages für dieses Repo nicht liefert |
 | Offline | Service Worker, Cache zuerst, Dateiliste von Hand | alle Dateien einer Version passen zusammen | Workbox: erzeugt die Liste automatisch, braucht Build |
-| Schrift | Inter (Glut) und Bricolage Grotesque (Zitrus), selbst gehostet (OFL) | kein Abruf bei Dritten, offline da; Inter kommt der Apple-Schrift am nächsten | SF Pro: darf nur für Apple-Plattformen genutzt werden; Systemschrift: auf Android Roboto, kein einheitlicher Look |
+| Schrift | Inter (Blatt) und Bricolage Grotesque (Zitrus), selbst gehostet (OFL) | kein Abruf bei Dritten, offline da; Inter kommt der Apple-Schrift am nächsten | SF Pro: darf nur für Apple-Plattformen genutzt werden; Systemschrift: auf Android Roboto, kein einheitlicher Look |
 
 ## Datenschutz
 
@@ -54,8 +54,8 @@ Elan ist eine Ernährungs- und Health-App als Android-App und PWA aus demselben 
 | Kurze Einrichtung, schnell zum ersten Eintrag | Ratgeber zu Onboarding von Ernährungs-Apps | drei Schritte, überspringbar, Backup einspielen gleich am Anfang |
 | Viele Einstellungen in Gruppen und Unterseiten, Wichtiges zuerst | Android-Designrichtlinien zu Einstellungen | Menü „Mehr“ mit vier Gruppen |
 | Navigationsleiste mit drei bis fünf Zielen | Android-Richtlinien zu Navigation | fünf Ziele: Heute, Woche, Rezepte, Health, Mehr |
-| Dunkles Design mit Ring-Kacheln, Mahlzeiten-Karte, rundem Plus-Knopf | Bildschirmfotos einer Fitness-App von Léon (14.11.2026) | Glut: Aufbau und Stimmung übernommen, Farben, Schrift und Symbole eigen |
-| Apple-Stil: große Titel, gruppierte Listen, farbige Symbole, Leiste aus Glas, Ringe | Léons Wunsch „allgemein der Apple-Style“ | Glut, mit Inter statt SF Pro |
+| Dunkles Design mit Ring-Kacheln, Mahlzeiten-Karte, rundem Plus-Knopf | Bildschirmfotos einer Fitness-App von Léon (14.11.2026) | Blatt: Aufbau übernommen, Farben, Schrift und Symbole eigen |
+| Apple-Stil: große Titel, gruppierte Listen, farbige Symbole, Ringe | Léons Wunsch „allgemein der Apple-Style“, dann „schlicht, ohne Glas, das Grüne“ | Blatt, mit Inter statt SF Pro |
 
 ## Annahmen [A]
 

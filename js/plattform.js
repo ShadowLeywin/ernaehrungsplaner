@@ -9,7 +9,7 @@ const nativ = (plugin, methode, optionen) => cap().nativePromise(plugin, methode
 
 /**
  * Farbe der Symbole in Status- und Navigationsleiste passend zum Design. Ohne diesen Aufruf richtet sich
- * Android nach dem Handy: helles Handy, dunkles Glut ergäbe dunkle Symbole auf Schwarz.
+ * Android nach dem Handy: helles Handy, dunkles Design ergäbe dunkle Symbole auf Schwarz.
  * 'DARK' heißt bei Capacitor: helle Symbole für dunklen Grund.
  */
 export function setzeSystemleisten(dunkel) {

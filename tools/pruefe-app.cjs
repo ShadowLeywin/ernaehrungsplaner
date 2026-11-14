@@ -55,9 +55,9 @@ async function hauptlauf(browser) {
   pruefe('Tagesscheibe hat sechs Segmente', (await seite.locator('.scheibe .segment').count()) === 6);
   await bild(seite, '01-heute-leer');
 
-  /* Glut: Standard-Design, Ring-Kacheln, Plus-Knopf */
+  /* Blatt: Standard-Design, Ring-Kacheln, Plus-Knopf */
   const darstellung = await seite.evaluate(() => `${document.documentElement.dataset.thema}/${document.documentElement.dataset.modus}`);
-  pruefe('Standard-Design ist Glut, dunkel', darstellung === 'glut/dunkel', darstellung);
+  pruefe('Standard-Design ist Blatt, dunkel', darstellung === 'blatt/dunkel', darstellung);
   await seite.locator('.kachel.makro-wasser').click();
   await seite.locator('.kachel.makro-wasser .kachel-wert', { hasText: '250 ml' }).waitFor();
   await seite.getByRole('button', { name: 'Rückgängig' }).click();
@@ -1131,7 +1131,7 @@ async function appLauf(browser) {
   pruefe('App: Texte passen zur App, „Speicher schützen“ entfällt', texte.includes('Deine Daten liegen nur in dieser App') && !texte.includes('Speicher schützen'), 'Backup-Text für die App, Abschnitt „Speicher“ ausgeblendet');
 
   const leisten = await seite.evaluate(() => window.__aufrufe.filter((a) => a.plugin === 'SystemBars').map((a) => a.optionen.style));
-  pruefe('App: Symbole der Systemleisten hell auf dunklem Glut', leisten.length > 0 && leisten.every((s) => s === 'DARK'), `SystemBars.setStyle: ${leisten.join(', ') || 'kein Aufruf'}`);
+  pruefe('App: Symbole der Systemleisten hell auf dunklem Blatt', leisten.length > 0 && leisten.every((s) => s === 'DARK'), `SystemBars.setStyle: ${leisten.join(', ') || 'kein Aufruf'}`);
   await seite.evaluate(() => { window.__aufrufe = []; });
   await seite.getByRole('button', { name: 'Backup speichern' }).click();
   await seite.locator('.hinweis', { hasText: 'Backup erstellt' }).waitFor();
@@ -1164,7 +1164,7 @@ async function appLauf(browser) {
   await seite.locator('.slot').first().waitFor();
   const abstaende = await seite.evaluate(() => ({
     oben: parseFloat(getComputedStyle(document.querySelector('.inhalt')).paddingTop),
-    // Abstand der Tippflächen zum unteren Rand: Innenabstand der Leiste plus ihr Abstand zum Rand (Glut schwebt)
+    // Abstand der Tippflächen zum unteren Rand: Innenabstand der Leiste plus ihr Abstand zum Rand (falls die Leiste schwebt)
     unten: (() => { const n = document.querySelector('.navigation'); return innerHeight - n.getBoundingClientRect().bottom + parseFloat(getComputedStyle(n).paddingBottom); })(),
   }));
   pruefe('App: Abstand zu Status- und Gestenleiste aus den Werten von Capacitor', abstaende.oben >= 32 && abstaende.unten >= 24, `oben ${abstaende.oben} px, unten ${abstaende.unten} px (vorgegeben 32 und 24)`);

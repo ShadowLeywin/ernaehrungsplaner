@@ -67,3 +67,4 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | `pathLength` | Gibt einem SVG-Pfad eine gedachte Länge, hier 100, damit der Ring direkt in Prozent gefüllt wird. | `ring()` in `js/ansichten/heute.js` |
 | Weiches Trennzeichen | Unsichtbares Zeichen `\u00AD`, an dem ein Wort bei Platzmangel mit Strich umbricht. | `KACHEL_NAME` in `js/ansichten/heute.js` |
 | Layout-Viewport | Die Breite, mit der der Handy-Browser die Seite anlegt; ist die Seite breiter, zoomt er heraus. | Seitenkopf in `css/app.css` |
+| `color-mix()` | CSS-Funktion, die zwei Farben mischt, hier eine Farbe mit Durchsichtigkeit zu einer Tönung. | `.slot-bild` im Blatt-Teil von `css/app.css` |

@@ -34,7 +34,7 @@ const MENUE = [
     { id: 'coach', farbe: '#af52de', titel: 'Coach-Export', text: 'Wochenbericht als Text für einen Chat', icon: 'bericht' },
   ] },
   { gruppe: 'App', eintraege: [
-    { id: 'darstellung', farbe: '#8e8e93', titel: 'Darstellung', text: 'Glut oder Zitrus, dunkel oder hell', icon: 'darstellung' },
+    { id: 'darstellung', farbe: '#8e8e93', titel: 'Darstellung', text: 'Blatt oder Zitrus, dunkel oder hell', icon: 'darstellung' },
     { id: 'ueber', farbe: '#007aff', titel: 'Über Elan', text: 'Alle Funktionen in Kürze, Datenschutz, Quellen', icon: 'info' },
     { id: 'neu', farbe: '#ff9500', titel: 'Was ist neu', text: 'Patchnotes', icon: 'neu' },
   ] },
@@ -354,7 +354,7 @@ function darstellungBereich() {
   return el('section', { class: 'bereich' },
     el('h2', {}, 'Darstellung'),
     wahl('Design', THEMEN, leseThema(), setzeThema),
-    el('p', { class: 'klein' }, 'Glut: dunkel und klar, mit Ringen je Nährwert. Zitrus: das ursprüngliche helle Design mit Fruchtfarben.'),
+    el('p', { class: 'klein' }, 'Blatt: schlicht wie auf dem iPhone, in Grün. Zitrus: das erste Design mit eigener Schrift.'),
     wahl('Hell oder dunkel', MODI, leseDarstellung(), setzeDarstellung));
 }
 

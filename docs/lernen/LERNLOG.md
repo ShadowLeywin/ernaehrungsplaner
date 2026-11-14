@@ -183,3 +183,11 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Fehler:** Im Laborwert-Blatt schlug der Klick fehl („element is not stable“ und „form intercepts pointer events“). Ursache: Der größere Titel machte die Seite 15 px zu breit, das Handy zoomte heraus. Lösung: Seitenkopf darf umbrechen. Eingegrenzt durch Ausblenden Element für Element.
 - **Fachbegriffe:** Design-Token, `backdrop-filter`, `pathLength`, weiches Trennzeichen (`\u00AD`), Layout-Viewport.
 - **Zum Auftrag:** Geholfen haben die Bilder. Gefehlt hat, ob Glut auch hell sein soll; Annahme [A]: dunkel als Standard, hell wählbar.
+
+## Session 13, Runde 3: Aus Glut wird Blatt (14.11.2026)
+
+- **Was und warum:** Léon: „keine Glasliste, aber der schlichte Vibe“, „mehr in den Farbtönen“, „ich mag das Grüne“. Design umbenannt in Blatt: Elans Grün als Akzent, Leiste wieder schlicht, Farbton je Mahlzeit hinter dem Symbol.
+- **Befehle:** `node tools/icons-erzeugen.cjs` (Startbilder auf dem neuen dunklen Grund) · `node tools/pruefe-app.cjs` (119 Kriterien).
+- **Entscheidung:** Ballaststoffe in Lila statt Grün, damit Grün allein den Akzent trägt. Verworfen: Glut nur umfärben und den Namen behalten; der Name passte nicht mehr.
+- **Technik:** `color-mix(in srgb, Farbe 22%, transparent)` tönt die Symbolflächen aus derselben Farbvariable.
+- **Zum Auftrag:** Geholfen hat die klare Ablehnung des Glases. Unklar war „mehr in den Farbtönen“; Annahme [A]: mehr kräftige Farben je Nährwert und Mahlzeit.
