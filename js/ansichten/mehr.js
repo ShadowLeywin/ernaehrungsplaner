@@ -20,6 +20,7 @@ export async function zeigeMehr(wurzel) {
   ]);
   haenge(wurzel, 
     el('header', { class: 'seitenkopf' }, el('h1', {}, 'Mehr')),
+    el('p', {}, el('a', { class: 'textlink', href: '#/zutaten' }, 'Zutaten und Mag-Liste verwalten')),
     zielBereich(ziele),
     wochenBereich(woche),
     anteileBereich(bereinigeAnteile(anteile)),
@@ -155,7 +156,7 @@ function anteileBereich(anteile) {
 
 /* ---------- Backup ---------- */
 
-const BEREICHE = { eintraege: 'Einträge im Tagebuch', plan: 'geplante Mahlzeiten', rezepte: 'Rezepte', zutaten: 'eigene Zutaten', vorlieben: 'Angaben in der Mag-Liste', tage: 'abweichende Tagestypen', einstellungen: 'Einstellungen' };
+const BEREICHE = { eintraege: 'Einträge im Tagebuch', plan: 'geplante Mahlzeiten', rezepte: 'Rezepte', zutaten: 'eigene Zutaten', vorlieben: 'Angaben in der Mag-Liste', messungen: 'Health-Werte', supplements: 'Supplements', tage: 'abweichende Tagestypen', einstellungen: 'Einstellungen' };
 const zaehle = (anzahl) => Object.entries(BEREICHE).map(([id, name]) => `${name}: ${zahl(anzahl[id] ?? 0)}`).join(', ');
 
 function backupBereich(letztesBackup, daten) {

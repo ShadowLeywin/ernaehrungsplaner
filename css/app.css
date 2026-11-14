@@ -297,6 +297,21 @@ input[type='date'] { appearance: none; -webkit-appearance: none; }
 .magzeile label small { display: block; font-size: 0.8125rem; color: var(--tinte-leise); }
 .magzeile select { min-height: 2.75rem; }
 
+/* ---------- Health ---------- */
+
+.bereich.erster { margin-top: 1rem !important; padding-top: 0; border-top: 0; }
+.verlauf svg { display: block; width: 100%; height: 4rem; stroke: var(--blatt); overflow: visible; }
+.makro-wasser .balken { display: block; }
+.makro-wasser .balken-voll { background: var(--heidelbeere); transition: width 0.25s ease-out; }
+.zusatz.zweifach { flex-wrap: wrap; }
+.zusatz.zweifach input { flex: 1 1 8rem; }
+details.bereich > summary { font-size: 1.1875rem; font-weight: 680; color: var(--tinte); justify-content: space-between; list-style: none; }
+details.bereich > summary::-webkit-details-marker { display: none; }
+/* Zeichen statt Pfeil: zeigt, dass sich der Bereich öffnen lässt */
+details.bereich > summary::after { content: '+'; font-size: 1.5rem; font-weight: 500; color: var(--blatt); line-height: 1; }
+details.bereich[open] > summary::after { content: '−'; }
+details.bereich[open] > summary { margin-bottom: 0.5rem; }
+
 /* ---------- Rezepte ---------- */
 
 .knopfreihe.links { justify-content: flex-start; }

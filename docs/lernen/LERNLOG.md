@@ -96,3 +96,14 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Fehler:** Ein Test zählte Zeilen, bevor die Seite neu gezeichnet war. Lösung: erst auf den gedrückten Filter warten, dann zählen. Das war ein Fehler im Test, nicht in der App.
 - **Fachbegriffe:** Dichte (Nährwert je 100 g), Charge, stabile Sortierung, `selectOption`.
 - **Offen:** Echte Essens-Vorschläge gibt es noch nicht; die Mag-Liste wirkt bisher nur in Suchlisten.
+
+## Session 7, Runde 1: Health, tägliche Werte (14.11.2026)
+
+- **Was und warum:** Seite „Health“ mit Gewicht, 7-Tage-Schnitt gegen ein Wochenziel, Wasser, Schlaf, Schritten, Supplements und Körpermaßen. Vorgezogen vor die Angebote, weil die an einer offenen Entscheidung hängen.
+- **Befehle:** `git status -sb` (kurz zeigen, was geändert und noch nicht committet ist; damit ließ sich nach einem Neustart der Stand klären) · `BILDER=<ordner> node tools/pruefe-app.cjs` (wie gehabt).
+- **Entscheidung:** Der Trend vergleicht den Schnitt der letzten 7 Tage mit dem Schnitt der 7 Tage davor und schweigt unter 3 Werten je Woche. Verworfen: Tageswert gegen Vortag, weil das Gewicht täglich um ein Kilo schwanken kann.
+- **Entscheidung 2:** „Zutaten“ ist aus der unteren Leiste raus, „Health“ ist drin. Mehr als fünf Einträge passen nicht, und Zutaten erreicht man über die Suche beim Eintragen.
+- **Entscheidung 3:** Getippte, noch nicht gespeicherte Werte liegen in einem Entwurf. So verliert „+250 ml“ kein halb eingetragenes Gewicht (per Test belegt).
+- **Fehler:** Ein Unit-Test schlug fehl, weil er die Liste der Speicher fest eingetragen hatte: dritte Wiederholung derselben Fehlerart. Lösung: Erwartung aus `STORES` ableiten, Regel in `CLAUDE.md` ergänzt.
+- **Fachbegriffe:** gleitender Durchschnitt, Entwurf (ungespeicherter Zustand), Toleranz, Sparkline (kleine Verlaufslinie), `<polyline>`.
+- **Zum Auftrag:** Geholfen hat „Resume“ nach dem Neustart: kurz und eindeutig. Gefehlt hat nichts.

@@ -1,6 +1,6 @@
 # Datenmodell
 
-Stand: Schema-Version 4 (App 0.5.0). Maßgeblich im Code: `js/logik/schema.js` und `js/db.js`.
+Stand: Schema-Version 5 (App 0.6.0). Maßgeblich im Code: `js/logik/schema.js` und `js/db.js`.
 
 ## Grundsätze
 
@@ -10,14 +10,16 @@ Stand: Schema-Version 4 (App 0.5.0). Maßgeblich im Code: `js/logik/schema.js` u
 - Nährwerte gelten immer je 100 g.
 - Darstellung (hell/dunkel) liegt je Gerät im `localStorage` und gehört nicht ins Backup.
 
-## Entitäten heute (Version 4)
+## Entitäten heute (Version 5)
 
 | Speicher | Schlüssel | Felder | Index |
 |---|---|---|---|
 | `zutaten` | `id` | `name`, `marke`, `kategorie`, `quelle` (`eigen`, `off`), `quelleId`, `je100` (Nährwerte), `portionen` [{`name`, `gramm`}], `unvollstaendig`, `geaendert` | – |
 | `eintraege` | `id` | `datum` (JJJJ-MM-TT), `slot`, `zutatId`, `name`, `marke`, `gramm`, `je100` (Kopie), `erstellt`; bei Rezepten zusätzlich `rezeptId` | `datum` |
-| `tage` | `datum` | `tagestyp` (nur bei Abweichung vom Wochenplan) | – |
-| `einstellungen` | `schluessel` | `wert`; Schlüssel: `ziele`, `woche`, `slotAnteile` (Prozent je Slot, Summe 100), `letztesBackup` | – |
+| `tage` | `datum` | `tagestyp` (nur bei Abweichung vom Wochenplan), `supplements` (Kennungen der an diesem Tag genommenen) | – |
+| `messungen` (ab 5) | `id` | `datum`, `art` (`gewicht`, `wasser`, `schlaf`, `schritte`, `mass:taille` …), `wert`; Kennung `<art>\|<datum>` bei einem Wert je Tag, bei Wasser mit Zufallsteil | `datum` |
+| `supplements` (ab 5) | `id` | `name`, `dosis` | – |
+| `einstellungen` | `schluessel` | `wert`; Schlüssel: `ziele`, `woche`, `slotAnteile` (Prozent je Slot, Summe 100), `gesundheit` (Wochenziel Gewicht, Wasser, Schlaf, Schritte), `letztesBackup` | – |
 | `plan` (ab 3) | `id` | wie `eintraege` (`datum`, `slot`, `zutatId`, `name`, `gramm`, `je100`, `rezeptId`), dazu `uebernommen` | `datum` |
 | `einkauf` (ab 3) | `id` | `woche` (Datum des Montags); Häkchen: `schluessel`, `erledigt`, Kennung `<woche>\|<zutatId>`; eigener Posten: `eigen`, `name`, `erledigt` | `woche` |
 | `rezepte` (ab 2) | `id` | `name`, `portionen`, `zutaten` [{`zutatId`, `name`, `marke`, `gramm`, `je100` (Kopie)}], `schritte` [{`text`, `prinzip`}], `erstellt`, `geaendert`; freiwillig fürs Vorkochen: `gewichtGekocht`, `haltbarTage`, `einfrierbar` | – |
@@ -49,6 +51,7 @@ Wochentag ── Tagestyp (in einstellungen.woche), Tag kann abweichen
 | Nährstoffe | `js/logik/naehrwerte.js` | 8 Makro-Felder, 22 Mikronährstoffe mit Einheit (Achtung: Omega-3 in g, EPA + DHA in mg) |
 | Slots | `js/logik/ziele.js` | 6 Mahlzeiten mit Anteil am Tagesziel |
 | Tagestypen | `js/logik/ziele.js` | Gym, Calisthenics, Rest |
+| Arten von Messungen | `js/logik/gesundheit.js` | Gewicht, Wasser, Schlaf, Schritte, fünf Körpermaße; je mit Einheit und Grenzen |
 | Kategorien | `js/logik/zutat.js` | 11 Zutaten-Kategorien |
 
 ## Schema-Version und Migration
@@ -64,8 +67,8 @@ Wochentag ── Tagestyp (in einstellungen.woche), Tag kann abweichen
 ## Backup-Format
 
 ```json
-{ "app": "elan", "schemaVersion": 4, "erstelltAm": "2026-11-13T10:00:00.000Z",
-  "daten": { "zutaten": [], "eintraege": [], "tage": [], "einstellungen": [], "rezepte": [], "plan": [], "einkauf": [], "vorlieben": [] } }
+{ "app": "elan", "schemaVersion": 5, "erstelltAm": "2026-11-13T10:00:00.000Z",
+  "daten": { "zutaten": [], "eintraege": [], "tage": [], "einstellungen": [], "rezepte": [], "plan": [], "einkauf": [], "vorlieben": [], "messungen": [], "supplements": [] } }
 ```
 
 Einspielen ersetzt alle Speicher in einer einzigen Transaktion. Bricht sie ab, bleibt der alte Stand vollständig.
@@ -80,9 +83,8 @@ Einspielen ersetzt alle Speicher in einer einzigen Transaktion. Bricht sie ab, b
 | 4 Wochenplan, Einkaufsliste, Meal-Prep | `plan`, `einkauf` (seit 3), Felder an `rezepte` | offen: gekochte Chargen mit Restportionen | – |
 | 6 Mag-Liste | `vorlieben` (vorhanden seit 4) | – | – |
 | 5 Angebote | `angebote` | `markt`, `produkt`, `preis`, `gueltigVon`, `gueltigBis`, `zutatId` | offen |
-| 7 Health | `messungen` | `datum`, `art` (gewicht, mass, schlaf, wasser, schritte), `wert`, `einheit` | 5 |
-| 7 Laborwerte | `labor` | `datum`, `name`, `wert`, `einheit`, `refMin`, `refMax` | 5 |
-| 7 Supplements | `supplements`, Feld an `tage` | `name`, `dosis`; je Tag `genommen` [] | 5 |
+| 7 Health (tägliche Werte) | `messungen`, `supplements` (vorhanden seit 5) | – | – |
+| 7 Laborwerte | `labor` | `datum`, `name`, `wert`, `einheit`, `refMin`, `refMax` | 6 |
 | 7 Symptome | `symptome` | `datum`, `zeit`, `art`, `staerke`, `eintragIds` [] | 6 |
 | 8 Import | kein eigener Speicher | erzeugt `rezepte` und `zutaten` | – |
 | 9 Export | kein eigener Speicher | liest alle Speicher | – |

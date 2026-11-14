@@ -22,7 +22,8 @@ async function zeichne() {
   const meinLauf = ++lauf;
 
   for (const link of document.querySelectorAll('.navigation a')) {
-    if (link.dataset.route === name) link.setAttribute('aria-current', 'page');
+    // Ein Eintrag der Leiste kann für mehrere Bereiche stehen (Zutaten gehören zu Rezepte)
+    if (link.dataset.route.split(' ').includes(name)) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
   }
 

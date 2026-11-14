@@ -29,6 +29,11 @@ export const MIGRATIONEN = [
   (db) => {
     db.createObjectStore('vorlieben', { keyPath: 'zutatId' });
   },
+  // Version 5: Health
+  (db) => {
+    db.createObjectStore('messungen', { keyPath: 'id' }).createIndex('datum', 'datum');
+    db.createObjectStore('supplements', { keyPath: 'id' });
+  },
 ];
 
 let offen;

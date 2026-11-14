@@ -95,16 +95,19 @@ Ziel: Bei einer Zutat sehen, wo sie diese Woche im Angebot ist.
 
 Module: 5. Start erst, wenn `OFFENE-FRAGEN.md` Nr. 2 entschieden ist.
 
-### Session 7: Health A (tägliche Werte)
+### Session 7: Health A, tägliche Werte (erledigt, Version 0.6)
 
 Ziel: Gewicht und Tageswerte in unter 10 Sekunden eintragen.
 
-| Abnahmekriterium | Testbefehl |
+| Abnahmekriterium | Beleg |
 |---|---|
-| Gewicht eintragen; 7-Tage-Schnitt und Vergleich mit dem Wochenziel | `npm test`, `pruefe-app.cjs` |
-| Körpermaße, Schlaf, Wasser, Schritte eintragen und als Verlauf sehen | `pruefe-app.cjs` |
-| Supplement-Liste pflegen und täglich abhaken | `pruefe-app.cjs` |
-| Tests und Beispieldaten enthalten nur erfundene Werte | Durchsicht von `test/` |
+| Gewicht eintragen; 7-Tage-Schnitt und Vergleich mit dem Wochenziel | `npm test`: `gesundheit.test.js`, 9 Tests; `pruefe-app.cjs`: „7-Tage-Schnitt gegen das Wochenziel“ |
+| Körpermaße, Schlaf, Wasser, Schritte eintragen | `pruefe-app.cjs`: vier Health-Kriterien |
+| Verlauf sehen | nur für das Gewicht (Linie der letzten 30 Tage); **offen** für Maße, Schlaf, Schritte |
+| Supplement-Liste pflegen und täglich abhaken | `pruefe-app.cjs`: „Supplement anlegen und je Tag abhaken“ |
+| Tests und Beispieldaten enthalten nur erfundene Werte | Durchsicht von `test/gesundheit.test.js` und `healthLauf` |
+
+Vorgezogen vor Session 6, weil die Angebote an einer offenen Entscheidung hängen.
 
 Module: 7 (erster Teil).
 
@@ -185,4 +188,5 @@ Jede Session hat eine Tabelle mit prüfbaren Kriterien und einem Testbefehl.
 - Testausgaben vom 14.11.2026 (Version 0.3): `npm test` 79 von 79, `node tools/pruefe-app.cjs` 50 von 50.
 - Testausgaben vom 14.11.2026 (Version 0.4): `npm test` 88 von 88, `node tools/pruefe-app.cjs` 59 von 59.
 - Testausgaben vom 14.11.2026 (Version 0.5): `npm test` 97 von 97, `node tools/pruefe-app.cjs` 68 von 68.
+- Testausgaben vom 14.11.2026 (Version 0.6): `npm test` 106 von 106, `node tools/pruefe-app.cjs` 76 von 76.
 - BLS 4.0 kostenfrei: [heise](https://heise.de/-11123877), [Agrolab](https://agrolab.com/en/news/food-news/6105-bls-datenbank-radar-01-26-en.html), abgerufen 13.11.2026.

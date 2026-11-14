@@ -32,6 +32,7 @@ async function liste(wurzel) {
     el('header', { class: 'seitenkopf' },
       el('h1', {}, 'Rezepte'),
       el('a', { class: 'knopf klein', href: '#/rezepte/neu' }, icon('plus', 18), 'Neues Rezept')),
+    el('a', { class: 'textlink', href: '#/zutaten' }, 'Zutaten und Mag-Liste'),
     rezepte.length
       ? el('ul', { class: 'zeilen' }, rezepte.map((r) => {
         const w = rezeptWerte(r);

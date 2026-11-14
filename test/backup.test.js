@@ -25,11 +25,14 @@ test('Backup enthält Kennung, Schema-Version, Zeitpunkt und alle Speicher', () 
 });
 
 test('Hin und zurück: ein erstelltes Backup besteht die Prüfung unverändert', () => {
+  // Erwartung aus der Liste der Speicher ableiten: so bleibt der Test richtig, wenn ein Speicher dazukommt
+  const erwartet = Object.fromEntries(Object.keys(STORES).map((store) => [store, DATEN[store] ?? []]));
   const kopie = JSON.parse(JSON.stringify(erstelleBackup(DATEN)));
   const p = pruefeBackup(kopie);
   assert.equal(p.ok, true);
-  assert.deepEqual(p.daten, DATEN);
-  assert.deepEqual(p.anzahl, { zutaten: 1, eintraege: 1, tage: 1, einstellungen: 1, rezepte: 1, plan: 1, einkauf: 1, vorlieben: 1 });
+  assert.deepEqual(p.daten, erwartet);
+  assert.deepEqual(p.anzahl, Object.fromEntries(Object.entries(erwartet).map(([store, liste]) => [store, liste.length])));
+  assert.equal(p.anzahl.eintraege, 1);
 });
 
 test('fremde und kaputte Dateien werden abgelehnt', () => {
