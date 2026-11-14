@@ -1,6 +1,7 @@
 // Rezepte: Nährwerte aus den Zutaten berechnen und Eingaben prüfen. Reine Funktionen.
 
 import { fuerMenge, runde, summe } from './naehrwerte.js';
+import { tageZwischen } from './datum.js';
 import { parseZahl } from './zutat.js';
 
 const teile = (werte, faktor, stellen) => Object.fromEntries(
@@ -9,20 +10,25 @@ const teile = (werte, faktor, stellen) => Object.fromEntries(
 
 /**
  * Alles, was sich aus einem Rezept ausrechnen lässt.
- * portionGramm ist das Rohgewicht je Portion; das Gewicht nach dem Kochen kommt mit dem Meal-Prep-Modus.
+ * Ist das Gewicht nach dem Kochen bekannt (Meal-Prep), gilt es als Grundlage für Portion und Werte je 100 g:
+ * Beim Kochen verdampft oder bindet sich Wasser, die Nährwerte bleiben, also ändert sich nur die Dichte.
  */
 export function rezeptWerte(rezept) {
   const zutaten = (rezept.zutaten ?? []).filter((z) => z.gramm > 0);
   const gesamt = summe(zutaten.map((z) => fuerMenge(z.je100, z.gramm)));
   const gesamtGramm = zutaten.reduce((s, z) => s + z.gramm, 0);
   const portionen = rezept.portionen > 0 ? rezept.portionen : 1;
+  const gekocht = rezept.gewichtGekocht > 0;
+  const fertigGramm = gekocht ? rezept.gewichtGekocht : gesamtGramm;
   return {
     gesamt,
-    gesamtGramm,
+    gesamtGramm, // Rohgewicht: maßgeblich für die Einkaufsliste
+    fertigGramm, // Gewicht dessen, was auf dem Teller landet
+    gekocht,
     portionen,
-    portionGramm: gesamtGramm / portionen,
+    portionGramm: fertigGramm / portionen,
     jePortion: teile(gesamt, 1 / portionen),
-    je100: gesamtGramm > 0 ? teile(gesamt, 100 / gesamtGramm, 2) : {},
+    je100: fertigGramm > 0 ? teile(gesamt, 100 / fertigGramm, 2) : {},
     // Fehlt bei einer Zutat ein Makro, ist die Summe nur eine Untergrenze
     unvollstaendig: zutaten.some((z) => ['protein', 'kh', 'fett'].some((id) => typeof z.je100?.[id] !== 'number')),
   };
@@ -81,6 +87,51 @@ export function pruefeRezept(eingabe) {
   });
   if (Object.keys(schrittFehler).length) fehler.schritt = schrittFehler;
 
+  // Meal-Prep, alles freiwillig
+  const vorkochen = {};
+  const gewicht = parseZahl(eingabe.gewichtGekocht);
+  if (gewicht !== null) {
+    if (Number.isNaN(gewicht) || gewicht <= 0 || gewicht > 50000) fehler.gewichtGekocht = 'Gramm von 1 bis 50.000.';
+    else vorkochen.gewichtGekocht = gewicht;
+  }
+  const haltbar = parseZahl(eingabe.haltbarTage);
+  if (haltbar !== null) {
+    if (!Number.isInteger(haltbar) || haltbar < 1 || haltbar > 30) fehler.haltbarTage = 'Ganze Tage von 1 bis 30.';
+    else vorkochen.haltbarTage = haltbar;
+  }
+  if (eingabe.einfrierbar) vorkochen.einfrierbar = true;
+
   const ok = Object.keys(fehler).length === 0;
-  return { ok, fehler, rezept: ok ? { name, portionen, zutaten, schritte } : null };
+  return { ok, fehler, rezept: ok ? { name, portionen, zutaten, schritte, ...vorkochen } : null };
+}
+
+/**
+ * Wird im Wochenplan eine vorgekochte Portion zu spät gegessen?
+ * Annahme: Gekocht wird am ersten Tag, an dem das Rezept im Plan steht. Liegt ein späterer Tag
+ * außerhalb der Haltbarkeit, gibt es eine Warnung; ab da zählt dieser Tag als neuer Kochtag
+ * (neu gekocht oder aus dem Gefrierfach).
+ * posten: Plan-Posten mehrerer Tage, rezepte: Map nach id. Liefert Map postenId → { tage, haltbar, einfrierbar }.
+ */
+export function haltbarkeitsWarnungen(posten, rezepte) {
+  const warnungen = new Map();
+  const jeRezept = new Map();
+  for (const p of posten) {
+    const rezept = p.rezeptId ? rezepte.get(p.rezeptId) : null;
+    if (!rezept?.haltbarTage) continue;
+    if (!jeRezept.has(rezept.id)) jeRezept.set(rezept.id, []);
+    jeRezept.get(rezept.id).push(p);
+  }
+  for (const [id, liste] of jeRezept) {
+    const rezept = rezepte.get(id);
+    liste.sort((a, b) => a.datum.localeCompare(b.datum));
+    let kochtag = liste[0].datum;
+    for (const p of liste) {
+      const tage = tageZwischen(kochtag, p.datum);
+      if (tage > rezept.haltbarTage) {
+        warnungen.set(p.id, { tage, haltbar: rezept.haltbarTage, einfrierbar: Boolean(rezept.einfrierbar) });
+        kochtag = p.datum;
+      }
+    }
+  }
+  return warnungen;
 }

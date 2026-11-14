@@ -90,6 +90,17 @@ export const einkaufDerWoche = (woche) => db.nachIndex('einkauf', 'woche', woche
 export const speichereEinkauf = (satz) => db.speichere('einkauf', { ...satz, id: satz.id ?? crypto.randomUUID() });
 export const loescheEinkauf = (id) => db.loesche('einkauf', id);
 
+/* ---------- Mag-Liste ---------- */
+
+/** Alle Vorlieben als Map nach zutatId */
+export const alleVorlieben = async () => new Map((await db.alle('vorlieben')).map((v) => [v.zutatId, v]));
+
+/** mag: J, R, K, N, S oder leer (dann wird die Angabe entfernt) */
+export function setzeVorliebe(zutatId, mag, notiz = '') {
+  if (!mag) return db.loesche('vorlieben', zutatId);
+  return db.speichere('vorlieben', { zutatId, mag, notiz: String(notiz).trim().slice(0, 120) });
+}
+
 /* ---------- Tage ---------- */
 
 export const holeTag = (datum) => db.hole('tage', datum);

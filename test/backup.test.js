@@ -12,6 +12,7 @@ const DATEN = {
   rezepte: [{ id: 'r1', name: 'Testeintopf', portionen: 2, zutaten: [], schritte: [] }],
   plan: [{ id: 'p1', datum: '2026-11-14', slot: 'abend', gramm: 100, je100: { kcal: 400 } }],
   einkauf: [{ id: '2026-11-09|eigen:1', woche: '2026-11-09', erledigt: true }],
+  vorlieben: [{ zutatId: 'basis:apfel', mag: 'R', notiz: '' }],
 };
 
 test('Backup enthält Kennung, Schema-Version, Zeitpunkt und alle Speicher', () => {
@@ -28,7 +29,7 @@ test('Hin und zurück: ein erstelltes Backup besteht die Prüfung unverändert',
   const p = pruefeBackup(kopie);
   assert.equal(p.ok, true);
   assert.deepEqual(p.daten, DATEN);
-  assert.deepEqual(p.anzahl, { zutaten: 1, eintraege: 1, tage: 1, einstellungen: 1, rezepte: 1, plan: 1, einkauf: 1 });
+  assert.deepEqual(p.anzahl, { zutaten: 1, eintraege: 1, tage: 1, einstellungen: 1, rezepte: 1, plan: 1, einkauf: 1, vorlieben: 1 });
 });
 
 test('fremde und kaputte Dateien werden abgelehnt', () => {

@@ -9,9 +9,9 @@ Elan ist eine Ernährungs- und Health-App als PWA: offline, deutsch, alle Daten 
 | 1 | Zutaten | lokale Datenbank, eigene Zutaten, Suche bei Open Food Facts | 0.1: vorhanden. Offen: USDA-Suche, BLS 4.0, Barcode per Kamera |
 | 2 | Rezepte | anlegen und ändern, Portionen, Nährwerte automatisch, je Schritt ein Feld „Prinzip dahinter“ | 0.2: vorhanden. Offen: Schritte umsortieren, Rezept kopieren |
 | 3 | Tagebuch | 6 Slots, Makros, Ballaststoffe, Ziele je Tagestyp | 0.3: vorhanden, mit allen Nährwerten für Tag und Wochenschnitt, Kopieren, einstellbaren Anteilen. Offen: Referenzwerte |
-| 4 | Wochenplan, Einkauf, Meal-Prep | Woche planen, Einkaufsliste automatisch, Portionen, Haltbarkeit, Einfrieren | 0.4: Wochenplan und Einkaufsliste vorhanden. Offen: Meal-Prep (Session 5) |
+| 4 | Wochenplan, Einkauf, Meal-Prep | Woche planen, Einkaufsliste automatisch, Portionen, Haltbarkeit, Einfrieren | 0.5: vorhanden. Offen: gekochte Chargen mit Restportionen verfolgen |
 | 5 | Angebote | Angebote bei den Zutaten zeigen | geplant, Session 6; Datenquelle ungeklärt |
-| 6 | Mag-Liste | je Obst und Gemüse: J (roh und gekocht), R (nur roh), K (nur gekocht), N (nein), S (Sonderfall); steuert Vorschläge | geplant, Session 5 |
+| 6 | Mag-Liste | je Obst und Gemüse: J (roh und gekocht), R (nur roh), K (nur gekocht), N (nein), S (Sonderfall); steuert Vorschläge | 0.5: vorhanden, wirkt in Suchlisten. Offen: eigene Essens-Vorschläge |
 | 7 | Health | Gewicht mit 7-Tage-Schnitt gegen Wochenziel, Maße, Laborwerte, Schlaf, Wasser, Supplements, Symptome mit Bezug zu Mahlzeiten, Schritte | geplant, Sessions 7 und 8 |
 | 8 | Import | Rezept aus eingefügtem Text, Android Share Target, später Schema.org | geplant, Session 9 |
 | 9 | Export | Backup als JSON, Coach-Export als Wochenbericht | Backup in 0.1 vorhanden; Coach-Export Session 9 |

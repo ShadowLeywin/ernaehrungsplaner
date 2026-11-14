@@ -4,6 +4,7 @@ import { isoDatum } from '../logik/datum.js';
 import { fuerMenge } from '../logik/naehrwerte.js';
 import { rezeptAlsZutat } from '../logik/rezepte.js';
 import { sucheZutaten, zuletztVerwendet } from '../logik/suche.js';
+import { magHinweis, sortiereNachVorliebe } from '../logik/vorlieben.js';
 import { SLOTS, slotFuerUhrzeit } from '../logik/ziele.js';
 import { pruefeMenge } from '../logik/zutat.js';
 import { gehe } from '../router.js';
@@ -13,13 +14,17 @@ import { blatt, el, gramm, hinweis, zahl } from '../ui.js';
 const slotName = (id) => SLOTS.find((s) => s.id === id)?.name ?? '';
 
 /** Suchfeld mit Trefferliste. beiWahl bekommt die angetippte Zutat (oder das als Zutat verpackte Rezept). */
-function suchListe({ auswahl, zuletzt = [], beiWahl, beiNeu }) {
+function suchListe({ auswahl, zuletzt = [], vorlieben = new Map(), beiWahl, beiNeu }) {
   const liste = el('div', { class: 'wahl-liste' });
+  const klein = (zutat) => {
+    const text = zutat.istRezept ? 'Rezept' : (magHinweis(vorlieben.get(zutat.id)) || zutat.marke);
+    return text ? el('small', {}, text) : null;
+  };
   const zeile = (zutat) => el('li', {}, el('button', { type: 'button', class: 'zeile', onclick: () => beiWahl(zutat) },
-    el('span', { class: 'zeile-name' }, zutat.name, zutat.istRezept ? el('small', {}, 'Rezept') : (zutat.marke ? el('small', {}, zutat.marke) : null)),
+    el('span', { class: 'zeile-name' }, zutat.name, klein(zutat)),
     el('span', { class: 'zeile-wert' }, `${zahl(zutat.je100.kcal ?? 0)} kcal`)));
   const zeichne = (begriff) => {
-    const treffer = sucheZutaten(auswahl, begriff, 40);
+    const treffer = sortiereNachVorliebe(sucheZutaten(auswahl, begriff, 40), vorlieben);
     const zeigeZuletzt = !begriff.trim() && zuletzt.length > 0;
     liste.replaceChildren(
       zeigeZuletzt ? el('h3', { class: 'zwischentitel' }, 'Zuletzt eingetragen') : '',
@@ -45,7 +50,7 @@ function suchListe({ auswahl, zuletzt = [], beiWahl, beiNeu }) {
  */
 export async function oeffneZutatWahl({ datum, slot, beiFertig, ziel = 'tagebuch' }) {
   const plan = ziel === 'plan';
-  const [zutaten, rezepte, alleEintraege] = await Promise.all([speicher.alleZutaten(), speicher.alleRezepte(), speicher.alleEintraege()]);
+  const [zutaten, rezepte, alleEintraege, vorlieben] = await Promise.all([speicher.alleZutaten(), speicher.alleRezepte(), speicher.alleEintraege(), speicher.alleVorlieben()]);
   const auswahl = [...rezepte.map(rezeptAlsZutat).filter((r) => r.portionen.length), ...zutaten];
   const nachId = new Map(auswahl.map((z) => [z.id, z]));
   const zuletzt = zuletztVerwendet(alleEintraege).map((id) => nachId.get(id)).filter(Boolean);
@@ -55,6 +60,7 @@ export async function oeffneZutatWahl({ datum, slot, beiFertig, ziel = 'tagebuch
     inhalt: (b) => suchListe({
       auswahl,
       zuletzt,
+      vorlieben,
       beiNeu: () => { b.schliessen(); gehe('/zutaten/neu'); },
       beiWahl: (zutat) => b.setze(zutat.name, mengenFormular({
         name: zutat.name, je100: zutat.je100, portionen: zutat.portionen, slot, speichernText: plan ? 'Einplanen' : 'Eintragen',
@@ -78,11 +84,12 @@ function neuerEintrag(zutat, datum, { gramm: menge, slot }) {
 
 /** Rezept-Formular: nur eine Zutat auswählen, die Menge fragt das Formular selbst ab. */
 export async function waehleZutat({ beiWahl }) {
-  const zutaten = await speicher.alleZutaten();
+  const [zutaten, vorlieben] = await Promise.all([speicher.alleZutaten(), speicher.alleVorlieben()]);
   blatt({
     titel: 'Zutat hinzufügen',
     inhalt: (b) => suchListe({
       auswahl: zutaten,
+      vorlieben,
       beiNeu: () => { b.schliessen(); gehe('/zutaten/neu'); },
       beiWahl: (zutat) => { b.schliessen(); beiWahl(zutat); },
     }),

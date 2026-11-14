@@ -34,3 +34,5 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | Wettlauf (Race Condition) | Zwei Abläufe kommen sich in die Quere, weil ihre Reihenfolge nicht festliegt. | Kommentar bei `hake` in `js/ansichten/einkauf.js` |
 | Web Share API | Die Schnittstelle, mit der eine Webseite das „Teilen“-Menü des Handys öffnet. | `teilen` in `js/ansichten/einkauf.js` |
 | Bereichsabfrage | Alle Sätze holen, deren Indexwert zwischen zwei Grenzen liegt. | `imBereich()` in `js/db.js` |
+| Stabile Sortierung | Beim Umsortieren behalten gleichrangige Einträge ihre bisherige Reihenfolge. | `sortiereNachVorliebe()` in `js/logik/vorlieben.js` |
+| Charge | Eine auf einmal gekochte Menge eines Rezepts. | Annahme [A] in `docs/DATENMODELL.md` |

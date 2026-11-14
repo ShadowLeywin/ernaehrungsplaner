@@ -290,6 +290,13 @@ input[type='date'] { appearance: none; -webkit-appearance: none; }
 .zusatz { display: flex; gap: 0.5rem; margin-top: 1.25rem !important; }
 .zusatz input { flex: 1; min-width: 0; }
 
+.haltbar { margin-top: 0.625rem; }
+.haken-feld { display: flex; align-items: center; gap: 0.75rem; min-height: 2.75rem; cursor: pointer; }
+.haken-feld input { flex: none; width: 1.5rem; min-height: 0; height: 1.5rem; padding: 0; accent-color: var(--blatt); }
+.magzeile { display: grid; grid-template-columns: minmax(0, 1fr) 9.5rem; align-items: center; gap: 0.75rem; padding: 0.375rem 0.5rem 0.375rem 0.875rem; }
+.magzeile label small { display: block; font-size: 0.8125rem; color: var(--tinte-leise); }
+.magzeile select { min-height: 2.75rem; }
+
 /* ---------- Rezepte ---------- */
 
 .knopfreihe.links { justify-content: flex-start; }

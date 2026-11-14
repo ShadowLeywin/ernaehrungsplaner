@@ -69,12 +69,16 @@ function detail(wurzel, rezept) {
     el('a', { class: 'zurueck', href: '#/rezepte' }, icon('zurueck', 18), 'Rezepte'),
     el('header', { class: 'detailkopf' },
       el('h1', {}, rezept.name),
-      el('p', {}, `${portionenText(rezept.portionen)}, je etwa ${zahl(w.portionGramm)} g Rohgewicht`)),
+      el('p', {}, `${portionenText(rezept.portionen)}, je etwa ${zahl(w.portionGramm)} g ${w.gekocht ? 'gekocht' : 'Rohgewicht'}`),
+      rezept.haltbarTage || rezept.einfrierbar ? el('p', { class: 'klein' }, [
+        rezept.haltbarTage ? `Hält im Kühlschrank ${rezept.haltbarTage} ${rezept.haltbarTage === 1 ? 'Tag' : 'Tage'}.` : null,
+        rezept.einfrierbar ? 'Lässt sich einfrieren.' : null,
+      ].filter(Boolean).join(' ')) : null),
     el('div', { class: 'knopfreihe links' },
       el('button', { type: 'button', class: 'knopf', onclick: () => oeffneRezeptPortion({ rezept }) }, 'Portion eintragen')),
     w.unvollstaendig ? el('p', { class: 'merkzettel' }, 'Bei mindestens einer Zutat fehlen Angaben. Die Werte fallen dadurch zu niedrig aus.') : null,
     el('table', { class: 'naehrwerte' }, el('caption', {}, 'Nährwerte je Portion'), el('tbody', {}, zeilen)),
-    el('p', { class: 'klein' }, `Je 100 g: ${zahl(w.je100.kcal ?? 0)} kcal. Ganzes Rezept: ${zahl(w.gesamt.kcal ?? 0)} kcal in ${zahl(w.gesamtGramm)} g.`),
+    el('p', { class: 'klein' }, `Je 100 g: ${zahl(w.je100.kcal ?? 0)} kcal. Ganzes Rezept: ${zahl(w.gesamt.kcal ?? 0)} kcal in ${zahl(w.fertigGramm)} g.`),
     el('h2', {}, 'Zutaten'),
     el('ul', { class: 'zeilen' }, rezept.zutaten.map((z) => el('li', { class: 'zeile' },
       el('span', { class: 'zeile-name' }, z.name, z.marke ? el('small', {}, z.marke) : null),
@@ -105,6 +109,9 @@ function formular(wurzel, vorlage) {
     portionen: vorlage ? alsText(vorlage.portionen) : '4',
     zutaten: (vorlage?.zutaten ?? []).map((z) => ({ ...z, gramm: alsText(z.gramm) })),
     schritte: vorlage?.schritte?.length ? vorlage.schritte.map((s) => ({ text: s.text, prinzip: s.prinzip ?? '' })) : [{ text: '', prinzip: '' }],
+    gewichtGekocht: vorlage?.gewichtGekocht ? alsText(vorlage.gewichtGekocht) : '',
+    haltbarTage: vorlage?.haltbarTage ? String(vorlage.haltbarTage) : '',
+    einfrierbar: Boolean(vorlage?.einfrierbar),
   };
   const summe = el('p', { class: 'klein', id: 'rezept-summe', 'aria-live': 'polite' });
 
@@ -181,6 +188,15 @@ function formular(wurzel, vorlage) {
           el('p', { class: 'klein' }, 'Das Prinzip erklärt, warum ein Schritt funktioniert. So lernst du beim Kochen mit.'),
           el('ol', { class: 'schritt-liste' }, eingabe.schritte.map(schrittBlock)),
           el('button', { type: 'button', class: 'knopf leise', onclick: () => { eingabe.schritte.push({ text: '', prinzip: '' }); zeichne({}, 'letzterSchritt'); } }, icon('plus', 18), 'Schritt hinzufügen')),
+        el('fieldset', { class: 'gruppe' },
+          el('legend', {}, 'Vorkochen (freiwillig)'),
+          el('p', { class: 'klein' }, 'Wiege den vollen Topf nach dem Kochen und zieh das Gewicht des leeren Topfs ab. Dann stimmen Portionsgewicht und Werte je 100 g.'),
+          el('div', { class: 'raster' },
+            feld({ name: 'gewichtGekocht', beschriftung: 'Gewicht nach dem Kochen', einheit: 'g', inputmode: 'decimal', value: eingabe.gewichtGekocht, fehler: fehler.gewichtGekocht, oninput: (e) => { eingabe.gewichtGekocht = e.target.value; } }),
+            feld({ name: 'haltbarTage', beschriftung: 'Hält im Kühlschrank', einheit: 'Tage', inputmode: 'numeric', value: eingabe.haltbarTage, fehler: fehler.haltbarTage, oninput: (e) => { eingabe.haltbarTage = e.target.value; } })),
+          el('label', { class: 'haken-feld' },
+            el('input', { type: 'checkbox', id: 'f-einfrierbar', checked: eingabe.einfrierbar ? true : null, onchange: (e) => { eingabe.einfrierbar = e.target.checked; } }),
+            'Lässt sich einfrieren')),
         el('div', { class: 'knopfreihe' }, el('button', { type: 'submit', class: 'knopf' }, 'Rezept speichern'))));
 
     zeigeSumme();

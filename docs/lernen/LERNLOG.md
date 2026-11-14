@@ -85,3 +85,14 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Fehler 3:** Der Knopf „Rückgängig“ im Hinweis war unter 40 px hoch. Gefunden, weil die Tippflächen-Prüfung jetzt auch auf den neuen Seiten läuft.
 - **Fachbegriffe:** abgeleitete Daten, Wettlauf (Race Condition), Zustand an Ort und Stelle ändern, Web Share API, Zwischenablage.
 - **Zum Auftrag:** Geholfen hat der Phasenplan mit je einem Ziel. Gefehlt hat nichts; die nächsten Schritte standen fest.
+
+## Session 5, Runde 1: Meal-Prep und Mag-Liste (14.11.2026)
+
+- **Was und warum:** Am Rezept stehen jetzt Gewicht nach dem Kochen, Haltbarkeit und „einfrierbar“; der Wochenplan warnt, wenn eine Portion zu alt wäre. Dazu die Mag-Liste (J, R, K, N, S) für Obst und Gemüse.
+- **Befehle:** `python3 -I - <<'EOF' … EOF` (kleines Skript direkt aus der Shell ausführen, hier um mehrere Dateien gezielt zu ändern) · `git merge --ff-only origin/main` (wie gehabt nach jedem Merge).
+- **Entscheidung:** Kochen ändert das Gewicht, nicht die Nährwerte. Die Summe des Rezepts bleibt, nur Portion und Werte je 100 g rechnen mit dem Gewicht nach dem Kochen. Die Einkaufsliste rechnet von gekochten Portionen auf Rohware zurück.
+- **Entscheidung 2:** Als Kochtag gilt der erste Tag, an dem das Rezept im Plan steht. Verworfen: eigene Verwaltung gekochter Chargen; das wäre genauer, aber eine Gewohnheit mehr.
+- **Entscheidung 3:** „Nein“ versteckt eine Zutat nicht, sondern stellt sie ans Ende. Wer für andere kocht, braucht sie trotzdem.
+- **Fehler:** Ein Test zählte Zeilen, bevor die Seite neu gezeichnet war. Lösung: erst auf den gedrückten Filter warten, dann zählen. Das war ein Fehler im Test, nicht in der App.
+- **Fachbegriffe:** Dichte (Nährwert je 100 g), Charge, stabile Sortierung, `selectOption`.
+- **Offen:** Echte Essens-Vorschläge gibt es noch nicht; die Mag-Liste wirkt bisher nur in Suchlisten.

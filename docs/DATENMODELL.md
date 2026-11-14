@@ -1,6 +1,6 @@
 # Datenmodell
 
-Stand: Schema-Version 3 (App 0.4.0). Maßgeblich im Code: `js/logik/schema.js` und `js/db.js`.
+Stand: Schema-Version 4 (App 0.5.0). Maßgeblich im Code: `js/logik/schema.js` und `js/db.js`.
 
 ## Grundsätze
 
@@ -10,7 +10,7 @@ Stand: Schema-Version 3 (App 0.4.0). Maßgeblich im Code: `js/logik/schema.js` u
 - Nährwerte gelten immer je 100 g.
 - Darstellung (hell/dunkel) liegt je Gerät im `localStorage` und gehört nicht ins Backup.
 
-## Entitäten heute (Version 3)
+## Entitäten heute (Version 4)
 
 | Speicher | Schlüssel | Felder | Index |
 |---|---|---|---|
@@ -20,7 +20,8 @@ Stand: Schema-Version 3 (App 0.4.0). Maßgeblich im Code: `js/logik/schema.js` u
 | `einstellungen` | `schluessel` | `wert`; Schlüssel: `ziele`, `woche`, `slotAnteile` (Prozent je Slot, Summe 100), `letztesBackup` | – |
 | `plan` (ab 3) | `id` | wie `eintraege` (`datum`, `slot`, `zutatId`, `name`, `gramm`, `je100`, `rezeptId`), dazu `uebernommen` | `datum` |
 | `einkauf` (ab 3) | `id` | `woche` (Datum des Montags); Häkchen: `schluessel`, `erledigt`, Kennung `<woche>\|<zutatId>`; eigener Posten: `eigen`, `name`, `erledigt` | `woche` |
-| `rezepte` (ab 2) | `id` | `name`, `portionen`, `zutaten` [{`zutatId`, `name`, `marke`, `gramm`, `je100` (Kopie)}], `schritte` [{`text`, `prinzip`}], `erstellt`, `geaendert` | – |
+| `rezepte` (ab 2) | `id` | `name`, `portionen`, `zutaten` [{`zutatId`, `name`, `marke`, `gramm`, `je100` (Kopie)}], `schritte` [{`text`, `prinzip`}], `erstellt`, `geaendert`; freiwillig fürs Vorkochen: `gewichtGekocht`, `haltbarTage`, `einfrierbar` | – |
+| `vorlieben` (ab 4) | `zutatId` | `mag` (J, R, K, N, S), `notiz` | – |
 
 Kennungen: Basis-Zutaten `basis:<name>`, eigene `eigen:<uuid>`, Open Food Facts `off:<barcode>`. Ein Rezept erscheint im Tagebuch als `rezept:<id>`.
 
@@ -34,6 +35,8 @@ Einkaufsliste = berechnet aus Plan-Posten der Woche; gespeichert sind nur Häkch
 Tagestyp (gym | calisthenics | rest) ── Ziel (in einstellungen.ziele)
 Wochentag ── Tagestyp (in einstellungen.woche), Tag kann abweichen
 ```
+
+**Roh oder gekocht?** Ohne `gewichtGekocht` gilt das Rohgewicht der Zutaten. Mit `gewichtGekocht` rechnen Portion und Werte je 100 g mit dem Gewicht nach dem Kochen; die Einkaufsliste rechnet von dort auf Rohware zurück.
 
 **Wie rechnet ein Rezept?** `rezeptWerte()` in `js/logik/rezepte.js` summiert die Zutaten und teilt durch die Portionen. Für das Tagebuch wird das Rezept wie eine Zutat verpackt (`rezeptAlsZutat()`): Werte je 100 g plus eine Portion in Gramm.
 
@@ -61,8 +64,8 @@ Wochentag ── Tagestyp (in einstellungen.woche), Tag kann abweichen
 ## Backup-Format
 
 ```json
-{ "app": "elan", "schemaVersion": 3, "erstelltAm": "2026-11-13T10:00:00.000Z",
-  "daten": { "zutaten": [], "eintraege": [], "tage": [], "einstellungen": [], "rezepte": [], "plan": [], "einkauf": [] } }
+{ "app": "elan", "schemaVersion": 4, "erstelltAm": "2026-11-13T10:00:00.000Z",
+  "daten": { "zutaten": [], "eintraege": [], "tage": [], "einstellungen": [], "rezepte": [], "plan": [], "einkauf": [], "vorlieben": [] } }
 ```
 
 Einspielen ersetzt alle Speicher in einer einzigen Transaktion. Bricht sie ab, bleibt der alte Stand vollständig.
@@ -74,10 +77,9 @@ Einspielen ersetzt alle Speicher in einer einzigen Transaktion. Bricht sie ab, b
 | 1 Zutaten | `zutaten` (vorhanden) | zusätzlich Quelle `usda`, `bls` | – |
 | 2 Rezepte | `rezepte` (vorhanden seit 2) | siehe Meal-Prep | – |
 | 3 Tagebuch | `eintraege`, `tage` (vorhanden) | offen: Datei `data/referenzwerte.json` (keine Nutzerdaten) | – |
-| 4 Wochenplan, Einkaufsliste | `plan`, `einkauf` (vorhanden seit 3) | – | – |
-| 4 Meal-Prep | Felder an `rezepte` | `haltbarTage`, `einfrierbar`, `gewichtGekocht` | 4 |
+| 4 Wochenplan, Einkaufsliste, Meal-Prep | `plan`, `einkauf` (seit 3), Felder an `rezepte` | offen: gekochte Chargen mit Restportionen | – |
+| 6 Mag-Liste | `vorlieben` (vorhanden seit 4) | – | – |
 | 5 Angebote | `angebote` | `markt`, `produkt`, `preis`, `gueltigVon`, `gueltigBis`, `zutatId` | offen |
-| 6 Mag-Liste | `vorlieben` | `zutatId`, `mag` (J, R, K, N, S), `notiz` | 4 |
 | 7 Health | `messungen` | `datum`, `art` (gewicht, mass, schlaf, wasser, schritte), `wert`, `einheit` | 5 |
 | 7 Laborwerte | `labor` | `datum`, `name`, `wert`, `einheit`, `refMin`, `refMax` | 5 |
 | 7 Supplements | `supplements`, Feld an `tage` | `name`, `dosis`; je Tag `genommen` [] | 5 |
@@ -90,6 +92,7 @@ Health-Speicher brauchen keine Sonderbehandlung im Backup: neue Speicher kommen 
 ## Annahmen [A]
 
 - [A] Mag-Liste als eigener Speicher statt als Feld an der Zutat, weil Basis-Zutaten nicht in der Datenbank liegen.
+- [A] Haltbarkeit: Als Kochtag gilt der erste Tag, an dem ein Rezept im Plan steht. Einen eigenen Kochtag kann man noch nicht eintragen.
 - [A] Eine gemeinsame Tabelle `messungen` für Gewicht, Maße, Schlaf, Wasser und Schritte reicht; Laborwerte brauchen wegen des Referenzbereichs einen eigenen Speicher.
 - [A] Die Versionsnummern in der Spalte „Ab Version“ sind Planwerte und können sich verschieben.
 
