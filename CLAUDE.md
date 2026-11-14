@@ -7,7 +7,7 @@ Regeln und Wissen für jede Claude-Session in diesem Repo. Erst lesen, dann arbe
 - **Was:** Progressive Web App für Android/Chrome, komplett deutsch, offline-first.
 - **Umfang:** nur Ernährung und Health-Daten. Kein Trainingslog; der Tagestyp (Gym, Calisthenics, Rest) bestimmt nur die Ziele.
 - **Nutzer:** Léon baut privat. Später nutzen Freunde die App, jeder mit eigenen lokalen Daten.
-- **Stand:** Version 0.5 (Tagebuch, Wochenplan mit Einkaufsliste, Rezepte mit Meal-Prep, Zutaten mit Mag-Liste, Ziele, Backup), Schema-Version 4. Plan: `docs/PHASENPLAN.md`.
+- **Stand:** Version 0.6 (Tagebuch, Wochenplan mit Einkaufsliste, Rezepte mit Meal-Prep, Zutaten mit Mag-Liste, Health, Ziele, Backup), Schema-Version 5. Plan: `docs/PHASENPLAN.md`.
 
 ## Feste Entscheidungen (gelten, bis Léon widerspricht)
 
@@ -70,7 +70,7 @@ Léon kann mehrere Runden am Stück freigeben („mach durch bis …“). Dann d
 | `js/speicher.js` | Datenzugriff für die Ansichten |
 | `js/ansichten/` | je Seite eine Datei, baut DOM-Elemente |
 | `js/ui.js` | `el`, `svg`, `haenge`, `blatt`, `hinweis`, `bestaetige`, `feld` |
-| `js/router.js` | Hash-Router (`#/heute`, `#/woche`, `#/rezepte`, `#/zutaten`, `#/mehr`) |
+| `js/router.js` | Hash-Router (`#/heute`, `#/woche`, `#/rezepte`, `#/health`, `#/mehr`; `#/zutaten` ohne eigenen Platz in der Leiste) |
 | `sw.js` | Service Worker, Cache zuerst |
 | `data/zutaten-basis.json` | mitgelieferte Zutaten, nur lesen |
 | `test/` | Unit-Tests und Beispieldaten |
@@ -84,7 +84,8 @@ Léon kann mehrere Runden am Stück freigeben („mach durch bis …“). Dann d
 - Zahlen in der Oberfläche über `zahl()` und `gramm()` aus `js/ui.js`.
 - Eingaben mit Komma erlauben (`parseZahl`), Felder mit `inputmode="decimal"`.
 - Tippflächen mindestens 40 px hoch, kein seitliches Rollen bei 320 px Breite.
-- Eine Eingabe des Nutzers nie durch Neuzeichnen der ganzen Seite gefährden: Häkchen und Zähler an Ort und Stelle ändern.
+- Eine Eingabe des Nutzers nie durch Neuzeichnen der ganzen Seite gefährden: Häkchen und Zähler an Ort und Stelle ändern, Getipptes in einem Entwurf halten (siehe `entwurf` in `js/ansichten/health.js`).
+- Tests nie an feste Listen binden, die mit dem Projekt wachsen (Schema-Nummer, Speicher): aus `js/logik/schema.js` ableiten.
 
 ## Pflichten bei jeder Änderung an App-Dateien
 

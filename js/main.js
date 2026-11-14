@@ -1,6 +1,7 @@
 // Einstieg: Ansichten anmelden, Router starten, Service Worker registrieren.
 
 import './darstellung.js';
+import { zeigeHealth } from './ansichten/health.js';
 import { zeigeHeute } from './ansichten/heute.js';
 import { zeigeMehr } from './ansichten/mehr.js';
 import { zeigeRezepte } from './ansichten/rezepte.js';
@@ -13,6 +14,7 @@ route('heute', zeigeHeute);
 route('woche', zeigeWoche);
 route('rezepte', zeigeRezepte);
 route('zutaten', zeigeZutaten);
+route('health', zeigeHealth);
 route('mehr', zeigeMehr);
 starte(document.getElementById('inhalt'), 'heute');
 

@@ -2,6 +2,7 @@
 
 import * as db from './db.js';
 import { erstelleBackup } from './logik/backup.js';
+import { bereinigeGesundheit, messungId } from './logik/gesundheit.js';
 import { rezeptAlsZutat } from './logik/rezepte.js';
 import { bereinigeWoche, bereinigeZiele, slotsMitAnteilen } from './logik/ziele.js';
 
@@ -106,13 +107,36 @@ export function setzeVorliebe(zutatId, mag, notiz = '') {
 export const holeTag = (datum) => db.hole('tage', datum);
 
 /** Tagestyp für einen Tag festlegen; null entfernt die Abweichung vom Wochenplan. */
-export async function setzeTagestyp(datum, tagestyp) {
-  const tag = (await db.hole('tage', datum)) ?? { datum };
+export const setzeTagestyp = (datum, tagestyp) => aendereTag(datum, (tag) => {
   if (tagestyp) tag.tagestyp = tagestyp;
   else delete tag.tagestyp;
+});
+
+/** Ein Supplement für einen Tag abhaken oder das Häkchen entfernen */
+export const setzeSupplementGenommen = (datum, id, genommen) => aendereTag(datum, (tag) => {
+  const liste = new Set(tag.supplements ?? []);
+  if (genommen) liste.add(id); else liste.delete(id);
+  if (liste.size) tag.supplements = [...liste];
+  else delete tag.supplements;
+});
+
+/** Tagessatz lesen, ändern, speichern. Steht außer dem Datum nichts mehr drin, wird er entfernt. */
+async function aendereTag(datum, aendere) {
+  const tag = (await db.hole('tage', datum)) ?? { datum };
+  aendere(tag);
   if (Object.keys(tag).length === 1) return db.loesche('tage', datum);
   return db.speichere('tage', tag);
 }
+
+/* ---------- Health ---------- */
+
+export const messungenZwischen = (von, bis) => db.imBereich('messungen', 'datum', von, bis);
+export const speichereMessung = ({ art, datum, wert }) => db.speichere('messungen', { id: messungId(art, datum, crypto.randomUUID()), art, datum, wert });
+export const loescheMessung = (id) => db.loesche('messungen', id);
+export const alleSupplements = () => db.alle('supplements');
+export const speichereSupplement = (s) => db.speichere('supplements', { ...s, id: s.id ?? crypto.randomUUID() });
+export const loescheSupplement = (id) => db.loesche('supplements', id);
+export const ladeGesundheit = async () => bereinigeGesundheit(await einstellung('gesundheit'));
 
 /* ---------- Einstellungen ---------- */
 

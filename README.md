@@ -2,7 +2,7 @@
 
 Ernährung und Health-Daten im Blick. Eine Progressive Web App: offline nutzbar, komplett deutsch, alle Daten bleiben auf deinem Gerät. Kein Konto, kein Server, keine Auswertung.
 
-## Was Version 0.5 kann
+## Was Version 0.6 kann
 
 - **Tagebuch** mit sechs Mahlzeiten, Energie, Eiweiß, Kohlenhydraten, Fett und Ballaststoffen gegen dein Tagesziel
 - **Alle Nährwerte** für den Tag und als Wochenschnitt, eine Mahlzeit vom Vortag übernehmen, ganze Tage kopieren
@@ -12,11 +12,12 @@ Ernährung und Health-Daten im Blick. Eine Progressive Web App: offline nutzbar,
 - **Rezepte** mit Zutaten, Portionen und Schritten; je Schritt ein „Prinzip dahinter“. Nährwerte je Portion werden berechnet, eine Portion landet mit einem Tipp im Tagebuch
 - **Meal-Prep:** Gewicht nach dem Kochen, Haltbarkeit und „einfrierbar“ am Rezept; der Wochenplan warnt, wenn eine vorgekochte Portion zu alt wäre
 - **Mag-Liste** für Obst und Gemüse: ja, nur roh, nur gekocht, nein, Sonderfall
+- **Health:** Gewicht mit 7-Tage-Schnitt gegen ein Wochenziel, Wasser, Schlaf, Schritte, Supplements zum Abhaken, Körpermaße
 - **Zutaten:** 184 mitgelieferte Lebensmittel, eigene Zutaten, Suche bei Open Food Facts auf Knopfdruck
 - **Backup** als Datei speichern und wieder einspielen
 - Hell und dunkel, läuft ohne Netz
 
-Geplant: Health-Tracking, Import und Export. Siehe [docs/PHASENPLAN.md](docs/PHASENPLAN.md).
+Geplant: Laborwerte und Symptome, Angebote, Import und Coach-Export. Siehe [docs/PHASENPLAN.md](docs/PHASENPLAN.md).
 
 ## Installieren
 

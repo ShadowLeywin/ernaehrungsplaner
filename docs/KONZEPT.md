@@ -12,13 +12,13 @@ Elan ist eine Ernährungs- und Health-App als PWA: offline, deutsch, alle Daten 
 | 4 | Wochenplan, Einkauf, Meal-Prep | Woche planen, Einkaufsliste automatisch, Portionen, Haltbarkeit, Einfrieren | 0.5: vorhanden. Offen: gekochte Chargen mit Restportionen verfolgen |
 | 5 | Angebote | Angebote bei den Zutaten zeigen | geplant, Session 6; Datenquelle ungeklärt |
 | 6 | Mag-Liste | je Obst und Gemüse: J (roh und gekocht), R (nur roh), K (nur gekocht), N (nein), S (Sonderfall); steuert Vorschläge | 0.5: vorhanden, wirkt in Suchlisten. Offen: eigene Essens-Vorschläge |
-| 7 | Health | Gewicht mit 7-Tage-Schnitt gegen Wochenziel, Maße, Laborwerte, Schlaf, Wasser, Supplements, Symptome mit Bezug zu Mahlzeiten, Schritte | geplant, Sessions 7 und 8 |
+| 7 | Health | Gewicht mit 7-Tage-Schnitt gegen Wochenziel, Maße, Laborwerte, Schlaf, Wasser, Supplements, Symptome mit Bezug zu Mahlzeiten, Schritte | 0.6: Gewicht mit 7-Tage-Schnitt, Wasser, Schlaf, Schritte, Supplements, Körpermaße vorhanden. Offen: Laborwerte, Symptome (Session 8), Verläufe |
 | 8 | Import | Rezept aus eingefügtem Text, Android Share Target, später Schema.org | geplant, Session 9 |
 | 9 | Export | Backup als JSON, Coach-Export als Wochenbericht | Backup in 0.1 vorhanden; Coach-Export Session 9 |
 
 ## Bedienung
 
-- Fünf Seiten in 0.4: Heute, Woche, Rezepte, Zutaten, Mehr. Mehr als fünf passen nicht in die untere Leiste; Health braucht deshalb einen Platz unter „Mehr“ oder ersetzt „Zutaten“ (Zutaten wandern dann unter Rezepte).
+- Fünf Seiten seit 0.6: Heute, Woche, Rezepte, Health, Mehr. Zutaten und Mag-Liste sind über „Rezepte“ und „Mehr“ erreichbar; man braucht sie selten direkt, weil die Suche beim Eintragen alles findet.
 - Signatur der App ist die **Tagesscheibe**: sechs Segmente wie eine aufgeschnittene Zitrusfrucht, eines je Mahlzeit. Breite = Anteil am Tagesziel, Füllung = gegessen.
 - Fruchtfarben je Makro: Eiweiß Grapefruit, Kohlenhydrate Zitrone, Fett Avocado, Ballaststoffe Heidelbeere.
 - Über dem Ziel liegen ist kein Fehler: kein Rot, nur ein dunkleres Grün.

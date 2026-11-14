@@ -36,3 +36,6 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | Bereichsabfrage | Alle Sätze holen, deren Indexwert zwischen zwei Grenzen liegt. | `imBereich()` in `js/db.js` |
 | Stabile Sortierung | Beim Umsortieren behalten gleichrangige Einträge ihre bisherige Reihenfolge. | `sortiereNachVorliebe()` in `js/logik/vorlieben.js` |
 | Charge | Eine auf einmal gekochte Menge eines Rezepts. | Annahme [A] in `docs/DATENMODELL.md` |
+| Gleitender Durchschnitt | Der Mittelwert der letzten Tage, der mit jedem neuen Tag ein Stück weiterwandert. | `gleitenderSchnitt()` in `js/logik/gesundheit.js` |
+| Entwurf | Getippte, noch nicht gespeicherte Eingaben, die ein Neuzeichnen überleben sollen. | `entwurf` in `js/ansichten/health.js` |
+| Sparkline | Eine kleine Verlaufslinie ohne Achsen, die nur die Richtung zeigt. | `verlaufslinie()` in `js/ansichten/health.js` |
