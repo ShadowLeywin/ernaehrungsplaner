@@ -199,3 +199,12 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Entscheidung:** Das Symbol steht in einem eigenen `span` mit `aria-hidden`. So bleibt der Name des Titels für Screenreader und Tests gleich. Verworfen: Symbol per CSS `::before`, weil Chrome erzeugten Inhalt in den Namen aufnimmt.
 - **Fehler:** In der Woche rückte das Plus nicht mehr nach rechts, weil der Kopf der Mahlzeiten kein `space-between` mehr hat. Lösung: Textblock mit `slot-text` (wächst mit `flex: 1`).
 - **Zum Auftrag:** Die Freigabe für alle drei Vorschläge sparte eine Runde.
+
+## Session 13, Runde 5: Rezeptkarten, kurze Wochentage, Ring-Test (14.11.2026)
+
+- **Was und warum:** Léon: „Ja alles machen und mehr denken“. Rezepte als Karten mit Symbol und Farbton, Nährwerte mit Farbpunkt, Wochentage kurz. Neue Prüfpunkte für Ring über 100 %, Zitrus-Wahl und Rezeptbild. Beim Durchsehen aller Seiten gefunden: Felder in Rezeptschritten waren unsichtbar (gleiche Farbe wie die Karte).
+- **Befehle:** `npm test` (152 grün, neu `test/rezeptbild.test.js`) · `node tools/pruefe-app.cjs` (122 Kriterien).
+- **Entscheidung:** Symbol und Farbe aus dem Namen als reine Funktion `rezeptBild` statt Fotos. Fotos bräuchten Speicherplatz im Backup und Kamera-Zugriff. Farbe zuerst nach Symbol, sonst stabil per Streuwert.
+- **Fehler:** Erste Fassung färbte zufällig (Chili auf Lila). Lösung: Farbton je Stichwort.
+- **Fachbegriffe:** Streuwert (Hash), `aspect-ratio`.
+- **Zum Auftrag:** „Mehr denken“ hieß hier: jede Seite ansehen, nicht nur die geänderten.

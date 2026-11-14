@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { formatKurz, formatLang, isoDatum, istGueltig, relativ, verschiebe, wochentagIndex } from '../js/logik/datum.js';
+import { formatKurz, formatLang, formatTagKurz, formatZeitraum, isoDatum, istGueltig, relativ, verschiebe, wochentagIndex } from '../js/logik/datum.js';
 
 test('isoDatum nutzt die Ortszeit', () => {
   assert.equal(isoDatum(new Date(2026, 10, 13, 23, 59)), '2026-11-13');
@@ -38,4 +38,15 @@ test('relativ kennt heute, gestern, morgen', () => {
   assert.equal(relativ('2026-11-12', '2026-11-13'), 'Gestern');
   assert.equal(relativ('2026-11-14', '2026-11-13'), 'Morgen');
   assert.equal(relativ('2026-11-10', '2026-11-13'), null);
+});
+
+test('formatTagKurz: Tag und Monat ohne führende Null', () => {
+  assert.equal(formatTagKurz('2026-11-09'), '9.11.');
+  assert.equal(formatTagKurz('2026-01-31'), '31.1.');
+});
+
+test('formatZeitraum: Monat nur einmal, außer über den Monatswechsel', () => {
+  assert.equal(formatZeitraum('2026-11-09', '2026-11-15'), '9. bis 15. November');
+  assert.equal(formatZeitraum('2026-10-26', '2026-11-01'), '26. Oktober bis 1. November');
+  assert.equal(formatZeitraum('2026-12-28', '2027-01-03'), '28. Dezember bis 3. Januar');
 });
