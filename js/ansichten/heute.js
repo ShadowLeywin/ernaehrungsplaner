@@ -157,13 +157,18 @@ function springeZu(ereignis, slotId) {
 const KACHEL_NAME = { kh: 'Kohlen\u00ADhydrate', ballaststoffe: 'Ballast\u00ADstoffe' };
 const EMOJI = { protein: '🥚', kh: '🍞', fett: '🥑', ballaststoffe: '🥦', wasser: '💧', alle: '📊' };
 
-/** Ring wie bei Aktivitäts-Apps: pathLength=100, damit der Strich direkt in Prozent angegeben wird. */
+/**
+ * Ring wie bei Aktivitäts-Apps: pathLength=100, damit der Strich direkt in Prozent angegeben wird.
+ * Über 100 % läuft eine zweite, dunklere Runde weiter (höchstens bis 200 %).
+ */
 function ring(anteil, emoji) {
   const prozent = Math.max(0, Math.min(1, anteil)) * 100;
+  const runde2 = Math.max(0, Math.min(1, anteil - 1)) * 100;
   return el('span', { class: 'ring' },
     svg('svg', { viewBox: '0 0 64 64', 'aria-hidden': 'true' },
       svg('circle', { class: 'ring-grund', cx: 32, cy: 32, r: 27, pathLength: 100 }),
-      prozent > 0.5 ? svg('circle', { class: 'ring-voll', cx: 32, cy: 32, r: 27, pathLength: 100, 'stroke-dasharray': `${prozent.toFixed(1)} 100` }) : null),
+      prozent > 0.5 ? svg('circle', { class: 'ring-voll', cx: 32, cy: 32, r: 27, pathLength: 100, 'stroke-dasharray': `${prozent.toFixed(1)} 100` }) : null,
+      runde2 > 0.5 ? svg('circle', { class: 'ring-runde2', cx: 32, cy: 32, r: 27, pathLength: 100, 'stroke-dasharray': `${runde2.toFixed(1)} 100` }) : null),
     el('span', { class: 'ring-bild', 'aria-hidden': 'true' }, emoji));
 }
 

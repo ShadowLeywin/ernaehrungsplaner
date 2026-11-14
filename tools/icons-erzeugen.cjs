@@ -8,7 +8,8 @@ const { chromium } = require('playwright');
 const WURZEL = path.resolve(__dirname, '..');
 const ZIEL = path.join(WURZEL, 'icons');
 const RES = path.join(WURZEL, 'android/app/src/main/res');
-const GRUEN = '#1c7445';
+// Dunkelgrün wie der Grund von Blatt, damit Icon und App zusammenpassen
+const GRUEN = '#123a24';
 // Startbild auf dem Grund von Blatt dunkel (Standard), damit beim Öffnen nichts hell aufblitzt
 const PAPIER = '#0b100c';
 
