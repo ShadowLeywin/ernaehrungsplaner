@@ -17,7 +17,7 @@ Stand: Schema-Version 2 (App 0.2.0). Maßgeblich im Code: `js/logik/schema.js` u
 | `zutaten` | `id` | `name`, `marke`, `kategorie`, `quelle` (`eigen`, `off`), `quelleId`, `je100` (Nährwerte), `portionen` [{`name`, `gramm`}], `unvollstaendig`, `geaendert` | – |
 | `eintraege` | `id` | `datum` (JJJJ-MM-TT), `slot`, `zutatId`, `name`, `marke`, `gramm`, `je100` (Kopie), `erstellt`; bei Rezepten zusätzlich `rezeptId` | `datum` |
 | `tage` | `datum` | `tagestyp` (nur bei Abweichung vom Wochenplan) | – |
-| `einstellungen` | `schluessel` | `wert`; Schlüssel: `ziele`, `woche`, `letztesBackup` | – |
+| `einstellungen` | `schluessel` | `wert`; Schlüssel: `ziele`, `woche`, `slotAnteile` (Prozent je Slot, Summe 100), `letztesBackup` | – |
 | `rezepte` (ab 2) | `id` | `name`, `portionen`, `zutaten` [{`zutatId`, `name`, `marke`, `gramm`, `je100` (Kopie)}], `schritte` [{`text`, `prinzip`}], `erstellt`, `geaendert` | – |
 
 Kennungen: Basis-Zutaten `basis:<name>`, eigene `eigen:<uuid>`, Open Food Facts `off:<barcode>`. Ein Rezept erscheint im Tagebuch als `rezept:<id>`.
@@ -39,7 +39,7 @@ Wochentag ── Tagestyp (in einstellungen.woche), Tag kann abweichen
 
 | Liste | Ort | Inhalt |
 |---|---|---|
-| Nährstoffe | `js/logik/naehrwerte.js` | 8 Makro-Felder, 22 Mikronährstoffe mit Einheit |
+| Nährstoffe | `js/logik/naehrwerte.js` | 8 Makro-Felder, 22 Mikronährstoffe mit Einheit (Achtung: Omega-3 in g, EPA + DHA in mg) |
 | Slots | `js/logik/ziele.js` | 6 Mahlzeiten mit Anteil am Tagesziel |
 | Tagestypen | `js/logik/ziele.js` | Gym, Calisthenics, Rest |
 | Kategorien | `js/logik/zutat.js` | 11 Zutaten-Kategorien |
@@ -69,7 +69,7 @@ Einspielen ersetzt alle Speicher in einer einzigen Transaktion. Bricht sie ab, b
 |---|---|---|---|
 | 1 Zutaten | `zutaten` (vorhanden) | zusätzlich Quelle `usda`, `bls` | – |
 | 2 Rezepte | `rezepte` (vorhanden seit 2) | offen: `gewichtGekocht` für den Meal-Prep-Modus | 3 |
-| 3 Tagebuch | `eintraege`, `tage` (vorhanden) | Einstellung `slotAnteile` | – |
+| 3 Tagebuch | `eintraege`, `tage` (vorhanden) | offen: Datei `data/referenzwerte.json` (keine Nutzerdaten) | – |
 | 4 Wochenplan | `plan` | `datum`, `slot`, `rezeptId` oder `zutatId`, `menge` | 3 |
 | 4 Einkaufsliste | `einkauf` | `zutatId`, `gramm`, `erledigt`, `woche` | 3 |
 | 4 Meal-Prep | Felder an `rezepte` | `haltbarTage`, `einfrierbar`, `portionGramm` | 3 |

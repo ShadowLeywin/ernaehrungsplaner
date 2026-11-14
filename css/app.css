@@ -232,6 +232,11 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--b
 .makro-fett .balken-voll { background: var(--avocado); }
 .makro-ballaststoffe .balken-voll { background: var(--heidelbeere); }
 
+.alle-naehrwerte { margin-top: 1.25rem !important; }
+.alle-naehrwerte summary { justify-content: center; }
+.wie-vortag { margin-top: 0.625rem; height: auto; padding: 0.5rem 0.875rem; text-align: left; }
+input[type='date'] { appearance: none; -webkit-appearance: none; }
+
 .slots { margin-top: 1.5rem; }
 .slot { padding: 0.875rem 0; border-top: 1px solid var(--linie); scroll-margin-top: 0.5rem; }
 .slot-kopf { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }

@@ -1,39 +1,49 @@
-// Ansicht "Heute": das Tagebuch eines Tages mit sechs Slots, Tagesscheibe und Makros.
+// Ansicht "Heute": das Tagebuch eines Tages mit sechs Slots, Tagesscheibe, Makros und allen Nährwerten.
 
-import { formatLang, isoDatum, istGueltig, relativ, verschiebe } from '../logik/datum.js';
-import { MAKROS, NAEHRSTOFFE, fuerMenge, summeEintraege } from '../logik/naehrwerte.js';
+import { formatKurz, formatLang, isoDatum, istGueltig, relativ, verschiebe } from '../logik/datum.js';
+import { MAKROS, NAEHRSTOFFE, fuerMenge, luecken, summeEintraege } from '../logik/naehrwerte.js';
 import { fuellRadius, segmente, sektorPfad } from '../logik/scheibe.js';
 import { APP_NAME } from '../logik/schema.js';
-import { SLOTS, TAGESTYPEN, fortschritt, tagestypFuer } from '../logik/ziele.js';
-import { neuZeichnen } from '../router.js';
+import { kopiereEintraege, wochenSchnitt, wochenTage } from '../logik/woche.js';
+import { TAGESTYPEN, fortschritt, tagestypFuer } from '../logik/ziele.js';
+import { gehe, neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
-import { el, gramm, haenge, icon, svg, zahl } from '../ui.js';
+import { blatt, el, gramm, haenge, hinweis, icon, svg, zahl } from '../ui.js';
 import { oeffneEintrag, oeffneZutatWahl } from './eintrag.js';
 
 const nameVon = (id) => NAEHRSTOFFE.find((n) => n.id === id).name;
+const eintraegeText = (n) => `${n} ${n === 1 ? 'Eintrag' : 'Einträge'}`;
+
+// Bleibt beim Neuzeichnen erhalten: ist "Alle Nährwerte" aufgeklappt, und zeigt es den Tag oder die Woche?
+const ansicht = { offen: false, modus: 'tag' };
 
 export async function zeigeHeute(wurzel, [parameter]) {
   const heute = isoDatum();
   const datum = istGueltig(parameter) ? parameter : heute;
-  const [eintraege, ziele, woche, tag] = await Promise.all([
-    speicher.eintraegeAm(datum), speicher.ladeZiele(), speicher.ladeWoche(), speicher.holeTag(datum),
+  const woche = wochenTage(datum);
+  const [eintraege, ziele, wochenplan, tag, slots, wochenEintraege, vortag] = await Promise.all([
+    speicher.eintraegeAm(datum), speicher.ladeZiele(), speicher.ladeWoche(), speicher.holeTag(datum), speicher.ladeSlots(),
+    speicher.eintraegeZwischen(woche[0], woche[6]), speicher.eintraegeAm(verschiebe(datum, -1)),
   ]);
-  const lautPlan = tagestypFuer(datum, woche, null);
-  const typ = tagestypFuer(datum, woche, tag);
+  const lautPlan = tagestypFuer(datum, wochenplan, null);
+  const typ = tagestypFuer(datum, wochenplan, tag);
   const ziel = ziele[typ];
   const ist = summeEintraege(eintraege);
-  const jeSlot = Object.fromEntries(SLOTS.map((s) => [s.id, eintraege
-    .filter((e) => e.slot === s.id)
-    .sort((a, b) => String(a.erstellt).localeCompare(String(b.erstellt)))]));
-  const kcalJeSlot = Object.fromEntries(SLOTS.map((s) => [s.id, summeEintraege(jeSlot[s.id]).kcal ?? 0]));
+  const imSlot = (liste, slot) => liste.filter((e) => e.slot === slot.id).sort((a, b) => String(a.erstellt).localeCompare(String(b.erstellt)));
+  const kcalJeSlot = Object.fromEntries(slots.map((s) => [s.id, summeEintraege(imSlot(eintraege, s)).kcal ?? 0]));
 
   document.title = `${relativ(datum, heute) ?? formatLang(datum)} – ${APP_NAME}`;
-  haenge(wurzel, 
+  haenge(wurzel,
     kopf(datum, heute),
     tagestypWahl(datum, typ, lautPlan),
-    uebersicht(ist, ziel, kcalJeSlot),
+    uebersicht(ist, ziel, slots, kcalJeSlot),
+    alleNaehrwerte(eintraege, wochenEintraege, woche),
     eintraege.length === 0 ? el('p', { class: 'leer' }, 'Noch nichts eingetragen. Tippe bei einer Mahlzeit auf das Plus.') : null,
-    el('div', { class: 'slots' }, SLOTS.map((slot) => slotBereich(slot, jeSlot[slot.id], kcalJeSlot[slot.id], ziel.kcal * slot.anteil, datum))),
+    el('div', { class: 'slots' }, slots.map((slot) => slotBereich({
+      slot, datum, eintraege: imSlot(eintraege, slot), vortag: imSlot(vortag, slot), kcal: kcalJeSlot[slot.id], zielKcal: ziel.kcal * slot.anteil,
+    }))),
+    eintraege.length ? el('div', { class: 'knopfreihe' },
+      el('button', { type: 'button', class: 'knopf leise', onclick: () => oeffneTagKopieren(datum, heute, eintraege) }, 'Diesen Tag kopieren')) : null,
   );
 }
 
@@ -61,11 +71,11 @@ function tagestypWahl(datum, typ, lautPlan) {
 
 /* ---------- Übersicht: Tagesscheibe und Makros ---------- */
 
-function uebersicht(ist, ziel, kcalJeSlot) {
+function uebersicht(ist, ziel, slots, kcalJeSlot) {
   const kcal = fortschritt(ist.kcal ?? 0, ziel.kcal);
   return el('section', { class: 'uebersicht', 'aria-label': 'Tagesstand' },
     el('div', { class: 'scheibe-rahmen' },
-      tagesscheibe(kcalJeSlot, ziel.kcal),
+      tagesscheibe(slots, kcalJeSlot, ziel.kcal),
       el('div', { class: kcal.ueber ? 'scheibe-mitte ueber' : 'scheibe-mitte' },
         el('strong', {}, zahl(Math.abs(kcal.rest))),
         el('span', {}, kcal.ueber ? 'kcal drüber' : 'kcal übrig'))),
@@ -73,12 +83,12 @@ function uebersicht(ist, ziel, kcalJeSlot) {
     el('ul', { class: 'makros' }, MAKROS.map((id) => makroZeile(id, ist[id] ?? 0, ziel[id]))));
 }
 
-function tagesscheibe(kcalJeSlot, zielKcal) {
+function tagesscheibe(slots, kcalJeSlot, zielKcal) {
   const M = 100; // Mittelpunkt
   const R_INNEN = 50;
   const R_AUSSEN = 96;
-  const teile = segmente(SLOTS, kcalJeSlot, zielKcal).map((s) => {
-    const slot = SLOTS.find((x) => x.id === s.id);
+  const teile = segmente(slots, kcalJeSlot, zielKcal).filter((s) => s.sichtbar).map((s) => {
+    const slot = slots.find((x) => x.id === s.id);
     const voll = Math.min(1, s.anteil);
     return svg('a', { href: `#slot-${s.id}`, class: s.ueber ? 'segment ueber' : 'segment', onclick: (e) => springeZu(e, s.id) },
       svg('title', {}, `${slot.name}: ${zahl(s.ist)} von ${zahl(s.ziel)} kcal`),
@@ -104,14 +114,60 @@ function makroZeile(id, ist, ziel) {
       el('span', { class: 'balken-voll', style: `width:${Math.min(100, stand.anteil * 100).toFixed(1)}%` })));
 }
 
+/* ---------- Alle Nährwerte: Tag oder Wochenschnitt ---------- */
+
+function alleNaehrwerte(eintraege, wochenEintraege, woche) {
+  const proWoche = ansicht.modus === 'woche';
+  const quelle = proWoche ? wochenEintraege : eintraege;
+  const { tage, schnitt } = wochenSchnitt(wochenEintraege);
+  const werte = proWoche ? schnitt : summeEintraege(eintraege);
+  const fehlt = new Set(luecken(quelle, NAEHRSTOFFE.map((n) => n.id)));
+  const stellen = (w) => (w < 1 ? 2 : w < 10 ? 1 : 0);
+
+  const zeilen = (gruppe) => NAEHRSTOFFE
+    .filter((n) => n.gruppe === gruppe && typeof werte[n.id] === 'number')
+    .map((n) => el('tr', { class: n.unter ? 'unterzeile' : null },
+      el('th', { scope: 'row' }, n.name),
+      el('td', {}, `${fehlt.has(n.id) ? 'mind. ' : ''}${zahl(werte[n.id], n.id === 'kcal' ? 0 : stellen(werte[n.id]))} ${n.einheit}`)));
+  const makros = zeilen('makro');
+  const mikros = zeilen('mikro');
+
+  const modusKnopf = (id, text) => el('button', {
+    type: 'button', class: 'wahl-knopf', 'aria-pressed': String(ansicht.modus === id), onclick: () => { ansicht.modus = id; neuZeichnen(); },
+  }, text);
+
+  let erklaerung = 'Summe dieses Tages.';
+  if (proWoche) {
+    erklaerung = tage
+      ? `Schnitt je Tag aus ${tage} ${tage === 1 ? 'Tag' : 'Tagen'} mit Einträgen, ${formatKurz(woche[0])} bis ${formatKurz(woche[6])}.`
+      : `In der Woche vom ${formatKurz(woche[0])} bis ${formatKurz(woche[6])} ist nichts eingetragen.`;
+  }
+
+  return el('details', { class: 'aufklappen alle-naehrwerte', open: ansicht.offen ? true : null, ontoggle: (e) => { ansicht.offen = e.target.open; } },
+    el('summary', {}, 'Alle Nährwerte'),
+    el('div', { class: 'stapel' },
+      el('div', { class: 'wahl', role: 'group', 'aria-label': 'Zeitraum' }, modusKnopf('tag', 'Dieser Tag'), modusKnopf('woche', 'Wochenschnitt')),
+      el('p', { class: 'klein' }, erklaerung),
+      makros.length ? el('table', { class: 'naehrwerte' }, el('caption', {}, 'Makronährstoffe'), el('tbody', {}, makros)) : null,
+      mikros.length ? el('table', { class: 'naehrwerte' }, el('caption', {}, 'Vitamine und Mineralstoffe'), el('tbody', {}, mikros)) : null,
+      fehlt.size && (makros.length || mikros.length) ? el('p', { class: 'klein' }, '„mind.“ steht dort, wo bei mindestens einer Zutat der Wert fehlt. Die echte Menge liegt dann höher.') : null,
+      el('p', { class: 'klein' }, 'Referenzwerte zum Vergleich folgen in einer späteren Version.')));
+}
+
 /* ---------- Slots ---------- */
 
-function slotBereich(slot, eintraege, kcal, zielKcal, datum) {
+function slotBereich({ slot, datum, eintraege, vortag, kcal, zielKcal }) {
+  const stand = zielKcal > 0 ? `${zahl(kcal)} von ${zahl(zielKcal)} kcal` : `${zahl(kcal)} kcal`;
+  const wieVortag = async () => {
+    for (const eintrag of kopiereEintraege(vortag, datum)) await speicher.speichereEintrag(eintrag);
+    hinweis(`${eintraegeText(vortag.length)} übernommen.`);
+    neuZeichnen();
+  };
   return el('section', { class: 'slot', id: `slot-${slot.id}` },
     el('div', { class: 'slot-kopf' },
       el('div', {},
         el('h2', {}, slot.name),
-        el('p', { class: 'slot-stand' }, `${zahl(kcal)} von ${zahl(zielKcal)} kcal${slot.hinweis ? `, ${slot.hinweis}` : ''}`)),
+        el('p', { class: 'slot-stand' }, `${stand}${slot.hinweis ? `, ${slot.hinweis}` : ''}`)),
       el('button', {
         type: 'button', class: 'rund plus', 'aria-label': `Zu ${slot.name} hinzufügen`,
         onclick: () => oeffneZutatWahl({ datum, slot: slot.id, beiFertig: neuZeichnen }),
@@ -120,5 +176,34 @@ function slotBereich(slot, eintraege, kcal, zielKcal, datum) {
       el('button', { type: 'button', class: 'eintrag', onclick: () => oeffneEintrag({ eintrag: e, beiFertig: neuZeichnen }) },
         el('span', { class: 'eintrag-name' }, e.name, e.rezeptId ? el('small', {}, 'Rezept') : (e.marke ? el('small', {}, e.marke) : null)),
         el('span', { class: 'eintrag-menge' }, `${zahl(e.gramm, 1)} g`),
-        el('span', { class: 'eintrag-kcal' }, `${zahl(fuerMenge(e.je100, e.gramm).kcal ?? 0)} kcal`))))) : null);
+        el('span', { class: 'eintrag-kcal' }, `${zahl(fuerMenge(e.je100, e.gramm).kcal ?? 0)} kcal`))))) : null,
+    // Viele essen morgens dasselbe: ein Tipp statt mehrerer Suchen
+    !eintraege.length && vortag.length ? el('button', { type: 'button', class: 'chip wie-vortag', onclick: wieVortag },
+      `Wie am Vortag: ${eintraegeText(vortag.length)}, ${zahl(summeEintraege(vortag).kcal ?? 0)} kcal`) : null);
+}
+
+/* ---------- Tag kopieren ---------- */
+
+function oeffneTagKopieren(datum, heute, eintraege) {
+  const vorschlag = datum === heute ? verschiebe(heute, 1) : heute;
+  const fehler = el('p', { class: 'fehlertext', role: 'alert' });
+  const eingabe = el('input', { type: 'date', id: 'f-kopierziel', value: vorschlag });
+  const b = blatt({
+    titel: 'Tag kopieren',
+    inhalt: el('form', {
+      class: 'stapel', novalidate: true,
+      onsubmit: async (e) => {
+        e.preventDefault();
+        const ziel = eingabe.value;
+        if (!istGueltig(ziel)) { fehler.textContent = 'Wähle ein Datum.'; return; }
+        if (ziel === datum) { fehler.textContent = 'Das ist derselbe Tag.'; return; }
+        for (const eintrag of kopiereEintraege(eintraege, ziel)) await speicher.speichereEintrag(eintrag);
+        b.schliessen();
+        hinweis(`${eintraegeText(eintraege.length)} nach ${formatKurz(ziel)} kopiert.`, { aktion: 'Hingehen', beiAktion: () => gehe(`/heute/${ziel}`) });
+      },
+    },
+    el('p', {}, `${eintraegeText(eintraege.length)} mit ${zahl(summeEintraege(eintraege).kcal ?? 0)} kcal kommen zu dem dazu, was am Zieltag schon steht.`),
+    el('div', { class: 'feld' }, el('label', { for: 'f-kopierziel' }, 'Wohin?'), eingabe, fehler),
+    el('div', { class: 'knopfreihe' }, el('button', { type: 'submit', class: 'knopf' }, 'Kopieren'))),
+  });
 }

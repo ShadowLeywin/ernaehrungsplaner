@@ -63,3 +63,14 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Wie die Migration getestet wird:** Das Prüfskript legt auf einer Seite ohne App-Code eine Datenbank im alten Aufbau an und öffnet erst dann die App.
 - **Fachbegriffe:** `onupgradeneeded`, `oldVersion`, Fixture (Beispieldatei für Tests), Entität, Adapter (ein Ding so verpacken, dass es wie ein anderes benutzt werden kann).
 - **Zum Auftrag:** Geholfen hat „mach von allein weiter“ mit klarer Berechtigung. Gefehlt hat ein Ziel für die Nacht; ich arbeite den Phasenplan in Reihenfolge ab.
+
+## Session 3, Runde 1: Tagebuch ausbauen (14.11.2026)
+
+- **Was und warum:** Alle Nährwerte für Tag und Wochenschnitt, „Wie am Vortag“ je Mahlzeit, ganzen Tag kopieren, Anteile der Mahlzeiten einstellbar. Referenzwerte fehlen bewusst: Die Quelle (DGE) war nicht erreichbar, und Gesundheitswerte kommen nicht aus dem Gedächtnis in die App.
+- **Befehle:** `git show 4926827:tools/build-lebensmittel.js | grep -n epaDha` (alte Datei aus der Historie lesen, ohne sie zurückzuholen) · `node -e "import('./js/logik/naehrwerte.js').then(m => console.log(m.NAEHRSTOFFE))"` (ein Modul kurz in Node ausprobieren).
+- **Entscheidung:** Der Wochenschnitt teilt durch die Tage mit Einträgen, nicht durch sieben. Verworfen: durch sieben teilen, weil ein vergessener Tag den Schnitt sonst verfälscht.
+- **Entscheidung 2:** Lücken werden mit „mind.“ gezeigt statt verschwiegen. Eine Summe mit fehlenden Werten ist eine Untergrenze.
+- **Fehler 1:** Im Bild stand „EPA + DHA 11 g“ bei 0,93 g Omega-3. Ursache: Die Daten führen EPA + DHA in Milligramm, die Liste nannte Gramm. Lösung: Einheit korrigiert, neuer Test (EPA + DHA nie größer als Omega-3).
+- **Fehler 2:** Der Browser-Test brach ab, weil ein Selektor plötzlich zwei Auswahlleisten traf. Lösung: Selektor über `aria-label` eindeutig machen.
+- **Fachbegriffe:** Bereichsabfrage (`IDBKeyRange.bound`), Selektor, Untergrenze, Plausibilitätstest, `<details>`.
+- **Zum Auftrag:** Geholfen hat, dass der Phasenplan Kriterien hatte; so war klar, was „fertig“ heißt. Gefehlt hat der Netzzugang zu `dge.de`.

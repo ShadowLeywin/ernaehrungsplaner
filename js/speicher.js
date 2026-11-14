@@ -3,7 +3,7 @@
 import * as db from './db.js';
 import { erstelleBackup } from './logik/backup.js';
 import { rezeptAlsZutat } from './logik/rezepte.js';
-import { bereinigeWoche, bereinigeZiele } from './logik/ziele.js';
+import { bereinigeWoche, bereinigeZiele, slotsMitAnteilen } from './logik/ziele.js';
 
 /* ---------- Zutaten ---------- */
 
@@ -64,6 +64,7 @@ export const loescheRezept = (id) => db.loesche('rezepte', id);
 /* ---------- Tagebuch ---------- */
 
 export const eintraegeAm = (datum) => db.nachIndex('eintraege', 'datum', datum);
+export const eintraegeZwischen = (von, bis) => db.imBereich('eintraege', 'datum', von, bis);
 export const alleEintraege = () => db.alle('eintraege');
 
 /** Eintrag anlegen oder ändern. Die Nährwerte werden als Kopie mitgespeichert (siehe docs/DATENMODELL.md). */
@@ -100,6 +101,8 @@ export const setzeEinstellung = (schluessel, wert) => db.speichere('einstellunge
 
 export const ladeZiele = async () => bereinigeZiele(await einstellung('ziele'));
 export const ladeWoche = async () => bereinigeWoche(await einstellung('woche'));
+/** Die sechs Slots mit den eingestellten Anteilen am Tagesziel */
+export const ladeSlots = async () => slotsMitAnteilen(await einstellung('slotAnteile'));
 
 /* ---------- Backup ---------- */
 

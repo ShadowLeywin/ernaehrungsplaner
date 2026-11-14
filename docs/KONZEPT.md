@@ -8,7 +8,7 @@ Elan ist eine Ernährungs- und Health-App als PWA: offline, deutsch, alle Daten 
 |---|---|---|---|
 | 1 | Zutaten | lokale Datenbank, eigene Zutaten, Suche bei Open Food Facts | 0.1: vorhanden. Offen: USDA-Suche, BLS 4.0, Barcode per Kamera |
 | 2 | Rezepte | anlegen und ändern, Portionen, Nährwerte automatisch, je Schritt ein Feld „Prinzip dahinter“ | 0.2: vorhanden. Offen: Schritte umsortieren, Rezept kopieren |
-| 3 | Tagebuch | 6 Slots, Makros, Ballaststoffe, Ziele je Tagestyp | 0.1: vorhanden. Offen: Mikronährstoffe Tag und Woche |
+| 3 | Tagebuch | 6 Slots, Makros, Ballaststoffe, Ziele je Tagestyp | 0.3: vorhanden, mit allen Nährwerten für Tag und Wochenschnitt, Kopieren, einstellbaren Anteilen. Offen: Referenzwerte |
 | 4 | Wochenplan, Einkauf, Meal-Prep | Woche planen, Einkaufsliste automatisch, Portionen, Haltbarkeit, Einfrieren | geplant, Sessions 4 und 5 |
 | 5 | Angebote | Angebote bei den Zutaten zeigen | geplant, Session 6; Datenquelle ungeklärt |
 | 6 | Mag-Liste | je Obst und Gemüse: J (roh und gekocht), R (nur roh), K (nur gekocht), N (nein), S (Sonderfall); steuert Vorschläge | geplant, Session 5 |

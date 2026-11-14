@@ -4,7 +4,7 @@ import { MODI, leseDarstellung, setzeDarstellung } from '../darstellung.js';
 import { backupDateiname, pruefeBackup } from '../logik/backup.js';
 import { WOCHENTAGE, formatKurz, isoDatum } from '../logik/datum.js';
 import { APP_NAME, APP_VERSION } from '../logik/schema.js';
-import { STANDARD_ZIELE, TAGESTYPEN, ZIEL_FELDER, makroAbweichung } from '../logik/ziele.js';
+import { SLOTS, STANDARD_ANTEILE, STANDARD_ZIELE, TAGESTYPEN, ZIEL_FELDER, bereinigeAnteile, makroAbweichung, pruefeAnteile } from '../logik/ziele.js';
 import { parseZahl } from '../logik/zutat.js';
 import { neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
@@ -14,13 +14,15 @@ let gewaehlterTyp = 'gym';
 
 export async function zeigeMehr(wurzel) {
   document.title = `Mehr – ${APP_NAME}`;
-  const [ziele, woche, letztesBackup, status, daten] = await Promise.all([
+  const [ziele, woche, letztesBackup, status, daten, anteile] = await Promise.all([
     speicher.ladeZiele(), speicher.ladeWoche(), speicher.einstellung('letztesBackup'), speicher.speicherStatus(), speicher.exportiere(),
+    speicher.einstellung('slotAnteile'),
   ]);
   haenge(wurzel, 
     el('header', { class: 'seitenkopf' }, el('h1', {}, 'Mehr')),
     zielBereich(ziele),
     wochenBereich(woche),
+    anteileBereich(bereinigeAnteile(anteile)),
     backupBereich(letztesBackup, daten.daten),
     darstellungBereich(),
     speicherBereich(status),
@@ -110,6 +112,45 @@ function wochenBereich(woche) {
         await speicher.setzeEinstellung('woche', aktuell);
         hinweis(`${tag}: ${TAGESTYPEN.find((t) => t.id === aktuell[i]).name}.`);
       } }, TAGESTYPEN.map((t) => el('option', { value: t.id, selected: t.id === aktuell[i] }, t.name)))))));
+}
+
+/* ---------- Anteile der Mahlzeiten ---------- */
+
+function anteileBereich(anteile) {
+  const eingabe = Object.fromEntries(SLOTS.map((s) => [s.id, String(anteile[s.id]).replace('.', ',')]));
+  const stand = el('p', { class: 'klein', id: 'anteile-stand', 'aria-live': 'polite' });
+  const zeigeStand = () => {
+    const p = pruefeAnteile(eingabe);
+    stand.textContent = p.ok ? 'Zusammen 100 %.' : p.fehler;
+    stand.className = p.ok ? 'klein' : 'fehlertext';
+  };
+  const felder = el('div', { class: 'raster' });
+  const zeichneFelder = () => felder.replaceChildren(...SLOTS.map((s) => feld({
+    name: `anteil-${s.id}`, beschriftung: s.name, einheit: '%', inputmode: 'decimal', value: eingabe[s.id],
+    oninput: (e) => { eingabe[s.id] = e.target.value; zeigeStand(); },
+  })));
+  const speichern = async (e) => {
+    e.preventDefault();
+    const p = pruefeAnteile(eingabe);
+    if (!p.ok) { zeigeStand(); stand.scrollIntoView({ block: 'center' }); return; }
+    await speicher.setzeEinstellung('slotAnteile', p.anteile);
+    hinweis('Anteile gespeichert.');
+  };
+  zeichneFelder();
+  zeigeStand();
+  return el('section', { class: 'bereich' },
+    el('h2', {}, 'Anteile der Mahlzeiten'),
+    el('p', { class: 'klein' }, 'Wie viel vom Tagesziel soll auf welche Mahlzeit entfallen? Das bestimmt die Segmente der Tagesscheibe. Eine Mahlzeit mit 0 % bekommt kein Segment.'),
+    el('form', { class: 'stapel', novalidate: true, onsubmit: speichern },
+      felder,
+      stand,
+      el('div', { class: 'knopfreihe' },
+        el('button', { type: 'button', class: 'knopf leise', onclick: () => {
+          for (const s of SLOTS) eingabe[s.id] = String(STANDARD_ANTEILE[s.id]);
+          zeichneFelder();
+          zeigeStand();
+        } }, 'Startwerte einsetzen'),
+        el('button', { type: 'submit', class: 'knopf' }, 'Anteile speichern'))));
 }
 
 /* ---------- Backup ---------- */

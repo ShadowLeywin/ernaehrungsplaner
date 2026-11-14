@@ -66,6 +66,8 @@ const warte = (anfrage) => new Promise((ok, nein) => {
 export const alle = (store) => tx(store, 'readonly', (t) => warte(t.objectStore(store).getAll()));
 export const hole = (store, schluessel) => tx(store, 'readonly', (t) => warte(t.objectStore(store).get(schluessel)));
 export const nachIndex = (store, index, wert) => tx(store, 'readonly', (t) => warte(t.objectStore(store).index(index).getAll(wert)));
+/** Alle Sätze, deren Indexwert zwischen von und bis liegt (beide eingeschlossen). */
+export const imBereich = (store, index, von, bis) => tx(store, 'readonly', (t) => warte(t.objectStore(store).index(index).getAll(IDBKeyRange.bound(von, bis))));
 export const speichere = (store, satz) => tx(store, 'readwrite', (t) => { t.objectStore(store).put(satz); return satz; });
 export const loesche = (store, schluessel) => tx(store, 'readwrite', (t) => { t.objectStore(store).delete(schluessel); });
 

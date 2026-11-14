@@ -11,7 +11,7 @@ export const NAEHRSTOFFE = [
   { id: 'ballaststoffe', name: 'Ballaststoffe', einheit: 'g', gruppe: 'makro' },
   { id: 'salz', name: 'Salz', einheit: 'g', gruppe: 'makro' },
   { id: 'omega3', name: 'Omega-3', einheit: 'g', gruppe: 'mikro' },
-  { id: 'epaDha', name: 'EPA + DHA', einheit: 'g', gruppe: 'mikro' },
+  { id: 'epaDha', name: 'EPA + DHA', einheit: 'mg', gruppe: 'mikro' },
   { id: 'vitA', name: 'Vitamin A', einheit: 'µg', gruppe: 'mikro' },
   { id: 'vitB1', name: 'Vitamin B1', einheit: 'mg', gruppe: 'mikro' },
   { id: 'vitB2', name: 'Vitamin B2', einheit: 'mg', gruppe: 'mikro' },

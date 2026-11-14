@@ -43,18 +43,19 @@ Noch offen aus dieser Session: Schritte umsortieren, Rezept kopieren.
 
 Module: 2.
 
-### Session 3: Tagebuch ausbauen
+### Session 3: Tagebuch ausbauen (erledigt bis auf Referenzwerte, Version 0.3)
 
 Ziel: Mikronährstoffe für Tag und Woche sehen.
 
-| Abnahmekriterium | Testbefehl |
+| Abnahmekriterium | Beleg |
 |---|---|
-| Tagesansicht zeigt Mikronährstoffe gegen Referenzwerte; Lücken in den Daten sind gekennzeichnet | `npm test`, `pruefe-app.cjs` |
-| Wochenansicht zeigt den Schnitt der Tage mit Einträgen | `npm test` |
-| Anteile der 6 Slots sind einstellbar, Summe 100 % wird erzwungen | `npm test`, `pruefe-app.cjs` |
-| Einen Tag oder eine Mahlzeit auf einen anderen Tag kopieren | `pruefe-app.cjs` |
+| Tagesansicht zeigt alle Nährwerte; Lücken in den Daten sind mit „mind.“ gekennzeichnet | `pruefe-app.cjs`: „Alle Nährwerte des Tages“ |
+| Vergleich mit Referenzwerten | **offen**: Quelle der DGE war nicht erreichbar (`OFFENE-FRAGEN.md` Nr. 5) |
+| Wochenansicht zeigt den Schnitt der Tage mit Einträgen | `npm test`: `woche.test.js`; `pruefe-app.cjs`: „Wochenschnitt“ |
+| Anteile der 6 Slots sind einstellbar, Summe 100 % wird erzwungen | `npm test`; `pruefe-app.cjs`: „Anteile der Mahlzeiten“ |
+| Eine Mahlzeit vom Vortag übernehmen, einen ganzen Tag kopieren | `pruefe-app.cjs`: zwei Kriterien |
 
-Module: 3. Vorher klären: Quelle der Referenzwerte (`OFFENE-FRAGEN.md` Nr. 5).
+Module: 3.
 
 ### Session 4: Wochenplan und Einkaufsliste
 
@@ -180,4 +181,5 @@ Jede Session hat eine Tabelle mit prüfbaren Kriterien und einem Testbefehl.
 
 - Testausgaben vom 13.11.2026 (Version 0.1): `npm test` 59 von 59, `node tools/pruefe-app.cjs` 33 von 33.
 - Testausgaben vom 14.11.2026 (Version 0.2): `npm test` 69 von 69, `node tools/pruefe-app.cjs` 45 von 45.
+- Testausgaben vom 14.11.2026 (Version 0.3): `npm test` 79 von 79, `node tools/pruefe-app.cjs` 50 von 50.
 - BLS 4.0 kostenfrei: [heise](https://heise.de/-11123877), [Agrolab](https://agrolab.com/en/news/food-news/6105-bls-datenbank-radar-01-26-en.html), abgerufen 13.11.2026.
