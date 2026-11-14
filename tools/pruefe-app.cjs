@@ -197,6 +197,19 @@ async function hauptlauf(browser) {
   pruefe('Alle Nährwerte des Tages, Lücken sind gekennzeichnet', zeilenTag > 15 && tagText.includes('Vitamin C') && tagText.includes('mind.'), `${zeilenTag} Zeilen, z. B. ${tagText.match(/Vitamin C\s+[^\n]+/)?.[0].replace(/\s+/g, ' ')}`);
   await seite.getByRole('button', { name: 'Wochenschnitt' }).click();
   await seite.locator('.alle-naehrwerte .klein', { hasText: 'Schnitt je Tag' }).waitFor();
+  const ohneGruppe = await seite.locator('.alle-naehrwerte').innerText();
+  await seite.goto(`${URL_APP}#/mehr`);
+  await seite.locator('#f-ref-geschlecht').selectOption('w');
+  await seite.locator('#f-ref-alter').selectOption('25');
+  await seite.locator('.hinweis', { hasText: 'Referenzgruppe gespeichert' }).waitFor();
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.locator('.alle-naehrwerte summary').waitFor();
+  if ((await seite.locator('.alle-naehrwerte').getAttribute('open')) === null) await seite.locator('.alle-naehrwerte summary').click();
+  await seite.getByRole('button', { name: 'Wochenschnitt' }).click();
+  const vitC = (await seite.locator('.alle-naehrwerte tr', { hasText: 'Vitamin C' }).innerText()).replace(/\s+/g, ' ');
+  const anteile = await seite.locator('.alle-naehrwerte td.anteil').count();
+  pruefe('Referenzwerte: ohne Gruppe ein Hinweis, mit Gruppe Prozent je Nährstoff', ohneGruppe.includes('Referenzgruppe wählen') && /Vitamin C .* \d+ %/.test(vitC) && anteile > 20,
+    `Gruppe Frau 25–50: „${vitC}“, ${anteile} Zeilen mit Anteil`);
   pruefe('Wochenschnitt über Tage mit Einträgen', (await seite.locator('.alle-naehrwerte').getAttribute('open')) !== null, (await seite.locator('.alle-naehrwerte .klein').first().innerText()));
   await bild(seite, '10-alle-naehrwerte');
   await seite.getByRole('button', { name: 'Dieser Tag' }).click();

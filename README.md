@@ -1,10 +1,11 @@
 # Elan
 
-Ernährung und Health-Daten im Blick. Eine Progressive Web App: offline nutzbar, komplett deutsch, alle Daten bleiben auf deinem Gerät. Kein Konto, kein Server, keine Auswertung.
+Ernährung und Health-Daten im Blick. Als Android-App und als Web-App: offline nutzbar, komplett deutsch, alle Daten bleiben auf deinem Gerät. Kein Konto, kein Server, keine Auswertung.
 
-## Was Version 0.10 kann
+## Was Version 1.0 kann
 
 - **Tagebuch** mit sechs Mahlzeiten, Energie, Eiweiß, Kohlenhydraten, Fett und Ballaststoffen gegen dein Tagesziel
+- **Vergleich mit den Referenzwerten der DGE** für Vitamine und Mineralstoffe
 - **Alle Nährwerte** für den Tag und als Wochenschnitt, eine Mahlzeit vom Vortag übernehmen, ganze Tage kopieren
 - **Tagestypen** Gym, Calisthenics und Rest mit eigenen Zielen und einem Wochenplan
 - **Wochenplan:** Mahlzeiten für sieben Tage vormerken und mit einem Tipp ins Tagebuch übernehmen
@@ -21,11 +22,13 @@ Ernährung und Health-Daten im Blick. Eine Progressive Web App: offline nutzbar,
 - **Backup** als Datei speichern und wieder einspielen; die App erinnert daran, wenn das letzte zu alt ist
 - Hell und dunkel, läuft ohne Netz
 
-Geplant: Referenzwerte für Vitamine und Mineralstoffe, Feinschliff nach Tests am Handy. Siehe [docs/PHASENPLAN.md](docs/PHASENPLAN.md).
+Geplant: Feinschliff nach Tests am Handy. Siehe [docs/PHASENPLAN.md](docs/PHASENPLAN.md).
 
 ## Installieren
 
-Seite in Chrome auf dem Handy öffnen, dann im Menü „Zum Startbildschirm hinzufügen“.
+**Android-App:** APK aufs Handy laden, öffnen, die Installation aus dieser Quelle einmal erlauben. Bauen: [docs/ANDROID.md](docs/ANDROID.md).
+
+**Web-App:** https://shadowleywin.github.io/ernaehrungsplaner/ in Chrome öffnen, dann im Menü „Zum Startbildschirm hinzufügen“.
 
 ## Entwickeln
 
@@ -43,6 +46,11 @@ Regeln und Aufbau stehen in [CLAUDE.md](CLAUDE.md), das Datenmodell in [docs/DAT
 
 - Mitgelieferte Nährwerte: USDA FoodData Central, SR Legacy (gemeinfrei)
 - Online-Suche: Open Food Facts (Open Database License)
+- Referenzwerte: Deutsche Gesellschaft für Ernährung (DGE), Stand Mai 2026
 - Schrift: Bricolage Grotesque (SIL Open Font License)
+
+## Lizenz
+
+[MIT](LICENSE)
 
 Die Angaben dienen der Orientierung und ersetzen keine ärztliche Beratung.

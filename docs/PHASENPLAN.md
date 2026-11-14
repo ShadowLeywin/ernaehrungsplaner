@@ -43,14 +43,14 @@ Noch offen aus dieser Session: Schritte umsortieren, Rezept kopieren.
 
 Module: 2.
 
-### Session 3: Tagebuch ausbauen (erledigt bis auf Referenzwerte, Version 0.3)
+### Session 3: Tagebuch ausbauen (erledigt, Referenzwerte seit 1.0.0)
 
 Ziel: Mikronährstoffe für Tag und Woche sehen.
 
 | Abnahmekriterium | Beleg |
 |---|---|
 | Tagesansicht zeigt alle Nährwerte; Lücken in den Daten sind mit „mind.“ gekennzeichnet | `pruefe-app.cjs`: „Alle Nährwerte des Tages“ |
-| Vergleich mit Referenzwerten | **offen**: Quelle der DGE war nicht erreichbar (`OFFENE-FRAGEN.md` Nr. 5) |
+| Vergleich mit Referenzwerten | erledigt in 1.0.0: `npm test`: `referenz.test.js`; `pruefe-app.cjs`: „Referenzwerte“ |
 | Wochenansicht zeigt den Schnitt der Tage mit Einträgen | `npm test`: `woche.test.js`; `pruefe-app.cjs`: „Wochenschnitt“ |
 | Anteile der 6 Slots sind einstellbar, Summe 100 % wird erzwungen | `npm test`; `pruefe-app.cjs`: „Anteile der Mahlzeiten“ |
 | Eine Mahlzeit vom Vortag übernehmen, einen ganzen Tag kopieren | `pruefe-app.cjs`: zwei Kriterien |
@@ -170,6 +170,18 @@ Ziel: Ein Prompt, der den Coach-Export in einem KI-Chat auswertet.
 
 Module: 9.
 
+### Session 12: Android-App (erledigt, Version 1.0.0)
+
+Ziel: Elan als installierbares APK.
+
+| Abnahmekriterium | Beleg |
+|---|---|
+| APK baut, ist signiert, enthält alle App-Dateien | `./gradlew assembleRelease`; `apksigner verify`; `aapt2 dump badging` |
+| Backup, Teilen und Open Food Facts laufen über native Plugins | `pruefe-app.cjs`: fünf Kriterien „App: …“ mit nachgebildeter Brücke |
+| Teilen aus anderen Apps öffnet den Import | Intent-Filter im Manifest; **am Gerät zu prüfen** |
+| Keine Cloud-Sicherung der Gesundheitsdaten | `allowBackup=false`, `dataExtractionRules` im APK geprüft |
+| Läuft auf dem Handy | **offen**: Léon testet (`docs/AUFGABEN-LEON.md`) |
+
 ## Selbsttest dieses Plans
 
 | Modul | im Datenmodell | im Phasenplan |
@@ -203,4 +215,5 @@ Jede Session hat eine Tabelle mit prüfbaren Kriterien und einem Testbefehl.
 - Testausgaben vom 14.11.2026 (Version 0.8): `npm test` 130 von 130, `node tools/pruefe-app.cjs` 91 von 91.
 - Testausgaben vom 14.11.2026 (Version 0.9): `npm test` 136 von 136, `node tools/pruefe-app.cjs` 98 von 98.
 - Testausgaben vom 14.11.2026 (Version 0.10): `npm test` 138 von 138, `node tools/pruefe-app.cjs` 103 von 103.
+- Testausgaben vom 14.11.2026 (Version 1.0.0): `npm test` 143 von 143, `node tools/pruefe-app.cjs` 110 von 110; APK gebaut und signiert.
 - BLS 4.0 kostenfrei: [heise](https://heise.de/-11123877), [Agrolab](https://agrolab.com/en/news/food-news/6105-bls-datenbank-radar-01-26-en.html), abgerufen 13.11.2026.

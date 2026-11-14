@@ -3,6 +3,7 @@
 import { MODI, leseDarstellung, setzeDarstellung } from '../darstellung.js';
 import { backupDateiname, pruefeBackup } from '../logik/backup.js';
 import { coachBericht } from '../logik/coach.js';
+import { GESCHLECHTER } from '../logik/referenz.js';
 import { WOCHENTAGE, formatKurz, isoDatum, verschiebe } from '../logik/datum.js';
 import { APP_NAME, APP_VERSION } from '../logik/schema.js';
 import { wochenTage } from '../logik/woche.js';
@@ -17,9 +18,9 @@ let gewaehlterTyp = 'gym';
 
 export async function zeigeMehr(wurzel) {
   document.title = `Mehr – ${APP_NAME}`;
-  const [ziele, woche, letztesBackup, status, daten, anteile] = await Promise.all([
+  const [ziele, woche, letztesBackup, status, daten, anteile, referenz] = await Promise.all([
     speicher.ladeZiele(), speicher.ladeWoche(), speicher.einstellung('letztesBackup'), speicher.speicherStatus(), speicher.exportiere(),
-    speicher.einstellung('slotAnteile'),
+    speicher.einstellung('slotAnteile'), speicher.ladeReferenz(),
   ]);
   haenge(wurzel, 
     el('header', { class: 'seitenkopf' }, el('h1', {}, 'Mehr')),
@@ -27,6 +28,7 @@ export async function zeigeMehr(wurzel) {
     zielBereich(ziele),
     wochenBereich(woche),
     anteileBereich(bereinigeAnteile(anteile)),
+    referenzBereich(referenz),
     backupBereich(letztesBackup, daten.daten),
     coachBereich(),
     darstellungBereich(),
@@ -156,6 +158,29 @@ function anteileBereich(anteile) {
           zeigeStand();
         } }, 'Startwerte einsetzen'),
         el('button', { type: 'submit', class: 'knopf' }, 'Anteile speichern'))));
+}
+
+/* ---------- Referenzgruppe ---------- */
+
+function referenzBereich({ daten, gruppe }) {
+  if (!daten) return null;
+  const wahl = { geschlecht: gruppe?.geschlecht ?? '', alter: gruppe?.alter ?? '' };
+  const speichern = async () => {
+    await speicher.setzeEinstellung('referenzgruppe', wahl.geschlecht && wahl.alter ? { ...wahl } : null);
+    hinweis(wahl.geschlecht && wahl.alter ? 'Referenzgruppe gespeichert.' : 'Ohne Referenzgruppe gibt es keinen Vergleich.');
+  };
+  const auswahl = (id, beschriftung, optionen, schluessel) => el('div', { class: 'feld' },
+    el('label', { for: id }, beschriftung),
+    el('select', { id, onchange: (e) => { wahl[schluessel] = e.target.value; speichern(); } },
+      el('option', { value: '' }, 'Keine Angabe'),
+      optionen.map((o) => el('option', { value: o.id, selected: o.id === wahl[schluessel] }, o.name))));
+  return el('section', { class: 'bereich' },
+    el('h2', {}, 'Referenzwerte'),
+    el('p', { class: 'klein' }, `Für Vitamine und Mineralstoffe vergleicht die App mit den Referenzwerten der DGE (Stand ${daten.stand}, abgerufen am ${formatKurz(daten.abgerufen)}). Sie hängen von Geschlecht und Alter ab. Die Angabe bleibt auf dem Gerät.`),
+    el('div', { class: 'raster' },
+      auswahl('f-ref-geschlecht', 'Geschlecht', GESCHLECHTER, 'geschlecht'),
+      auswahl('f-ref-alter', 'Alter', daten.altersgruppen, 'alter')),
+    el('p', { class: 'klein' }, 'Für Schwangere und Stillende gelten andere Werte; die zeigt die App nicht.'));
 }
 
 /* ---------- Backup ---------- */

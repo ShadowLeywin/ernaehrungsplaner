@@ -240,6 +240,7 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--b
 
 .alle-naehrwerte { margin-top: 1.25rem !important; }
 .alle-naehrwerte summary { justify-content: center; }
+.naehrwerte td.anteil { width: 4.5rem; color: var(--tinte-leise); font-size: 0.875rem; }
 .wie-vortag { margin-top: 0.625rem; height: auto; padding: 0.5rem 0.875rem; text-align: left; }
 input[type='date'] { appearance: none; -webkit-appearance: none; }
 
