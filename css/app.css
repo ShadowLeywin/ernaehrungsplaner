@@ -542,6 +542,26 @@ body:has(.seite-willkommen) .navigation { display: none; }
   background: var(--flaeche-2); font-size: 1.125rem; line-height: 1;
 }
 
+/* Rezepte: Karten mit Symbol auf Farbton statt Foto */
+.rezeptliste { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; background: none; border-radius: 0; overflow: visible; }
+.rezeptliste li + li { border-top: 0; }
+.rezeptliste .rezeptkarte {
+  display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 0.375rem; height: 100%;
+  padding: 0.5rem 0.5rem 0.75rem; border-radius: 1.25rem; background: var(--flaeche);
+}
+.rezeptliste .zeile-name { padding: 0 0.375rem; font-weight: 650; line-height: 1.25; }
+.rezeptliste .zeile-wert { padding: 0 0.375rem; font-size: 0.8125rem; }
+.rezept-bild, .rezept-held {
+  display: grid; place-items: center; border-radius: 0.875rem; line-height: 1;
+  background: color-mix(in srgb, var(--bild-farbe, var(--limette)) 24%, var(--flaeche));
+}
+.rezept-bild { aspect-ratio: 4 / 3; font-size: 2.75rem; }
+.rezept-held { height: 9rem; margin-bottom: 1rem; border-radius: 1.25rem; font-size: 4.5rem; }
+.naehrwerte .mit-punkt th::before {
+  content: ''; display: inline-block; width: 0.625rem; height: 0.625rem; margin-right: 0.5rem;
+  border-radius: 50%; background: var(--ring-farbe); vertical-align: 0.05em;
+}
+
 /* Woche: jeder Tag eine Karte, Kürzel des Wochentags in der Farbe des Tagestyps */
 .seite-woche .slots { display: grid; gap: 0.75rem; margin-top: 1rem; }
 .seite-woche .slot { padding: 0.75rem 1rem; border-top: 0; border-radius: 1.25rem; background: var(--flaeche); }
@@ -611,7 +631,8 @@ body:has(.seite-willkommen) .navigation { display: none; }
 }
 
 :root[data-thema='blatt'] body { letter-spacing: -0.006em; }
-:root[data-thema='blatt'] h1 { font-size: 2.125rem; line-height: 1.12; font-weight: 750; letter-spacing: -0.028em; }
+/* Großer Titel wie bei iOS (34 px), auf 320 px etwas kleiner, damit „Diese Woche“ neben die Pfeile passt */
+:root[data-thema='blatt'] h1 { font-size: clamp(1.75rem, 8.6vw, 2.125rem); line-height: 1.12; font-weight: 750; letter-spacing: -0.028em; }
 :root[data-thema='blatt'] h2 { font-weight: 680; letter-spacing: -0.015em; }
 
 /* Leiste: schlicht, volle Breite, feine Linie oben, Limetten-Kapsel am aktiven Ziel */
@@ -668,6 +689,8 @@ body:has(.seite-willkommen) .navigation { display: none; }
 
 /* Fruchtflächen aus Zitrus in Blatt neutral, Hinweis ruhig */
 :root[data-thema='blatt'] .schritt, :root[data-thema='blatt'] .prinzip { background: var(--flaeche); }
+/* Felder in einer Karte eine Stufe getönt, sonst verschwinden sie in der Karte */
+:root[data-thema='blatt'] .schritt :is(input, textarea) { background: var(--flaeche-2); }
 :root[data-thema='blatt'] .hinweis { background: #24302a; color: #eef5e4; }
 :root[data-thema='blatt'] .hinweis-aktion { color: var(--limette); }
 

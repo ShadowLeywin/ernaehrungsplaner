@@ -30,7 +30,7 @@ Was nur du erledigen kannst, weil es ein echtes Handy oder dein GitHub-Konto bra
 | A11 | Woche → etwas einplanen → „Einkaufsliste“ → „Offene Posten teilen“ | Teilen-Menü mit der Liste |
 | A12 | Mehr → Referenzwerte: Geschlecht und Alter wählen. Dann Heute → „Alle Nährwerte“ | Prozent je Vitamin und Mineralstoff |
 | A13 | Health → Gewicht eintragen → „Tageswerte speichern“, App schließen und öffnen | Wert ist noch da |
-| A14 | Mehr → Darstellung → „Dunkel“ | Alles bleibt lesbar |
+| A14 | Mehr → Darstellung: Design Blatt und Zitrus, dazu Hell und Dunkel durchschalten | Alles bleibt lesbar, die Wahl bleibt nach Neustart |
 | A15 | Mehr → „Was ist neu“ und „Über Elan“ lesen | Liste der Neuerungen, Funktionen kurz erklärt |
 | A16 | Bei einer Mahlzeit auf das Plus: Steht oben „Zuletzt eingetragen“ mit „+ 80 g“? Antippen | Eintrag ist sofort da, unten „Rückgängig“ |
 | A17 | Zwei Minuten frei herumtippen | Notiere, was hakt, zu klein ist oder unklar heißt |

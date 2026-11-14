@@ -364,6 +364,21 @@ async function dunkelLauf(browser) {
   await seite.locator('dialog .zeilen .zeile').first().click();
   await seite.locator('#f-gramm').fill('150');
   await bild(seite, '07-blatt-menge', false);
+  await seite.keyboard.press('Escape');
+  await seite.locator('dialog').waitFor({ state: 'detached' });
+
+  // Über dem Ziel: 12 × 250 ml = 3.000 ml bei 2.500 ml Ziel, die zweite Runde zeigt 20 %
+  for (let i = 0; i < 12; i++) await seite.locator('.kachel.makro-wasser').click();
+  await seite.locator('.kachel.makro-wasser .kachel-wert', { hasText: '3.000 ml' }).waitFor();
+  const runde2 = await seite.locator('.kachel.makro-wasser .ring-runde2').getAttribute('stroke-dasharray');
+  pruefe('Ring über 100 %: zweite Runde zeigt den Überschuss', runde2 === '20.0 100', `Wasser 3.000 von 2.500 ml, zweite Runde „${runde2}“`);
+
+  // Das erste Design bleibt wählbar und wirkt sofort
+  await seite.goto(`${URL_APP}#/mehr/darstellung`);
+  await seite.getByRole('group', { name: 'Design' }).getByRole('button', { name: 'Zitrus' }).click();
+  await seite.getByRole('group', { name: 'Hell oder dunkel' }).getByRole('button', { name: 'Hell' }).click();
+  const zitrus = await seite.evaluate(() => `${document.documentElement.dataset.thema}/${document.documentElement.dataset.modus}/${getComputedStyle(document.body).fontFamily.split(',')[0]}/${localStorage.getItem('elan.thema')}`);
+  pruefe('Darstellung: Zitrus hell wählbar, mit eigener Schrift, bleibt gespeichert', zitrus.startsWith('zitrus/hell/') && zitrus.includes('Bricolage') && zitrus.endsWith('/zitrus'), zitrus);
   await kontext.close();
 }
 
@@ -393,6 +408,8 @@ async function rezeptLauf(browser) {
   await bild(seite, '08-rezept-formular');
   await seite.getByRole('button', { name: 'Rezept speichern' }).click();
   await seite.locator('h1', { hasText: 'Testchili' }).waitFor();
+  const held = await seite.locator('.rezept-held').evaluate((e) => ({ symbol: e.textContent, farbe: e.style.getPropertyValue('--bild-farbe'), versteckt: e.getAttribute('aria-hidden') }));
+  pruefe('Rezept: Bildfläche mit Symbol und Farbton, für Screenreader ausgeblendet', held.symbol.length > 0 && held.farbe.startsWith('var(--') && held.versteckt === 'true', `${held.symbol} auf ${held.farbe}`);
   const kcalText = await seite.locator('table.naehrwerte td').first().innerText();
   const kcalPortion = Number(kcalText.replace(/[^\d]/g, ''));
   pruefe('Rezept anlegen: Zutaten, Portionen, Schritte mit Prinzip', (await seite.locator('.schritte > li').count()) === 2 && (await seite.locator('.prinzip').count()) === 1 && kcalPortion > 0,

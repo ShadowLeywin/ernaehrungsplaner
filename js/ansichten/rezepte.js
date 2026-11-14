@@ -2,6 +2,7 @@
 // Jeder Schritt kann ein "Prinzip dahinter" tragen: warum er funktioniert.
 
 import { NAEHRSTOFFE } from '../logik/naehrwerte.js';
+import { rezeptBild } from '../logik/rezeptbild.js';
 import { pruefeRezept, rezeptWerte } from '../logik/rezepte.js';
 import { APP_NAME } from '../logik/schema.js';
 import { parseZahl } from '../logik/zutat.js';
@@ -38,14 +39,22 @@ async function liste(wurzel) {
     el('div', { class: 'linkreihe' },
       el('a', { class: 'textlink', href: '#/rezepte/import' }, 'Rezept importieren'),
       el('a', { class: 'textlink', href: '#/zutaten' }, 'Zutaten und Mag-Liste')),
+    // Karten in zwei Spalten; statt Fotos ein Symbol auf einem Farbton, beides aus dem Namen
     rezepte.length
-      ? el('ul', { class: 'zeilen' }, rezepte.map((r) => {
+      ? el('ul', { class: 'zeilen rezeptliste' }, rezepte.map((r) => {
         const w = rezeptWerte(r);
-        return el('li', {}, el('a', { class: 'zeile', href: adresse(r.id) },
+        return el('li', {}, el('a', { class: 'zeile rezeptkarte', href: adresse(r.id) },
+          rezeptBildFlaeche(r.name, 'rezept-bild'),
           el('span', { class: 'zeile-name' }, r.name, el('small', {}, portionenText(r.portionen))),
           el('span', { class: 'zeile-wert' }, `${zahl(w.jePortion.kcal ?? 0)} kcal je Portion`)));
       }))
       : el('p', { class: 'leer' }, 'Noch kein Rezept. Lege eines an, dann trägst du eine Portion mit einem Tipp ins Tagebuch ein.'));
+}
+
+/** Fläche mit Symbol und Farbton des Rezepts; für Screenreader ausgeblendet, der Name steht daneben. */
+function rezeptBildFlaeche(name, klasse) {
+  const { symbol, farbe } = rezeptBild(name);
+  return el('span', { class: klasse, style: `--bild-farbe:var(--${farbe})`, 'aria-hidden': 'true' }, symbol);
 }
 
 /* ---------- Detail ---------- */
@@ -57,7 +66,8 @@ function detail(wurzel, rezept) {
     .filter((id) => typeof w.jePortion[id] === 'number')
     .map((id) => {
       const n = NAEHRSTOFFE.find((x) => x.id === id);
-      return el('tr', {}, el('th', { scope: 'row' }, n.name), el('td', {}, `${id === 'kcal' ? zahl(w.jePortion[id]) : gramm(w.jePortion[id])} ${n.einheit}`));
+      // Farbpunkt wie bei den Ringen auf „Heute“, damit man die Makros wiedererkennt
+      return el('tr', { class: id === 'kcal' ? null : `mit-punkt makro-${id}` }, el('th', { scope: 'row' }, n.name), el('td', {}, `${id === 'kcal' ? zahl(w.jePortion[id]) : gramm(w.jePortion[id])} ${n.einheit}`));
     });
 
   const loeschen = async () => {
@@ -74,6 +84,7 @@ function detail(wurzel, rezept) {
   haenge(wurzel,
     el('a', { class: 'zurueck', href: '#/rezepte' }, icon('zurueck', 18), 'Rezepte'),
     el('header', { class: 'detailkopf' },
+      rezeptBildFlaeche(rezept.name, 'rezept-held'),
       el('h1', {}, rezept.name),
       el('p', {}, `${portionenText(rezept.portionen)}, je etwa ${zahl(w.portionGramm)} g ${w.gekocht ? 'gekocht' : 'Rohgewicht'}`),
       rezept.haltbarTage || rezept.einfrierbar ? el('p', { class: 'klein' }, [

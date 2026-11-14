@@ -1,6 +1,6 @@
 // Ansicht "Woche": Mahlzeiten für sieben Tage vormerken und ins Tagebuch übernehmen.
 
-import { WOCHENTAGE, ausIso, formatTag, isoDatum, istGueltig, verschiebe } from '../logik/datum.js';
+import { WOCHENTAGE, ausIso, formatTag, formatTagKurz, formatZeitraum, isoDatum, istGueltig, verschiebe } from '../logik/datum.js';
 import { fuerMenge, summeEintraege } from '../logik/naehrwerte.js';
 import { alsEintraege, naechsterFreierSlot } from '../logik/plan.js';
 import { haltbarkeitsWarnungen } from '../logik/rezepte.js';
@@ -42,7 +42,7 @@ export async function zeigeWoche(wurzel, teile) {
     // Kopf wie auf „Heute“: Zeitraum klein darüber, großer Titel, Blättern rechts
     el('header', { class: 'tageskopf' },
       el('div', { class: 'tagestitel' },
-        el('p', { class: 'ueberzeile' }, `${formatTag(tage[0])} bis ${formatTag(tage[6])}`),
+        el('p', { class: 'ueberzeile' }, formatZeitraum(tage[0], tage[6])),
         el('h1', {}, wochenTitel(tage[0], heute))),
       el('div', { class: 'blaettern' },
         el('a', { class: 'rund', href: `#/woche/${verschiebe(tage[0], -7)}`, 'aria-label': 'Eine Woche zurück' }, icon('zurueck')),
@@ -81,7 +81,8 @@ function tagBereich({ datum, istHeute, posten, typ, ziele, warnungen }) {
       // Kürzel des Wochentags, gefärbt nach Tagestyp: so sieht man die Woche auf einen Blick
       el('span', { class: `slot-bild tagestyp-${typ}`, 'aria-hidden': 'true' }, wochentag.slice(0, 2)),
       el('div', { class: 'slot-text' },
-        el('h2', {}, `${wochentag}, ${formatTag(datum)}`, istHeute ? el('span', { class: 'marke' }, 'heute') : null),
+        // Kurzes Datum: „Mittwoch, 12. November“ bräche auf schmalen Handys um
+        el('h2', {}, `${wochentag}, ${formatTagKurz(datum)}`, istHeute ? el('span', { class: 'marke' }, 'heute') : null),
         el('p', { class: 'slot-stand' }, `${typName}, ${zahl(geplant)} von ${zahl(ziele[typ].kcal)} kcal geplant`)),
       el('button', {
         type: 'button', class: 'rund plus', 'aria-label': `Für ${wochentag} einplanen`,

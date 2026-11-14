@@ -16,6 +16,8 @@ export const NEUIGKEITEN = [
       'Health und Woche im selben Stil: Abschnitte als Karten mit farbigem Symbol, jeder Wochentag in der Farbe seines Tagestyps.',
       'Ringe über 100 % laufen in einer zweiten, dunkleren Runde weiter.',
       'App-Icon auf dunkelgrünem Grund.',
+      'Rezepte als Karten mit Symbol und passendem Farbton (Chili rot, Fisch blau); Nährwerte mit Farbpunkt wie die Ringe.',
+      'Wochentage kurz („Mittwoch, 12.11.“), damit nichts umbricht.',
       'Das erste Design „Zitrus“ gibt es weiter unter Mehr → Darstellung.',
     ],
   },
@@ -58,7 +60,7 @@ export const NEUIGKEITEN = [
 
 /** Die Funktionen der App in Kürze, für „Über Elan“ */
 export const FUNKTIONEN = [
-  { titel: 'Heute', text: 'Was du isst, in sechs Mahlzeiten. Die Scheibe zeigt, wie viel vom Tagesziel erreicht ist; darunter Eiweiß, Kohlenhydrate, Fett und Ballaststoffe.' },
+  { titel: 'Heute', text: 'Was du isst, in sechs Mahlzeiten. Die Scheibe zeigt, wie viel vom Tagesziel erreicht ist; darunter je ein Ring für Eiweiß, Kohlenhydrate, Fett, Ballaststoffe und Wasser. Der Plus-Knopf trägt in die Mahlzeit zur Uhrzeit ein.' },
   { titel: 'Tagestypen', text: 'Gym, Calisthenics oder Rest: Jeder Typ hat eigene Ziele. Der Wochenplan legt fest, welcher Tag welcher ist.' },
   { titel: 'Alle Nährwerte', text: 'Vitamine und Mineralstoffe für den Tag oder als Wochenschnitt, mit Anteil am Referenzwert der DGE.' },
   { titel: 'Woche und Einkauf', text: 'Mahlzeiten vormerken, mit einem Tipp ins Tagebuch übernehmen. Die Einkaufsliste rechnet Rezepte in Zutaten um und zeigt Angebote.' },
@@ -66,5 +68,6 @@ export const FUNKTIONEN = [
   { titel: 'Zutaten', text: '184 Lebensmittel sind dabei, eigene kommen dazu. Suche bei Open Food Facts nur auf Knopfdruck. Die Mag-Liste merkt sich, was du (nicht) magst.' },
   { titel: 'Health', text: 'Gewicht mit 7-Tage-Schnitt gegen dein Wochenziel, Wasser, Schlaf, Schritte, Supplements, Maße, Laborwerte und Symptome.' },
   { titel: 'Backup und Coach-Export', text: 'Alle Daten als Datei sichern und wieder einspielen. Der Wochenbericht ist Text zum Einfügen in einen Chat.' },
+  { titel: 'Darstellung', text: 'Blatt (schlicht und grün) oder Zitrus (das erste Design), jeweils hell, dunkel oder wie das Handy.' },
   { titel: 'Datenschutz', text: 'Kein Konto, kein Server, keine Auswertung. Alles bleibt auf dem Gerät; ins Netz geht nur, was du selbst auslöst.' },
 ];

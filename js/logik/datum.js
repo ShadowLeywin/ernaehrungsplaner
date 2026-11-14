@@ -44,6 +44,20 @@ export function formatTag(iso) {
   return new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'long' }).format(ausIso(iso));
 }
 
+/** Zeitraum kurz: "9. bis 15. November", über den Monatswechsel "27. Oktober bis 2. November". */
+export function formatZeitraum(von, bis) {
+  const a = ausIso(von);
+  const b = ausIso(bis);
+  if (a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear()) return `${a.getDate()}. bis ${formatTag(bis)}`;
+  return `${formatTag(von)} bis ${formatTag(bis)}`;
+}
+
+/** "13.11." – kurz für schmale Überschriften */
+export function formatTagKurz(iso) {
+  const d = ausIso(iso);
+  return `${d.getDate()}.${d.getMonth() + 1}.`;
+}
+
 /** "13.11.2026" */
 export function formatKurz(iso) {
   return new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(ausIso(iso));
