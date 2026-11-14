@@ -887,6 +887,92 @@ async function importLauf(browser) {
   await kontext.close();
 }
 
+async function angebotLauf(browser) {
+  const { kontext, seite, fehler } = await neueSeite(browser);
+  const tag = (versatz) => seite.evaluate((v) => { const d = new Date(); d.setHours(12); d.setDate(d.getDate() + v); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }, versatz);
+  await seite.goto(`${URL_APP}#/zutaten/basis%3Aapfel`, { waitUntil: 'networkidle' });
+  await seite.locator('.angebot-bereich').waitFor();
+  const leer = await seite.locator('.angebot-bereich p.klein').innerText();
+  await seite.getByRole('button', { name: 'Angebot eintragen' }).click();
+  await seite.getByRole('button', { name: 'Angebot speichern' }).click();
+  const pflicht = await seite.locator('dialog .fehlertext').allInnerTexts();
+  await seite.locator('#f-angebot-markt').fill('Testmarkt');
+  await seite.locator('#f-angebot-preis').fill('1,99');
+  await seite.locator('#f-angebot-menge').fill('1 kg');
+  await seite.locator('#f-angebot-gueltigBis').fill(await tag(3));
+  await seite.getByRole('button', { name: 'Angebot speichern' }).click();
+  await seite.locator('.angebot-bereich .zeile').waitFor();
+  const zeile = (await seite.locator('.angebot-bereich .zeile-name').innerText()).replace(/\n/g, ' | ');
+  pruefe('Angebot an einer Zutat eintragen', leer.includes('Kein aktuelles') && pflicht.length === 2 && zeile.startsWith('Testmarkt | 1,99 € für 1 kg, bis '), `Pflichtfehler: ${pflicht.join(' | ')}; gespeichert: ${zeile}`);
+
+  // Ein günstigeres und ein abgelaufenes Angebot direkt in die Datenbank
+  const gestern = await tag(-1);
+  await seite.evaluate((abgelaufenBis) => new Promise((ok, nein) => {
+    const a = indexedDB.open('elan');
+    a.onsuccess = () => {
+      const t = a.result.transaction('angebote', 'readwrite');
+      t.objectStore('angebote').put({ id: 'test-guenstig', zutatId: 'basis:apfel', zutatName: 'Apfel', markt: 'Günstigmarkt', preis: 1.49, quelle: 'hand' });
+      t.objectStore('angebote').put({ id: 'test-alt', zutatId: 'basis:apfel', zutatName: 'Apfel', markt: 'Altmarkt', preis: 0.5, gueltigBis: abgelaufenBis, quelle: 'hand' });
+      t.oncomplete = () => { a.result.close(); ok(); };
+      t.onerror = () => nein(t.error);
+    };
+  }), gestern);
+  await seite.reload({ waitUntil: 'networkidle' });
+  await seite.locator('.angebot-bereich .zeile').first().waitFor();
+  const maerkte = await seite.locator('.angebot-bereich .zeile-name').evaluateAll((z) => z.map((x) => x.firstChild.textContent));
+  pruefe('Abgelaufene Angebote verschwinden, das günstigste steht oben', maerkte.join() === 'Günstigmarkt,Testmarkt', `bei der Zutat: ${maerkte.join(', ')} (Altmarkt mit 0,50 € bis gestern fehlt)`);
+
+  await seite.goto(`${URL_APP}#/woche`);
+  await seite.locator('.plantag.heute .plus').click();
+  await seite.locator('dialog input[type=search]').fill('apfel');
+  await seite.locator('dialog .zeilen .zeile', { hasText: /^Apfel/ }).first().click();
+  await seite.locator('#f-gramm').fill('340');
+  await seite.getByRole('button', { name: 'Einplanen', exact: true }).click();
+  await seite.locator('dialog').waitFor({ state: 'detached' });
+  await seite.getByRole('link', { name: 'Einkaufsliste' }).click();
+  await seite.locator('.haken').first().waitFor();
+  const posten = (await seite.locator('.haken').first().innerText()).replace(/\n+/g, ' | ');
+  pruefe('Einkaufsliste zeigt das günstigste aktuelle Angebot', posten.includes('Angebot Günstigmarkt: 1,49 €'), posten);
+  await bild(seite, '21-einkauf-angebot');
+
+  await seite.goto(`${URL_APP}#/woche`);
+  await seite.getByRole('link', { name: 'Angebote' }).click();
+  await seite.locator('h1', { hasText: 'Angebote' }).waitFor();
+  const gruppen = await seite.locator('.seite > h2').allInnerTexts();
+  await seite.locator('#angebote-abgelaufen summary').click();
+  await seite.getByRole('button', { name: 'Abgelaufene löschen' }).click();
+  await seite.locator('.hinweis', { hasText: 'abgelaufene gelöscht' }).waitFor();
+  await seite.locator('#angebote-abgelaufen').waitFor({ state: 'detached' });
+  pruefe('Übersicht nach Markt, Abgelaufene lassen sich aufräumen', gruppen.join() === 'Günstigmarkt,Testmarkt', `Märkte: ${gruppen.join(', ')}; 1 abgelaufenes gelöscht`);
+
+  const datei = path.resolve(__dirname, '..', 'test', 'daten', 'angebote-beispiel.json');
+  await seite.locator('#f-angebote-datei').setInputFiles(datei);
+  await seite.locator('.hinweis', { hasText: 'eingelesen' }).waitFor();
+  const meldung = await seite.locator('.hinweis span').innerText();
+  await seite.locator('.seite > h2', { hasText: 'Testmarkt Nord' }).waitFor();
+  await seite.locator('#f-angebote-datei').setInputFiles(datei);
+  await seite.locator('.hinweis', { hasText: 'eingelesen' }).waitFor();
+  await seite.waitForTimeout(300);
+  const anzahl = await seite.locator('.seite > .zeilen .zeile').count();
+  pruefe('Angebotsdatei einlesen: zugeordnet, Unbekanntes genannt, erneutes Einlesen ersetzt', meldung.startsWith('2 Angebote eingelesen. Nicht zugeordnet: Einhornfilet. 2 Zeilen ungültig.') && anzahl === 4, `„${meldung}“; nach zweimaligem Einlesen ${anzahl} aktuelle Angebote (2 von Hand, 2 aus der Datei)`);
+  await bild(seite, '22-angebote');
+
+  const unsinn = [];
+  for (const [route, warteAuf] of [['angebote', '#f-angebote-datei'], ['zutaten/basis%3Aapfel', '.angebot-bereich']]) {
+    await seite.goto(`${URL_APP}#/${route}`);
+    await seite.locator(warteAuf).first().waitFor({ state: 'attached' });
+    await seite.locator('h1').waitFor();
+    const b = await seite.evaluate(() => ({ inhalt: document.documentElement.scrollWidth, fenster: window.innerWidth }));
+    if (b.inhalt > b.fenster) unsinn.push(`${route} zu breit (${b.inhalt})`);
+    if (/\b(null|undefined|NaN)\b/.test(await seite.locator('body').innerText())) unsinn.push(`${route}: null/undefined/NaN im Text`);
+    const klein = await seite.evaluate(() => [...document.querySelectorAll('button, a, select, summary, label.knopf, input:not([type=checkbox]):not([type=file])')].filter((e) => e.offsetParent).map((e) => ({ t: (e.getAttribute('aria-label') || e.textContent).trim().slice(0, 18), h: Math.round(e.getBoundingClientRect().height) })).filter((e) => e.h < 40));
+    if (klein.length) unsinn.push(`${route}: Tippflächen unter 40 px ${JSON.stringify(klein)}`);
+  }
+  pruefe('Angebote: Breite, Text, Tippflächen', unsinn.length === 0, unsinn.join(' | ') || 'beide Seiten in Ordnung');
+  pruefe('Angebots-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
+  await kontext.close();
+}
+
 async function migrationsLauf(browser) {
   const { kontext, seite, fehler } = await neueSeite(browser);
   // Datenbank im Aufbau von Schema-Version 1 anlegen, bevor die App sie öffnet (Seite ohne App-Code, gleiche Herkunft)
@@ -918,7 +1004,7 @@ async function migrationsLauf(browser) {
     const speicher = await new Promise((ok) => { const a = indexedDB.open('elan'); a.onsuccess = () => { const n = [...a.result.objectStoreNames]; a.result.close(); ok(n); }; });
     return { version: info.version, speicher };
   });
-  pruefe('Migration: Datenbank aus Version 1 wird angehoben, Einträge bleiben', stand.version === SCHEMA_VERSION && stand.speicher.includes('rezepte') && stand.speicher.includes('plan') && stand.speicher.includes('vorlieben') && stand.speicher.includes('messungen') && stand.speicher.includes('labor') && (await seite.locator('.eintrag').count()) === 1,
+  pruefe('Migration: Datenbank aus Version 1 wird angehoben, Einträge bleiben', stand.version === SCHEMA_VERSION && stand.speicher.includes('rezepte') && stand.speicher.includes('plan') && stand.speicher.includes('vorlieben') && stand.speicher.includes('messungen') && stand.speicher.includes('labor') && stand.speicher.includes('angebote') && (await seite.locator('.eintrag').count()) === 1,
     `Version ${stand.version}, Speicher ${stand.speicher.join(', ')}, alter Eintrag: ${(await seite.locator('.eintrag').innerText()).replace(/\n/g, ' | ')}`);
 
   await seite.goto(`${URL_APP}#/mehr`);
@@ -949,6 +1035,7 @@ async function migrationsLauf(browser) {
     await healthLauf(browser);
     await befundLauf(browser);
     await importLauf(browser);
+    await angebotLauf(browser);
     await migrationsLauf(browser);
     await offlineLauf(browser);
     await dunkelLauf(browser);

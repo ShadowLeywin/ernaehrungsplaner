@@ -1,7 +1,8 @@
 // Einkaufsliste einer Woche. Sie wird bei jedem Öffnen aus dem Wochenplan berechnet;
 // gespeichert sind nur die Häkchen und die von Hand ergänzten Posten.
 
-import { formatTag } from '../logik/datum.js';
+import { aktuelleJeZutat, angebotText } from '../logik/angebote.js';
+import { formatTag, isoDatum } from '../logik/datum.js';
 import { einkaufsliste, listeAlsText, mengeText } from '../logik/plan.js';
 import { APP_NAME } from '../logik/schema.js';
 import { kategorieName } from '../logik/zutat.js';
@@ -11,9 +12,12 @@ import { el, haenge, hinweis, icon } from '../ui.js';
 
 export async function zeigeEinkauf(wurzel, tage) {
   const woche = tage[0];
-  const [posten, rezepte, zutaten, gespeichert] = await Promise.all([
-    speicher.planZwischen(tage[0], tage[6]), speicher.alleRezepte(), speicher.alleZutaten(), speicher.einkaufDerWoche(woche),
+  const [posten, rezepte, zutaten, gespeichert, angebote] = await Promise.all([
+    speicher.planZwischen(tage[0], tage[6]), speicher.alleRezepte(), speicher.alleZutaten(), speicher.einkaufDerWoche(woche), speicher.alleAngebote(),
   ]);
+  // Je Zutat das günstigste Angebot, das heute gilt
+  const guenstig = aktuelleJeZutat(angebote, isoDatum());
+  const angebotHinweis = (schluessel) => (guenstig.has(schluessel) ? `Angebot ${angebotText(guenstig.get(schluessel)[0])}` : null);
   const liste = einkaufsliste(posten, new Map(rezepte.map((r) => [r.id, r])), new Map(zutaten.map((z) => [z.id, z])));
   const erledigt = new Set(gespeichert.filter((s) => s.schluessel && s.erledigt).map((s) => s.schluessel));
   const eigene = gespeichert.filter((s) => s.eigen).sort((a, b) => String(a.erstellt).localeCompare(String(b.erstellt)));
@@ -86,7 +90,7 @@ export async function zeigeEinkauf(wurzel, tage) {
     gruppen.map((g) => [
       el('h2', {}, kategorieName(g.kategorie)),
       el('ul', { class: 'zeilen' }, g.posten.map((p) => zeile({
-        id: `haken-${p.schluessel}`, name: p.name, klein: p.marke, an: erledigt.has(p.schluessel),
+        id: `haken-${p.schluessel}`, name: p.name, klein: [p.marke, angebotHinweis(p.schluessel)].filter(Boolean).join(', '), an: erledigt.has(p.schluessel),
         menge: p.stueck ? `${mengeText(p.gramm)}, etwa ${p.stueck} Stück` : mengeText(p.gramm),
         beiWechsel: (an) => hake(p.schluessel, an),
       }))),

@@ -83,17 +83,19 @@ Ziel: Vorkochen planen; Vorschläge achten auf Vorlieben.
 
 Module: 4 (Meal-Prep), 6.
 
-### Session 6: Angebote
+### Session 6: Angebote (erledigt ohne marktguru, Version 0.9)
 
 Ziel: Bei einer Zutat sehen, wo sie diese Woche im Angebot ist.
 
-| Abnahmekriterium | Testbefehl |
+| Abnahmekriterium | Beleg |
 |---|---|
-| Angebotsdatei mit Schema-Version einlesen (Datei-Import oder mitgelieferte Datei) | `npm test` |
-| Angebote erscheinen bei der passenden Zutat und in der Einkaufsliste | `pruefe-app.cjs` |
-| Abgelaufene Angebote verschwinden | `npm test` |
+| Angebotsdatei mit Schema-Version einlesen (Datei-Import) | `npm test`: `angebote.test.js`; `pruefe-app.cjs`: „Angebotsdatei einlesen“ |
+| Angebote erscheinen bei der passenden Zutat und in der Einkaufsliste | `pruefe-app.cjs`: „Angebot an einer Zutat“, „Einkaufsliste zeigt das günstigste“ |
+| Abgelaufene Angebote verschwinden | `npm test`; `pruefe-app.cjs`: „Abgelaufene Angebote verschwinden“ |
 
-Module: 5. Start erst, wenn `OFFENE-FRAGEN.md` Nr. 2 entschieden ist.
+Angebote kommen von Hand oder aus einer selbst gepflegten Datei (`docs/ANGEBOTE-FORMAT.md`). Ein automatischer Abruf bei marktguru bleibt aus, bis `OFFENE-FRAGEN.md` Nr. 2 entschieden ist.
+
+Module: 5.
 
 ### Session 7: Health A, tägliche Werte (erledigt, Version 0.6)
 
@@ -196,4 +198,5 @@ Jede Session hat eine Tabelle mit prüfbaren Kriterien und einem Testbefehl.
 - Testausgaben vom 14.11.2026 (Version 0.6): `npm test` 106 von 106, `node tools/pruefe-app.cjs` 76 von 76.
 - Testausgaben vom 14.11.2026 (Version 0.7): `npm test` 113 von 113, `node tools/pruefe-app.cjs` 83 von 83.
 - Testausgaben vom 14.11.2026 (Version 0.8): `npm test` 130 von 130, `node tools/pruefe-app.cjs` 91 von 91.
+- Testausgaben vom 14.11.2026 (Version 0.9): `npm test` 136 von 136, `node tools/pruefe-app.cjs` 98 von 98.
 - BLS 4.0 kostenfrei: [heise](https://heise.de/-11123877), [Agrolab](https://agrolab.com/en/news/food-news/6105-bls-datenbank-radar-01-26-en.html), abgerufen 13.11.2026.

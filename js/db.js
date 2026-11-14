@@ -39,6 +39,10 @@ export const MIGRATIONEN = [
     db.createObjectStore('labor', { keyPath: 'id' });
     db.createObjectStore('symptome', { keyPath: 'id' }).createIndex('datum', 'datum');
   },
+  // Version 7: Angebote
+  (db) => {
+    db.createObjectStore('angebote', { keyPath: 'id' });
+  },
 ];
 
 let offen;

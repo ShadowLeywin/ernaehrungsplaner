@@ -145,7 +145,7 @@ export function leseRezept(eingabe) {
  * dann die Einzahl ("Karotten" → "Karotte", "Zwiebeln" → "Zwiebel", "Eier" → "Ei").
  * Lieber kein Treffer als ein falscher: Was nicht passt, ergänzt der Nutzer im Formular von Hand.
  */
-function findeZutat(suchname, zutaten) {
+export function findeZutat(suchname, zutaten) {
   const letztes = suchname.split(/\s+/).at(-1) ?? '';
   const versuche = [suchname, letztes];
   for (const endung of ['n', 'en', 'e', 's', 'er']) {

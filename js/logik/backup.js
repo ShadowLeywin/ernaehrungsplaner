@@ -18,6 +18,8 @@ export const BACKUP_MIGRATIONEN = {
   4: (daten) => ({ ...daten, messungen: [], supplements: [] }),
   // Version 5 kannte noch keine Laborwerte und Symptome
   5: (daten) => ({ ...daten, labor: [], symptome: [] }),
+  // Version 6 kannte noch keine Angebote
+  6: (daten) => ({ ...daten, angebote: [] }),
 };
 
 export function erstelleBackup(daten, jetzt = new Date()) {

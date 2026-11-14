@@ -9,6 +9,7 @@ import { sucheOnline } from '../off-abruf.js';
 import { gehe, neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { bestaetige, el, feld, haenge, hinweis, icon, zahl } from '../ui.js';
+import { angebotBereich } from './angebote.js';
 import { zeigeMagListe } from './magliste.js';
 
 // Zustand der Liste bleibt beim Wechsel zwischen Liste und Detail erhalten
@@ -24,7 +25,8 @@ export async function zeigeZutaten(wurzel, teile) {
     const zutat = await speicher.holeZutat(teile[0]);
     if (!zutat) return nichtGefunden(wurzel);
     if (teile[1] === 'bearbeiten' && istEigen(zutat)) return formular(wurzel, zutat, false);
-    return detail(wurzel, zutat, istObstGemuese(zutat) ? (await speicher.alleVorlieben()).get(zutat.id) : null);
+    const [vorlieben, angebote] = await Promise.all([speicher.alleVorlieben(), speicher.alleAngebote()]);
+    return detail(wurzel, zutat, istObstGemuese(zutat) ? vorlieben.get(zutat.id) : null, angebote);
   }
   return liste(wurzel);
 }
@@ -123,7 +125,7 @@ async function liste(wurzel) {
 
 /* ---------- Detail ---------- */
 
-function detail(wurzel, zutat, vorliebe) {
+function detail(wurzel, zutat, vorliebe, angebote) {
   document.title = `${zutat.name} – ${APP_NAME}`;
   const zeilen = (gruppe) => NAEHRSTOFFE
     .filter((n) => n.gruppe === gruppe && typeof zutat.je100[n.id] === 'number')
@@ -158,6 +160,7 @@ function detail(wurzel, zutat, vorliebe) {
       el('summary', {}, `Vitamine und Mineralstoffe (${mikros.length})`),
       el('table', { class: 'naehrwerte' }, el('tbody', {}, mikros))) : null,
     zutat.portionen?.length ? el('p', {}, `Portion: ${zutat.portionen.map((p) => `1 ${p.name} = ${zahl(p.gramm)} g`).join(', ')}`) : null,
+    angebotBereich(zutat, angebote),
     el('div', { class: 'knopfreihe' },
       istEigen(zutat) ? el('button', { type: 'button', class: 'knopf leise', onclick: loeschen }, 'Löschen') : null,
       istEigen(zutat)

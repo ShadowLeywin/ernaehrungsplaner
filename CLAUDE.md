@@ -7,7 +7,7 @@ Regeln und Wissen für jede Claude-Session in diesem Repo. Erst lesen, dann arbe
 - **Was:** Progressive Web App für Android/Chrome, komplett deutsch, offline-first.
 - **Umfang:** nur Ernährung und Health-Daten. Kein Trainingslog; der Tagestyp (Gym, Calisthenics, Rest) bestimmt nur die Ziele.
 - **Nutzer:** Léon baut privat. Später nutzen Freunde die App, jeder mit eigenen lokalen Daten.
-- **Stand:** Version 0.8 (Tagebuch, Wochenplan mit Einkaufsliste, Rezepte mit Meal-Prep und Import, Zutaten mit Mag-Liste, Health mit Laborwerten und Symptomen, Ziele, Backup, Coach-Export), Schema-Version 6. Offen: Angebote, Referenzwerte, Tests am Handy. Plan: `docs/PHASENPLAN.md`.
+- **Stand:** Version 0.9 (alle neun Module in einer ersten Fassung), Schema-Version 7. Offen: Referenzwerte, automatischer Abruf von Angeboten, Tests am Handy. Léons Aufgaben: `docs/AUFGABEN-LEON.md`. Plan: `docs/PHASENPLAN.md`.
 
 ## Feste Entscheidungen (gelten, bis Léon widerspricht)
 
@@ -110,4 +110,4 @@ Lokal ist der Service Worker aus. Mit `?sw=1` in der Adresse läuft er wie auf d
 
 ## Doku
 
-`docs/KONZEPT.md` (neun Module, Technik), `docs/DATENMODELL.md`, `docs/PHASENPLAN.md`, `docs/OFFENE-FRAGEN.md`, `docs/COACH-PROMPT.md`, `docs/IST-ANALYSE.md` (alter Stand, verworfen).
+`docs/KONZEPT.md` (neun Module, Technik), `docs/DATENMODELL.md`, `docs/PHASENPLAN.md`, `docs/OFFENE-FRAGEN.md`, `docs/AUFGABEN-LEON.md`, `docs/COACH-PROMPT.md`, `docs/ANGEBOTE-FORMAT.md`, `docs/IST-ANALYSE.md` (alter Stand, verworfen).

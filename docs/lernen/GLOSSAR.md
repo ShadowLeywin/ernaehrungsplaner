@@ -48,3 +48,5 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | Share Target | Ein Eintrag im Manifest, durch den die App im „Teilen“-Menü von Android erscheint. | `share_target` in `manifest.webmanifest`, Auswertung in `js/main.js` |
 | Falsch-positiver Treffer | Die Suche meldet einen Fund, der keiner ist. | Test „Wasser ist keine Wassermelone“ in `test/import.test.js` |
 | Prompt | Der Auftragstext an eine KI. | `docs/COACH-PROMPT.md` |
+| Herkunftsfeld | Ein Feld, das festhält, woher ein Datensatz stammt, damit man ihn später gezielt ersetzen kann. | `quelle` in `ersetzeDateiAngebote()` in `js/speicher.js` |
+| `export` | Das Schlüsselwort, mit dem eine Datei eine Funktion für andere Dateien freigibt. | `findeZutat` in `js/logik/import.js` |

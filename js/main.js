@@ -1,6 +1,7 @@
 // Einstieg: Ansichten anmelden, Router starten, Service Worker registrieren.
 
 import './darstellung.js';
+import { zeigeAngebote } from './ansichten/angebote.js';
 import { zeigeHealth } from './ansichten/health.js';
 import { zeigeHeute } from './ansichten/heute.js';
 import { zeigeMehr } from './ansichten/mehr.js';
@@ -21,6 +22,7 @@ if (geteilt.has('text') || geteilt.has('titel') || geteilt.has('url')) {
 
 route('heute', zeigeHeute);
 route('woche', zeigeWoche);
+route('angebote', zeigeAngebote);
 route('rezepte', zeigeRezepte);
 route('zutaten', zeigeZutaten);
 route('health', zeigeHealth);
