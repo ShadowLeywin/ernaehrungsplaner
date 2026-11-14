@@ -301,6 +301,13 @@ input[type='date'] { appearance: none; -webkit-appearance: none; }
 
 .bereich.erster { margin-top: 1rem !important; padding-top: 0; border-top: 0; }
 .verlauf svg { display: block; width: 100%; height: 4rem; stroke: var(--blatt); overflow: visible; }
+#verlaeufe .verlauf { margin-top: 0.875rem; }
+#verlaeufe .verlauf svg { height: 3rem; }
+#verlaeufe figcaption { font-size: 0.875rem; color: var(--tinte-leise); }
+#verlaeufe figcaption strong { color: var(--tinte); font-weight: 660; }
+.backup-erinnerung { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-top: 1.5rem !important; }
+.backup-erinnerung .textlink { flex: none; }
+.schritt .linkreihe .textlink { min-height: 2.5rem; padding: 0.25rem 0; }
 .makro-wasser .balken { display: block; }
 .makro-wasser .balken-voll { background: var(--heidelbeere); transition: width 0.25s ease-out; }
 .zusatz.zweifach { flex-wrap: wrap; }

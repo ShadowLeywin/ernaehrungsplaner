@@ -85,3 +85,10 @@ test('Health-Ziele: Startwerte, Bereinigung, Prüfung', () => {
   assert.equal(schlecht.ok, false);
   assert.deepEqual(Object.keys(schlecht.fehler), ['wochenzielKg', 'wasserZielMl']);
 });
+
+test('verlaufJeTag: Wasser wird je Tag summiert, andere Arten bleiben Einzelwerte', async () => {
+  const { verlaufJeTag } = await import('../js/logik/gesundheit.js');
+  const liste = [m('wasser', '2026-11-13', 500), m('wasser', '2026-11-13', 250), m('wasser', '2026-11-14', 1000), m('wasser', '2026-10-01', 9999), m('schlaf', '2026-11-13', 7), m('schlaf', '2026-11-14', 8)];
+  assert.deepEqual(verlaufJeTag(liste, 'wasser', '2026-11-14', 30), [{ datum: '2026-11-13', wert: 750 }, { datum: '2026-11-14', wert: 1000 }]);
+  assert.deepEqual(verlaufJeTag(liste, 'schlaf', '2026-11-14', 30).map((p) => p.wert), [7, 8]);
+});

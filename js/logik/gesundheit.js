@@ -116,6 +116,21 @@ export function verlauf(messungen, artId, datum, tage = 30) {
     .map((m) => ({ datum: m.datum, wert: m.wert }));
 }
 
+/**
+ * Verlauf einer Art als Reihe je Tag. Bei Arten, die sich am Tag summieren (Wasser), wird je Tag addiert.
+ * Liefert [{ datum, wert }] alt nach neu, nur Tage mit Werten.
+ */
+export function verlaufJeTag(messungen, artId, datum, tage = 30) {
+  if (artVon(artId).proTag !== 'summe') return verlauf(messungen, artId, datum, tage);
+  const von = verschiebe(datum, -(tage - 1));
+  const summen = new Map();
+  for (const m of messungen) {
+    if (m.art !== artId || m.datum < von || m.datum > datum) continue;
+    summen.set(m.datum, (summen.get(m.datum) ?? 0) + m.wert);
+  }
+  return [...summen.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([d, wert]) => ({ datum: d, wert }));
+}
+
 /** Punkte für eine kleine Verlaufslinie: "x,y x,y …" in einem Feld von breite × hoehe. */
 export function linienPunkte(werte, breite, hoehe, rand = 4) {
   if (werte.length < 2) return '';

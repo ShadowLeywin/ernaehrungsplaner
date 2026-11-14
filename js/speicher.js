@@ -67,6 +67,7 @@ export const loescheRezept = (id) => db.loesche('rezepte', id);
 export const eintraegeAm = (datum) => db.nachIndex('eintraege', 'datum', datum);
 export const eintraegeZwischen = (von, bis) => db.imBereich('eintraege', 'datum', von, bis);
 export const alleEintraege = () => db.alle('eintraege');
+export const anzahlEintraege = () => db.anzahl('eintraege');
 
 /** Eintrag anlegen oder ändern. Die Nährwerte werden als Kopie mitgespeichert (siehe docs/DATENMODELL.md). */
 export function speichereEintrag(eintrag) {

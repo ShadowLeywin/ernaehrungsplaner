@@ -86,6 +86,7 @@ const warte = (anfrage) => new Promise((ok, nein) => {
   anfrage.onerror = () => nein(anfrage.error);
 });
 
+export const anzahl = (store) => tx(store, 'readonly', (t) => warte(t.objectStore(store).count()));
 export const alle = (store) => tx(store, 'readonly', (t) => warte(t.objectStore(store).getAll()));
 export const hole = (store, schluessel) => tx(store, 'readonly', (t) => warte(t.objectStore(store).get(schluessel)));
 export const nachIndex = (store, index, wert) => tx(store, 'readonly', (t) => warte(t.objectStore(store).index(index).getAll(wert)));

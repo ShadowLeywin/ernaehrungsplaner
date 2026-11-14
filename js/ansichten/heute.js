@@ -1,5 +1,6 @@
 // Ansicht "Heute": das Tagebuch eines Tages mit sechs Slots, Tagesscheibe, Makros und allen Nährwerten.
 
+import { backupFaellig } from '../logik/backup.js';
 import { formatKurz, formatLang, isoDatum, istGueltig, relativ, verschiebe } from '../logik/datum.js';
 import { MAKROS, NAEHRSTOFFE, fuerMenge, luecken, summeEintraege } from '../logik/naehrwerte.js';
 import { fuellRadius, segmente, sektorPfad } from '../logik/scheibe.js';
@@ -22,9 +23,10 @@ export async function zeigeHeute(wurzel, [parameter]) {
   const heute = isoDatum();
   const datum = istGueltig(parameter) ? parameter : heute;
   const woche = wochenTage(datum);
-  const [eintraege, ziele, wochenplan, tag, slots, wochenEintraege, vortag, plan] = await Promise.all([
+  const [eintraege, ziele, wochenplan, tag, slots, wochenEintraege, vortag, plan, letztesBackup, anzahlEintraege] = await Promise.all([
     speicher.eintraegeAm(datum), speicher.ladeZiele(), speicher.ladeWoche(), speicher.holeTag(datum), speicher.ladeSlots(),
     speicher.eintraegeZwischen(woche[0], woche[6]), speicher.eintraegeAm(verschiebe(datum, -1)), speicher.planAm(datum),
+    speicher.einstellung('letztesBackup'), speicher.anzahlEintraege(),
   ]);
   const lautPlan = tagestypFuer(datum, wochenplan, null);
   const typ = tagestypFuer(datum, wochenplan, tag);
@@ -46,6 +48,7 @@ export async function zeigeHeute(wurzel, [parameter]) {
     }))),
     eintraege.length ? el('div', { class: 'knopfreihe' },
       el('button', { type: 'button', class: 'knopf leise', onclick: () => oeffneTagKopieren(datum, heute, eintraege) }, 'Diesen Tag kopieren')) : null,
+    backupErinnerung(backupFaellig(letztesBackup, heute, anzahlEintraege)),
   );
 }
 
@@ -87,6 +90,16 @@ function geplantHinweis(offen, datum) {
     el('div', { class: 'knopfreihe' },
       el('a', { class: 'knopf leise klein', href: `#/woche/${datum}` }, 'Plan ansehen'),
       el('button', { type: 'button', class: 'knopf klein', onclick: uebernehmen }, 'Übernehmen')));
+}
+
+/** Browser-Speicher kann verloren gehen; die Erinnerung steht unten, damit sie beim Eintragen nicht stört. */
+function backupErinnerung({ faellig, tage }) {
+  if (!faellig) return null;
+  return el('div', { class: 'merkzettel backup-erinnerung' },
+    el('p', {}, tage === null
+      ? 'Du hast noch kein Backup. Deine Einträge liegen nur in diesem Browser.'
+      : `Dein letztes Backup ist ${tage} Tage her.`),
+    el('a', { class: 'textlink', href: '#/mehr' }, 'Zum Backup'));
 }
 
 /* ---------- Übersicht: Tagesscheibe und Makros ---------- */

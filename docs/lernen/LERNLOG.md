@@ -140,3 +140,14 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Fehler:** Ein Selektor im Test traf zwei Elemente (`.klein` ist auch eine Klasse des Knopfs). Lösung: `p.klein`. Fehler im Test, nicht in der App.
 - **Fachbegriffe:** Dateiformat mit Versionsfeld, Herkunftsfeld, Wiederverwendung, `export`.
 - **Zum Auftrag:** Geholfen hat „bau weiter“. Gefehlt hat die Antwort auf die Frage zu den Angeboten; deshalb die Annahme [A], die nichts verbaut.
+
+## Session 10, Runde 1: Feinschliff ohne Handy (14.11.2026)
+
+- **Was und warum:** Verläufe für Wasser, Schlaf, Schritte und Maße; Erinnerung an das Backup auf „Heute“; Rezepte kopieren und Schritte umsortieren. Dazu die Aufgabenliste für Léon als PDF.
+- **Befehle:** `node pdf.cjs docs/AUFGABEN-LEON.md ziel.pdf schrift.woff2` (ein kleines Skript baut aus der Markdown-Datei eine Seite und lässt den Browser sie als PDF drucken) · `git status -sb`.
+- **Entscheidung:** Die Erinnerung erscheint erst ab fünf Einträgen und steht unten auf der Seite. Verworfen: sofort und oben; wer gerade anfängt, hat noch nichts zu verlieren und soll nicht gestört werden.
+- **Entscheidung 2:** Eine Linie gibt es erst ab zwei Werten. Ein einzelner Punkt sagt nichts über einen Verlauf.
+- **Entscheidung 3:** Kopie und Import nutzen denselben Weg ins Formular (ein Entwurf ohne Kennung). Eine Mechanik, zwei Funktionen.
+- **Fehler:** Im PDF stand A15 vor A14, weil die Zeile nachträglich eingefügt worden war. Aufgefallen beim Ansehen der Seiten. Lösung: Reihenfolge in der Quelle korrigiert, PDF neu erzeugt.
+- **Fachbegriffe:** PDF-Druck im Headless-Browser, Schwellenwert, Entwurf ohne Kennung.
+- **Zum Auftrag:** Geholfen hat „gib mir die Aufgaben als PDF“: klares Ziel, klares Format. Gefehlt hat nichts.

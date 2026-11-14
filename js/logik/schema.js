@@ -3,7 +3,7 @@
 
 export const APP_NAME = 'Elan';
 export const APP_KENNUNG = 'elan';
-export const APP_VERSION = '0.9.0';
+export const APP_VERSION = '0.10.0';
 
 export const SCHEMA_VERSION = 7;
 

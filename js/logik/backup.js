@@ -1,6 +1,7 @@
 // Backup: alle Nutzerdaten als eine JSON-Datei. Reine Funktionen (Bauen und Prüfen).
 // Browser-Speicher kann gelöscht werden; das Backup ist der einzige Schutz davor.
 
+import { tageZwischen } from './datum.js';
 import { APP_KENNUNG, SCHEMA_VERSION, STORES } from './schema.js';
 
 /**
@@ -65,4 +66,19 @@ export function pruefeBackup(roh) {
   }
   if (fehler.length) return { ok: false, fehler };
   return { ok: true, fehler: [], daten: sauber, anzahl, erstelltAm: roh.erstelltAm ?? null };
+}
+
+export const BACKUP_AB_EINTRAEGEN = 5;
+export const BACKUP_NACH_TAGEN = 14;
+
+/**
+ * Soll an ein Backup erinnert werden? Erst wenn es etwas zu verlieren gibt (ab 5 Einträgen im Tagebuch),
+ * und dann, wenn noch nie gesichert wurde oder das letzte Backup älter als 14 Tage ist.
+ * Liefert { faellig, tage } – tage ist null, wenn es noch kein Backup gab.
+ */
+export function backupFaellig(letztesBackup, heute, anzahlEintraege) {
+  if (anzahlEintraege < BACKUP_AB_EINTRAEGEN) return { faellig: false, tage: null };
+  if (!letztesBackup) return { faellig: true, tage: null };
+  const tage = tageZwischen(letztesBackup, heute);
+  return { faellig: tage > BACKUP_NACH_TAGEN, tage };
 }
