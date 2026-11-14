@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
-  ARTEN, STANDARD_GESUNDHEIT, bereinigeGesundheit, gewichtsTrend, gleitenderSchnitt, letzterWert, linienPunkte, messungId,
+  ARTEN, STANDARD_GESUNDHEIT, bereinigeGesundheit, gewichtsTrend, trendRichtung, gleitenderSchnitt, letzterWert, linienPunkte, messungId,
   pruefeGesundheit, pruefeMesswert, tagesSumme, tagesWert, verlauf,
 } from '../js/logik/gesundheit.js';
 import { verschiebe } from '../js/logik/datum.js';
@@ -91,4 +91,13 @@ test('verlaufJeTag: Wasser wird je Tag summiert, andere Arten bleiben Einzelwert
   const liste = [m('wasser', '2026-11-13', 500), m('wasser', '2026-11-13', 250), m('wasser', '2026-11-14', 1000), m('wasser', '2026-10-01', 9999), m('schlaf', '2026-11-13', 7), m('schlaf', '2026-11-14', 8)];
   assert.deepEqual(verlaufJeTag(liste, 'wasser', '2026-11-14', 30), [{ datum: '2026-11-13', wert: 750 }, { datum: '2026-11-14', wert: 1000 }]);
   assert.deepEqual(verlaufJeTag(liste, 'schlaf', '2026-11-14', 30).map((p) => p.wert), [7, 8]);
+});
+
+test('trendRichtung: Pfeil nur bei spürbarer Änderung', () => {
+  assert.equal(trendRichtung(0.3), 'hoch');
+  assert.equal(trendRichtung(-0.2), 'runter');
+  assert.equal(trendRichtung(0.04), 'gleich');
+  assert.equal(trendRichtung(-0.049), 'gleich');
+  assert.equal(trendRichtung(null), 'gleich');
+  assert.equal(trendRichtung(Number.NaN), 'gleich');
 });

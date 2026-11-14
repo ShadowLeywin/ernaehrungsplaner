@@ -7,6 +7,7 @@ import { letzteMengen, sucheZutaten, zuletztVerwendet } from '../logik/suche.js'
 import { magHinweis, sortiereNachVorliebe } from '../logik/vorlieben.js';
 import { SLOTS, slotFuerUhrzeit } from '../logik/ziele.js';
 import { pruefeMenge } from '../logik/zutat.js';
+import { tippGefuehl } from '../plattform.js';
 import { gehe } from '../router.js';
 import * as speicher from '../speicher.js';
 import { blatt, el, gramm, hinweis, zahl } from '../ui.js';
@@ -73,6 +74,7 @@ export async function oeffneZutatWahl({ datum, slot, beiFertig, ziel = 'tagebuch
       // Ein Tipp: dieselbe Menge wie beim letzten Mal, mit Rückgängig statt Rückfrage
       beiSchnell: async (zutat, menge) => {
         const gespeichert = await (plan ? speicher.speicherePlan : speicher.speichereEintrag)(neuerEintrag(zutat, datum, { gramm: menge, slot }));
+        tippGefuehl('erfolg');
         b.schliessen();
         beiFertig();
         hinweis(`${zutat.name}, ${zahl(menge, 1)} g ${plan ? 'eingeplant' : 'eingetragen'}.`, {
@@ -85,6 +87,7 @@ export async function oeffneZutatWahl({ datum, slot, beiFertig, ziel = 'tagebuch
         gramm: zutat.istRezept ? zutat.portionen[0].gramm : undefined,
         beiSpeichern: async (wahl) => {
           await (plan ? speicher.speicherePlan : speicher.speichereEintrag)(neuerEintrag(zutat, datum, wahl));
+          tippGefuehl('erfolg');
           b.schliessen();
           hinweis(plan ? 'Eingeplant.' : 'Eingetragen.');
           beiFertig();
@@ -124,6 +127,7 @@ export function oeffneRezeptPortion({ rezept, beiFertig }) {
       slot: slotFuerUhrzeit(new Date().getHours()), speichernText: 'Für heute eintragen',
       beiSpeichern: async (wahl) => {
         await speicher.speichereEintrag(neuerEintrag(zutat, isoDatum(), wahl));
+        tippGefuehl('erfolg');
         b.schliessen();
         hinweis(`Eingetragen bei ${slotName(wahl.slot)}.`, { aktion: 'Zum Tagebuch', beiAktion: () => gehe('/heute') });
         beiFertig?.();

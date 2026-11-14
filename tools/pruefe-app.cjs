@@ -722,6 +722,7 @@ async function healthLauf(browser) {
   await seite.reload({ waitUntil: 'networkidle' });
   await seite.locator('.verlauf').waitFor();
   const halten = await seite.locator('#gewicht-trend').innerText();
+  const karteVorher = await seite.locator('.gewicht-karte').evaluate((k) => `${k.querySelector('.gewicht-zahl').textContent}|${k.querySelector('.gewicht-aenderung')?.textContent}|${k.querySelector('.trend-pille')?.textContent}`);
   await seite.locator('details.bereich summary', { hasText: 'Ziele für Health' }).click();
   await seite.locator('#f-ziel-wochenzielKg').fill('0,25');
   await seite.getByRole('button', { name: 'Ziele speichern' }).click();
@@ -730,6 +731,8 @@ async function healthLauf(browser) {
   const zunehmen = await seite.locator('#gewicht-trend').innerText();
   pruefe('Health: 7-Tage-Schnitt gegen das Wochenziel', halten.includes('80,3 kg') && halten.includes('+0,3 kg zur Vorwoche') && halten.includes('mehr als geplant') && zunehmen.includes('im Ziel'),
     `Ziel ±0: „${halten}“ | Ziel +0,25: „…${zunehmen.slice(-45)}“`);
+  const pilleNachher = await seite.locator('.gewicht-karte .trend-pille').innerText();
+  pruefe('Health: Gewichts-Karte mit großem Schnitt, Pfeil und Stand zum Ziel', karteVorher === '80,3 kg|↑ +0,3 kg|über Plan' && pilleNachher === 'im Ziel', `vorher ${karteVorher}, mit Ziel +0,25: ${pilleNachher}`);
   await bild(seite, '16-health');
 
   await seite.locator('#f-gewicht').fill('81');
@@ -1186,6 +1189,22 @@ async function appLauf(browser) {
   }));
   pruefe('App: Abstand zu Status- und Gestenleiste aus den Werten von Capacitor', abstaende.oben >= 32 && abstaende.unten >= 24, `oben ${abstaende.oben} px, unten ${abstaende.unten} px (vorgegeben 32 und 24)`);
   await bild(seite, '24-app-heute');
+
+  // Vibration: Wasser tippt leicht an; unter Darstellung abschaltbar
+  await seite.evaluate(() => { window.__aufrufe = []; });
+  await seite.locator('.kachel.makro-wasser').click();
+  await seite.locator('.kachel.makro-wasser .kachel-wert', { hasText: '250 ml' }).waitFor();
+  const tipp = await seite.evaluate(() => window.__aufrufe.filter((a) => a.plugin === 'Haptics').map((a) => `${a.methode}:${a.optionen.style ?? a.optionen.type}`));
+  await trageEin(seite, 'Frühstück', 'apfel', 100);
+  const erfolg = await seite.evaluate(() => window.__aufrufe.filter((a) => a.plugin === 'Haptics').map((a) => `${a.methode}:${a.optionen.style ?? a.optionen.type}`));
+  await seite.goto(`${URL_APP}#/mehr/darstellung`);
+  await seite.getByRole('group', { name: 'Vibration beim Tippen' }).getByRole('button', { name: 'Aus' }).click();
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.evaluate(() => { window.__aufrufe = []; });
+  await seite.locator('.kachel.makro-wasser').click();
+  await seite.locator('.kachel.makro-wasser .kachel-wert', { hasText: '500 ml' }).waitFor();
+  const ohne = await seite.evaluate(() => window.__aufrufe.filter((a) => a.plugin === 'Haptics').length);
+  pruefe('App: Vibration beim Tippen, abschaltbar', tipp.join() === 'impact:LIGHT' && erfolg.join() === 'impact:LIGHT,notification:SUCCESS' && ohne === 0, `Wasser: ${tipp.join() || 'kein Aufruf'}; nach Eintragen: ${erfolg.join()}; aus: ${ohne} Aufrufe`);
   pruefe('App-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
   await kontext.close();
 }

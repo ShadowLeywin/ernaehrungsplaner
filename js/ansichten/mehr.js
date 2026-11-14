@@ -9,7 +9,7 @@ import { APP_NAME, APP_VERSION } from '../logik/schema.js';
 import { wochenTage } from '../logik/woche.js';
 import { SLOTS, STANDARD_ANTEILE, STANDARD_ZIELE, TAGESTYPEN, ZIEL_FELDER, bereinigeAnteile, makroAbweichung, pruefeAnteile } from '../logik/ziele.js';
 import { parseZahl } from '../logik/zutat.js';
-import { gibDatei, istApp, teileText } from '../plattform.js';
+import { gibDatei, istApp, setzeVibration, teileText, tippGefuehl, vibrationAn } from '../plattform.js';
 import { neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { FUNKTIONEN, NEUIGKEITEN } from '../daten/neuigkeiten.js';
@@ -34,7 +34,7 @@ const MENUE = [
     { id: 'coach', farbe: '#af52de', titel: 'Coach-Export', text: 'Wochenbericht als Text für einen Chat', icon: 'bericht' },
   ] },
   { gruppe: 'App', eintraege: [
-    { id: 'darstellung', farbe: '#8e8e93', titel: 'Darstellung', text: 'Blatt oder Zitrus, dunkel oder hell', icon: 'darstellung' },
+    { id: 'darstellung', farbe: '#8e8e93', titel: 'Darstellung', text: 'Blatt oder Zitrus, dunkel oder hell, Vibration', icon: 'darstellung' },
     { id: 'ueber', farbe: '#007aff', titel: 'Über Elan', text: 'Alle Funktionen in Kürze, Datenschutz, Quellen', icon: 'info' },
     { id: 'neu', farbe: '#ff9500', titel: 'Was ist neu', text: 'Patchnotes', icon: 'neu' },
   ] },
@@ -355,7 +355,8 @@ function darstellungBereich() {
     el('h2', {}, 'Darstellung'),
     wahl('Design', THEMEN, leseThema(), setzeThema),
     el('p', { class: 'klein' }, 'Blatt: schlicht wie auf dem iPhone, in Grün. Zitrus: das erste Design mit eigener Schrift.'),
-    wahl('Hell oder dunkel', MODI, leseDarstellung(), setzeDarstellung));
+    wahl('Hell oder dunkel', MODI, leseDarstellung(), setzeDarstellung),
+    wahl('Vibration beim Tippen', [{ id: 'an', name: 'An' }, { id: 'aus', name: 'Aus' }], vibrationAn() ? 'an' : 'aus', (id) => { setzeVibration(id === 'an'); if (id === 'an') tippGefuehl(); }));
 }
 
 function speicherBereich(status) {

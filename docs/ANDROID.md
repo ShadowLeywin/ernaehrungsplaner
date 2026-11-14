@@ -22,7 +22,7 @@ Alle Unterschiede stehen in `js/plattform.js`. Der Browser-Test `tools/pruefe-ap
 Voraussetzungen: Node 22, Java 21, Android-SDK mit Plattform 36 und Build-Tools 36.
 
 ```bash
-npm ci                          # Capacitor und zwei Plugins (nur für das APK)
+npm ci                          # Capacitor und drei Plugins: Teilen, Dateien, Vibration (nur für das APK)
 node tools/apk-vorbereiten.cjs  # App-Dateien nach www/, Version nach build.gradle
 npx cap sync android            # www/ ins Android-Projekt kopieren
 cd android && ./gradlew assembleRelease

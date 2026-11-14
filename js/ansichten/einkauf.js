@@ -6,7 +6,7 @@ import { formatTag, isoDatum } from '../logik/datum.js';
 import { einkaufsliste, listeAlsText, mengeText } from '../logik/plan.js';
 import { APP_NAME } from '../logik/schema.js';
 import { kategorieName } from '../logik/zutat.js';
-import { teileText } from '../plattform.js';
+import { teileText, tippGefuehl } from '../plattform.js';
 import { neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { el, haenge, hinweis, icon } from '../ui.js';
@@ -43,6 +43,7 @@ export async function zeigeEinkauf(wurzel, tage) {
       el('input', {
         type: 'checkbox', id, checked: an ? true : null,
         onchange: async (e) => {
+          if (e.target.checked) tippGefuehl();
           e.target.closest('.haken').classList.toggle('erledigt', e.target.checked);
           await beiWechsel(e.target.checked);
           zeigeStand();

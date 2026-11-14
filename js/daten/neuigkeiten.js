@@ -18,6 +18,8 @@ export const NEUIGKEITEN = [
       'App-Icon auf dunkelgrünem Grund.',
       'Rezepte als Karten mit Symbol und passendem Farbton (Chili rot, Fisch blau); Nährwerte mit Farbpunkt wie die Ringe.',
       'Wochentage kurz („Mittwoch, 12.11.“), damit nichts umbricht.',
+      'Health: Gewichts-Karte mit großem 7-Tage-Schnitt, Pfeil zur Vorwoche und Stand zum Wochenziel.',
+      'Leichte Vibration beim Eintragen, bei Wasser und Häkchen; unter Mehr → Darstellung abschaltbar.',
       'Das erste Design „Zitrus“ gibt es weiter unter Mehr → Darstellung.',
     ],
   },

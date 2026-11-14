@@ -208,3 +208,11 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Fehler:** Erste Fassung färbte zufällig (Chili auf Lila). Lösung: Farbton je Stichwort.
 - **Fachbegriffe:** Streuwert (Hash), `aspect-ratio`.
 - **Zum Auftrag:** „Mehr denken“ hieß hier: jede Seite ansehen, nicht nur die geänderten.
+
+## Session 13, Runde 6: Vibration und Gewichts-Karte (14.11.2026)
+
+- **Was und warum:** Léon: „Ja mach dat“. Umgesetzt: leichte Vibration (Wasser, Häkchen, Eintragen), abschaltbar unter Darstellung; Gewichts-Karte auf Health mit großem 7-Tage-Schnitt, Pfeil und Stand zum Ziel. Das Foto je Rezept blieb weg, weil ich davon abgeraten hatte [A].
+- **Befehle:** `npm install --save-exact @capacitor/haptics@8.0.2` (Plugin nur fürs APK, Version vom 27.03.2026) · `npx cap sync android` (trägt das Plugin in die Gradle-Dateien ein).
+- **Entscheidung:** In der App das Plugin Haptics, im Browser `navigator.vibrate`. Fehlt beides, passiert nichts. Verworfen: nur `navigator.vibrate`; in der WebView fehlt dafür die Berechtigung.
+- **Entscheidung 2:** Pfeilrichtung als reine Funktion `trendRichtung` mit Schwelle 0,05 kg, damit Rundungsrauschen keinen Pfeil erzeugt. „Über Plan“ ist gelb, nicht rot: Die App wertet nicht.
+- **Prüfung:** 124 Kriterien, neu: Gewichts-Karte und Vibration in der nachgebauten App (an, beim Eintragen, aus).
