@@ -1,6 +1,6 @@
 # Aufgaben für Léon
 
-Was nur du erledigen kannst. Von oben nach unten, ein Punkt nach dem anderen. Stand: Version 1.0.0 (Android-App, in Arbeit), 14.11.2026.
+Was nur du erledigen kannst, weil es ein echtes Handy oder dein GitHub-Konto braucht. Von oben nach unten, ein Punkt nach dem anderen. Stand: Version 1.0.0 (Android-App, in Arbeit), 14.11.2026.
 
 **So antwortest du:** Schreib die Nummer und was passiert ist, zum Beispiel „A3 geht, A4: Knopf verdeckt“ oder „B1: ja“.
 
@@ -31,9 +31,9 @@ Was nur du erledigen kannst. Von oben nach unten, ein Punkt nach dem anderen. St
 | A12 | Mehr → Referenzwerte: Geschlecht und Alter wählen. Dann Heute → „Alle Nährwerte“ | Prozent je Vitamin und Mineralstoff |
 | A13 | Health → Gewicht eintragen → „Tageswerte speichern“, App schließen und öffnen | Wert ist noch da |
 | A14 | Mehr → Darstellung → „Dunkel“ | Alles bleibt lesbar |
-| A16 | Mehr → „Was ist neu“ und „Über Elan“ lesen | Liste der Neuerungen, Funktionen kurz erklärt |
-| A17 | Bei einer Mahlzeit auf das Plus: Steht oben „Zuletzt eingetragen“ mit „+ 80 g“? Antippen | Eintrag ist sofort da, unten „Rückgängig“ |
-| A15 | Zwei Minuten frei herumtippen | Notiere, was hakt, zu klein ist oder unklar heißt |
+| A15 | Mehr → „Was ist neu“ und „Über Elan“ lesen | Liste der Neuerungen, Funktionen kurz erklärt |
+| A16 | Bei einer Mahlzeit auf das Plus: Steht oben „Zuletzt eingetragen“ mit „+ 80 g“? Antippen | Eintrag ist sofort da, unten „Rückgängig“ |
+| A17 | Zwei Minuten frei herumtippen | Notiere, was hakt, zu klein ist oder unklar heißt |
 
 ## B. Automatischer Bau einrichten (5 Minuten, am Rechner oder Handy)
 
@@ -56,9 +56,3 @@ Was du als Nächstes verbessert haben willst: ein Satz an Claude genügt.
 | C1 | Coach-Prompt ausprobieren: `docs/COACH-PROMPT.md`, Prompt und Wochenbericht (Mehr → Coach-Export) in einen KI-Chat | Du siehst, ob die Auswertung hilft |
 | C2 | Die Lego-Anleitung lesen: `docs/lernen/ANLEITUNG-SESSION-0.md` | Verstehen, wie die App gebaut ist, mit Selbsttest |
 | C3 | Die Web-Version (Adresse oben in der README) einmal im Browser öffnen | Gleiche App ohne Installation, praktisch für Freunde |
-
-## Was Claude ohne dich nicht prüfen kann
-
-- alles, was ein echtes Gerät braucht: Installation, Tastatur, Zurück-Taste, Teilen-Menü, Statusleiste
-- ob Open Food Facts von deinem Handy aus antwortet
-- ob Namen und Texte für dich natürlich klingen
