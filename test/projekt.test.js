@@ -86,3 +86,14 @@ test('Basis-Zutaten: EPA + DHA (in mg) ist nie mehr als Omega-3 gesamt (in g)', 
   const falsch = zutaten.filter((z) => (z.je100.epaDha ?? 0) / 1000 > (z.je100.omega3 ?? 0) + 0.05).map((z) => z.name);
   assert.deepEqual(falsch, []);
 });
+
+test('versionCode wächst mit der Baunummer, und eine höhere Version liegt immer darüber', async () => {
+  const { createRequire } = await import('node:module');
+  const { versionsNummer } = createRequire(import.meta.url)('../tools/apk-vorbereiten.cjs');
+  assert.equal(versionsNummer('1.0.0', 0), 100000000);
+  assert.ok(versionsNummer('1.0.0', 42) > versionsNummer('1.0.0', 41));
+  assert.ok(versionsNummer('1.0.1', 0) > versionsNummer('1.0.0', 9999));
+  assert.ok(versionsNummer('1.1.0', 0) > versionsNummer('1.0.99', 9999));
+  assert.ok(versionsNummer('1.0.0', 0) > 1000000); // höher als das erste ausgelieferte APK
+  assert.equal(versionsNummer('1.0.0', 123456), 100009999);
+});

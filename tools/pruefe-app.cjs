@@ -150,7 +150,11 @@ async function hauptlauf(browser) {
 
   /* Ziele */
   await seite.getByRole('link', { name: 'Mehr', exact: true }).click();
+  await seite.locator('.menuepunkt').first().waitFor();
+  const menue = await seite.locator('.menuegruppe-titel').allInnerTexts();
+  await seite.getByRole('link', { name: /Ziele je Tagestyp/ }).click();
   await seite.locator('#f-ziel-kcal').waitFor();
+  pruefe('Mehr ist ein Menü mit Gruppen und Unterseiten', menue.length === 4 && seite.url().endsWith('#/mehr/ziele'), `Gruppen: ${menue.join(', ')}; Ziele unter ${seite.url().split('#')[1]}`);
   await seite.locator('#f-ziel-kcal').fill('3000');
   await seite.locator('#f-ziel-kcal').blur();
   const warnung = await seite.locator('.bereich').first().locator('.merkzettel').innerText().catch(() => '');
@@ -160,6 +164,8 @@ async function hauptlauf(browser) {
   await bild(seite, '05-mehr');
 
   /* Backup */
+  await seite.goto(`${URL_APP}#/mehr/backup`);
+  await seite.getByRole('button', { name: 'Backup speichern' }).waitFor();
   const [download] = await Promise.all([seite.waitForEvent('download'), seite.getByRole('button', { name: 'Backup speichern' }).click()]);
   const datei = path.join(os.tmpdir(), `elan-test-${Date.now()}.json`);
   await download.saveAs(datei);
@@ -171,7 +177,7 @@ async function hauptlauf(browser) {
   await seite.locator('#slot-abendsnack .eintrag').click();
   await seite.getByRole('button', { name: 'Löschen' }).click();
   await seite.locator('dialog').waitFor({ state: 'detached' });
-  await seite.goto(`${URL_APP}#/mehr`);
+  await seite.goto(`${URL_APP}#/mehr/backup`);
   await seite.locator('#f-backup-datei').setInputFiles(datei);
   const rueckfrage = await seite.locator('dialog p').innerText();
   await seite.getByRole('button', { name: 'Alles ersetzen' }).click();
@@ -181,7 +187,7 @@ async function hauptlauf(browser) {
   pruefe('Backup einspielen stellt den Stand wieder her', (await seite.locator('.eintrag').count()) === 4, `Rückfrage: „${rueckfrage}“ → ${await seite.locator('.eintrag').count()} Einträge`);
 
   fs.writeFileSync(datei, '{"app":"fremd","schemaVersion":1,"daten":{}}');
-  await seite.goto(`${URL_APP}#/mehr`);
+  await seite.goto(`${URL_APP}#/mehr/backup`);
   await seite.locator('#f-backup-datei').setInputFiles(datei);
   const ablehnung = await seite.locator('dialog p').innerText();
   await seite.getByRole('button', { name: 'Verstanden' }).click();
@@ -198,7 +204,7 @@ async function hauptlauf(browser) {
   await seite.getByRole('button', { name: 'Wochenschnitt' }).click();
   await seite.locator('.alle-naehrwerte .klein', { hasText: 'Schnitt je Tag' }).waitFor();
   const ohneGruppe = await seite.locator('.alle-naehrwerte').innerText();
-  await seite.goto(`${URL_APP}#/mehr`);
+  await seite.goto(`${URL_APP}#/mehr/referenz`);
   await seite.locator('#f-ref-geschlecht').selectOption('w');
   await seite.locator('#f-ref-alter').selectOption('25');
   await seite.locator('.hinweis', { hasText: 'Referenzgruppe gespeichert' }).waitFor();
@@ -235,7 +241,7 @@ async function hauptlauf(browser) {
   await seite.locator('.eintrag').first().waitFor();
   pruefe('Ganzen Tag kopieren', (await seite.locator('.eintrag').count()) === heuteAnzahl + 1, `Ziel ${zielTag}: „${kopiert}“ → ${await seite.locator('.eintrag').count()} Einträge (1 war schon da)`);
 
-  await seite.goto(`${URL_APP}#/mehr`);
+  await seite.goto(`${URL_APP}#/mehr/mahlzeiten`);
   await seite.locator('#f-anteil-morgensnack').fill('0');
   const zuWenig = await seite.locator('#anteile-stand').innerText();
   await seite.getByRole('button', { name: 'Anteile speichern' }).click();
@@ -255,7 +261,7 @@ async function hauptlauf(browser) {
   await seite.locator('.eintrag').first().waitFor();
   const breiten = [];
   const unsinn = [];
-  for (const [route, warteAuf] of [['heute', '.eintrag'], ['zutaten', '.zeilen .zeile'], ['zutaten/neu', '#f-name'], ['zutaten/basis%3Aapfel', 'table.naehrwerte'], ['mehr', '#f-ziel-kcal']]) {
+  for (const [route, warteAuf] of [['heute', '.eintrag'], ['zutaten', '.zeilen .zeile'], ['zutaten/neu', '#f-name'], ['zutaten/basis%3Aapfel', 'table.naehrwerte'], ['mehr', '.menuepunkt'], ['mehr/coach', '.unterseite'], ['mehr/ueber', '.funktionen'], ['mehr/neu', '.neuigkeiten']]) {
     await seite.goto(`${URL_APP}#/${route}`);
     await seite.locator(warteAuf).first().waitFor();
     const b = await seite.evaluate(() => ({ inhalt: document.documentElement.scrollWidth, fenster: window.innerWidth }));
@@ -871,7 +877,7 @@ async function importLauf(browser) {
   await seite.locator('.slot').first().waitFor();
   await trageEin(seite, 'Frühstück', 'haferflocken', 80);
   await trageEin(seite, 'Mittagessen', 'reis', 200);
-  await seite.goto(`${URL_APP}#/mehr`);
+  await seite.goto(`${URL_APP}#/mehr/coach`);
   await seite.getByRole('button', { name: 'Bericht erstellen' }).click();
   await seite.locator('#f-coach-text').waitFor();
   const bericht = await seite.locator('#f-coach-text').inputValue();
@@ -886,7 +892,7 @@ async function importLauf(browser) {
   await bild(seite, '20-coach');
 
   const unsinn = [];
-  for (const [route, warteAuf] of [['rezepte/import', '#f-import-text'], ['mehr', '#f-ziel-kcal']]) {
+  for (const [route, warteAuf] of [['rezepte/import', '#f-import-text'], ['mehr', '.menuepunkt']]) {
     await seite.goto(`${URL_APP}#/${route}`);
     await seite.locator(warteAuf).first().waitFor();
     const b = await seite.evaluate(() => ({ inhalt: document.documentElement.scrollWidth, fenster: window.innerWidth }));
@@ -1090,8 +1096,8 @@ async function appLauf(browser) {
       document.documentElement.style.setProperty('--safe-area-inset-bottom', '24px');
     }, { once: true });
   }, JSON.parse(OFF_BEISPIEL));
-  await seite.goto(`${URL_APP}#/mehr`, { waitUntil: 'networkidle' });
-  await seite.locator('#f-ziel-kcal').waitFor();
+  await seite.goto(`${URL_APP}#/mehr/backup`, { waitUntil: 'networkidle' });
+  await seite.getByRole('button', { name: 'Backup speichern' }).waitFor();
   const texte = await seite.locator('.seite').innerText();
   pruefe('App: Texte passen zur App, „Speicher schützen“ entfällt', texte.includes('Deine Daten liegen nur in dieser App') && !texte.includes('Speicher schützen'), 'Backup-Text für die App, Abschnitt „Speicher“ ausgeblendet');
 
@@ -1105,6 +1111,7 @@ async function appLauf(browser) {
     `${backupAufrufe.join(' → ')}; Datei ${datei.path}, Schema ${inhalt.schemaVersion}`);
 
   await seite.evaluate(() => { window.__aufrufe = []; });
+  await seite.goto(`${URL_APP}#/mehr/coach`);
   await seite.getByRole('button', { name: 'Bericht erstellen' }).click();
   await seite.locator('#f-coach-text').waitFor();
   await seite.locator('#coach-ausgabe').getByRole('button', { name: 'Teilen' }).click();
@@ -1167,7 +1174,7 @@ async function migrationsLauf(browser) {
   pruefe('Migration: Datenbank aus Version 1 wird angehoben, Einträge bleiben', stand.version === SCHEMA_VERSION && stand.speicher.includes('rezepte') && stand.speicher.includes('plan') && stand.speicher.includes('vorlieben') && stand.speicher.includes('messungen') && stand.speicher.includes('labor') && stand.speicher.includes('angebote') && (await seite.locator('.eintrag').count()) === 1,
     `Version ${stand.version}, Speicher ${stand.speicher.join(', ')}, alter Eintrag: ${(await seite.locator('.eintrag').innerText()).replace(/\n/g, ' | ')}`);
 
-  await seite.goto(`${URL_APP}#/mehr`);
+  await seite.goto(`${URL_APP}#/mehr/backup`);
   await seite.locator('#f-backup-datei').setInputFiles(path.resolve(__dirname, '..', 'test', 'daten', 'backup-v1.json'));
   const frage = await seite.locator('dialog p').innerText();
   await seite.getByRole('button', { name: 'Alles ersetzen' }).click();

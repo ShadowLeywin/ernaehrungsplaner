@@ -402,3 +402,36 @@ input[type='time'] { appearance: none; -webkit-appearance: none; }
 @media (prefers-reduced-motion: reduce) {
   .segment-voll, .blatt[open] { animation: none; }
 }
+
+/* ---------- Mehr: Menü und Unterseiten ---------- */
+
+.menuegruppe { margin-top: 1.5rem !important; }
+.menuegruppe-titel { font-size: 0.875rem; font-weight: 660; color: var(--tinte-leise); margin: 0 0 0.375rem 0.25rem; }
+.menue { background: var(--flaeche); border-radius: 1rem; overflow: hidden; }
+.menue li + li { border-top: 1px solid var(--linie); }
+.menuepunkt {
+  display: grid; grid-template-columns: 2.5rem 1fr auto; align-items: center; gap: 0.75rem;
+  min-height: 3.75rem; padding: 0.5rem 0.75rem 0.5rem 0.875rem; color: var(--tinte); text-decoration: none;
+}
+.menuepunkt > svg { color: var(--tinte-leise); }
+.menue-icon { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; background: var(--limette-blass); color: var(--blatt); }
+.menue-text { display: flex; flex-direction: column; font-weight: 620; }
+.menue-text small { font-weight: 400; font-size: 0.8125rem; color: var(--tinte-leise); }
+.fusszeile { text-align: center; margin-top: 1.5rem !important; }
+
+/* Auf einer Unterseite ist der Seitentitel schon die Überschrift */
+.unterseite > .bereich:first-child { margin-top: 0 !important; padding-top: 0; border-top: 0; }
+.unterseite > .bereich:first-child > h2:first-child { display: none; }
+
+.funktionen { display: grid; gap: 0.625rem; }
+.funktionen li { padding: 0.875rem 1rem; border-radius: 1rem; background: var(--flaeche); }
+.funktionen h2 { font-size: 1.0625rem; }
+.funktionen p { margin-top: 0.25rem; color: var(--tinte-leise); font-size: 0.9375rem; }
+
+.neuigkeiten { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.25rem; }
+.neuigkeiten > li { padding: 1rem; border-radius: 1rem; background: var(--flaeche); }
+.neuigkeiten .neu-kopf { font-size: 0.875rem; color: var(--tinte-leise); }
+.neuigkeiten .neu-kopf .marke { margin-left: 0; }
+.neuigkeiten h2 { margin-top: 0.25rem; }
+.neuigkeiten ul { margin-top: 0.5rem; padding-left: 1.125rem; list-style: disc; }
+.neuigkeiten ul li + li { margin-top: 0.25rem; }

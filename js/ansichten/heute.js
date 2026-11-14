@@ -100,7 +100,7 @@ function backupErinnerung({ faellig, tage }) {
     el('p', {}, tage === null
       ? 'Du hast noch kein Backup. Deine Einträge liegen nur in diesem Browser.'
       : `Dein letztes Backup ist ${tage} Tage her.`),
-    el('a', { class: 'textlink', href: '#/mehr' }, 'Zum Backup'));
+    el('a', { class: 'textlink', href: '#/mehr/backup' }, 'Zum Backup'));
 }
 
 /* ---------- Übersicht: Tagesscheibe und Makros ---------- */
@@ -187,8 +187,8 @@ function alleNaehrwerte(eintraege, wochenEintraege, woche, referenz) {
       mikros.length ? el('table', { class: 'naehrwerte' }, el('caption', {}, 'Vitamine und Mineralstoffe'), el('tbody', {}, mikros)) : null,
       fehlt.size && (makros.length || mikros.length) ? el('p', { class: 'klein' }, '„mind.“ steht dort, wo bei mindestens einer Zutat der Wert fehlt. Die echte Menge liegt dann höher.') : null,
       referenz.gruppe
-        ? el('p', { class: 'klein' }, `Prozent: Anteil am Referenzwert der DGE für deine Gruppe (Stand ${referenz.daten.stand}). Er gilt als Schnitt über längere Zeit, nicht für jeden einzelnen Tag. Einstellbar unter „Mehr“.`)
-        : el('p', { class: 'klein' }, el('a', { class: 'textlink', href: '#/mehr' }, 'Referenzgruppe wählen'), ', dann siehst du den Anteil am Referenzwert der DGE.')));
+        ? el('p', { class: 'klein' }, `Prozent: Anteil am Referenzwert der DGE für deine Gruppe (Stand ${referenz.daten.stand}). Er gilt als Schnitt über längere Zeit, nicht für jeden einzelnen Tag. Einstellbar unter Mehr → Referenzwerte.`)
+        : el('p', { class: 'klein' }, el('a', { class: 'textlink', href: '#/mehr/referenz' }, 'Referenzgruppe wählen'), ', dann siehst du den Anteil am Referenzwert der DGE.')));
 }
 
 /* ---------- Slots ---------- */
