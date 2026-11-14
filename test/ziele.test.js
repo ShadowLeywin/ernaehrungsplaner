@@ -1,8 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {
-  SLOTS, STANDARD_WOCHE, skaliereZiel, STANDARD_ZIELE, TAGESTYPEN, bereinigeWoche, bereinigeZiele, fortschritt, makroAbweichung, slotZiele, tagestypFuer,
-} from '../js/logik/ziele.js';
+import { bereinigeRinge, bereinigeWoche, bereinigeZiele, FEIER_RINGE, kachelSpalten, RINGE, fortschritt, makroAbweichung, neuErreicht, skaliereZiel, SLOTS, slotZiele, STANDARD_WOCHE, STANDARD_ZIELE, TAGESTYPEN, tagestypFuer } from '../js/logik/ziele.js';
 
 test('sechs Slots, Anteile ergeben zusammen 100 %', () => {
   assert.equal(SLOTS.length, 6);
@@ -61,4 +59,27 @@ test('skaliereZiel: Eiweiß bleibt, Kohlenhydrate und Fett im alten Verhältnis,
   assert.ok(Math.abs(makroAbweichung(neu).abweichung) <= 10, String(makroAbweichung(neu).abweichung));
   const knapp = skaliereZiel(alt, 500); // weniger als das Eiweiß allein
   assert.deepEqual([knapp.kh, knapp.fett], [0, 0]);
+});
+
+test('neuErreicht: nur beim Überschreiten der 100 %', () => {
+  assert.equal(neuErreicht(0.9, 1), true);
+  assert.equal(neuErreicht(0.5, 1.3), true);
+  assert.equal(neuErreicht(1, 1.2), false, 'war schon erreicht');
+  assert.equal(neuErreicht(undefined, 1.2), false, 'erstes Anzeigen ist keine Feier');
+  assert.equal(neuErreicht(0.9, 0.99), false);
+});
+
+test('FEIER_RINGE: Kohlenhydrate und Fett werden nicht gefeiert', () => {
+  assert.ok(FEIER_RINGE.includes('protein'));
+  assert.ok(!FEIER_RINGE.includes('kh') && !FEIER_RINGE.includes('fett'));
+});
+
+test('bereinigeRinge: Standard alle, Reihenfolge fest, Unbekanntes fällt weg', () => {
+  assert.deepEqual(bereinigeRinge(null), RINGE.map((r) => r.id));
+  assert.deepEqual(bereinigeRinge(['wasser', 'protein', 'quatsch']), ['protein', 'wasser']);
+  assert.deepEqual(bereinigeRinge([]), [], 'alle abgewählt bleibt erlaubt');
+});
+
+test('kachelSpalten: 4 als 2 × 2, sonst höchstens 3', () => {
+  assert.deepEqual([1, 2, 3, 4, 5, 6].map(kachelSpalten), [1, 2, 3, 2, 3, 3]);
 });

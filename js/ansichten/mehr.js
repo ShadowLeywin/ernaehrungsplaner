@@ -7,7 +7,7 @@ import { GESCHLECHTER } from '../logik/referenz.js';
 import { WOCHENTAGE, formatKurz, isoDatum, verschiebe } from '../logik/datum.js';
 import { APP_NAME, APP_VERSION } from '../logik/schema.js';
 import { wochenTage } from '../logik/woche.js';
-import { SLOTS, STANDARD_ANTEILE, STANDARD_ZIELE, TAGESTYPEN, ZIEL_FELDER, bereinigeAnteile, makroAbweichung, pruefeAnteile } from '../logik/ziele.js';
+import { RINGE, SLOTS, STANDARD_ANTEILE, STANDARD_ZIELE, TAGESTYPEN, ZIEL_FELDER, bereinigeAnteile, bereinigeRinge, makroAbweichung, pruefeAnteile } from '../logik/ziele.js';
 import { parseZahl } from '../logik/zutat.js';
 import { gibDatei, istApp, setzeVibration, teileText, tippGefuehl, vibrationAn } from '../plattform.js';
 import { neuZeichnen } from '../router.js';
@@ -61,7 +61,7 @@ export async function zeigeMehr(wurzel, [unterseite]) {
   if (!eintrag) return zeigeMenue(wurzel);
   document.title = `${eintrag.titel} – ${APP_NAME}`;
   const bauen = {
-    ziele: async () => zielBereich(await speicher.ladeZiele()),
+    ziele: async () => [zielBereich(await speicher.ladeZiele()), ringeBereich(bereinigeRinge(await speicher.einstellung('ringe')))],
     wochenplan: async () => wochenBereich(await speicher.ladeWoche()),
     mahlzeiten: async () => anteileBereich(bereinigeAnteile(await speicher.einstellung('slotAnteile'))),
     referenz: async () => referenzBereich(await speicher.ladeReferenz()),
@@ -92,6 +92,27 @@ function zeigeMenue(wurzel) {
           el('span', { class: 'menue-text' }, e.titel, el('small', {}, e.text)),
           icon('vor', 18))))))),
     el('p', { class: 'klein fusszeile' }, `${APP_NAME} ${APP_VERSION}`));
+}
+
+/* ---------- Ringe auf „Heute“ ---------- */
+
+/** Welche Kacheln „Heute“ zeigt. Speichert sofort; Häkchen ändern sich an Ort und Stelle. */
+function ringeBereich(gewaehlt) {
+  const an = new Set(gewaehlt);
+  return el('section', { class: 'bereich' },
+    el('h2', {}, 'Ringe auf „Heute“'),
+    el('p', { class: 'klein' }, 'Blende aus, was du nicht verfolgen willst. Die Werte zählen trotzdem weiter.'),
+    el('ul', { class: 'zeilen' }, RINGE.map((r) => el('li', { class: 'haken' },
+      el('label', {},
+        el('input', {
+          type: 'checkbox', id: `ring-${r.id}`, checked: an.has(r.id) ? true : null,
+          onchange: async (e) => {
+            if (e.target.checked) an.add(r.id); else an.delete(r.id);
+            await speicher.setzeEinstellung('ringe', RINGE.map((x) => x.id).filter((id) => an.has(id)));
+            tippGefuehl();
+          },
+        }),
+        el('span', { class: 'zeile-name' }, r.name))))));
 }
 
 /* ---------- Ziele ---------- */

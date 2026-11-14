@@ -120,6 +120,36 @@ export function fortschritt(ist = 0, ziel = 0) {
   return { anteil: ist / ziel, rest: ziel - ist, ueber: ist > ziel };
 }
 
+/** Kacheln auf „Heute“ in fester Reihenfolge. Jede lässt sich ausblenden (Mehr → Ziele). */
+export const RINGE = [
+  { id: 'protein', name: 'Eiweiß' },
+  { id: 'kh', name: 'Kohlenhydrate' },
+  { id: 'fett', name: 'Fett' },
+  { id: 'ballaststoffe', name: 'Ballaststoffe' },
+  { id: 'wasser', name: 'Wasser' },
+  { id: 'alle', name: 'Alle Nährwerte' },
+];
+
+/** Gespeicherte Auswahl prüfen: nur bekannte Ringe, in fester Reihenfolge. Nichts Gültiges gespeichert: alle. */
+export function bereinigeRinge(roh) {
+  if (!Array.isArray(roh)) return RINGE.map((r) => r.id);
+  return RINGE.map((r) => r.id).filter((id) => roh.includes(id));
+}
+
+/** Spalten für das Kachel-Raster: 4 Kacheln als 2 × 2 statt 3 + 1, sonst bis zu 3 nebeneinander. */
+export const kachelSpalten = (anzahl) => (anzahl === 4 ? 2 : Math.max(1, Math.min(3, anzahl)));
+
+/**
+ * Ringe, deren Erreichen gefeiert wird. Kohlenhydrate und Fett nicht: Dort ist das Ziel eher eine Obergrenze,
+ * es zu erreichen ist kein Erfolg an sich.
+ */
+export const FEIER_RINGE = ['protein', 'ballaststoffe', 'wasser'];
+
+/** Wurde ein Ziel gerade erreicht? Nur beim Übergang unter 100 % → ab 100 %, nicht beim ersten Anzeigen. */
+export function neuErreicht(vorher, jetzt) {
+  return typeof vorher === 'number' && typeof jetzt === 'number' && vorher < 1 && jetzt >= 1;
+}
+
 /** Welcher Slot passt zur Uhrzeit? Vorbelegung beim Eintragen, der Nutzer kann ändern. */
 export function slotFuerUhrzeit(stunde) {
   if (stunde < 10) return 'fruehstueck';

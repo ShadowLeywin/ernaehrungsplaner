@@ -216,3 +216,13 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Entscheidung:** In der App das Plugin Haptics, im Browser `navigator.vibrate`. Fehlt beides, passiert nichts. Verworfen: nur `navigator.vibrate`; in der WebView fehlt dafür die Berechtigung.
 - **Entscheidung 2:** Pfeilrichtung als reine Funktion `trendRichtung` mit Schwelle 0,05 kg, damit Rundungsrauschen keinen Pfeil erzeugt. „Über Plan“ ist gelb, nicht rot: Die App wertet nicht.
 - **Prüfung:** 124 Kriterien, neu: Gewichts-Karte und Vibration in der nachgebauten App (an, beim Eintragen, aus).
+
+## Session 13, Runde 7: Stabiler, Übergänge, Ziel-Feier, Ringe, Widget (14.11.2026)
+
+- **Was und warum:** Léon: „alles umsetzen, stabiler machen, bessere Übergänge“. Doppeltipp-Schutz und Fehlerhinweise zentral in `el()`, Fehlerseite mit „Neu laden“. Übergänge mit Richtung (reine Funktion `richtungZwischen`), Blatt gleitet hinaus. Ziel-Feier (`neuErreicht`), Ringe abwählbar (`bereinigeRinge`, `kachelSpalten`), Android-Widget über eigenes Plugin `ElanWidget`.
+- **Befehle:** `./gradlew lintVitalRelease` (strenger Lint für das Release, grün) · `node tools/pruefe-app.cjs` (129 Kriterien).
+- **Gegenprobe:** Der Doppeltipp-Test lief gegen die alte `ui.js` und fand 2 Einträge statt 1. Der Fehler war echt.
+- **Fehler:** Das neue Schließen mit Animation ließ ein Blatt 0,2 s modal stehen. Wechselte man sofort die Seite, war die neue Seite gesperrt. Lösung: Beim Seitenwechsel schließen offene Blätter sofort. Gefunden durch einen Test, der dreimal rot war: angehalten, einzeln nachgestellt, Ursache belegt.
+- **Testfehler:** Ein Test hing an der Uhrzeit (Berlin, nach 21 Uhr landete die Portion im Abendsnack). Ein Filter mit `\b` griff nicht, weil `textContent` die Wörter ohne Leerzeichen verbindet.
+- **Entscheidung:** CSS-Animation statt View Transitions API. Sie läuft überall und sperrt keine Eingaben; geprüft am 14.11.2026.
+- **Fachbegriffe:** modal, inert, AppWidgetProvider, RemoteViews, SharedPreferences.

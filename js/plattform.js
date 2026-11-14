@@ -33,7 +33,7 @@ export function setzeVibration(an) {
 }
 
 /**
- * Kurzes Tippgefühl. art 'leicht' (Wasser, Häkchen) oder 'erfolg' (etwas eingetragen).
+ * Kurzes Tippgefühl. art 'leicht' (Wasser, Häkchen), 'erfolg' (etwas eingetragen) oder 'feier' (Ziel erreicht).
  * App: Plugin Haptics (nutzt den Vibrationsmotor wie native Apps). Browser: navigator.vibrate, falls vorhanden.
  * Wartet nie und wirft nie: Fehlt die Vibration, geht alles andere normal weiter.
  */
@@ -41,14 +41,33 @@ export function tippGefuehl(art = 'leicht') {
   if (!vibrationAn()) return;
   try {
     if (istApp()) {
-      const aufruf = art === 'erfolg'
-        ? nativ('Haptics', 'notification', { type: 'SUCCESS' })
-        : nativ('Haptics', 'impact', { style: 'LIGHT' });
+      const aufruf = {
+        erfolg: () => nativ('Haptics', 'notification', { type: 'SUCCESS' }),
+        feier: () => nativ('Haptics', 'impact', { style: 'HEAVY' }),
+      }[art]?.() ?? nativ('Haptics', 'impact', { style: 'LIGHT' });
       aufruf.catch(() => {});
     } else {
-      navigator.vibrate?.(art === 'erfolg' ? [12, 60, 18] : 10);
+      navigator.vibrate?.({ erfolg: [12, 60, 18], feier: [18, 50, 18, 50, 36] }[art] ?? 10);
     }
   } catch { /* ohne Vibration weiter */ }
+}
+
+/* ---------- Widget auf dem Startbildschirm (nur App) ---------- */
+
+/**
+ * Werte für das Android-Widget: { datum, kcalUebrig, wasserMl, wasserZielMl }, ganze Zahlen.
+ * Im Browser gibt es kein Widget; dort passiert nichts. Fehler stören die App nicht.
+ */
+export function aktualisiereWidget(werte) {
+  if (!istApp()) return;
+  try {
+    nativ('ElanWidget', 'aktualisiere', {
+      datum: werte.datum,
+      kcalUebrig: Math.round(werte.kcalUebrig),
+      wasserMl: Math.round(werte.wasserMl),
+      wasserZielMl: Math.round(werte.wasserZielMl),
+    }).catch(() => {});
+  } catch { /* ältere App ohne Widget */ }
 }
 
 /** Bricht der Nutzer das Teilen-Menü ab, ist das kein Fehler. */

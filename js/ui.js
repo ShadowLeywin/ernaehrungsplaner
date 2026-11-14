@@ -2,10 +2,41 @@
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
+/** Fehler einer Aktion melden, statt sie still verschwinden zu lassen. */
+export function meldeFehler(fehler) {
+  console.error(fehler);
+  hinweis(`Das hat nicht geklappt: ${fehler?.message ?? fehler}`);
+}
+
+/**
+ * Klick und Absenden absichern. Gibt der Handler ein Promise zurück (Speichern), zählen weitere
+ * Tipps erst, wenn es fertig ist: Ein Doppeltipp legt so keinen Eintrag doppelt an.
+ * Formulare sperren solange ihre Absende-Knöpfe. Fehler landen als Hinweis statt unbemerkt in der Konsole.
+ */
+function gesichert(knoten, art, handler) {
+  return (ereignis) => {
+    if (knoten.dataset.laeuft) {
+      if (art === 'submit') ereignis.preventDefault(); // sonst lädt der Browser die Seite neu
+      return;
+    }
+    let ergebnis;
+    try { ergebnis = handler(ereignis); } catch (fehler) { meldeFehler(fehler); return; }
+    if (!ergebnis || typeof ergebnis.then !== 'function') return;
+    knoten.dataset.laeuft = '1';
+    const knoepfe = art === 'submit' ? [...knoten.querySelectorAll('button[type=submit]:not(:disabled)')] : [];
+    for (const k of knoepfe) k.disabled = true;
+    ergebnis.catch(meldeFehler).finally(() => {
+      delete knoten.dataset.laeuft;
+      for (const k of knoepfe) k.disabled = false;
+    });
+  };
+}
+
 function fuelle(knoten, attribute, kinder) {
   for (const [name, wert] of Object.entries(attribute ?? {})) {
     if (wert === null || wert === undefined || wert === false) continue;
-    if (name.startsWith('on') && typeof wert === 'function') knoten.addEventListener(name.slice(2), wert);
+    if ((name === 'onclick' || name === 'onsubmit') && typeof wert === 'function') knoten.addEventListener(name.slice(2), gesichert(knoten, name.slice(2), wert));
+    else if (name.startsWith('on') && typeof wert === 'function') knoten.addEventListener(name.slice(2), wert);
     else if (name === 'class') knoten.setAttribute('class', wert);
     else if (name === 'dataset') Object.assign(knoten.dataset, wert);
     else if (name === 'value' && !(knoten instanceof SVGElement)) knoten.value = wert;
@@ -95,14 +126,27 @@ export function blatt({ titel, inhalt, beiSchliessen }) {
   const dialog = el('dialog', { class: 'blatt' },
     el('div', { class: 'blatt-kopf' },
       titelEl,
-      el('button', { type: 'button', class: 'rund', 'aria-label': 'Schließen', onclick: () => dialog.close() }, icon('zu'))),
+      el('button', { type: 'button', class: 'rund', 'aria-label': 'Schließen', onclick: () => zu() }, icon('zu'))),
     koerper);
+  // Schließen mit kurzer Abwärtsbewegung. Ohne Animation (reduzierte Bewegung) oder falls das Ende
+  // der Animation nie gemeldet wird, schließt ein Zeitlimit trotzdem: Das Blatt bleibt nie hängen.
+  const zu = () => {
+    if (!dialog.open || dialog.classList.contains('schliesst')) return;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { dialog.close(); return; }
+    dialog.classList.add('schliesst');
+    dialog.inert = true; // während der Animation nichts mehr antippen (sonst zweites Speichern möglich)
+    const fertig = () => { clearTimeout(zeit); if (dialog.open) dialog.close(); };
+    const zeit = setTimeout(fertig, 260);
+    // Nur das Ende der eigenen Animation zählt, nicht das eines Kindes (Ring, Hinweis …)
+    dialog.addEventListener('animationend', (e) => { if (e.target === dialog) fertig(); });
+  };
   const steuerung = {
-    schliessen: () => dialog.close(),
+    schliessen: zu,
     setze: (neuerTitel, neuerInhalt) => { titelEl.textContent = neuerTitel; koerper.replaceChildren(neuerInhalt); },
   };
   koerper.append(typeof inhalt === 'function' ? inhalt(steuerung) : inhalt);
-  dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); }); // Tippen neben das Blatt
+  dialog.addEventListener('click', (e) => { if (e.target === dialog) zu(); }); // Tippen neben das Blatt
+  dialog.addEventListener('cancel', (e) => { e.preventDefault(); zu(); }); // Zurück-Taste oder Escape
   dialog.addEventListener('close', () => { dialog.remove(); beiSchliessen?.(); });
   document.body.append(dialog);
   dialog.showModal();

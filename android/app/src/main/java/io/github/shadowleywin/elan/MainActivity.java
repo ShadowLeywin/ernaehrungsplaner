@@ -17,6 +17,8 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        // Eigenes Plugin für das Widget; muss vor super.onCreate angemeldet sein
+        registerPlugin(WidgetPlugin.class);
         super.onCreate(savedInstanceState);
         oeffneGeteilt(getIntent());
     }
