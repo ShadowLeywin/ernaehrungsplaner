@@ -6,6 +6,7 @@ import { formatTag, isoDatum } from '../logik/datum.js';
 import { einkaufsliste, listeAlsText, mengeText } from '../logik/plan.js';
 import { APP_NAME } from '../logik/schema.js';
 import { kategorieName } from '../logik/zutat.js';
+import { teileText } from '../plattform.js';
 import { neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { el, haenge, hinweis, icon } from '../ui.js';
@@ -59,14 +60,13 @@ export async function zeigeEinkauf(wurzel, tage) {
   }
 
   const teilen = async () => {
-    const text = listeAlsText(liste, eigene, erledigt, `Einkauf ${zeitraum}`);
     try {
-      if (navigator.share) await navigator.share({ text });
-      else { await navigator.clipboard.writeText(text); hinweis('Liste kopiert.'); }
-    } catch (fehler) {
-      if (fehler.name !== 'AbortError') hinweis('Teilen hat nicht geklappt.');
+      if ((await teileText(listeAlsText(liste, eigene, erledigt, `Einkauf ${zeitraum}`), 'Einkaufsliste')) === 'kopiert') hinweis('Liste kopiert.');
+    } catch {
+      hinweis('Teilen hat nicht geklappt.');
     }
   };
+
 
   const neuerPosten = el('input', { id: 'f-eigener-posten', 'aria-label': 'Eigener Posten', placeholder: 'Noch etwas? Zum Beispiel Spülmittel', maxlength: 80, autocomplete: 'off', enterkeyhint: 'done' });
   const ergaenze = async (e) => {

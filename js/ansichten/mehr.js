@@ -8,6 +8,7 @@ import { APP_NAME, APP_VERSION } from '../logik/schema.js';
 import { wochenTage } from '../logik/woche.js';
 import { SLOTS, STANDARD_ANTEILE, STANDARD_ZIELE, TAGESTYPEN, ZIEL_FELDER, bereinigeAnteile, makroAbweichung, pruefeAnteile } from '../logik/ziele.js';
 import { parseZahl } from '../logik/zutat.js';
+import { gibDatei, istApp, teileText } from '../plattform.js';
 import { neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { bestaetige, el, feld, haenge, hinweis, zahl } from '../ui.js';
@@ -29,7 +30,7 @@ export async function zeigeMehr(wurzel) {
     backupBereich(letztesBackup, daten.daten),
     coachBereich(),
     darstellungBereich(),
-    speicherBereich(status),
+    istApp() ? null : speicherBereich(status),
     ueberBereich());
 }
 
@@ -167,14 +168,10 @@ function backupBereich(letztesBackup, daten) {
 
   const sichern = async () => {
     const backup = await speicher.exportiere();
-    const url = URL.createObjectURL(new Blob([JSON.stringify(backup, null, 1)], { type: 'application/json' }));
-    const link = el('a', { href: url, download: backupDateiname() });
-    document.body.append(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    const ergebnis = await gibDatei(backupDateiname(), JSON.stringify(backup, null, 1));
+    if (ergebnis === 'abgebrochen') { hinweis('Backup nicht abgelegt.'); return; }
     await speicher.setzeEinstellung('letztesBackup', isoDatum());
-    hinweis('Backup gespeichert. Lege die Datei außerhalb des Handys ab.');
+    hinweis(istApp() ? 'Backup erstellt. Lege die Datei außerhalb des Handys ab, zum Beispiel in Drive.' : 'Backup gespeichert. Lege die Datei außerhalb des Handys ab.');
     neuZeichnen();
   };
 
@@ -206,7 +203,9 @@ function backupBereich(letztesBackup, daten) {
   const dateiWahl = el('input', { type: 'file', accept: 'application/json,.json', class: 'unsichtbar', id: 'f-backup-datei', onchange: einspielen });
   return el('section', { class: 'bereich' },
     el('h2', {}, 'Backup'),
-    el('p', {}, 'Deine Daten liegen nur in diesem Browser. Löscht der Browser seinen Speicher, sind sie weg. Ein Backup ist eine Datei, die du selbst aufbewahrst.'),
+    el('p', {}, istApp()
+      ? 'Deine Daten liegen nur in dieser App. Deinstallierst du sie oder geht das Handy verloren, sind sie weg. Ein Backup ist eine Datei, die du selbst aufbewahrst.'
+      : 'Deine Daten liegen nur in diesem Browser. Löscht der Browser seinen Speicher, sind sie weg. Ein Backup ist eine Datei, die du selbst aufbewahrst.'),
     el('p', { class: 'klein' }, `Auf diesem Gerät: ${zaehle(anzahl)}.`),
     el('p', { class: letztesBackup ? 'klein' : 'merkzettel' }, letztesBackup ? `Letztes Backup: ${formatKurz(letztesBackup)}.` : 'Du hast noch kein Backup gespeichert.'),
     el('div', { class: 'knopfreihe' },
@@ -232,12 +231,15 @@ function coachBereich() {
     const tagSaetze = new Map(saetze.filter(Boolean).map((t) => [t.datum, t]));
     const text = coachBericht({ tage, stichtag, eintraege, ziele, wochenplan, tagSaetze, messungen, gesundheit, symptome, supplements });
     const kopiere = async () => {
-      try { await navigator.clipboard.writeText(text); hinweis('Bericht kopiert.'); } catch { hinweis('Kopieren hat nicht geklappt. Markiere den Text von Hand.'); }
+      try { await navigator.clipboard.writeText(text); hinweis('Bericht kopiert.'); } catch { hinweis('Kopieren hat nicht geklappt. Tippe auf „Teilen“ oder markiere den Text von Hand.'); }
+    };
+    const teile = async () => {
+      try { if ((await teileText(text, 'Wochenbericht')) === 'kopiert') hinweis('Bericht kopiert.'); } catch { hinweis('Teilen hat nicht geklappt.'); }
     };
     ausgabe.replaceChildren(
       el('textarea', { id: 'f-coach-text', rows: 14, readonly: true, 'aria-label': 'Wochenbericht' }, text),
       el('div', { class: 'knopfreihe' },
-        navigator.share ? el('button', { type: 'button', class: 'knopf leise', onclick: () => navigator.share({ text }).catch(() => {}) }, 'Teilen') : null,
+        istApp() || navigator.share ? el('button', { type: 'button', class: 'knopf leise', onclick: teile }, 'Teilen') : null,
         el('button', { type: 'button', class: 'knopf', onclick: kopiere }, 'Bericht kopieren')));
   };
   const wahl = (id, name) => el('button', {
