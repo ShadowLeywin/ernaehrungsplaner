@@ -27,7 +27,7 @@ Regeln und Wissen für jede Claude-Session in diesem Repo. Erst lesen, dann arbe
 | Netz | nur auf ausdrücklichen Knopfdruck (Open Food Facts). Der Import ruft keine fremden Seiten ab |
 | Name | „Elan“ steht nur in `js/logik/schema.js`, `manifest.webmanifest`, `index.html` |
 | Version | bleibt 1.0.0, bis Léon zufrieden ist. Jede sichtbare Änderung bekommt trotzdem einen Eintrag in `js/daten/neuigkeiten.js` (Was ist neu) |
-| Design | Standard „Glut“: dunkel, im Stil von iOS, Akzent Glutrot, Schrift Inter; „Zitrus“ (hell, Fruchtfarben) bleibt wählbar. Thema über `data-thema`, Modus über `data-modus` (`js/darstellung.js`). Karten, Einstellungen als gruppiertes Menü, Eintragen mit möglichst wenigen Tipps |
+| Design | Standard „Blatt“: schlicht im Stil von iOS, Elans Grün, viele Farbtöne je Nährwert und Mahlzeit, Leiste ohne Glas, Schrift Inter; „Zitrus“ (Fruchtfarben, Bricolage) bleibt wählbar. Thema über `data-thema`, Modus über `data-modus` (`js/darstellung.js`). Karten, Einstellungen als gruppiertes Menü, Eintragen mit möglichst wenigen Tipps |
 
 ## Arbeitsschleife (jede Runde)
 

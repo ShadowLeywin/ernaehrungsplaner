@@ -1,4 +1,4 @@
-// Thema (Glut oder Zitrus) und Modus (hell, dunkel, wie das Handy). Gilt je Gerät (localStorage), gehört nicht ins Backup.
+// Thema (Blatt oder Zitrus) und Modus (hell, dunkel, wie das Handy). Gilt je Gerät (localStorage), gehört nicht ins Backup.
 // Dieselbe Logik steht als kurzes Skript in index.html, damit beim Start nichts aufblitzt.
 
 import { setzeSystemleisten } from './plattform.js';
@@ -8,7 +8,7 @@ const SCHLUESSEL_THEMA = 'elan.thema';
 const dunkelFrage = matchMedia('(prefers-color-scheme: dark)');
 
 export const THEMEN = [
-  { id: 'glut', name: 'Glut' },
+  { id: 'blatt', name: 'Blatt' },
   { id: 'zitrus', name: 'Zitrus' },
 ];
 
@@ -18,12 +18,12 @@ export const MODI = [
   { id: 'system', name: 'Wie das Handy' },
 ];
 
-// Glut ist als dunkles Design gedacht; wer nie etwas gewählt hat, sieht es dunkel.
-const STANDARD = { thema: 'glut', modus: 'dunkel' };
+// Wer nie etwas gewählt hat, sieht Blatt dunkel (Léons Wahl).
+const STANDARD = { thema: 'blatt', modus: 'dunkel' };
 
 // Farbe der Statusleiste je Thema und Modus, passend zum Seitengrund in css/app.css
 const STATUSFARBE = {
-  glut: { hell: '#f2f2f7', dunkel: '#000000' },
+  blatt: { hell: '#f3f6ee', dunkel: '#0b100c' },
   zitrus: { hell: '#f5f9ec', dunkel: '#0f1812' },
 };
 

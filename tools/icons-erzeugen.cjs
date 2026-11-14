@@ -9,8 +9,8 @@ const WURZEL = path.resolve(__dirname, '..');
 const ZIEL = path.join(WURZEL, 'icons');
 const RES = path.join(WURZEL, 'android/app/src/main/res');
 const GRUEN = '#1c7445';
-// Startbild auf dem Grund von Glut dunkel (Standard), damit beim Öffnen nichts hell aufblitzt
-const PAPIER = '#000000';
+// Startbild auf dem Grund von Blatt dunkel (Standard), damit beim Öffnen nichts hell aufblitzt
+const PAPIER = '#0b100c';
 
 /** form: 'eckig' (gerundetes Quadrat), 'rund' (Kreis), 'randlos' (Fläche bis zum Rand), 'frei' (ohne Fläche) */
 async function svgText(form) {

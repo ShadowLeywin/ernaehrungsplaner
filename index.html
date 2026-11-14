@@ -1,15 +1,15 @@
 <!doctype html>
-<html lang="de" data-thema="glut" data-modus="dunkel">
+<html lang="de" data-thema="blatt" data-modus="dunkel">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#0b100c">
   <meta name="description" content="Elan: Ernährung und Health-Daten im Blick. Offline, alle Daten bleiben auf deinem Gerät.">
   <title>Elan</title>
   <script>
     // Thema und Modus sofort setzen, damit beim Start nichts aufblitzt (gleiche Logik wie js/darstellung.js)
     try {
-      var t = localStorage.getItem('elan.thema') === 'zitrus' ? 'zitrus' : 'glut';
+      var t = localStorage.getItem('elan.thema') === 'zitrus' ? 'zitrus' : 'blatt';
       var m = localStorage.getItem('elan.darstellung') || 'dunkel';
       var dunkel = m === 'dunkel' || (m === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
       document.documentElement.dataset.thema = t;

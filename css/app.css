@@ -1,5 +1,5 @@
 /* Elan – Gestaltung. Zwei Designs aus denselben Bausteinen:
-   - Glut (Standard): dunkel und klar im Stil von iOS, Ringe je Nährwert, Akzent in Glutrot. Ganz unten.
+   - Blatt (Standard): schlicht im Stil von iOS, in Elans Grün, hell und dunkel. Ganz unten.
    - Zitrus: das erste Design, hier direkt in :root.
    Leitidee Zitrus: Zitrusfrüchte. Helles, kühles Papier, Blattgrün als Tinte, Limette als Energie.
    Jeder Makronährstoff hat eine Fruchtfarbe: Eiweiß Grapefruit, Kohlenhydrate Zitrone,
@@ -534,133 +534,121 @@ body:has(.seite-willkommen) .navigation { display: none; }
 .neuigkeiten ul li + li { margin-top: 0.25rem; }
 
 /* ==========================================================================
-   Glut: Standard-Design. Dunkel und klar im Stil von iOS.
-   Systemgrau für Flächen, große fette Titel, schwebende Leiste mit Glas,
-   gruppierte Listen mit farbigen Symbolen. Akzent: Glut (tiefes Rotorange).
-   Weiße Schrift auf dem Akzent hat mindestens 4,5 : 1 Kontrast.
+   Blatt: Standard-Design. Schlicht im Stil von iOS, in Elans Grün.
+   Große fette Titel, gruppierte Listen mit farbigen Symbolen, ruhige Leiste
+   ohne Glas, kräftige Farben je Nährwert und je Mahlzeit.
+   Farbiger Grund leicht grün getönt, damit es nicht steril wirkt.
    ========================================================================== */
 
-:root[data-thema='glut'] {
+:root[data-thema='blatt'] {
   --schrift: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --papier: #f2f2f7;
+  --papier: #f3f6ee;
   --flaeche: #ffffff;
-  --flaeche-2: #e9e9ee;
-  --tinte: #1c1c1e;
-  --tinte-leise: #6c6c70;
-  --linie: #dcdce1;
-  --limette: #ff5a2c;
-  --limette-blass: #ffe2d8;
-  --blatt: #c2410c;
-  --akzent: #d63a15;
+  --flaeche-2: #e8eee0;
+  --tinte: #14241a;
+  --tinte-leise: #5b6a5e;
+  --linie: #dce4d2;
+  --limette: #b5e13a;
+  --limette-blass: #e6f3c4;
+  --blatt: #1c7445;
+  --akzent: #1c7445;
   --auf-akzent: #ffffff;
-  --auf-limette: #ffffff;
-  --grapefruit: #ff2d55;
-  --zitrone: #f5a700;
-  --avocado: #007aff;
-  --heidelbeere: #28b14c;
-  --wasser: #32ade6;
-  --ueber: #a8290a;
-  --zettel: #fff3d6;
-  --warnung: #d70015;
-  --glas: rgb(249 249 251 / 0.78);
-  --glut-schein: rgb(255 90 44 / 0.10);
-  --schatten: 0 8px 28px rgb(0 0 0 / 0.14);
+  --auf-limette: #14241a;
+  --grapefruit: #ff375f;
+  --zitrone: #f5b400;
+  --avocado: #0a84ff;
+  --heidelbeere: #a550e0;
+  --wasser: #22b5e6;
+  --mandarine: #ff8a00;
+  --ueber: #4f7f1f;
+  --zettel: #fbf3cf;
+  --warnung: #c62828;
+  --schatten: 0 8px 24px rgb(20 36 26 / 0.14);
   color-scheme: light;
 }
 
-:root[data-thema='glut'][data-modus='dunkel'] {
-  --papier: #000000;
-  --flaeche: #1c1c1e;
-  --flaeche-2: #2c2c2e;
-  --tinte: #f5f5f7;
-  --tinte-leise: #98989f;
-  --linie: #38383a;
-  --limette: #ff6a3d;
-  --limette-blass: rgb(255 106 61 / 0.18);
-  --blatt: #ff8a5c;
-  --grapefruit: #ff375f;
-  --zitrone: #ffcc00;
-  --avocado: #0a84ff;
-  --heidelbeere: #30d158;
-  --wasser: #64d2ff;
-  --ueber: #ffb08f;
-  --zettel: #2e2614;
-  --warnung: #ff6961;
-  --glas: rgb(30 30 32 / 0.72);
-  --glut-schein: rgb(255 90 44 / 0.16);
-  --schatten: 0 10px 30px rgb(0 0 0 / 0.6);
+:root[data-thema='blatt'][data-modus='dunkel'] {
+  --papier: #0b100c;
+  --flaeche: #172019;
+  --flaeche-2: #223024;
+  --tinte: #eef5e4;
+  --tinte-leise: #9dab9f;
+  --linie: #2a382d;
+  --limette: #b5e13a;
+  --limette-blass: rgb(181 225 58 / 0.16);
+  --blatt: #b5e13a;
+  --akzent: #b5e13a;
+  --auf-akzent: #14241a;
+  --grapefruit: #ff4f6e;
+  --zitrone: #ffd23f;
+  --avocado: #3d9bff;
+  --heidelbeere: #bf7bff;
+  --wasser: #5fd4ff;
+  --mandarine: #ffa23a;
+  --ueber: #e3f6a8;
+  --zettel: #2f2b14;
+  --warnung: #ff8a80;
+  --schatten: 0 10px 30px rgb(0 0 0 / 0.55);
   color-scheme: dark;
 }
 
-/* Schwacher Glutschein oben, bleibt beim Rollen stehen */
-:root[data-thema='glut'] body {
-  background:
-    radial-gradient(120% 60% at 100% -10%, var(--glut-schein), transparent 60%) fixed,
-    var(--papier);
-  letter-spacing: -0.006em;
-}
-:root[data-thema='glut'] h1 { font-size: 2.125rem; line-height: 1.12; font-weight: 750; letter-spacing: -0.028em; }
-:root[data-thema='glut'] h2 { font-weight: 680; letter-spacing: -0.015em; }
+:root[data-thema='blatt'] body { letter-spacing: -0.006em; }
+:root[data-thema='blatt'] h1 { font-size: 2.125rem; line-height: 1.12; font-weight: 750; letter-spacing: -0.028em; }
+:root[data-thema='blatt'] h2 { font-weight: 680; letter-spacing: -0.015em; }
 
-/* Leiste: schwebende Kapsel aus Glas */
-:root[data-thema='glut'] .navigation {
-  left: max(0.75rem, var(--rand-left)); right: max(0.75rem, var(--rand-right));
-  bottom: calc(var(--rand-bottom) + 0.5rem);
-  max-width: 32rem; margin: 0 auto; padding: 0.25rem;
-  border: 1px solid rgb(127 127 127 / 0.16); border-radius: 999px;
-  background: var(--glas); box-shadow: var(--schatten);
-  -webkit-backdrop-filter: blur(22px) saturate(180%); backdrop-filter: blur(22px) saturate(180%);
-}
-:root[data-thema='glut'] .navigation a { height: calc(var(--leiste) - 0.5rem); border-radius: 999px; font-size: 0.6875rem; font-weight: 600; }
-:root[data-thema='glut'] .navigation .nav-bild { width: auto; height: 1.75rem; }
-:root[data-thema='glut'] .navigation a[aria-current='page'] { color: var(--blatt); background: var(--limette-blass); }
-:root[data-thema='glut'] .navigation a[aria-current='page'] .nav-bild { background: none; color: inherit; }
-:root[data-thema='glut'] .inhalt { padding-bottom: calc(var(--leiste) + var(--rand-bottom) + 2.5rem); }
-:root[data-thema='glut'] .hinweis-ort { bottom: calc(var(--leiste) + var(--rand-bottom) + 1.25rem); }
-:root[data-thema='glut'] body:has(.fab) .hinweis-ort { bottom: calc(var(--leiste) + var(--rand-bottom) + 6rem); }
-:root[data-thema='glut'] .fab { bottom: calc(var(--leiste) + var(--rand-bottom) + 1.25rem); box-shadow: 0 8px 26px rgb(214 58 21 / 0.45); }
+/* Leiste: schlicht, volle Breite, feine Linie oben, Limetten-Kapsel am aktiven Ziel */
+:root[data-thema='blatt'] .navigation { background: var(--flaeche); border-top: 1px solid var(--linie); }
+:root[data-thema='blatt'] .navigation a { font-size: 0.75rem; font-weight: 600; }
 
 /* Segmentierte Auswahl wie bei iOS */
-:root[data-thema='glut'] .wahl { border-radius: 0.75rem; background: var(--flaeche-2); padding: 0.1875rem; }
-:root[data-thema='glut'] .wahl-knopf { border-radius: 0.5625rem; color: var(--tinte); font-weight: 560; }
-:root[data-thema='glut'] .wahl-knopf[aria-pressed='true'] { background: var(--flaeche); font-weight: 650; box-shadow: 0 2px 6px rgb(0 0 0 / 0.12); }
-:root[data-thema='glut'][data-modus='dunkel'] .wahl-knopf[aria-pressed='true'] { background: #636366; }
+:root[data-thema='blatt'] .wahl { border-radius: 0.75rem; background: var(--flaeche-2); padding: 0.1875rem; }
+:root[data-thema='blatt'] .wahl-knopf { border-radius: 0.5625rem; color: var(--tinte); font-weight: 560; }
+:root[data-thema='blatt'] .wahl-knopf[aria-pressed='true'] { background: var(--flaeche); font-weight: 650; box-shadow: 0 2px 6px rgb(0 0 0 / 0.12); }
+:root[data-thema='blatt'][data-modus='dunkel'] .wahl-knopf[aria-pressed='true'] { background: #3a4a3d; }
 
-/* Knöpfe, Chips, Felder: graue Flächen statt Rahmen */
-:root[data-thema='glut'] .knopf.leise, :root[data-thema='glut'] .chip { background: var(--flaeche-2); border-color: transparent; }
-:root[data-thema='glut'] .chip.schnell { background: var(--limette-blass); color: var(--blatt); }
-:root[data-thema='glut'] input:not([type='file']), :root[data-thema='glut'] select, :root[data-thema='glut'] textarea {
+/* Knöpfe, Chips, Felder: getönte Flächen statt Rahmen */
+:root[data-thema='blatt'] .knopf.leise, :root[data-thema='blatt'] .chip { background: var(--flaeche-2); border-color: transparent; }
+:root[data-thema='blatt'] .chip.schnell { background: var(--limette-blass); color: var(--blatt); }
+:root[data-thema='blatt'] input:not([type='file']), :root[data-thema='blatt'] select, :root[data-thema='blatt'] textarea {
   border-color: transparent; background: var(--flaeche);
 }
-:root[data-thema='glut'] input:focus-visible, :root[data-thema='glut'] select:focus-visible, :root[data-thema='glut'] textarea:focus-visible {
+:root[data-thema='blatt'] input:focus-visible, :root[data-thema='blatt'] select:focus-visible, :root[data-thema='blatt'] textarea:focus-visible {
   border-color: var(--limette); box-shadow: 0 0 0 3px var(--limette-blass);
 }
-:root[data-thema='glut'] .rund.plus { background: var(--limette-blass); color: var(--blatt); }
-:root[data-thema='glut'] .slot .rund.plus { background: transparent; border-color: var(--limette); color: var(--limette); }
-:root[data-thema='glut'] .textlink, :root[data-thema='glut'] .zurueck { text-decoration: none; }
+:root[data-thema='blatt'] .rund.plus { background: var(--limette-blass); color: var(--blatt); }
+:root[data-thema='blatt'] .slot .rund.plus { background: transparent; border-color: var(--limette); color: var(--blatt); }
+:root[data-thema='blatt'][data-modus='hell'] .slot .rund.plus { border-color: var(--blatt); }
+:root[data-thema='blatt'] .textlink, :root[data-thema='blatt'] .zurueck { text-decoration: none; }
 
-/* Blatt: erhöhte Fläche mit Griff oben, Inhalte eine Stufe heller */
-:root[data-thema='glut'] .blatt { background: var(--papier); border-radius: 1.75rem 1.75rem 0 0; }
-:root[data-thema='glut'][data-modus='dunkel'] .blatt { background: var(--flaeche); }
-:root[data-thema='glut'][data-modus='dunkel'] .blatt :is(.zeilen, .vorschau, input:not([type='file']), select, textarea) { background: var(--flaeche-2); }
-:root[data-thema='glut'] .blatt::before {
+/* Blatt (Dialog): erhöhte Fläche mit Griff oben */
+:root[data-thema='blatt'] .blatt { border-radius: 1.75rem 1.75rem 0 0; }
+:root[data-thema='blatt'][data-modus='dunkel'] .blatt { background: var(--flaeche); }
+:root[data-thema='blatt'][data-modus='dunkel'] .blatt :is(.zeilen, .vorschau, input:not([type='file']), select, textarea) { background: var(--flaeche-2); }
+:root[data-thema='blatt'] .blatt::before {
   content: ''; display: block; flex: none; width: 2.25rem; height: 0.3125rem; margin: 0.5rem auto 0;
   border-radius: 999px; background: var(--linie);
 }
-:root[data-thema='glut'] .blatt::backdrop { background: rgb(0 0 0 / 0.55); }
+:root[data-thema='blatt'] .blatt::backdrop { background: rgb(0 0 0 / 0.55); }
 
 /* Gruppierte Listen wie in den iOS-Einstellungen: farbige Symbole, Trennlinie ab dem Text */
-:root[data-thema='glut'] .menue-icon { width: 2rem; height: 2rem; border-radius: 0.5rem; background: var(--icon, var(--akzent)); color: #ffffff; }
-:root[data-thema='glut'] .menue-icon svg { width: 18px; height: 18px; }
-:root[data-thema='glut'] .menuepunkt { grid-template-columns: 2rem 1fr auto; min-height: 3.5rem; }
-:root[data-thema='glut'] .menue li + li { border-top: 0; position: relative; }
-:root[data-thema='glut'] .menue li + li::before { content: ''; position: absolute; top: 0; left: 3.625rem; right: 0; border-top: 1px solid var(--linie); }
-:root[data-thema='glut'] .menuegruppe-titel { font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; margin-left: 1rem; }
-:root[data-thema='glut'] .menue, :root[data-thema='glut'] .zeilen, :root[data-thema='glut'] .eintraege { border-radius: 1rem; }
+:root[data-thema='blatt'] .menue-icon { width: 2rem; height: 2rem; border-radius: 0.5rem; background: var(--icon, var(--akzent)); color: #ffffff; }
+:root[data-thema='blatt'] .menue-icon svg { width: 18px; height: 18px; }
+:root[data-thema='blatt'] .menuepunkt { grid-template-columns: 2rem 1fr auto; min-height: 3.5rem; }
+:root[data-thema='blatt'] .menue li + li { border-top: 0; position: relative; }
+:root[data-thema='blatt'] .menue li + li::before { content: ''; position: absolute; top: 0; left: 3.625rem; right: 0; border-top: 1px solid var(--linie); }
+:root[data-thema='blatt'] .menuegruppe-titel { font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; margin-left: 1rem; }
+:root[data-thema='blatt'] .menue, :root[data-thema='blatt'] .zeilen, :root[data-thema='blatt'] .eintraege { border-radius: 1rem; }
 
-/* Fruchtflächen aus Zitrus in Glut neutral */
-:root[data-thema='glut'] .schritt, :root[data-thema='glut'] .prinzip { background: var(--flaeche); }
-:root[data-thema='glut'] .hinweis { background: var(--flaeche-2); color: var(--tinte); border: 1px solid rgb(127 127 127 / 0.16); }
-:root[data-thema='glut'] .hinweis-aktion { color: var(--blatt); }
-:root[data-thema='glut'][data-modus='hell'] .hinweis { background: #2c2c2e; color: #f5f5f7; border: 0; }
-:root[data-thema='glut'][data-modus='hell'] .hinweis-aktion { color: #ff8a5c; }
+/* Mehr Farbe: jede Mahlzeit hat ihren Farbton hinter dem Symbol */
+:root[data-thema='blatt'] .slot-bild { background: color-mix(in srgb, var(--slot-farbe, var(--limette)) 22%, transparent); }
+#slot-fruehstueck { --slot-farbe: var(--zitrone); }
+#slot-morgensnack { --slot-farbe: var(--grapefruit); }
+#slot-mittag { --slot-farbe: var(--mandarine, var(--zitrone)); }
+#slot-nachmittagssnack { --slot-farbe: var(--limette); }
+#slot-abend { --slot-farbe: var(--avocado); }
+#slot-abendsnack { --slot-farbe: var(--heidelbeere); }
+
+/* Fruchtflächen aus Zitrus in Blatt neutral, Hinweis ruhig */
+:root[data-thema='blatt'] .schritt, :root[data-thema='blatt'] .prinzip { background: var(--flaeche); }
+:root[data-thema='blatt'] .hinweis { background: #24302a; color: #eef5e4; }
+:root[data-thema='blatt'] .hinweis-aktion { color: var(--limette); }
