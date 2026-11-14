@@ -516,6 +516,111 @@ async function wochenLauf(browser) {
   await kontext.close();
 }
 
+async function vorkochLauf(browser) {
+  const { kontext, seite, fehler } = await neueSeite(browser);
+  await seite.goto(`${URL_APP}#/rezepte`, { waitUntil: 'networkidle' });
+  await seite.locator('.leer').waitFor();
+  await seite.evaluate(() => new Promise((ok, nein) => {
+    const a = indexedDB.open('elan');
+    a.onsuccess = () => {
+      const t = a.result.transaction('rezepte', 'readwrite');
+      t.objectStore('rezepte').put({
+        id: 'test-vorkochen', name: 'Vorkochtopf', portionen: 4, schritte: [], gewichtGekocht: 1400, haltbarTage: 2, einfrierbar: true,
+        zutaten: [{ zutatId: 'basis:kidneybohnen', name: 'Testbohnen', marke: '', gramm: 1000, je100: { kcal: 100, protein: 7, kh: 12, fett: 0.5 } }],
+      });
+      t.oncomplete = () => { a.result.close(); ok(); };
+      t.onerror = () => nein(t.error);
+    };
+  }));
+  await seite.goto(`${URL_APP}#/rezepte/test-vorkochen`);
+  await seite.locator('table.naehrwerte').waitFor();
+  const kopf = (await seite.locator('.detailkopf').innerText()).replace(/\n/g, ' | ');
+  const kcal = await seite.locator('table.naehrwerte td').first().innerText();
+  pruefe('Meal-Prep: Gewicht nach dem Kochen ergibt das Portionsgewicht, Energie je Portion bleibt', kopf.includes('350 g gekocht') && kopf.includes('2 Tage') && kopf.includes('einfrieren') && kcal === '250 kcal', `${kopf} → ${kcal}`);
+
+  await seite.getByRole('link', { name: 'Bearbeiten' }).click();
+  await seite.locator('#f-haltbarTage').fill('2,5');
+  await seite.getByRole('button', { name: 'Rezept speichern' }).click();
+  const tageFehler = await seite.locator('.fehlertext').first().innerText();
+  await seite.locator('#f-haltbarTage').fill('2');
+  await seite.locator('#f-gewichtGekocht').fill('1200');
+  await bild(seite, '13-rezept-vorkochen');
+  await seite.getByRole('button', { name: 'Rezept speichern' }).click();
+  await seite.locator('table.naehrwerte').waitFor();
+  pruefe('Meal-Prep: Angaben im Formular änderbar und geprüft', (await seite.locator('.detailkopf').innerText()).includes('300 g gekocht'), `„${tageFehler}“ bei 2,5 Tagen; danach ${(await seite.locator('.detailkopf p').first().innerText())}`);
+
+  // Nächste Woche: Montag kochen, Donnerstag wieder essen = 3 Tage alt bei 2 Tagen Haltbarkeit
+  await seite.goto(`${URL_APP}#/woche`);
+  await seite.getByRole('link', { name: 'Eine Woche weiter' }).click();
+  await seite.locator('h1', { hasText: 'Nächste Woche' }).waitFor();
+  for (const tag of [0, 2, 3]) {
+    await seite.locator('.plantag').nth(tag).locator('.plus').click();
+    await seite.locator('dialog input[type=search]').fill('vorkochtopf');
+    await seite.locator('dialog .zeilen .zeile').first().click();
+    await seite.getByRole('button', { name: 'Einplanen', exact: true }).click();
+    await seite.locator('dialog').waitFor({ state: 'detached' });
+  }
+  const warnungen = await seite.locator('.haltbar').allInnerTexts();
+  const amDonnerstag = await seite.locator('.plantag').nth(3).locator('.haltbar').count();
+  pruefe('Wochenplan warnt, wenn eine vorgekochte Portion zu alt wäre', warnungen.length === 1 && amDonnerstag === 1 && warnungen[0].includes('3 Tage alt') && warnungen[0].includes('einfrieren'), warnungen.join(' | '));
+  await bild(seite, '14-woche-haltbar');
+
+  await seite.getByRole('link', { name: 'Einkaufsliste' }).click();
+  await seite.locator('.haken').first().waitFor();
+  const posten = (await seite.locator('.haken').first().innerText()).replace(/\n+/g, ' | ');
+  // 3 Portionen zu 300 g gekocht = 900 von 1.200 g = drei Viertel des Rezepts = 750 g Rohware
+  pruefe('Einkaufsliste rechnet gekochte Portionen auf Rohware zurück', posten.includes('750 g'), posten);
+
+  /* Mag-Liste */
+  await seite.goto(`${URL_APP}#/zutaten/mag`);
+  await seite.locator('.magzeile').first().waitFor();
+  const vorher = await seite.locator('#mag-stand').innerText();
+  await seite.locator('[id="mag-basis:apfel"]').selectOption('N');
+  await seite.waitForFunction((alt) => document.getElementById('mag-stand').textContent !== alt, vorher);
+  const nachher = await seite.locator('#mag-stand').innerText();
+  await seite.getByRole('button', { name: 'Offen' }).click();
+  await seite.locator('.wahl-knopf[aria-pressed=true]', { hasText: 'Offen' }).waitFor(); // erst zählen, wenn neu gezeichnet ist
+  const apfelOffen = await seite.locator('[id="mag-basis:apfel"]').count();
+  await seite.reload({ waitUntil: 'networkidle' });
+  await seite.getByRole('button', { name: 'Alle' }).click();
+  pruefe('Mag-Liste: Angabe je Obst und Gemüse, Filter „Offen“, übersteht Neuladen', vorher.startsWith('0 von') && nachher.startsWith('1 von') && apfelOffen === 0 && (await seite.locator('[id="mag-basis:apfel"]').inputValue()) === 'N', `${vorher} → ${nachher}`);
+  await bild(seite, '15-magliste');
+
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.getByRole('button', { name: 'Zu Frühstück hinzufügen' }).click();
+  await seite.locator('dialog input[type=search]').fill('apfel');
+  const namen = await seite.locator('dialog .zeilen .zeile-name').evaluateAll((z) => z.map((x) => x.firstChild.textContent));
+  const zusatz = await seite.locator('dialog .zeilen .zeile').last().locator('small').innerText();
+  pruefe('Suchliste: Abgelehntes steht am Ende und ist gekennzeichnet', namen.length > 1 && namen.at(-1) === 'Apfel' && zusatz === 'magst du nicht', `Reihenfolge: ${namen.join(', ')}; Zusatz „${zusatz}“`);
+  await seite.locator('dialog').getByRole('button', { name: 'Schließen' }).click();
+
+  await seite.goto(`${URL_APP}#/zutaten/basis%3Aapfel`);
+  await seite.locator('#f-mag').selectOption('S');
+  await seite.locator('#f-mag-notiz').waitFor();
+  await seite.locator('#f-mag-notiz').fill('nur geschält');
+  await seite.locator('#f-mag-notiz').blur();
+  await seite.locator('.hinweis', { hasText: 'Gemerkt' }).waitFor();
+  await seite.reload({ waitUntil: 'networkidle' });
+  await seite.locator('#f-mag-notiz').waitFor();
+  pruefe('Sonderfall mit Beschreibung an der Zutat', (await seite.locator('#f-mag').inputValue()) === 'S' && (await seite.locator('#f-mag-notiz').inputValue()) === 'nur geschält', `Auswahl S, Notiz „${await seite.locator('#f-mag-notiz').inputValue()}“`);
+
+  const unsinn = [];
+  const mass = [];
+  for (const [route, warteAuf] of [['zutaten/mag', '.magzeile'], ['rezepte/test-vorkochen/bearbeiten', '#f-einfrierbar'], ['zutaten/basis%3Aapfel', '#f-mag']]) {
+    await seite.goto(`${URL_APP}#/${route}`);
+    await seite.locator(warteAuf).first().waitFor();
+    const b = await seite.evaluate(() => ({ inhalt: document.documentElement.scrollWidth, fenster: window.innerWidth }));
+    mass.push(`${route} ${b.inhalt}/${b.fenster}`);
+    if (b.inhalt > b.fenster) unsinn.push(`${route} zu breit`);
+    if (/\b(null|undefined|NaN)\b/.test(await seite.locator('body').innerText())) unsinn.push(`${route}: null/undefined/NaN im Text`);
+    const klein = await seite.evaluate(() => [...document.querySelectorAll('button, a, select, input:not([type=checkbox])')].filter((e) => e.offsetParent).map((e) => Math.round(e.getBoundingClientRect().height)).filter((h) => h < 40).length);
+    if (klein) unsinn.push(`${route}: ${klein} Tippflächen unter 40 px`);
+  }
+  pruefe('Mag-Liste und Vorkochen: Breite, Text und Tippflächen', unsinn.length === 0, unsinn.join(' | ') || mass.join(', '));
+  pruefe('Vorkoch-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
+  await kontext.close();
+}
+
 async function migrationsLauf(browser) {
   const { kontext, seite, fehler } = await neueSeite(browser);
   // Datenbank im Aufbau von Schema-Version 1 anlegen, bevor die App sie öffnet (Seite ohne App-Code, gleiche Herkunft)
@@ -547,7 +652,7 @@ async function migrationsLauf(browser) {
     const speicher = await new Promise((ok) => { const a = indexedDB.open('elan'); a.onsuccess = () => { const n = [...a.result.objectStoreNames]; a.result.close(); ok(n); }; });
     return { version: info.version, speicher };
   });
-  pruefe('Migration: Datenbank aus Version 1 wird angehoben, Einträge bleiben', stand.version === SCHEMA_VERSION && stand.speicher.includes('rezepte') && stand.speicher.includes('plan') && (await seite.locator('.eintrag').count()) === 1,
+  pruefe('Migration: Datenbank aus Version 1 wird angehoben, Einträge bleiben', stand.version === SCHEMA_VERSION && stand.speicher.includes('rezepte') && stand.speicher.includes('plan') && stand.speicher.includes('vorlieben') && (await seite.locator('.eintrag').count()) === 1,
     `Version ${stand.version}, Speicher ${stand.speicher.join(', ')}, alter Eintrag: ${(await seite.locator('.eintrag').innerText()).replace(/\n/g, ' | ')}`);
 
   await seite.goto(`${URL_APP}#/mehr`);
@@ -574,6 +679,7 @@ async function migrationsLauf(browser) {
     await hauptlauf(browser);
     await rezeptLauf(browser);
     await wochenLauf(browser);
+    await vorkochLauf(browser);
     await migrationsLauf(browser);
     await offlineLauf(browser);
     await dunkelLauf(browser);

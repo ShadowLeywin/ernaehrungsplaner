@@ -25,6 +25,10 @@ export const MIGRATIONEN = [
     db.createObjectStore('plan', { keyPath: 'id' }).createIndex('datum', 'datum');
     db.createObjectStore('einkauf', { keyPath: 'id' }).createIndex('woche', 'woche');
   },
+  // Version 4: Mag-Liste
+  (db) => {
+    db.createObjectStore('vorlieben', { keyPath: 'zutatId' });
+  },
 ];
 
 let offen;

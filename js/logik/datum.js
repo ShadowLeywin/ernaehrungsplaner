@@ -26,6 +26,9 @@ export function verschiebe(iso, tage) {
   return isoDatum(d);
 }
 
+/** Ganze Tage von a bis b (negativ, wenn b früher liegt) */
+export const tageZwischen = (a, b) => Math.round((ausIso(b) - ausIso(a)) / 86400000);
+
 /** Montag = 0 … Sonntag = 6 */
 export const wochentagIndex = (iso) => (ausIso(iso).getDay() + 6) % 7;
 

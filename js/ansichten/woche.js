@@ -3,6 +3,7 @@
 import { WOCHENTAGE, ausIso, formatTag, isoDatum, istGueltig, verschiebe } from '../logik/datum.js';
 import { fuerMenge, summeEintraege } from '../logik/naehrwerte.js';
 import { alsEintraege, naechsterFreierSlot } from '../logik/plan.js';
+import { haltbarkeitsWarnungen } from '../logik/rezepte.js';
 import { APP_NAME } from '../logik/schema.js';
 import { wochenTage } from '../logik/woche.js';
 import { SLOTS, TAGESTYPEN, tagestypFuer } from '../logik/ziele.js';
@@ -29,9 +30,12 @@ export async function zeigeWoche(wurzel, teile) {
   const tage = wochenTage(istGueltig(teile[0]) ? teile[0] : heute);
   if (teile[1] === 'einkauf') return zeigeEinkauf(wurzel, tage, heute);
 
-  const [posten, ziele, wochenplan, tagSaetze] = await Promise.all([
-    speicher.planZwischen(tage[0], tage[6]), speicher.ladeZiele(), speicher.ladeWoche(), Promise.all(tage.map(speicher.holeTag)),
+  // Die Vorwoche wird mitgelesen: Was am Sonntag gekocht wurde, kann am Dienstag schon zu alt sein
+  const [mitVorwoche, ziele, wochenplan, tagSaetze, rezepte] = await Promise.all([
+    speicher.planZwischen(verschiebe(tage[0], -7), tage[6]), speicher.ladeZiele(), speicher.ladeWoche(), Promise.all(tage.map(speicher.holeTag)), speicher.alleRezepte(),
   ]);
+  const posten = mitVorwoche.filter((p) => p.datum >= tage[0]);
+  const warnungen = haltbarkeitsWarnungen(mitVorwoche, new Map(rezepte.map((r) => [r.id, r])));
   document.title = `${wochenTitel(tage[0], heute)} – ${APP_NAME}`;
 
   haenge(wurzel,
@@ -50,10 +54,11 @@ export async function zeigeWoche(wurzel, teile) {
       posten: posten.filter((p) => p.datum === datum).sort((a, b) => slotRang(a.slot) - slotRang(b.slot) || String(a.erstellt).localeCompare(String(b.erstellt))),
       typ: tagestypFuer(datum, wochenplan, tagSaetze[i]),
       ziele,
+      warnungen,
     }))));
 }
 
-function tagBereich({ datum, istHeute, posten, typ, ziele }) {
+function tagBereich({ datum, istHeute, posten, typ, ziele, warnungen }) {
   const geplant = summeEintraege(posten).kcal ?? 0;
   const offen = posten.filter((p) => !p.uebernommen);
   const typName = TAGESTYPEN.find((t) => t.id === typ).name;
@@ -82,5 +87,10 @@ function tagBereich({ datum, istHeute, posten, typ, ziele }) {
         el('span', { class: 'eintrag-name' }, p.name, el('small', {}, p.uebernommen ? `${slotName(p.slot)}, im Tagebuch` : slotName(p.slot))),
         el('span', { class: 'eintrag-menge' }, `${zahl(p.gramm, 1)} g`),
         el('span', { class: 'eintrag-kcal' }, `${zahl(fuerMenge(p.je100, p.gramm).kcal ?? 0)} kcal`))))) : null,
+    posten.filter((p) => warnungen.has(p.id)).map((p) => {
+      const warnung = warnungen.get(p.id);
+      return el('p', { class: 'merkzettel haltbar' },
+        `${p.name} wäre hier ${warnung.tage} Tage alt, hält aber nur ${warnung.haltbar}. ${warnung.einfrierbar ? 'Rechtzeitig einfrieren oder frisch kochen.' : 'Besser frisch kochen.'}`);
+    }),
     offen.length ? el('button', { type: 'button', class: 'chip wie-vortag', onclick: uebernehmen }, 'Ins Tagebuch übernehmen') : null);
 }

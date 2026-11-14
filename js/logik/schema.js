@@ -3,9 +3,9 @@
 
 export const APP_NAME = 'Elan';
 export const APP_KENNUNG = 'elan';
-export const APP_VERSION = '0.4.0';
+export const APP_VERSION = '0.5.0';
 
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 /** Speicher (Object Stores) und ihr Schlüsselfeld. */
 export const STORES = {
@@ -16,4 +16,5 @@ export const STORES = {
   rezepte: 'id', // ab Version 2: Zutaten mit Mengen, Portionen, Schritte mit "Prinzip dahinter"
   plan: 'id', // ab Version 3: vorgemerkte Mahlzeiten je Tag und Slot
   einkauf: 'id', // ab Version 3: Häkchen und eigene Posten der Einkaufsliste je Woche
+  vorlieben: 'zutatId', // ab Version 4: Mag-Liste für Obst und Gemüse (J, R, K, N, S)
 };

@@ -70,16 +70,16 @@ Ziel: Aus einer geplanten Woche entsteht eine Einkaufsliste.
 
 Module: 4 (Wochenplan, Einkauf).
 
-### Session 5: Meal-Prep und Mag-Liste
+### Session 5: Meal-Prep und Mag-Liste (erledigt, Version 0.5)
 
 Ziel: Vorkochen planen; Vorschläge achten auf Vorlieben.
 
-| Abnahmekriterium | Testbefehl |
+| Abnahmekriterium | Beleg |
 |---|---|
-| Gesamtgewicht nach dem Kochen ÷ Portionen ergibt Gewicht und Nährwerte je Portion | `npm test` |
-| Rezept trägt Haltbarkeit in Tagen und „einfrierbar“; der Plan warnt, wenn eine Portion zu spät verplant ist | `npm test`, `pruefe-app.cjs` |
-| Je Obst und Gemüse eine Angabe J, R, K, N oder S | `pruefe-app.cjs` |
-| Vorschläge lassen N weg und beachten R und K | `npm test` |
+| Gesamtgewicht nach dem Kochen ÷ Portionen ergibt Gewicht und Nährwerte je Portion | `npm test`: `mealprep.test.js`; `pruefe-app.cjs`: zwei Meal-Prep-Kriterien |
+| Rezept trägt Haltbarkeit in Tagen und „einfrierbar“; der Plan warnt, wenn eine Portion zu spät verplant ist | `npm test`; `pruefe-app.cjs`: „Wochenplan warnt“ |
+| Je Obst und Gemüse eine Angabe J, R, K, N oder S | `pruefe-app.cjs`: „Mag-Liste“, „Sonderfall“ |
+| Vorschläge lassen N weg und beachten R und K | `npm test`: `vorschlaege()`; in der App wirkt das bisher nur in Suchlisten (Abgelehntes am Ende, Hinweis). Eigene Essens-Vorschläge gibt es noch nicht |
 
 Module: 4 (Meal-Prep), 6.
 
@@ -184,4 +184,5 @@ Jede Session hat eine Tabelle mit prüfbaren Kriterien und einem Testbefehl.
 - Testausgaben vom 14.11.2026 (Version 0.2): `npm test` 69 von 69, `node tools/pruefe-app.cjs` 45 von 45.
 - Testausgaben vom 14.11.2026 (Version 0.3): `npm test` 79 von 79, `node tools/pruefe-app.cjs` 50 von 50.
 - Testausgaben vom 14.11.2026 (Version 0.4): `npm test` 88 von 88, `node tools/pruefe-app.cjs` 59 von 59.
+- Testausgaben vom 14.11.2026 (Version 0.5): `npm test` 97 von 97, `node tools/pruefe-app.cjs` 68 von 68.
 - BLS 4.0 kostenfrei: [heise](https://heise.de/-11123877), [Agrolab](https://agrolab.com/en/news/food-news/6105-bls-datenbank-radar-01-26-en.html), abgerufen 13.11.2026.

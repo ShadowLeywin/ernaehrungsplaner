@@ -7,7 +7,7 @@ Regeln und Wissen für jede Claude-Session in diesem Repo. Erst lesen, dann arbe
 - **Was:** Progressive Web App für Android/Chrome, komplett deutsch, offline-first.
 - **Umfang:** nur Ernährung und Health-Daten. Kein Trainingslog; der Tagestyp (Gym, Calisthenics, Rest) bestimmt nur die Ziele.
 - **Nutzer:** Léon baut privat. Später nutzen Freunde die App, jeder mit eigenen lokalen Daten.
-- **Stand:** Version 0.4 (Tagebuch, Wochenplan mit Einkaufsliste, Rezepte, Zutaten, Ziele, Backup), Schema-Version 3. Plan: `docs/PHASENPLAN.md`.
+- **Stand:** Version 0.5 (Tagebuch, Wochenplan mit Einkaufsliste, Rezepte mit Meal-Prep, Zutaten mit Mag-Liste, Ziele, Backup), Schema-Version 4. Plan: `docs/PHASENPLAN.md`.
 
 ## Feste Entscheidungen (gelten, bis Léon widerspricht)
 

@@ -33,7 +33,8 @@ export function einkaufsliste(posten, rezepte, zutaten) {
 
   for (const p of posten) {
     const rezept = p.rezeptId ? rezepte.get(p.rezeptId) : null;
-    const gesamt = rezept ? rezeptWerte(rezept).gesamtGramm : 0;
+    // Geplant wird in Gramm auf dem Teller; bei vorgekochten Rezepten ist das das Gewicht nach dem Kochen
+    const gesamt = rezept ? rezeptWerte(rezept).fertigGramm : 0;
     if (rezept && gesamt > 0) {
       const faktor = p.gramm / gesamt;
       for (const z of rezept.zutaten) merke(z.zutatId, z.name, z.marke, z.gramm * faktor);

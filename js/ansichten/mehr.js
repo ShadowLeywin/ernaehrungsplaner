@@ -155,7 +155,7 @@ function anteileBereich(anteile) {
 
 /* ---------- Backup ---------- */
 
-const BEREICHE = { eintraege: 'Einträge im Tagebuch', plan: 'geplante Mahlzeiten', rezepte: 'Rezepte', zutaten: 'eigene Zutaten', tage: 'abweichende Tagestypen', einstellungen: 'Einstellungen' };
+const BEREICHE = { eintraege: 'Einträge im Tagebuch', plan: 'geplante Mahlzeiten', rezepte: 'Rezepte', zutaten: 'eigene Zutaten', vorlieben: 'Angaben in der Mag-Liste', tage: 'abweichende Tagestypen', einstellungen: 'Einstellungen' };
 const zaehle = (anzahl) => Object.entries(BEREICHE).map(([id, name]) => `${name}: ${zahl(anzahl[id] ?? 0)}`).join(', ');
 
 function backupBereich(letztesBackup, daten) {

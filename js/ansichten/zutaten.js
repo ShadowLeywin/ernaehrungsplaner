@@ -3,11 +3,13 @@
 import { NAEHRSTOFFE } from '../logik/naehrwerte.js';
 import { APP_NAME } from '../logik/schema.js';
 import { sucheZutaten } from '../logik/suche.js';
+import { MAG, istObstGemuese } from '../logik/vorlieben.js';
 import { FORMULAR_FELDER, KATEGORIEN, QUELLEN, kategorieName, pruefeZutat } from '../logik/zutat.js';
 import { sucheOnline } from '../off-abruf.js';
 import { gehe, neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { bestaetige, el, feld, haenge, hinweis, icon, zahl } from '../ui.js';
+import { zeigeMagListe } from './magliste.js';
 
 // Zustand der Liste bleibt beim Wechsel zwischen Liste und Detail erhalten
 const zustand = { begriff: '', nurEigene: false, online: null };
@@ -16,11 +18,13 @@ const adresse = (id, anhang = '') => `#/zutaten/${encodeURIComponent(id)}${anhan
 const istEigen = (zutat) => !String(zutat.id).startsWith('basis:');
 
 export async function zeigeZutaten(wurzel, teile) {
+  if (teile[0] === 'mag') return zeigeMagListe(wurzel);
   if (teile[0] === 'neu') return formular(wurzel, teile[1] ? await speicher.holeZutat(teile[1]) : null, true);
   if (teile[0]) {
     const zutat = await speicher.holeZutat(teile[0]);
     if (!zutat) return nichtGefunden(wurzel);
-    return teile[1] === 'bearbeiten' && istEigen(zutat) ? formular(wurzel, zutat, false) : detail(wurzel, zutat);
+    if (teile[1] === 'bearbeiten' && istEigen(zutat)) return formular(wurzel, zutat, false);
+    return detail(wurzel, zutat, istObstGemuese(zutat) ? (await speicher.alleVorlieben()).get(zutat.id) : null);
   }
   return liste(wurzel);
 }
@@ -111,6 +115,7 @@ async function liste(wurzel) {
       oninput: (e) => { zustand.begriff = e.target.value; zeichneTreffer(); zeichneOnline(); },
     }),
     el('div', { class: 'wahl schmal', role: 'group', 'aria-label': 'Auswahl' }, filter(`Alle (${zutaten.length})`, false), filter(`Eigene (${eigeneIds.size})`, true)),
+    el('a', { class: 'textlink', href: '#/zutaten/mag' }, 'Mag-Liste für Obst und Gemüse'),
     el('p', { class: 'klein' }, 'Werte je 100 g'),
     treffer,
     online);
@@ -118,7 +123,7 @@ async function liste(wurzel) {
 
 /* ---------- Detail ---------- */
 
-function detail(wurzel, zutat) {
+function detail(wurzel, zutat, vorliebe) {
   document.title = `${zutat.name} – ${APP_NAME}`;
   const zeilen = (gruppe) => NAEHRSTOFFE
     .filter((n) => n.gruppe === gruppe && typeof zutat.je100[n.id] === 'number')
@@ -144,6 +149,7 @@ function detail(wurzel, zutat) {
       el('h1', {}, zutat.name),
       el('p', {}, [zutat.marke, kategorieName(zutat.kategorie)].filter(Boolean).join(', ')),
       el('p', { class: 'klein' }, `Quelle: ${QUELLEN[zutat.quelle] ?? 'unbekannt'}`)),
+    istObstGemuese(zutat) ? magBereich(zutat, vorliebe) : null,
     zutat.unvollstaendig ? el('p', { class: 'merkzettel' }, 'Bei dieser Zutat fehlen Angaben. Summen im Tagebuch fallen dadurch zu niedrig aus.') : null,
     el('table', { class: 'naehrwerte' },
       el('caption', {}, 'Nährwerte je 100 g'),
@@ -157,6 +163,25 @@ function detail(wurzel, zutat) {
       istEigen(zutat)
         ? el('a', { class: 'knopf', href: adresse(zutat.id, '/bearbeiten') }, 'Bearbeiten')
         : el('a', { class: 'knopf leise', href: `#/zutaten/neu/${encodeURIComponent(zutat.id)}` }, 'Als eigene Zutat kopieren')));
+}
+
+/** Angabe für die Mag-Liste direkt an der Zutat; der Sonderfall bekommt hier seine Beschreibung. */
+function magBereich(zutat, vorliebe) {
+  const merke = async (mag, notiz) => {
+    await speicher.setzeVorliebe(zutat.id, mag, notiz);
+    hinweis(mag ? 'Gemerkt.' : 'Angabe entfernt.');
+    neuZeichnen();
+  };
+  return el('div', { class: 'stapel mag-bereich' },
+    el('div', { class: 'feld' },
+      el('label', { for: 'f-mag' }, 'Magst du das?'),
+      el('select', { id: 'f-mag', onchange: (e) => merke(e.target.value, vorliebe?.notiz) },
+        el('option', { value: '' }, 'Keine Angabe'),
+        MAG.map((m) => el('option', { value: m.id, selected: vorliebe?.mag === m.id }, m.name)))),
+    vorliebe?.mag === 'S' ? feld({
+      name: 'mag-notiz', beschriftung: 'Was ist der Sonderfall?', placeholder: 'Zum Beispiel nur geschält', maxlength: 120,
+      value: vorliebe.notiz ?? '', onchange: (e) => merke('S', e.target.value),
+    }) : null);
 }
 
 function nichtGefunden(wurzel) {
