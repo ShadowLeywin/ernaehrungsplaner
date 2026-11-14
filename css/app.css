@@ -1,5 +1,7 @@
-/* Elan – Gestaltung.
-   Leitidee: Zitrusfrüchte. Helles, kühles Papier, Blattgrün als Tinte, Limette als Energie.
+/* Elan – Gestaltung. Zwei Designs aus denselben Bausteinen:
+   - Glut (Standard): dunkel und klar im Stil von iOS, Ringe je Nährwert, Akzent in Glutrot. Ganz unten.
+   - Zitrus: das erste Design, hier direkt in :root.
+   Leitidee Zitrus: Zitrusfrüchte. Helles, kühles Papier, Blattgrün als Tinte, Limette als Energie.
    Jeder Makronährstoff hat eine Fruchtfarbe: Eiweiß Grapefruit, Kohlenhydrate Zitrone,
    Fett Avocado, Ballaststoffe Heidelbeere. */
 
@@ -7,6 +9,15 @@
   font-family: 'Bricolage Grotesque';
   src: url('../schrift/bricolage-grotesque.woff2') format('woff2');
   font-weight: 200 800;
+  font-display: swap;
+}
+
+/* Inter mit optischer Größe: Titel werden enger, Fließtext offener, ähnlich der Systemschrift von Apple.
+   Die Apple-Schrift selbst darf außerhalb von Apple-Geräten nicht mitgeliefert werden. */
+@font-face {
+  font-family: 'Inter';
+  src: url('../schrift/inter.woff2') format('woff2');
+  font-weight: 100 900;
   font-display: swap;
 }
 
@@ -30,6 +41,11 @@
   --avocado: #6c9a2a;
   --heidelbeere: #5661c9;
   --zettel: #fff2bf;
+  --flaeche-2: #eef3e3;
+  --wasser: var(--heidelbeere);
+  --ueber: var(--avocado);
+  --auf-limette: #14241a;
+  --schrift: 'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --akzent: var(--blatt);
   --auf-akzent: #ffffff;
   --warnung: #b93626;
@@ -47,6 +63,7 @@
   --limette-blass: #2a3d1d;
   --blatt: #a8e06c;
   --zettel: #3a3413;
+  --flaeche-2: #223127;
   --akzent: var(--limette);
   --auf-akzent: #14241a;
   --warnung: #ff8d7c;
@@ -62,7 +79,7 @@ body {
   margin: 0;
   background: var(--papier);
   color: var(--tinte);
-  font-family: 'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--schrift);
   font-size: 1rem;
   line-height: 1.45;
   font-variant-numeric: tabular-nums;
@@ -113,7 +130,7 @@ h2 { font-size: 1.1875rem; line-height: 1.25; font-weight: 680; letter-spacing: 
   display: grid; place-items: center; width: 3.25rem; height: 1.875rem; border-radius: 999px;
 }
 .navigation a[aria-current='page'] { color: var(--tinte); font-weight: 700; }
-.navigation a[aria-current='page'] .nav-bild { background: var(--limette); color: #14241a; }
+.navigation a[aria-current='page'] .nav-bild { background: var(--limette); color: var(--auf-limette); }
 
 .offline {
   position: fixed; top: max(0.5rem, var(--rand-top)); right: 0.75rem; z-index: 6;
@@ -121,7 +138,9 @@ h2 { font-size: 1.1875rem; line-height: 1.25; font-weight: 680; letter-spacing: 
   background: var(--tinte); color: var(--papier); font-size: 0.8125rem;
 }
 
-.seitenkopf { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.seitenkopf { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; }
+/* Große Titel dürfen umbrechen statt die Seite breiter zu machen (sonst zoomt das Handy heraus) */
+.seitenkopf h1, .tagestitel h1 { min-width: 0; overflow-wrap: anywhere; hyphens: auto; }
 .klein { font-size: 0.875rem; color: var(--tinte-leise); }
 .leer { color: var(--tinte-leise); padding: 0.5rem 0; }
 .fehlerseite, .fehlertext { color: var(--warnung); font-size: 0.875rem; }
@@ -198,13 +217,21 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--b
 
 /* ---------- Heute ---------- */
 
-.tageskopf { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; }
-.tagestitel { text-align: center; }
-.tagestitel p { color: var(--tinte-leise); }
+.tageskopf { display: flex; align-items: flex-end; justify-content: space-between; gap: 0.5rem; }
+.tagestitel { min-width: 0; }
+.ueberzeile { font-size: 0.8125rem; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; color: var(--tinte-leise); }
 .tagestitel .textlink { min-height: 2.5rem; padding: 0; font-size: 0.875rem; }
+.blaettern { display: flex; gap: 0.25rem; flex: none; }
+.blaettern .rund { background: var(--flaeche); }
 
-.uebersicht { padding-top: 0.25rem; }
-.scheibe-rahmen { position: relative; width: min(66vw, 15rem); margin: 0 auto; }
+/* Kalorien-Karte: Zahl links, Tagesscheibe rechts */
+.uebersicht { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 1rem; }
+.kartentitel { display: block; font-size: 0.8125rem; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; color: var(--tinte-leise); }
+.kcal-gross strong { display: block; margin-top: 0.25rem; font-size: 3rem; line-height: 1; font-weight: 760; letter-spacing: -0.04em; }
+.kcal-gross.ueber strong { color: var(--ueber); }
+.kcal-rest { font-size: 1rem; font-weight: 600; color: var(--tinte-leise); }
+.kcal-zeile { margin-top: 0.625rem; color: var(--tinte-leise); font-size: 0.875rem; }
+.scheibe-rahmen { position: relative; width: min(36vw, 9.5rem); }
 .scheibe { display: block; width: 100%; height: auto; overflow: visible; }
 .segment-grund, .segment-voll { stroke-width: 2.5; stroke-linejoin: round; }
 .segment-grund { fill: var(--limette-blass); stroke: var(--limette-blass); }
@@ -213,41 +240,62 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--b
   transform-box: view-box; transform-origin: 100px 100px;
   animation: wachsen 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
-.segment.ueber .segment-voll { fill: var(--avocado); stroke: var(--avocado); }
+.segment.ueber .segment-voll { fill: var(--ueber); stroke: var(--ueber); }
 .segment:focus-visible { outline: none; }
 .segment:focus-visible .segment-grund { stroke: var(--blatt); }
 @keyframes wachsen { from { transform: scale(0.55); opacity: 0; } }
-
 .scheibe-mitte {
-  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  pointer-events: none; text-align: center;
+  position: absolute; inset: 0; display: grid; place-items: center;
+  pointer-events: none; font-size: 0.8125rem; font-weight: 700; color: var(--tinte-leise);
 }
-.scheibe-mitte strong { font-size: 1.875rem; line-height: 1; font-weight: 760; letter-spacing: -0.03em; }
-.scheibe-mitte span { font-size: 0.8125rem; color: var(--tinte-leise); }
-.kcal-zeile { text-align: center; margin-top: 0.5rem; color: var(--tinte-leise); font-size: 0.9375rem; }
 
-.makros { display: grid; gap: 0.75rem; margin-top: 1.25rem; }
-.makro { display: grid; grid-template-columns: 1fr auto; row-gap: 0.25rem; align-items: baseline; }
-.makro-name { font-weight: 620; }
-.makro-wert { font-size: 0.9375rem; color: var(--tinte-leise); }
-.makro.ueber .makro-wert { color: var(--tinte); font-weight: 660; }
+/* Kacheln: 3 × 2, je ein Ring */
+.kacheln { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.625rem; }
+.kachel {
+  display: flex; flex-direction: column; align-items: center; gap: 0.0625rem; min-width: 0;
+  padding: 0.875rem 0.375rem 0.75rem; border: 0; border-radius: 1.125rem;
+  background: var(--flaeche); color: var(--tinte); text-align: center; font: inherit;
+}
+button.kachel:active { transform: scale(0.97); }
+.ring { position: relative; display: block; width: 3.5rem; height: 3.5rem; margin-bottom: 0.375rem; }
+.ring svg { display: block; width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 7; }
+.ring-grund { stroke: var(--ring-farbe, var(--blatt)); opacity: 0.2; }
+.ring-voll { stroke: var(--ring-farbe, var(--blatt)); stroke-linecap: round; transition: stroke-dasharray 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.ring-bild { position: absolute; inset: 0; display: grid; place-items: center; font-size: 1.25rem; line-height: 1; }
+.kachel-wert { font-size: 1.0625rem; font-weight: 720; letter-spacing: -0.01em; white-space: nowrap; }
+.kachel-ziel { font-size: 0.75rem; color: var(--tinte-leise); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.kachel-name { margin-top: 0.25rem; font-size: 0.8125rem; font-weight: 620; line-height: 1.2; }
+.kachel-plus { font-size: 0.6875rem; font-weight: 700; color: var(--ring-farbe); }
+.makro-protein { --ring-farbe: var(--grapefruit); }
+.makro-kh { --ring-farbe: var(--zitrone); }
+.makro-fett { --ring-farbe: var(--avocado); }
+.makro-ballaststoffe { --ring-farbe: var(--heidelbeere); }
+.kachel.makro-wasser { --ring-farbe: var(--wasser); }
+.kachel-alle { --ring-farbe: var(--tinte-leise); }
+.kachel-alle .kachel-wert { font-size: 0.9375rem; }
+
+/* Balken (Health, Alle Nährwerte) */
 .balken { grid-column: 1 / -1; height: 0.625rem; border-radius: 999px; background: var(--linie); overflow: hidden; }
 .balken-voll { display: block; height: 100%; border-radius: 999px; background: var(--blatt); }
-.makro-protein .balken-voll { background: var(--grapefruit); }
-.makro-kh .balken-voll { background: var(--zitrone); }
-.makro-fett .balken-voll { background: var(--avocado); }
-.makro-ballaststoffe .balken-voll { background: var(--heidelbeere); }
+
+/* Plus-Knopf zum schnellen Eintragen, rechts über der Leiste */
+.fab {
+  position: fixed; z-index: 4; right: max(1rem, var(--rand-right));
+  bottom: calc(var(--leiste) + var(--rand-bottom) + 1rem);
+  display: grid; place-items: center; width: 3.75rem; height: 3.75rem; border: 0; border-radius: 50%;
+  background: var(--akzent); color: var(--auf-akzent); box-shadow: var(--schatten);
+}
+.fab:active { transform: scale(0.94); }
+@media (min-width: 40rem) { .fab { right: calc(50% - 17rem); } }
+body:has(.fab) .hinweis-ort { bottom: calc(var(--leiste) + var(--rand-bottom) + 5.5rem); }
+.seite-heute { padding-bottom: 4rem; }
 
 .alle-naehrwerte { margin-top: 1.25rem !important; }
 .alle-naehrwerte summary { justify-content: center; }
 .naehrwerte td.anteil { width: 4.5rem; color: var(--tinte-leise); font-size: 0.875rem; }
 .wie-vortag { margin-top: 0.625rem; height: auto; padding: 0.5rem 0.875rem; text-align: left; }
 input[type='date'] { appearance: none; -webkit-appearance: none; }
-
-.slots { margin-top: 1.5rem; }
-.slot { padding: 0.875rem 0; border-top: 1px solid var(--linie); scroll-margin-top: 0.5rem; }
-.slot-kopf { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
-.slot-stand { font-size: 0.875rem; color: var(--tinte-leise); }
 
 .eintraege, .zeilen { margin-top: 0.625rem; background: var(--flaeche); border-radius: 0.875rem; overflow: hidden; }
 .eintraege li + li, .zeilen li + li { border-top: 1px solid var(--linie); }
@@ -284,7 +332,7 @@ input[type='date'] { appearance: none; -webkit-appearance: none; }
 /* ---------- Woche und Einkaufsliste ---------- */
 
 .knopfreihe.mitte { justify-content: center; }
-.marke { margin-left: 0.5rem; padding: 0.0625rem 0.5rem; border-radius: 999px; background: var(--limette); color: #14241a; font-size: 0.75rem; font-weight: 700; vertical-align: middle; }
+.marke { margin-left: 0.5rem; padding: 0.0625rem 0.5rem; border-radius: 999px; background: var(--limette); color: var(--auf-limette); font-size: 0.75rem; font-weight: 700; vertical-align: middle; }
 .eintrag.erledigt { color: var(--tinte-leise); }
 .eintrag.erledigt .eintrag-kcal { font-weight: 500; }
 .geplant > * + * { margin-top: 0.5rem; }
@@ -316,7 +364,7 @@ input[type='date'] { appearance: none; -webkit-appearance: none; }
 .backup-erinnerung .textlink { flex: none; }
 .schritt .linkreihe .textlink { min-height: 2.5rem; padding: 0.25rem 0; }
 .makro-wasser .balken { display: block; }
-.makro-wasser .balken-voll { background: var(--heidelbeere); transition: width 0.25s ease-out; }
+.makro-wasser .balken-voll { background: var(--wasser); transition: width 0.25s ease-out; }
 .zusatz.zweifach { flex-wrap: wrap; }
 .zusatz.zweifach input { flex: 1 1 8rem; }
 details.bereich > summary { font-size: 1.1875rem; font-weight: 680; color: var(--tinte); justify-content: space-between; list-style: none; }
@@ -357,7 +405,7 @@ input[type='time'] { appearance: none; -webkit-appearance: none; }
 .schritte > li { position: relative; padding-left: 2.5rem; counter-increment: schritt; }
 .schritte > li::before {
   content: counter(schritt); position: absolute; left: 0; top: 0; width: 1.75rem; height: 1.75rem;
-  display: grid; place-items: center; border-radius: 50%; background: var(--limette); color: #14241a; font-weight: 720; font-size: 0.9375rem;
+  display: grid; place-items: center; border-radius: 50%; background: var(--limette); color: var(--auf-limette); font-weight: 720; font-size: 0.9375rem;
 }
 .prinzip { margin-top: 0.5rem; padding: 0.625rem 0.875rem; border-radius: 0.75rem; background: var(--limette-blass); font-size: 0.9375rem; }
 .prinzip strong { display: block; font-size: 0.8125rem; font-weight: 700; color: var(--blatt); }
@@ -410,20 +458,26 @@ input[type='time'] { appearance: none; -webkit-appearance: none; }
 /* ---------- Karten: ruhige Flächen statt Linien ---------- */
 
 .karte, .uebersicht { padding: 1.125rem 1rem; border-radius: 1.25rem; background: var(--flaeche); }
-.uebersicht { padding-top: 1.25rem; }
-.wasser-kopf { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; }
-.wasser-kopf h2 { font-size: 1.0625rem; }
-.wasser-stand { color: var(--tinte-leise); font-size: 0.9375rem; }
-.wasser-karte > * + * { margin-top: 0.625rem; }
-.wasser-karte .balken { display: block; }
-.wasser-karte .balken-voll { background: var(--heidelbeere); transition: width 0.25s ease-out; }
-
-.slots { display: grid; gap: 0.75rem; }
-.slot { padding: 0.875rem 1rem; border-top: 0; border-radius: 1.25rem; background: var(--flaeche); }
-.slot .eintraege { margin-top: 0.375rem; background: transparent; border-radius: 0; }
+.mahlzeiten { padding-bottom: 0.375rem; }
+.mahlzeiten .kartentitel { margin-bottom: 0.25rem; }
+.slot { padding: 0.75rem 0; scroll-margin-top: 1rem; }
+.slot + .slot { border-top: 1px solid var(--linie); }
+.slot-kopf { display: flex; align-items: center; gap: 0.75rem; }
+.slot-bild {
+  display: grid; place-items: center; flex: none; width: 2.5rem; height: 2.5rem; border-radius: 0.75rem;
+  background: var(--flaeche-2); font-size: 1.25rem; line-height: 1;
+}
+.slot-text { flex: 1; min-width: 0; }
+.slot-text h2 { font-size: 1.0625rem; }
+.slot-stand { font-size: 0.875rem; color: var(--tinte-leise); }
+.slot .eintraege { margin: 0.375rem 0 0; background: transparent; border-radius: 0; }
 .slot .eintraege li { border-top: 1px solid var(--linie); }
-.slot .eintrag { padding-left: 0; padding-right: 0; }
-.slot .rund.plus { background: var(--limette); color: #14241a; }
+.slot .eintrag { grid-template-columns: minmax(0, 1fr) auto auto; padding-left: 0; padding-right: 0; }
+.slot .eintrag-menge, .slot .eintrag-kcal { white-space: nowrap; }
+/* Ab etwas mehr Breite rücken die Einträge unter den Namen der Mahlzeit, wie bei iOS-Listen */
+@media (min-width: 24rem) { .slot .eintraege, .slot .wie-vortag { margin-left: 3.25rem; } }
+.slot .rund.plus { border-radius: 0.75rem; background: transparent; border: 1.5px solid var(--linie); color: var(--blatt); }
+.slot .rund.plus:active { background: var(--limette-blass); }
 
 /* ---------- Ersteinrichtung ---------- */
 
@@ -478,3 +532,135 @@ body:has(.seite-willkommen) .navigation { display: none; }
 .neuigkeiten h2 { margin-top: 0.25rem; }
 .neuigkeiten ul { margin-top: 0.5rem; padding-left: 1.125rem; list-style: disc; }
 .neuigkeiten ul li + li { margin-top: 0.25rem; }
+
+/* ==========================================================================
+   Glut: Standard-Design. Dunkel und klar im Stil von iOS.
+   Systemgrau für Flächen, große fette Titel, schwebende Leiste mit Glas,
+   gruppierte Listen mit farbigen Symbolen. Akzent: Glut (tiefes Rotorange).
+   Weiße Schrift auf dem Akzent hat mindestens 4,5 : 1 Kontrast.
+   ========================================================================== */
+
+:root[data-thema='glut'] {
+  --schrift: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --papier: #f2f2f7;
+  --flaeche: #ffffff;
+  --flaeche-2: #e9e9ee;
+  --tinte: #1c1c1e;
+  --tinte-leise: #6c6c70;
+  --linie: #dcdce1;
+  --limette: #ff5a2c;
+  --limette-blass: #ffe2d8;
+  --blatt: #c2410c;
+  --akzent: #d63a15;
+  --auf-akzent: #ffffff;
+  --auf-limette: #ffffff;
+  --grapefruit: #ff2d55;
+  --zitrone: #f5a700;
+  --avocado: #007aff;
+  --heidelbeere: #28b14c;
+  --wasser: #32ade6;
+  --ueber: #a8290a;
+  --zettel: #fff3d6;
+  --warnung: #d70015;
+  --glas: rgb(249 249 251 / 0.78);
+  --glut-schein: rgb(255 90 44 / 0.10);
+  --schatten: 0 8px 28px rgb(0 0 0 / 0.14);
+  color-scheme: light;
+}
+
+:root[data-thema='glut'][data-modus='dunkel'] {
+  --papier: #000000;
+  --flaeche: #1c1c1e;
+  --flaeche-2: #2c2c2e;
+  --tinte: #f5f5f7;
+  --tinte-leise: #98989f;
+  --linie: #38383a;
+  --limette: #ff6a3d;
+  --limette-blass: rgb(255 106 61 / 0.18);
+  --blatt: #ff8a5c;
+  --grapefruit: #ff375f;
+  --zitrone: #ffcc00;
+  --avocado: #0a84ff;
+  --heidelbeere: #30d158;
+  --wasser: #64d2ff;
+  --ueber: #ffb08f;
+  --zettel: #2e2614;
+  --warnung: #ff6961;
+  --glas: rgb(30 30 32 / 0.72);
+  --glut-schein: rgb(255 90 44 / 0.16);
+  --schatten: 0 10px 30px rgb(0 0 0 / 0.6);
+  color-scheme: dark;
+}
+
+/* Schwacher Glutschein oben, bleibt beim Rollen stehen */
+:root[data-thema='glut'] body {
+  background:
+    radial-gradient(120% 60% at 100% -10%, var(--glut-schein), transparent 60%) fixed,
+    var(--papier);
+  letter-spacing: -0.006em;
+}
+:root[data-thema='glut'] h1 { font-size: 2.125rem; line-height: 1.12; font-weight: 750; letter-spacing: -0.028em; }
+:root[data-thema='glut'] h2 { font-weight: 680; letter-spacing: -0.015em; }
+
+/* Leiste: schwebende Kapsel aus Glas */
+:root[data-thema='glut'] .navigation {
+  left: max(0.75rem, var(--rand-left)); right: max(0.75rem, var(--rand-right));
+  bottom: calc(var(--rand-bottom) + 0.5rem);
+  max-width: 32rem; margin: 0 auto; padding: 0.25rem;
+  border: 1px solid rgb(127 127 127 / 0.16); border-radius: 999px;
+  background: var(--glas); box-shadow: var(--schatten);
+  -webkit-backdrop-filter: blur(22px) saturate(180%); backdrop-filter: blur(22px) saturate(180%);
+}
+:root[data-thema='glut'] .navigation a { height: calc(var(--leiste) - 0.5rem); border-radius: 999px; font-size: 0.6875rem; font-weight: 600; }
+:root[data-thema='glut'] .navigation .nav-bild { width: auto; height: 1.75rem; }
+:root[data-thema='glut'] .navigation a[aria-current='page'] { color: var(--blatt); background: var(--limette-blass); }
+:root[data-thema='glut'] .navigation a[aria-current='page'] .nav-bild { background: none; color: inherit; }
+:root[data-thema='glut'] .inhalt { padding-bottom: calc(var(--leiste) + var(--rand-bottom) + 2.5rem); }
+:root[data-thema='glut'] .hinweis-ort { bottom: calc(var(--leiste) + var(--rand-bottom) + 1.25rem); }
+:root[data-thema='glut'] body:has(.fab) .hinweis-ort { bottom: calc(var(--leiste) + var(--rand-bottom) + 6rem); }
+:root[data-thema='glut'] .fab { bottom: calc(var(--leiste) + var(--rand-bottom) + 1.25rem); box-shadow: 0 8px 26px rgb(214 58 21 / 0.45); }
+
+/* Segmentierte Auswahl wie bei iOS */
+:root[data-thema='glut'] .wahl { border-radius: 0.75rem; background: var(--flaeche-2); padding: 0.1875rem; }
+:root[data-thema='glut'] .wahl-knopf { border-radius: 0.5625rem; color: var(--tinte); font-weight: 560; }
+:root[data-thema='glut'] .wahl-knopf[aria-pressed='true'] { background: var(--flaeche); font-weight: 650; box-shadow: 0 2px 6px rgb(0 0 0 / 0.12); }
+:root[data-thema='glut'][data-modus='dunkel'] .wahl-knopf[aria-pressed='true'] { background: #636366; }
+
+/* Knöpfe, Chips, Felder: graue Flächen statt Rahmen */
+:root[data-thema='glut'] .knopf.leise, :root[data-thema='glut'] .chip { background: var(--flaeche-2); border-color: transparent; }
+:root[data-thema='glut'] .chip.schnell { background: var(--limette-blass); color: var(--blatt); }
+:root[data-thema='glut'] input:not([type='file']), :root[data-thema='glut'] select, :root[data-thema='glut'] textarea {
+  border-color: transparent; background: var(--flaeche);
+}
+:root[data-thema='glut'] input:focus-visible, :root[data-thema='glut'] select:focus-visible, :root[data-thema='glut'] textarea:focus-visible {
+  border-color: var(--limette); box-shadow: 0 0 0 3px var(--limette-blass);
+}
+:root[data-thema='glut'] .rund.plus { background: var(--limette-blass); color: var(--blatt); }
+:root[data-thema='glut'] .slot .rund.plus { background: transparent; border-color: var(--limette); color: var(--limette); }
+:root[data-thema='glut'] .textlink, :root[data-thema='glut'] .zurueck { text-decoration: none; }
+
+/* Blatt: erhöhte Fläche mit Griff oben, Inhalte eine Stufe heller */
+:root[data-thema='glut'] .blatt { background: var(--papier); border-radius: 1.75rem 1.75rem 0 0; }
+:root[data-thema='glut'][data-modus='dunkel'] .blatt { background: var(--flaeche); }
+:root[data-thema='glut'][data-modus='dunkel'] .blatt :is(.zeilen, .vorschau, input:not([type='file']), select, textarea) { background: var(--flaeche-2); }
+:root[data-thema='glut'] .blatt::before {
+  content: ''; display: block; flex: none; width: 2.25rem; height: 0.3125rem; margin: 0.5rem auto 0;
+  border-radius: 999px; background: var(--linie);
+}
+:root[data-thema='glut'] .blatt::backdrop { background: rgb(0 0 0 / 0.55); }
+
+/* Gruppierte Listen wie in den iOS-Einstellungen: farbige Symbole, Trennlinie ab dem Text */
+:root[data-thema='glut'] .menue-icon { width: 2rem; height: 2rem; border-radius: 0.5rem; background: var(--icon, var(--akzent)); color: #ffffff; }
+:root[data-thema='glut'] .menue-icon svg { width: 18px; height: 18px; }
+:root[data-thema='glut'] .menuepunkt { grid-template-columns: 2rem 1fr auto; min-height: 3.5rem; }
+:root[data-thema='glut'] .menue li + li { border-top: 0; position: relative; }
+:root[data-thema='glut'] .menue li + li::before { content: ''; position: absolute; top: 0; left: 3.625rem; right: 0; border-top: 1px solid var(--linie); }
+:root[data-thema='glut'] .menuegruppe-titel { font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; margin-left: 1rem; }
+:root[data-thema='glut'] .menue, :root[data-thema='glut'] .zeilen, :root[data-thema='glut'] .eintraege { border-radius: 1rem; }
+
+/* Fruchtflächen aus Zitrus in Glut neutral */
+:root[data-thema='glut'] .schritt, :root[data-thema='glut'] .prinzip { background: var(--flaeche); }
+:root[data-thema='glut'] .hinweis { background: var(--flaeche-2); color: var(--tinte); border: 1px solid rgb(127 127 127 / 0.16); }
+:root[data-thema='glut'] .hinweis-aktion { color: var(--blatt); }
+:root[data-thema='glut'][data-modus='hell'] .hinweis { background: #2c2c2e; color: #f5f5f7; border: 0; }
+:root[data-thema='glut'][data-modus='hell'] .hinweis-aktion { color: #ff8a5c; }

@@ -1,6 +1,6 @@
 // Ansicht "Mehr": Ziele je Tagestyp, Wochenplan, Backup, Darstellung, Speicher, Über die App.
 
-import { MODI, leseDarstellung, setzeDarstellung } from '../darstellung.js';
+import { MODI, THEMEN, leseDarstellung, leseThema, setzeDarstellung, setzeThema } from '../darstellung.js';
 import { backupDateiname, pruefeBackup } from '../logik/backup.js';
 import { coachBericht } from '../logik/coach.js';
 import { GESCHLECHTER } from '../logik/referenz.js';
@@ -20,23 +20,23 @@ let gewaehlterTyp = 'gym';
 /** Unterseiten von „Mehr“, in Gruppen. Das Häufigste steht oben. */
 const MENUE = [
   { gruppe: 'Ziele und Tagebuch', eintraege: [
-    { id: 'ziele', titel: 'Ziele je Tagestyp', text: 'Energie und Makros für Gym, Calisthenics, Rest', icon: 'ziel' },
-    { id: 'wochenplan', titel: 'Wochenplan', text: 'Welcher Wochentag welcher Tagestyp ist', icon: 'kalender' },
-    { id: 'mahlzeiten', titel: 'Anteile der Mahlzeiten', text: 'Wie sich das Tagesziel auf sechs Mahlzeiten verteilt', icon: 'scheibe' },
-    { id: 'referenz', titel: 'Referenzwerte', text: 'Geschlecht und Alter für den Vergleich mit der DGE', icon: 'waage' },
+    { id: 'ziele', farbe: '#ff3b30', titel: 'Ziele je Tagestyp', text: 'Energie und Makros für Gym, Calisthenics, Rest', icon: 'ziel' },
+    { id: 'wochenplan', farbe: '#ff9500', titel: 'Wochenplan', text: 'Welcher Wochentag welcher Tagestyp ist', icon: 'kalender' },
+    { id: 'mahlzeiten', farbe: '#ff2d55', titel: 'Anteile der Mahlzeiten', text: 'Wie sich das Tagesziel auf sechs Mahlzeiten verteilt', icon: 'scheibe' },
+    { id: 'referenz', farbe: '#5856d6', titel: 'Referenzwerte', text: 'Geschlecht und Alter für den Vergleich mit der DGE', icon: 'waage' },
   ] },
   { gruppe: 'Lebensmittel', eintraege: [
-    { id: 'zutaten', titel: 'Zutaten und Mag-Liste', text: 'Eigene Zutaten, Open Food Facts, Vorlieben', icon: 'zutaten', adresse: '#/zutaten' },
-    { id: 'angebote', titel: 'Angebote', text: 'Preise je Zutat und Markt', icon: 'preis', adresse: '#/angebote' },
+    { id: 'zutaten', farbe: '#34c759', titel: 'Zutaten und Mag-Liste', text: 'Eigene Zutaten, Open Food Facts, Vorlieben', icon: 'zutaten', adresse: '#/zutaten' },
+    { id: 'angebote', farbe: '#30b0c7', titel: 'Angebote', text: 'Preise je Zutat und Markt', icon: 'preis', adresse: '#/angebote' },
   ] },
   { gruppe: 'Daten', eintraege: [
-    { id: 'backup', titel: 'Backup', text: 'Alle Daten als Datei sichern und einspielen', icon: 'sicherung' },
-    { id: 'coach', titel: 'Coach-Export', text: 'Wochenbericht als Text für einen Chat', icon: 'bericht' },
+    { id: 'backup', farbe: '#007aff', titel: 'Backup', text: 'Alle Daten als Datei sichern und einspielen', icon: 'sicherung' },
+    { id: 'coach', farbe: '#af52de', titel: 'Coach-Export', text: 'Wochenbericht als Text für einen Chat', icon: 'bericht' },
   ] },
   { gruppe: 'App', eintraege: [
-    { id: 'darstellung', titel: 'Darstellung', text: 'Hell, dunkel oder wie das Handy', icon: 'darstellung' },
-    { id: 'ueber', titel: 'Über Elan', text: 'Alle Funktionen in Kürze, Datenschutz, Quellen', icon: 'info' },
-    { id: 'neu', titel: 'Was ist neu', text: 'Patchnotes', icon: 'neu' },
+    { id: 'darstellung', farbe: '#8e8e93', titel: 'Darstellung', text: 'Glut oder Zitrus, dunkel oder hell', icon: 'darstellung' },
+    { id: 'ueber', farbe: '#007aff', titel: 'Über Elan', text: 'Alle Funktionen in Kürze, Datenschutz, Quellen', icon: 'info' },
+    { id: 'neu', farbe: '#ff9500', titel: 'Was ist neu', text: 'Patchnotes', icon: 'neu' },
   ] },
 ];
 
@@ -88,7 +88,7 @@ function zeigeMenue(wurzel) {
       el('h2', { class: 'menuegruppe-titel' }, g.gruppe),
       el('ul', { class: 'menue' }, g.eintraege.map((e) => el('li', {},
         el('a', { class: 'menuepunkt', href: e.adresse ?? `#/mehr/${e.id}` },
-          el('span', { class: 'menue-icon' }, menueIcon(e.icon)),
+          el('span', { class: 'menue-icon', style: `--icon:${e.farbe}` }, menueIcon(e.icon)),
           el('span', { class: 'menue-text' }, e.titel, el('small', {}, e.text)),
           icon('vor', 18))))))),
     el('p', { class: 'klein fusszeile' }, `${APP_NAME} ${APP_VERSION}`));
@@ -345,13 +345,17 @@ function coachBereich() {
 /* ---------- Darstellung, Speicher, Über ---------- */
 
 function darstellungBereich() {
-  const aktuell = leseDarstellung();
+  const wahl = (titel, liste, aktuell, setze) => el('div', { class: 'stapel' },
+    el('h3', { class: 'zwischentitel' }, titel),
+    el('div', { class: 'wahl', role: 'group', 'aria-label': titel }, liste.map((m) => el('button', {
+      type: 'button', class: 'wahl-knopf', 'aria-pressed': String(m.id === aktuell),
+      onclick: () => { setze(m.id); neuZeichnen(); },
+    }, m.name))));
   return el('section', { class: 'bereich' },
     el('h2', {}, 'Darstellung'),
-    el('div', { class: 'wahl', role: 'group', 'aria-label': 'Darstellung' }, MODI.map((m) => el('button', {
-      type: 'button', class: 'wahl-knopf', 'aria-pressed': String(m.id === aktuell),
-      onclick: () => { setzeDarstellung(m.id); neuZeichnen(); },
-    }, m.name))));
+    wahl('Design', THEMEN, leseThema(), setzeThema),
+    el('p', { class: 'klein' }, 'Glut: dunkel und klar, mit Ringen je Nährwert. Zitrus: das ursprüngliche helle Design mit Fruchtfarben.'),
+    wahl('Hell oder dunkel', MODI, leseDarstellung(), setzeDarstellung));
 }
 
 function speicherBereich(status) {

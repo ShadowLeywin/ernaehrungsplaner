@@ -62,3 +62,8 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | Informationsarchitektur | Wie Inhalte und Einstellungen gegliedert und auffindbar sind. | `MENUE` in `js/ansichten/mehr.js` |
 | Patchnotes | Die Liste der Änderungen einer App, neueste zuerst. | `js/daten/neuigkeiten.js` |
 | GitHub-Secret | Ein geheimer Wert, den ein Workflow lesen kann, der aber nie im Repo steht. | `.github/workflows/apk.yml` |
+| Design-Token | Eine benannte Variable für Farbe, Abstand oder Schrift, aus der alle Regeln schöpfen. | `:root` und `:root[data-thema='glut']` in `css/app.css` |
+| `backdrop-filter` | Verwischt, was hinter einem Element liegt; ergibt den Glaseffekt. | `.navigation` im Glut-Teil von `css/app.css` |
+| `pathLength` | Gibt einem SVG-Pfad eine gedachte Länge, hier 100, damit der Ring direkt in Prozent gefüllt wird. | `ring()` in `js/ansichten/heute.js` |
+| Weiches Trennzeichen | Unsichtbares Zeichen `\u00AD`, an dem ein Wort bei Platzmangel mit Strich umbricht. | `KACHEL_NAME` in `js/ansichten/heute.js` |
+| Layout-Viewport | Die Breite, mit der der Handy-Browser die Seite anlegt; ist die Seite breiter, zoomt er heraus. | Seitenkopf in `css/app.css` |

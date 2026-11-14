@@ -9,7 +9,8 @@ const WURZEL = path.resolve(__dirname, '..');
 const ZIEL = path.join(WURZEL, 'icons');
 const RES = path.join(WURZEL, 'android/app/src/main/res');
 const GRUEN = '#1c7445';
-const PAPIER = '#f5f9ec';
+// Startbild auf dem Grund von Glut dunkel (Standard), damit beim Öffnen nichts hell aufblitzt
+const PAPIER = '#000000';
 
 /** form: 'eckig' (gerundetes Quadrat), 'rund' (Kreis), 'randlos' (Fläche bis zum Rand), 'frei' (ohne Fläche) */
 async function svgText(form) {
@@ -63,7 +64,7 @@ const groesse = (svg, px) => svg.replace('<svg ', `<svg width="${px}" height="${
       // Adaptives Icon: Vordergrund 108 dp, das System legt die grüne Fläche dahinter und schneidet zu
       await zeichne(seite, groesse(frei, 108 * faktor), 108 * faktor, 108 * faktor, path.join(ordner, 'ic_launcher_foreground.png'));
     }
-    // Startbilder: helle Fläche, Icon in der Mitte; Größen wie von Capacitor angelegt
+    // Startbilder: dunkle Fläche, Icon in der Mitte; Größen wie von Capacitor angelegt
     const startbilder = fs.readdirSync(RES).filter((o) => o.startsWith('drawable')).map((o) => path.join(RES, o, 'splash.png')).filter((f) => fs.existsSync(f));
     for (const datei of startbilder) {
       const { breite, hoehe } = await seite.evaluate(async (daten) => {

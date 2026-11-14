@@ -22,8 +22,10 @@ Elan ist eine Ernährungs- und Health-App als Android-App und PWA aus demselben 
 - Beim ersten Start führt eine kurze Einrichtung in drei Schritten zum ersten Eintrag.
 - Eintragen braucht möglichst wenige Tipps: Zuletzt Gegessenes mit einem Tipp und der Menge vom letzten Mal; Wasser direkt auf „Heute“.
 - Fünf Seiten seit 0.6: Heute, Woche, Rezepte, Health, Mehr. Zutaten und Mag-Liste sind über „Rezepte“ und „Mehr“ erreichbar; man braucht sie selten direkt, weil die Suche beim Eintragen alles findet.
+- Zwei Designs: **Glut** (Standard, dunkel, im Stil von iOS: große Titel, gruppierte Listen mit farbigen Symbolen, schwebende Leiste mit Glas, Ringe je Nährwert) und **Zitrus** (das erste, helle Design). Beide in hell und dunkel.
+- „Heute“: Kalorien-Karte mit Tagesscheibe, sechs Kacheln (Eiweiß, Kohlenhydrate, Fett, Ballaststoffe, Wasser zum Antippen, alle Nährwerte), eine Karte mit allen Mahlzeiten, Plus-Knopf für die Mahlzeit zur Uhrzeit.
 - Signatur der App ist die **Tagesscheibe**: sechs Segmente wie eine aufgeschnittene Zitrusfrucht, eines je Mahlzeit. Breite = Anteil am Tagesziel, Füllung = gegessen.
-- Fruchtfarben je Makro: Eiweiß Grapefruit, Kohlenhydrate Zitrone, Fett Avocado, Ballaststoffe Heidelbeere.
+- Farben je Makro: in Zitrus Fruchtfarben (Eiweiß Grapefruit, Kohlenhydrate Zitrone, Fett Avocado, Ballaststoffe Heidelbeere), in Glut die Systemfarben von iOS (Eiweiß Pink, Kohlenhydrate Gelb, Fett Blau, Ballaststoffe Grün, Wasser Cyan).
 - Über dem Ziel liegen ist kein Fehler: kein Rot, nur ein dunkleres Grün.
 
 ## Technik-Empfehlung
@@ -36,7 +38,7 @@ Elan ist eine Ernährungs- und Health-App als Android-App und PWA aus demselben 
 | Hosting | GitHub Pages | kostenlos, HTTPS, aus dem Repo | Cloudflare Pages oder Netlify: gleiche Leistung, zusätzliches Konto |
 | Android-App | Capacitor 8 | packt die vorhandene Web-App, keine zweite Codebasis, native Plugins für Teilen und Dateien | Trusted Web Activity: kleiner, braucht aber eine Datei auf der Domain-Wurzel, die GitHub Pages für dieses Repo nicht liefert |
 | Offline | Service Worker, Cache zuerst, Dateiliste von Hand | alle Dateien einer Version passen zusammen | Workbox: erzeugt die Liste automatisch, braucht Build |
-| Schrift | Bricolage Grotesque, selbst gehostet (OFL) | kein Abruf bei Dritten, offline da | Systemschrift: 41 KB weniger, weniger Charakter |
+| Schrift | Inter (Glut) und Bricolage Grotesque (Zitrus), selbst gehostet (OFL) | kein Abruf bei Dritten, offline da; Inter kommt der Apple-Schrift am nächsten | SF Pro: darf nur für Apple-Plattformen genutzt werden; Systemschrift: auf Android Roboto, kein einheitlicher Look |
 
 ## Datenschutz
 
@@ -52,6 +54,8 @@ Elan ist eine Ernährungs- und Health-App als Android-App und PWA aus demselben 
 | Kurze Einrichtung, schnell zum ersten Eintrag | Ratgeber zu Onboarding von Ernährungs-Apps | drei Schritte, überspringbar, Backup einspielen gleich am Anfang |
 | Viele Einstellungen in Gruppen und Unterseiten, Wichtiges zuerst | Android-Designrichtlinien zu Einstellungen | Menü „Mehr“ mit vier Gruppen |
 | Navigationsleiste mit drei bis fünf Zielen | Android-Richtlinien zu Navigation | fünf Ziele: Heute, Woche, Rezepte, Health, Mehr |
+| Dunkles Design mit Ring-Kacheln, Mahlzeiten-Karte, rundem Plus-Knopf | Bildschirmfotos einer Fitness-App von Léon (14.11.2026) | Glut: Aufbau und Stimmung übernommen, Farben, Schrift und Symbole eigen |
+| Apple-Stil: große Titel, gruppierte Listen, farbige Symbole, Leiste aus Glas, Ringe | Léons Wunsch „allgemein der Apple-Style“ | Glut, mit Inter statt SF Pro |
 
 ## Annahmen [A]
 
@@ -63,4 +67,5 @@ Elan ist eine Ernährungs- und Health-App als Android-App und PWA aus demselben 
 - [MacroFactor vs Cronometer](https://macrofactor.com/macrofactor-vs-cronometer/) (Herstellerangabe), [Fitia: was einen Kalorienzähler einfach macht](https://fitia.app/learn/article/what-makes-calorie-counter-simple-easy-app-2026/), [Android: Einstellungen](https://developer.android.com/design/ui/mobile/guides/patterns/settings), [Android: Layout- und Navigationsmuster](https://developer.android.google.cn/design/ui/mobile/guides/layout-and-content/layout-and-nav-patterns?hl=en), abgerufen 14.11.2026.
 
 - Startauftrag „Session 0“ von Léon, 13.11.2026.
+- Lizenz der Schrift Inter: `schrift/LIZENZ-OFL-INTER.txt` (SIL Open Font License 1.1), Paket `@fontsource-variable/inter` 5.3.0, abgerufen 14.11.2026. Lizenz von SF Pro nur für Apple-Plattformen: [Apple Developer Forums](https://developer.apple.com/forums/thread/733267), abgerufen 14.11.2026.
 - Lizenz der Schrift: `schrift/LIZENZ-OFL.txt` (SIL Open Font License 1.1), Paket `@fontsource-variable/bricolage-grotesque` 5.3.0, abgerufen 13.11.2026.

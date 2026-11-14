@@ -5,6 +5,20 @@ export const NEUIGKEITEN = [
   {
     version: '1.0.0',
     datum: '2026-11-14',
+    titel: 'Neues Design: Glut',
+    punkte: [
+      'Neues Standard-Design „Glut“: dunkel, klar, im Stil von iOS, mit Akzent in Glutrot.',
+      '„Heute“ neu geordnet: große Kalorien-Karte mit Tagesscheibe, darunter je ein Ring für Eiweiß, Kohlenhydrate, Fett, Ballaststoffe und Wasser.',
+      'Wasser mit einem Tipp auf den Ring zählen, mit „Rückgängig“.',
+      'Alle Mahlzeiten in einer Karte, jede mit eigenem Symbol.',
+      'Runder Plus-Knopf unten rechts: trägt in die Mahlzeit ein, die zur Uhrzeit passt.',
+      'Schwebende Leiste mit Glaseffekt, Einstellungen mit farbigen Symbolen wie auf dem iPhone.',
+      'Das helle Zitrus-Design gibt es weiter unter Mehr → Darstellung.',
+    ],
+  },
+  {
+    version: '1.0.0',
+    datum: '2026-11-14',
     titel: 'Aufgeräumt und schneller',
     punkte: [
       '„Mehr“ ist jetzt ein Menü mit Unterseiten statt einer langen Liste.',
