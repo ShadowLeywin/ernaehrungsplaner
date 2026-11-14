@@ -20,6 +20,11 @@ export const MIGRATIONEN = [
   (db) => {
     db.createObjectStore('rezepte', { keyPath: 'id' });
   },
+  // Version 3: Wochenplan und Einkaufsliste
+  (db) => {
+    db.createObjectStore('plan', { keyPath: 'id' }).createIndex('datum', 'datum');
+    db.createObjectStore('einkauf', { keyPath: 'id' }).createIndex('woche', 'woche');
+  },
 ];
 
 let offen;

@@ -104,7 +104,7 @@ h2 { font-size: 1.1875rem; line-height: 1.25; font-weight: 680; letter-spacing: 
   font-size: 0.8125rem; font-weight: 560; text-decoration: none; color: var(--tinte-leise);
 }
 .navigation .nav-bild {
-  display: grid; place-items: center; width: 3.5rem; height: 1.875rem; border-radius: 999px;
+  display: grid; place-items: center; width: 3.25rem; height: 1.875rem; border-radius: 999px;
 }
 .navigation a[aria-current='page'] { color: var(--tinte); font-weight: 700; }
 .navigation a[aria-current='page'] .nav-bild { background: var(--limette); color: #14241a; }
@@ -274,6 +274,22 @@ input[type='date'] { appearance: none; -webkit-appearance: none; }
 .naehrwerte .unterzeile td { color: var(--tinte-leise); }
 .aufklappen summary { min-height: 2.75rem; display: flex; align-items: center; font-weight: 620; color: var(--blatt); cursor: pointer; }
 
+/* ---------- Woche und Einkaufsliste ---------- */
+
+.knopfreihe.mitte { justify-content: center; }
+.marke { margin-left: 0.5rem; padding: 0.0625rem 0.5rem; border-radius: 999px; background: var(--limette); color: #14241a; font-size: 0.75rem; font-weight: 700; vertical-align: middle; }
+.eintrag.erledigt { color: var(--tinte-leise); }
+.eintrag.erledigt .eintrag-kcal { font-weight: 500; }
+.geplant > * + * { margin-top: 0.5rem; }
+
+.haken { display: flex; align-items: center; gap: 0.5rem; min-height: 3.25rem; padding: 0 0.5rem 0 0.875rem; }
+.haken label { flex: 1; min-width: 0; display: flex; align-items: center; gap: 0.75rem; min-height: 3.25rem; cursor: pointer; }
+.haken input[type='checkbox'] { flex: none; width: 1.5rem; min-height: 0; height: 1.5rem; padding: 0; accent-color: var(--blatt); }
+.haken.erledigt .zeile-name, .haken.erledigt .zeile-wert { color: var(--tinte-leise); text-decoration: line-through; }
+.haken .zeile-wert { padding-right: 0.375rem; text-align: right; }
+.zusatz { display: flex; gap: 0.5rem; margin-top: 1.25rem !important; }
+.zusatz input { flex: 1; min-width: 0; }
+
 /* ---------- Rezepte ---------- */
 
 .knopfreihe.links { justify-content: flex-start; }
@@ -334,7 +350,7 @@ input[type='date'] { appearance: none; -webkit-appearance: none; }
   display: flex; align-items: center; gap: 1rem; max-width: 32rem; padding: 0.75rem 1rem;
   border-radius: 0.875rem; background: var(--tinte); color: var(--papier); box-shadow: var(--schatten); pointer-events: auto;
 }
-.hinweis-aktion { background: none; border: 0; padding: 0.25rem; color: var(--limette); font-weight: 700; white-space: nowrap; }
+.hinweis-aktion { background: none; border: 0; min-height: 2.5rem; margin: -0.5rem -0.5rem -0.5rem 0; padding: 0 0.5rem; color: var(--limette); font-weight: 700; white-space: nowrap; }
 :root[data-modus='dunkel'] .hinweis-aktion { color: #2c6b12; }
 
 @media (prefers-reduced-motion: reduce) {

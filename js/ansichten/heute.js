@@ -4,6 +4,7 @@ import { formatKurz, formatLang, isoDatum, istGueltig, relativ, verschiebe } fro
 import { MAKROS, NAEHRSTOFFE, fuerMenge, luecken, summeEintraege } from '../logik/naehrwerte.js';
 import { fuellRadius, segmente, sektorPfad } from '../logik/scheibe.js';
 import { APP_NAME } from '../logik/schema.js';
+import { alsEintraege } from '../logik/plan.js';
 import { kopiereEintraege, wochenSchnitt, wochenTage } from '../logik/woche.js';
 import { TAGESTYPEN, fortschritt, tagestypFuer } from '../logik/ziele.js';
 import { gehe, neuZeichnen } from '../router.js';
@@ -21,9 +22,9 @@ export async function zeigeHeute(wurzel, [parameter]) {
   const heute = isoDatum();
   const datum = istGueltig(parameter) ? parameter : heute;
   const woche = wochenTage(datum);
-  const [eintraege, ziele, wochenplan, tag, slots, wochenEintraege, vortag] = await Promise.all([
+  const [eintraege, ziele, wochenplan, tag, slots, wochenEintraege, vortag, plan] = await Promise.all([
     speicher.eintraegeAm(datum), speicher.ladeZiele(), speicher.ladeWoche(), speicher.holeTag(datum), speicher.ladeSlots(),
-    speicher.eintraegeZwischen(woche[0], woche[6]), speicher.eintraegeAm(verschiebe(datum, -1)),
+    speicher.eintraegeZwischen(woche[0], woche[6]), speicher.eintraegeAm(verschiebe(datum, -1)), speicher.planAm(datum),
   ]);
   const lautPlan = tagestypFuer(datum, wochenplan, null);
   const typ = tagestypFuer(datum, wochenplan, tag);
@@ -36,9 +37,10 @@ export async function zeigeHeute(wurzel, [parameter]) {
   haenge(wurzel,
     kopf(datum, heute),
     tagestypWahl(datum, typ, lautPlan),
+    geplantHinweis(plan.filter((p) => !p.uebernommen), datum),
     uebersicht(ist, ziel, slots, kcalJeSlot),
     alleNaehrwerte(eintraege, wochenEintraege, woche),
-    eintraege.length === 0 ? el('p', { class: 'leer' }, 'Noch nichts eingetragen. Tippe bei einer Mahlzeit auf das Plus.') : null,
+    eintraege.length === 0 && !plan.some((p) => !p.uebernommen) ? el('p', { class: 'leer' }, 'Noch nichts eingetragen. Tippe bei einer Mahlzeit auf das Plus.') : null,
     el('div', { class: 'slots' }, slots.map((slot) => slotBereich({
       slot, datum, eintraege: imSlot(eintraege, slot), vortag: imSlot(vortag, slot), kcal: kcalJeSlot[slot.id], zielKcal: ziel.kcal * slot.anteil,
     }))),
@@ -67,6 +69,24 @@ function tagestypWahl(datum, typ, lautPlan) {
     TAGESTYPEN.map((t) => el('button', {
       type: 'button', class: 'wahl-knopf', 'aria-pressed': String(t.id === typ), onclick: () => waehle(t.id),
     }, t.name)));
+}
+
+/** Steht für diesen Tag etwas im Wochenplan, das noch nicht im Tagebuch ist? Dann ein Tipp zum Übernehmen. */
+function geplantHinweis(offen, datum) {
+  if (!offen.length) return null;
+  const uebernehmen = async () => {
+    for (const p of offen) {
+      await speicher.speichereEintrag(alsEintraege([p])[0]);
+      await speicher.speicherePlan({ ...p, uebernommen: true });
+    }
+    hinweis('Aus dem Wochenplan übernommen.');
+    neuZeichnen();
+  };
+  return el('div', { class: 'merkzettel geplant' },
+    el('p', {}, `Im Wochenplan ${offen.length === 1 ? 'steht 1 Mahlzeit' : `stehen ${offen.length} Mahlzeiten`} mit ${zahl(summeEintraege(offen).kcal ?? 0)} kcal.`),
+    el('div', { class: 'knopfreihe' },
+      el('a', { class: 'knopf leise klein', href: `#/woche/${datum}` }, 'Plan ansehen'),
+      el('button', { type: 'button', class: 'knopf klein', onclick: uebernehmen }, 'Übernehmen')));
 }
 
 /* ---------- Übersicht: Tagesscheibe und Makros ---------- */

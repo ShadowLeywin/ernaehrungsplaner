@@ -13,6 +13,8 @@ const URL_APP = `http://127.0.0.1:${PORT}/`;
 const BILDER = process.env.BILDER;
 const OFF_BEISPIEL = fs.readFileSync(path.resolve(__dirname, '..', 'test', 'daten', 'off-suche.json'), 'utf8');
 
+let SCHEMA_VERSION; // wird beim Start aus js/logik/schema.js gelesen, damit der Test nicht bei jeder Schemaänderung angepasst werden muss
+
 const ergebnisse = [];
 const pruefe = (kriterium, ok, beleg = '') => { ergebnisse.push({ kriterium, ok: Boolean(ok), beleg: String(beleg) }); };
 const bild = async (seite, name, ganz = true) => { if (BILDER) await seite.screenshot({ path: path.join(BILDER, `${name}.png`), fullPage: ganz }); };
@@ -162,7 +164,7 @@ async function hauptlauf(browser) {
   const datei = path.join(os.tmpdir(), `elan-test-${Date.now()}.json`);
   await download.saveAs(datei);
   const backup = JSON.parse(fs.readFileSync(datei, 'utf8'));
-  pruefe('Backup speichern', backup.app === 'elan' && backup.schemaVersion === 2 && Array.isArray(backup.daten.rezepte) && backup.daten.eintraege.length === 4 && backup.daten.zutaten.length === 2,
+  pruefe('Backup speichern', backup.app === 'elan' && backup.schemaVersion === SCHEMA_VERSION && Array.isArray(backup.daten.rezepte) && backup.daten.eintraege.length === 4 && backup.daten.zutaten.length === 2,
     `${download.suggestedFilename()}: ${backup.daten.eintraege.length} Einträge, ${backup.daten.zutaten.length} Zutaten, ${backup.daten.einstellungen.length} Einstellungen`);
 
   await seite.goto(`${URL_APP}#/heute`);
@@ -405,6 +407,115 @@ async function rezeptLauf(browser) {
   await kontext.close();
 }
 
+async function wochenLauf(browser) {
+  const { kontext, seite, fehler } = await neueSeite(browser, { permissions: ['clipboard-read', 'clipboard-write'] });
+  await seite.goto(`${URL_APP}#/woche`, { waitUntil: 'networkidle' });
+  await seite.locator('h1', { hasText: 'Diese Woche' }).waitFor();
+  pruefe('Woche: sieben Tage, leerer Plan lädt zum Planen ein', (await seite.locator('.plantag').count()) === 7 && (await seite.locator('.leer').count()) === 1, `${await seite.locator('.tagestitel p').innerText()}; ${await seite.locator('.plantag.heute h2').innerText()}`);
+
+  // Ein Rezept direkt in die Datenbank legen (das Formular ist im Rezept-Lauf geprüft)
+  await seite.evaluate(() => new Promise((ok, nein) => {
+    const a = indexedDB.open('elan');
+    a.onsuccess = () => {
+      const t = a.result.transaction('rezepte', 'readwrite');
+      t.objectStore('rezepte').put({
+        id: 'test-eintopf', name: 'Testeintopf', portionen: 4, schritte: [],
+        zutaten: [
+          { zutatId: 'basis:kidneybohnen', name: 'Testbohnen', marke: '', gramm: 800, je100: { kcal: 100, protein: 7, kh: 12, fett: 0.5 } },
+          { zutatId: 'basis:apfel', name: 'Apfel', marke: '', gramm: 400, je100: { kcal: 52, protein: 0.3, kh: 11.4, fett: 0.2 } },
+        ],
+      });
+      t.oncomplete = () => { a.result.close(); ok(); };
+      t.onerror = () => nein(t.error);
+    };
+  }));
+
+  const plane = async (tagIndex, begriff, chip, gramm) => {
+    await seite.locator('.plantag').nth(tagIndex).locator('.plus').click();
+    await seite.locator('dialog input[type=search]').fill(begriff);
+    await seite.locator('dialog .zeilen .zeile').first().click();
+    if (chip) await seite.getByRole('button', { name: chip }).click();
+    else await seite.locator('#f-gramm').fill(String(gramm));
+    await seite.getByRole('button', { name: 'Einplanen', exact: true }).click();
+    await seite.locator('dialog').waitFor({ state: 'detached' });
+  };
+  const heuteIndex = await seite.locator('.plantag').evaluateAll((tage) => tage.findIndex((t) => t.classList.contains('heute')));
+  const andererTag = heuteIndex === 0 ? 1 : 0;
+  await plane(heuteIndex, 'testeintopf', /^1 Portion/);
+  await plane(heuteIndex, 'apfel', null, 340);
+  await plane(andererTag, 'testeintopf', /^1 Portion/);
+  await plane(andererTag, 'apfel', null, 170);
+  const tagHeute = seite.locator('.plantag.heute');
+  const slotsGeplant = await tagHeute.locator('.eintrag small').allInnerTexts();
+  pruefe('Mahlzeiten einplanen, der nächste freie Slot wird vorgeschlagen', (await seite.locator('.plantag .eintrag').count()) === 4 && slotsGeplant.join() === 'Frühstück,Morgensnack',
+    `${await tagHeute.locator('.slot-stand').innerText()}; Slots: ${slotsGeplant.join(', ')}`);
+  await bild(seite, '11-woche');
+
+  await seite.getByRole('link', { name: 'Einkaufsliste' }).click();
+  await seite.locator('.haken').first().waitFor();
+  const posten = await seite.locator('.haken').evaluateAll((z) => z.map((x) => x.innerText.replace(/\n+/g, ' | ')));
+  const apfel = posten.find((x) => x.startsWith('Apfel')) ?? '';
+  const bohnen = posten.find((x) => x.startsWith('Testbohnen')) ?? '';
+  // 2 Portionen von 4 = halbes Rezept: 400 g Bohnen, 200 g Apfel; dazu 340 g + 170 g Apfel direkt = 710 g
+  pruefe('Einkaufsliste: Rezepte aufgelöst, gleiche Zutaten summiert, nach Kategorie', posten.length === 2 && apfel.includes('710 g') && apfel.includes('5 Stück') && bohnen.includes('400 g'),
+    `${posten.join(' ; ')} unter ${(await seite.locator('.seite h2').allInnerTexts()).join(', ')}`);
+
+  await seite.locator('.haken input').first().check();
+  await seite.locator('#f-eigener-posten').fill('Spülmittel');
+  await seite.getByRole('button', { name: 'Dazu' }).click();
+  await seite.locator('.haken', { hasText: 'Spülmittel' }).waitFor();
+  await seite.reload({ waitUntil: 'networkidle' });
+  await seite.locator('.haken').first().waitFor();
+  const stand = await seite.locator('#einkauf-stand').innerText();
+  pruefe('Häkchen und eigene Posten überleben ein Neuladen', stand === '1 von 3 erledigt' && (await seite.locator('.haken.erledigt').count()) === 1, stand);
+  await bild(seite, '12-einkauf');
+
+  // Im Emulator gibt es kein "Teilen"-Menü; dort wird kopiert. Am Handy öffnet sich das Menü des Systems.
+  await seite.evaluate(() => { if (navigator.share) Object.defineProperty(navigator, 'share', { value: undefined }); });
+  await seite.getByRole('button', { name: 'Offene Posten teilen' }).click();
+  await seite.locator('.hinweis', { hasText: 'Liste kopiert' }).waitFor();
+  const kopie = await seite.evaluate(() => navigator.clipboard.readText());
+  pruefe('Offene Posten als Text', kopie.startsWith('Einkauf ') && kopie.includes('- Spülmittel') && kopie.split('\n').length === 3, kopie.replace(/\n/g, ' / '));
+
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.locator('.geplant').waitFor();
+  const merk = await seite.locator('.geplant p').innerText();
+  await seite.locator('.geplant').getByRole('button', { name: 'Übernehmen' }).click();
+  await seite.locator('.eintrag').first().waitFor();
+  const imTagebuch = await seite.locator('.eintrag').count();
+  await seite.goto(`${URL_APP}#/woche`);
+  await seite.locator('.plantag.heute .eintrag').first().waitFor();
+  const erledigt = await seite.locator('.plantag.heute .eintrag.erledigt').count();
+  const andere = seite.locator('.plantag').nth(andererTag);
+  await andere.getByRole('button', { name: 'Ins Tagebuch übernehmen' }).click();
+  await seite.locator('.hinweis', { hasText: 'ins Tagebuch übernommen' }).waitFor();
+  pruefe('Geplantes ins Tagebuch übernehmen (aus „Heute“ und aus der Woche)', imTagebuch === 2 && erledigt === 2 && (await seite.locator('.geplant').count()) === 0 && (await andere.locator('.eintrag.erledigt').count()) === 2,
+    `„${merk}“ → ${imTagebuch} Einträge heute, im Plan als erledigt markiert`);
+
+  await seite.locator('.plantag.heute .eintrag').first().click();
+  await seite.getByRole('button', { name: 'Löschen' }).click();
+  await seite.locator('.hinweis', { hasText: 'Aus dem Plan entfernt' }).waitFor();
+  await seite.getByRole('link', { name: 'Eine Woche weiter' }).click();
+  await seite.locator('h1', { hasText: 'Nächste Woche' }).waitFor();
+  pruefe('Plan-Posten entfernen, Woche wechseln', (await seite.locator('.plantag .eintrag').count()) === 0, `${await seite.locator('h1').innerText()}: ${await seite.locator('.tagestitel p').innerText()}`);
+
+  const unsinn = [];
+  const mass = [];
+  for (const [route, warteAuf] of [['woche', '.plantag'], ['woche/' + (await seite.evaluate(() => new Date().toISOString().slice(0, 10))) + '/einkauf', '.zusatz']]) {
+    await seite.goto(`${URL_APP}#/${route}`);
+    await seite.locator(warteAuf).first().waitFor();
+    const b = await seite.evaluate(() => ({ inhalt: document.documentElement.scrollWidth, fenster: window.innerWidth }));
+    mass.push(`${route.replace(/\d{4}-\d\d-\d\d/, '…')} ${b.inhalt}/${b.fenster}`);
+    if (b.inhalt > b.fenster) unsinn.push(`${route} zu breit`);
+    if (/\b(null|undefined|NaN)\b/.test(await seite.locator('body').innerText())) unsinn.push(`${route}: null/undefined/NaN im Text`);
+    const klein = await seite.evaluate(() => [...document.querySelectorAll('button, a, select, input:not([type=checkbox])')].filter((e) => e.offsetParent).map((e) => Math.round(e.getBoundingClientRect().height)).filter((h) => h < 40).length);
+    if (klein) unsinn.push(`${route}: ${klein} Tippflächen unter 40 px`);
+  }
+  pruefe('Woche und Einkauf: Breite, Text und Tippflächen', unsinn.length === 0, unsinn.join(' | ') || mass.join(', '));
+  pruefe('Wochen-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
+  await kontext.close();
+}
+
 async function migrationsLauf(browser) {
   const { kontext, seite, fehler } = await neueSeite(browser);
   // Datenbank im Aufbau von Schema-Version 1 anlegen, bevor die App sie öffnet (Seite ohne App-Code, gleiche Herkunft)
@@ -436,7 +547,7 @@ async function migrationsLauf(browser) {
     const speicher = await new Promise((ok) => { const a = indexedDB.open('elan'); a.onsuccess = () => { const n = [...a.result.objectStoreNames]; a.result.close(); ok(n); }; });
     return { version: info.version, speicher };
   });
-  pruefe('Migration: Datenbank aus Version 1 wird angehoben, Einträge bleiben', stand.version === 2 && stand.speicher.includes('rezepte') && (await seite.locator('.eintrag').count()) === 1,
+  pruefe('Migration: Datenbank aus Version 1 wird angehoben, Einträge bleiben', stand.version === SCHEMA_VERSION && stand.speicher.includes('rezepte') && stand.speicher.includes('plan') && (await seite.locator('.eintrag').count()) === 1,
     `Version ${stand.version}, Speicher ${stand.speicher.join(', ')}, alter Eintrag: ${(await seite.locator('.eintrag').innerText()).replace(/\n/g, ' | ')}`);
 
   await seite.goto(`${URL_APP}#/mehr`);
@@ -455,12 +566,14 @@ async function migrationsLauf(browser) {
 
 (async () => {
   if (BILDER) fs.mkdirSync(BILDER, { recursive: true });
+  ({ SCHEMA_VERSION } = await import('../js/logik/schema.js'));
   const server = await starte(PORT);
   const browser = await chromium.launch();
   let abbruch = null;
   try {
     await hauptlauf(browser);
     await rezeptLauf(browser);
+    await wochenLauf(browser);
     await migrationsLauf(browser);
     await offlineLauf(browser);
     await dunkelLauf(browser);

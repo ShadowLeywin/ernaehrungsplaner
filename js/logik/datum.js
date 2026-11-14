@@ -36,6 +36,11 @@ export function formatLang(iso) {
   return new Intl.DateTimeFormat('de-DE', { weekday: 'long', day: 'numeric', month: 'long' }).format(ausIso(iso));
 }
 
+/** "13. November" */
+export function formatTag(iso) {
+  return new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'long' }).format(ausIso(iso));
+}
+
 /** "13.11.2026" */
 export function formatKurz(iso) {
   return new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(ausIso(iso));

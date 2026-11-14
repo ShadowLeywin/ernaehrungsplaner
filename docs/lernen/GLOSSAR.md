@@ -30,3 +30,7 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | Adapter | Eine kleine Funktion, die ein Ding so verpackt, dass anderer Code es wie etwas Bekanntes behandeln kann. | `rezeptAlsZutat()` in `js/logik/rezepte.js` |
 | `onupgradeneeded` | Das Ereignis, in dem die IndexedDB ihren Aufbau ändern darf; nur dort laufen Migrationen. | `oeffne()` in `js/db.js` |
 | Entität | Eine Art von Ding, das die App speichert, mit eigenem Speicher und Schlüssel. | Tabelle in `docs/DATENMODELL.md` |
+| Abgeleitete Daten | Werte, die sich jederzeit aus anderen berechnen lassen und deshalb nicht gespeichert werden. | `einkaufsliste()` in `js/logik/plan.js` |
+| Wettlauf (Race Condition) | Zwei Abläufe kommen sich in die Quere, weil ihre Reihenfolge nicht festliegt. | Kommentar bei `hake` in `js/ansichten/einkauf.js` |
+| Web Share API | Die Schnittstelle, mit der eine Webseite das „Teilen“-Menü des Handys öffnet. | `teilen` in `js/ansichten/einkauf.js` |
+| Bereichsabfrage | Alle Sätze holen, deren Indexwert zwischen zwei Grenzen liegt. | `imBereich()` in `js/db.js` |

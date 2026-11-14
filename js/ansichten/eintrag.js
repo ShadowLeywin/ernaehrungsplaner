@@ -39,26 +39,30 @@ function suchListe({ auswahl, zuletzt = [], beiWahl, beiNeu }) {
     liste);
 }
 
-/** Tagebuch: erst suchen und antippen, dann im selben Blatt die Menge. */
-export async function oeffneZutatWahl({ datum, slot, beiFertig }) {
+/**
+ * Erst suchen und antippen, dann im selben Blatt die Menge.
+ * ziel: 'tagebuch' trägt ein, 'plan' merkt für den Wochenplan vor.
+ */
+export async function oeffneZutatWahl({ datum, slot, beiFertig, ziel = 'tagebuch' }) {
+  const plan = ziel === 'plan';
   const [zutaten, rezepte, alleEintraege] = await Promise.all([speicher.alleZutaten(), speicher.alleRezepte(), speicher.alleEintraege()]);
   const auswahl = [...rezepte.map(rezeptAlsZutat).filter((r) => r.portionen.length), ...zutaten];
   const nachId = new Map(auswahl.map((z) => [z.id, z]));
   const zuletzt = zuletztVerwendet(alleEintraege).map((id) => nachId.get(id)).filter(Boolean);
 
   blatt({
-    titel: slotName(slot),
+    titel: plan ? 'Einplanen' : slotName(slot),
     inhalt: (b) => suchListe({
       auswahl,
       zuletzt,
       beiNeu: () => { b.schliessen(); gehe('/zutaten/neu'); },
       beiWahl: (zutat) => b.setze(zutat.name, mengenFormular({
-        name: zutat.name, je100: zutat.je100, portionen: zutat.portionen, slot, speichernText: 'Eintragen',
+        name: zutat.name, je100: zutat.je100, portionen: zutat.portionen, slot, speichernText: plan ? 'Einplanen' : 'Eintragen',
         gramm: zutat.istRezept ? zutat.portionen[0].gramm : undefined,
         beiSpeichern: async (wahl) => {
-          await speicher.speichereEintrag(neuerEintrag(zutat, datum, wahl));
+          await (plan ? speicher.speicherePlan : speicher.speichereEintrag)(neuerEintrag(zutat, datum, wahl));
           b.schliessen();
-          hinweis('Eingetragen.');
+          hinweis(plan ? 'Eingeplant.' : 'Eingetragen.');
           beiFertig();
         },
       })),
@@ -103,24 +107,27 @@ export function oeffneRezeptPortion({ rezept, beiFertig }) {
   });
 }
 
-/** Bestehenden Eintrag ändern oder löschen */
-export async function oeffneEintrag({ eintrag, beiFertig }) {
+/** Bestehenden Eintrag (oder Plan-Posten) ändern oder löschen */
+export async function oeffneEintrag({ eintrag, beiFertig, ziel = 'tagebuch' }) {
+  const plan = ziel === 'plan';
+  const speichere = plan ? speicher.speicherePlan : speicher.speichereEintrag;
+  const loesche = plan ? speicher.loeschePlan : speicher.loescheEintrag;
   const zutat = await speicher.holeZutat(eintrag.zutatId).catch(() => null);
   const b = blatt({
     titel: eintrag.name,
     inhalt: mengenFormular({
       name: eintrag.name, je100: eintrag.je100, portionen: zutat?.portionen, slot: eintrag.slot, gramm: eintrag.gramm, speichernText: 'Speichern',
       beiSpeichern: async ({ gramm: menge, slot }) => {
-        await speicher.speichereEintrag({ ...eintrag, gramm: menge, slot });
+        await speichere({ ...eintrag, gramm: menge, slot });
         b.schliessen();
         hinweis('Gespeichert.');
         beiFertig();
       },
       beiLoeschen: async () => {
-        await speicher.loescheEintrag(eintrag.id);
+        await loesche(eintrag.id);
         b.schliessen();
         beiFertig();
-        hinweis('Eintrag gelöscht.', { aktion: 'Rückgängig', beiAktion: async () => { await speicher.speichereEintrag(eintrag); beiFertig(); } });
+        hinweis(plan ? 'Aus dem Plan entfernt.' : 'Eintrag gelöscht.', { aktion: 'Rückgängig', beiAktion: async () => { await speichere(eintrag); beiFertig(); } });
       },
     }),
   });
