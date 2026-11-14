@@ -1,0 +1,11 @@
+{
+  "_hinweis": "Erfundene Beispieldatei im Format aus docs/ANGEBOTE-FORMAT.md.",
+  "schemaVersion": 1,
+  "angebote": [
+    { "zutat": "Apfel", "markt": "Testmarkt Nord", "preis": 1.99, "menge": "1 kg", "gueltigBis": "2099-12-31" },
+    { "zutat": "basis:banane", "markt": "Testmarkt Süd", "preis": 0.99, "menge": "1 kg" },
+    { "zutat": "Einhornfilet", "markt": "Testmarkt Nord", "preis": 9.99 },
+    { "zutat": "Apfel", "markt": "", "preis": 1.5 },
+    { "zutat": "Apfel", "markt": "Testmarkt Süd", "preis": "kostenlos" }
+  ]
+}

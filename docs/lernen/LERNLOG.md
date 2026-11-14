@@ -129,3 +129,14 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Lehre:** Grüne Tests prüfen nur, was man gefragt hat. Ausgaben lesen und sich fragen „kann das stimmen?“ findet die Fehler, an die man nicht gedacht hat.
 - **Fachbegriffe:** Parser, Heuristik, JSON-LD, Share Target, Wortgrenze, falsch-positiver Treffer.
 - **Zum Auftrag:** Geholfen hat die Regel „kein Scraping“: Sie hat die Grenze des Imports von Anfang an klar gemacht.
+
+## Session 6, Runde 1: Angebote ohne marktguru (14.11.2026)
+
+- **Was und warum:** Angebote je Zutat und Markt, von Hand oder aus einer selbst gepflegten Datei. Das günstigste aktuelle steht in der Einkaufsliste. Vorher: Aufgabenliste für Léon angelegt, weil das Sitzungslimit für mich nicht sichtbar ist.
+- **Befehle:** `sed -i 's/^function findeZutat/export function findeZutat/' js/logik/import.js` (eine Funktion für andere Dateien freigeben) · `git status -sb` (vor jeder Runde der Stand).
+- **Entscheidung:** Kein automatischer Abruf bei marktguru, solange die Erlaubnis ungeklärt ist [A]. Verworfen: das alte Skript zurückholen; es hing an einer inoffiziellen Schnittstelle.
+- **Entscheidung 2:** Eine eingelesene Datei ersetzt die Angebote der vorigen Datei, lässt aber von Hand eingetragene stehen. Dafür trägt jedes Angebot seine Quelle (`hand` oder `datei`).
+- **Entscheidung 3:** Die Zuordnung in der Datei nutzt dieselbe strenge Suche wie der Rezept-Import (nur ganze Wörter). Eine Regel, eine Funktion.
+- **Fehler:** Ein Selektor im Test traf zwei Elemente (`.klein` ist auch eine Klasse des Knopfs). Lösung: `p.klein`. Fehler im Test, nicht in der App.
+- **Fachbegriffe:** Dateiformat mit Versionsfeld, Herkunftsfeld, Wiederverwendung, `export`.
+- **Zum Auftrag:** Geholfen hat „bau weiter“. Gefehlt hat die Antwort auf die Frage zu den Angeboten; deshalb die Annahme [A], die nichts verbaut.

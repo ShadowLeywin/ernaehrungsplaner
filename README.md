@@ -2,7 +2,7 @@
 
 Ernährung und Health-Daten im Blick. Eine Progressive Web App: offline nutzbar, komplett deutsch, alle Daten bleiben auf deinem Gerät. Kein Konto, kein Server, keine Auswertung.
 
-## Was Version 0.8 kann
+## Was Version 0.9 kann
 
 - **Tagebuch** mit sechs Mahlzeiten, Energie, Eiweiß, Kohlenhydraten, Fett und Ballaststoffen gegen dein Tagesziel
 - **Alle Nährwerte** für den Tag und als Wochenschnitt, eine Mahlzeit vom Vortag übernehmen, ganze Tage kopieren
@@ -10,6 +10,7 @@ Ernährung und Health-Daten im Blick. Eine Progressive Web App: offline nutzbar,
 - **Wochenplan:** Mahlzeiten für sieben Tage vormerken und mit einem Tipp ins Tagebuch übernehmen
 - **Einkaufsliste** aus dem Wochenplan: Rezepte werden in Zutaten aufgelöst, Gleiches zusammengezählt, nach Kategorie sortiert, abhakbar und teilbar
 - **Rezepte** mit Zutaten, Portionen und Schritten; je Schritt ein „Prinzip dahinter“. Nährwerte je Portion werden berechnet, eine Portion landet mit einem Tipp im Tagebuch
+- **Angebote** je Zutat und Markt, von Hand oder aus einer eigenen Datei ([Format](docs/ANGEBOTE-FORMAT.md)); das günstigste steht in der Einkaufsliste
 - **Rezept-Import** aus eingefügtem oder geteiltem Text und aus Schema.org-Daten einer Seite; die App ruft dabei keine fremden Seiten ab
 - **Coach-Export:** Wochenbericht als Text zum Kopieren, dazu ein Prompt in [docs/COACH-PROMPT.md](docs/COACH-PROMPT.md)
 - **Meal-Prep:** Gewicht nach dem Kochen, Haltbarkeit und „einfrierbar“ am Rezept; der Wochenplan warnt, wenn eine vorgekochte Portion zu alt wäre
@@ -20,7 +21,7 @@ Ernährung und Health-Daten im Blick. Eine Progressive Web App: offline nutzbar,
 - **Backup** als Datei speichern und wieder einspielen
 - Hell und dunkel, läuft ohne Netz
 
-Geplant: Angebote, Referenzwerte für Vitamine und Mineralstoffe, Feinschliff nach Tests am Handy. Siehe [docs/PHASENPLAN.md](docs/PHASENPLAN.md).
+Geplant: Referenzwerte für Vitamine und Mineralstoffe, Feinschliff nach Tests am Handy. Siehe [docs/PHASENPLAN.md](docs/PHASENPLAN.md).
 
 ## Installieren
 

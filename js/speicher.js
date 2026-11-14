@@ -102,6 +102,18 @@ export function setzeVorliebe(zutatId, mag, notiz = '') {
   return db.speichere('vorlieben', { zutatId, mag, notiz: String(notiz).trim().slice(0, 120) });
 }
 
+/* ---------- Angebote ---------- */
+
+export const alleAngebote = () => db.alle('angebote');
+export const speichereAngebot = (a) => db.speichere('angebote', { ...a, id: a.id ?? crypto.randomUUID() });
+export const loescheAngebot = (id) => db.loesche('angebote', id);
+
+/** Angebote aus einer Datei ersetzen die der vorigen Datei; von Hand eingetragene bleiben stehen. */
+export async function ersetzeDateiAngebote(neue) {
+  for (const alt of (await db.alle('angebote')).filter((a) => a.quelle === 'datei')) await db.loesche('angebote', alt.id);
+  for (const a of neue) await speichereAngebot(a);
+}
+
 /* ---------- Tage ---------- */
 
 export const holeTag = (datum) => db.hole('tage', datum);

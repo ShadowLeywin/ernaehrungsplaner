@@ -1,6 +1,6 @@
 # Datenmodell
 
-Stand: Schema-Version 6 (App 0.8.0). Maßgeblich im Code: `js/logik/schema.js` und `js/db.js`.
+Stand: Schema-Version 7 (App 0.9.0). Maßgeblich im Code: `js/logik/schema.js` und `js/db.js`.
 
 ## Grundsätze
 
@@ -10,7 +10,7 @@ Stand: Schema-Version 6 (App 0.8.0). Maßgeblich im Code: `js/logik/schema.js` u
 - Nährwerte gelten immer je 100 g.
 - Darstellung (hell/dunkel) liegt je Gerät im `localStorage` und gehört nicht ins Backup.
 
-## Entitäten heute (Version 6)
+## Entitäten heute (Version 7)
 
 | Speicher | Schlüssel | Felder | Index |
 |---|---|---|---|
@@ -20,6 +20,7 @@ Stand: Schema-Version 6 (App 0.8.0). Maßgeblich im Code: `js/logik/schema.js` u
 | `messungen` (ab 5) | `id` | `datum`, `art` (`gewicht`, `wasser`, `schlaf`, `schritte`, `mass:taille` …), `wert`; Kennung `<art>\|<datum>` bei einem Wert je Tag, bei Wasser mit Zufallsteil | `datum` |
 | `supplements` (ab 5) | `id` | `name`, `dosis` | – |
 | `labor` (ab 6) | `id` | `name`, `wert`, `einheit`, `datum`, freiwillig `refMin`, `refMax`, `notiz` | – |
+| `angebote` (ab 7) | `id` | `zutatId`, `zutatName`, `markt`, `preis`, `quelle` (`hand`, `datei`); freiwillig `menge`, `gueltigVon`, `gueltigBis`, `notiz` | – |
 | `symptome` (ab 6) | `id` | `art`, `staerke` (1 bis 5), `datum`, freiwillig `zeit`, `notiz`; `eintragIds` (zugeordnete Tagebuch-Einträge) | `datum` |
 | `einstellungen` | `schluessel` | `wert`; Schlüssel: `ziele`, `woche`, `slotAnteile` (Prozent je Slot, Summe 100), `gesundheit` (Wochenziel Gewicht, Wasser, Schlaf, Schritte), `letztesBackup` | – |
 | `plan` (ab 3) | `id` | wie `eintraege` (`datum`, `slot`, `zutatId`, `name`, `gramm`, `je100`, `rezeptId`), dazu `uebernommen` | `datum` |
@@ -36,6 +37,7 @@ Zutat (Datei oder Speicher) 1 ── n Eintrag n ── 1 Tag (über datum)
 Zutat n ── m Rezept (über rezepte.zutaten), Rezept 1 ── n Eintrag (über rezeptId)
 Plan-Posten ── wird zu ── Eintrag (Kopie beim Übernehmen, Posten bekommt uebernommen = true)
 Einkaufsliste = berechnet aus Plan-Posten der Woche; gespeichert sind nur Häkchen und eigene Posten
+Zutat 1 ── n Angebot (über zutatId); abgelaufene Angebote bleiben gespeichert, werden aber nicht mehr gezeigt
 Symptom n ── m Eintrag (über symptome.eintragIds); gelöschte Einträge fallen in der Anzeige still weg
 Tagestyp (gym | calisthenics | rest) ── Ziel (in einstellungen.ziele)
 Wochentag ── Tagestyp (in einstellungen.woche), Tag kann abweichen
@@ -70,8 +72,8 @@ Wochentag ── Tagestyp (in einstellungen.woche), Tag kann abweichen
 ## Backup-Format
 
 ```json
-{ "app": "elan", "schemaVersion": 6, "erstelltAm": "2026-11-13T10:00:00.000Z",
-  "daten": { "zutaten": [], "eintraege": [], "tage": [], "einstellungen": [], "rezepte": [], "plan": [], "einkauf": [], "vorlieben": [], "messungen": [], "supplements": [], "labor": [], "symptome": [] } }
+{ "app": "elan", "schemaVersion": 7, "erstelltAm": "2026-11-13T10:00:00.000Z",
+  "daten": { "zutaten": [], "eintraege": [], "tage": [], "einstellungen": [], "rezepte": [], "plan": [], "einkauf": [], "vorlieben": [], "messungen": [], "supplements": [], "labor": [], "symptome": [], "angebote": [] } }
 ```
 
 Einspielen ersetzt alle Speicher in einer einzigen Transaktion. Bricht sie ab, bleibt der alte Stand vollständig.
@@ -85,7 +87,7 @@ Einspielen ersetzt alle Speicher in einer einzigen Transaktion. Bricht sie ab, b
 | 3 Tagebuch | `eintraege`, `tage` (vorhanden) | offen: Datei `data/referenzwerte.json` (keine Nutzerdaten) | – |
 | 4 Wochenplan, Einkaufsliste, Meal-Prep | `plan`, `einkauf` (seit 3), Felder an `rezepte` | offen: gekochte Chargen mit Restportionen | – |
 | 6 Mag-Liste | `vorlieben` (vorhanden seit 4) | – | – |
-| 5 Angebote | `angebote` | `markt`, `produkt`, `preis`, `gueltigVon`, `gueltigBis`, `zutatId` | offen |
+| 5 Angebote | `angebote` (vorhanden seit 7) | Format der Datei: `docs/ANGEBOTE-FORMAT.md` | – |
 | 7 Health (tägliche Werte) | `messungen`, `supplements` (vorhanden seit 5) | – | – |
 | 7 Laborwerte, Symptome | `labor`, `symptome` (vorhanden seit 6) | – | – |
 | 8 Import | kein eigener Speicher | erzeugt `rezepte` und `zutaten` | – |

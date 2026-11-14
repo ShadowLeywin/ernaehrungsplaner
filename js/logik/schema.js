@@ -3,9 +3,9 @@
 
 export const APP_NAME = 'Elan';
 export const APP_KENNUNG = 'elan';
-export const APP_VERSION = '0.8.0';
+export const APP_VERSION = '0.9.0';
 
-export const SCHEMA_VERSION = 6;
+export const SCHEMA_VERSION = 7;
 
 /** Speicher (Object Stores) und ihr Schlüsselfeld. */
 export const STORES = {
@@ -21,4 +21,5 @@ export const STORES = {
   supplements: 'id', // ab Version 5: Liste der Supplements; abgehakt wird je Tag im Speicher tage
   labor: 'id', // ab Version 6: Laborwerte mit Datum und Referenzbereich
   symptome: 'id', // ab Version 6: Symptome mit Stärke und zugeordneten Tagebuch-Einträgen
+  angebote: 'id', // ab Version 7: Angebote je Zutat und Markt, von Hand oder aus einer eigenen Datei
 };

@@ -46,6 +46,7 @@ export async function zeigeWoche(wurzel, teile) {
         el('p', {}, `${formatTag(tage[0])} bis ${formatTag(tage[6])}`)),
       el('a', { class: 'rund', href: `#/woche/${verschiebe(tage[0], 7)}`, 'aria-label': 'Eine Woche weiter' }, icon('vor'))),
     el('div', { class: 'knopfreihe mitte' },
+      el('a', { class: 'knopf leise', href: '#/angebote' }, 'Angebote'),
       el('a', { class: 'knopf', href: `#/woche/${tage[0]}/einkauf` }, 'Einkaufsliste')),
     posten.length === 0 ? el('p', { class: 'leer' }, 'Noch nichts geplant. Tippe an einem Tag auf das Plus und merke vor, was du essen willst.') : null,
     el('div', { class: 'slots' }, tage.map((datum, i) => tagBereich({
