@@ -9,6 +9,7 @@ import { APP_NAME } from '../logik/schema.js';
 import { neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { el, feld, haenge, hinweis, icon, svg, zahl } from '../ui.js';
+import { zeigeLabor, zeigeSymptome } from './befunde.js';
 
 const MASSE = ARTEN.filter((a) => a.gruppe === 'mass');
 const alsText = (wert) => (typeof wert === 'number' ? String(wert).replace('.', ',') : '');
@@ -19,6 +20,8 @@ let entwurf = { datum: null, werte: {} };
 const aufgeklappt = new Set();
 
 export async function zeigeHealth(wurzel, [parameter]) {
+  if (parameter === 'labor') return zeigeLabor(wurzel);
+  if (parameter === 'symptome') return zeigeSymptome(wurzel);
   const heute = isoDatum();
   const datum = istGueltig(parameter) ? parameter : heute;
   if (entwurf.datum !== datum) entwurf = { datum, werte: {} };
@@ -38,6 +41,9 @@ export async function zeigeHealth(wurzel, [parameter]) {
       datum < heute
         ? el('a', { class: 'rund', href: `#/health/${verschiebe(datum, 1)}`, 'aria-label': 'Einen Tag weiter' }, icon('vor'))
         : el('span', { class: 'rund' })),
+    el('div', { class: 'knopfreihe mitte' },
+      el('a', { class: 'knopf leise klein', href: '#/health/labor' }, 'Laborwerte'),
+      el('a', { class: 'knopf leise klein', href: '#/health/symptome' }, 'Symptome')),
     tageswerte(datum, messungen, ziele),
     wasser(datum, messungen, ziele),
     supplementBereich(datum, supplements, tag),

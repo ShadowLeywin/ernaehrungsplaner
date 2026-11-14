@@ -312,6 +312,10 @@ details.bereich > summary::after { content: '+'; font-size: 1.5rem; font-weight:
 details.bereich[open] > summary::after { content: '−'; }
 details.bereich[open] > summary { margin-bottom: 0.5rem; }
 
+.laborwert strong { font-size: 1.375rem; font-weight: 720; }
+.laborgruppe .aufklappen { margin-top: 0.25rem; }
+input[type='time'] { appearance: none; -webkit-appearance: none; }
+
 /* ---------- Rezepte ---------- */
 
 .knopfreihe.links { justify-content: flex-start; }

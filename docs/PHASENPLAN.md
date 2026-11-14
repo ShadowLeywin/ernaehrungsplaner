@@ -111,15 +111,17 @@ Vorgezogen vor Session 6, weil die Angebote an einer offenen Entscheidung hänge
 
 Module: 7 (erster Teil).
 
-### Session 8: Health B (Laborwerte und Symptome)
+### Session 8: Health B, Laborwerte und Symptome (erledigt, Version 0.7)
 
 Ziel: Auffälligkeiten festhalten und mit Mahlzeiten verbinden.
 
-| Abnahmekriterium | Testbefehl |
+| Abnahmekriterium | Beleg |
 |---|---|
-| Laborwert mit Datum, Einheit und Referenzbereich; Werte außerhalb sind markiert | `npm test`, `pruefe-app.cjs` |
-| Symptom mit Uhrzeit und Stärke; Zuordnung zu Einträgen desselben Tages | `pruefe-app.cjs` |
-| Übersicht: Welche Zutaten standen wie oft vor einem Symptom? | `npm test` |
+| Laborwert mit Datum, Einheit und Referenzbereich; Werte außerhalb sind markiert | `npm test`: `befunde.test.js`; `pruefe-app.cjs`: drei Labor-Kriterien |
+| Symptom mit Uhrzeit und Stärke; Zuordnung zu Einträgen desselben Tages | `pruefe-app.cjs`: „Symptom mit Stärke, Uhrzeit und Zuordnung“ |
+| Übersicht: Welche Zutaten standen wie oft vor einem Symptom? | `npm test`: `vorSymptomen()`; `pruefe-app.cjs`: „Übersicht“ |
+
+Die App deutet nichts medizinisch: Sie vergleicht mit dem eingetragenen Bereich und zählt.
 
 Module: 7 (zweiter Teil).
 
@@ -189,4 +191,5 @@ Jede Session hat eine Tabelle mit prüfbaren Kriterien und einem Testbefehl.
 - Testausgaben vom 14.11.2026 (Version 0.4): `npm test` 88 von 88, `node tools/pruefe-app.cjs` 59 von 59.
 - Testausgaben vom 14.11.2026 (Version 0.5): `npm test` 97 von 97, `node tools/pruefe-app.cjs` 68 von 68.
 - Testausgaben vom 14.11.2026 (Version 0.6): `npm test` 106 von 106, `node tools/pruefe-app.cjs` 76 von 76.
+- Testausgaben vom 14.11.2026 (Version 0.7): `npm test` 113 von 113, `node tools/pruefe-app.cjs` 83 von 83.
 - BLS 4.0 kostenfrei: [heise](https://heise.de/-11123877), [Agrolab](https://agrolab.com/en/news/food-news/6105-bls-datenbank-radar-01-26-en.html), abgerufen 13.11.2026.

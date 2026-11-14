@@ -3,9 +3,9 @@
 
 export const APP_NAME = 'Elan';
 export const APP_KENNUNG = 'elan';
-export const APP_VERSION = '0.6.0';
+export const APP_VERSION = '0.7.0';
 
-export const SCHEMA_VERSION = 5;
+export const SCHEMA_VERSION = 6;
 
 /** Speicher (Object Stores) und ihr Schlüsselfeld. */
 export const STORES = {
@@ -19,4 +19,6 @@ export const STORES = {
   vorlieben: 'zutatId', // ab Version 4: Mag-Liste für Obst und Gemüse (J, R, K, N, S)
   messungen: 'id', // ab Version 5: Health-Werte (Gewicht, Wasser, Schlaf, Schritte, Körpermaße)
   supplements: 'id', // ab Version 5: Liste der Supplements; abgehakt wird je Tag im Speicher tage
+  labor: 'id', // ab Version 6: Laborwerte mit Datum und Referenzbereich
+  symptome: 'id', // ab Version 6: Symptome mit Stärke und zugeordneten Tagebuch-Einträgen
 };

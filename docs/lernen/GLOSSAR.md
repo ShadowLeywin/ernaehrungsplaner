@@ -39,3 +39,6 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | Gleitender Durchschnitt | Der Mittelwert der letzten Tage, der mit jedem neuen Tag ein Stück weiterwandert. | `gleitenderSchnitt()` in `js/logik/gesundheit.js` |
 | Entwurf | Getippte, noch nicht gespeicherte Eingaben, die ein Neuzeichnen überleben sollen. | `entwurf` in `js/ansichten/health.js` |
 | Sparkline | Eine kleine Verlaufslinie ohne Achsen, die nur die Richtung zeigt. | `verlaufslinie()` in `js/ansichten/health.js` |
+| Referenzbereich | Die Spanne, in der ein Laborwert laut Labor üblicherweise liegt. | `laborStatus()` in `js/logik/befunde.js` |
+| Korrelation | Zwei Dinge treten zusammen auf; das beweist nicht, dass eines das andere verursacht. | Hinweistext in `zeigeSymptome()` in `js/ansichten/befunde.js` |
+| `<datalist>` | Eine Liste von Vorschlägen, die der Browser unter einem Eingabefeld anbietet. | `oeffneLaborFormular()` in `js/ansichten/befunde.js` |
