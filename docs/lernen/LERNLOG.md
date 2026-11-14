@@ -107,3 +107,14 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Fehler:** Ein Unit-Test schlug fehl, weil er die Liste der Speicher fest eingetragen hatte: dritte Wiederholung derselben Fehlerart. Lösung: Erwartung aus `STORES` ableiten, Regel in `CLAUDE.md` ergänzt.
 - **Fachbegriffe:** gleitender Durchschnitt, Entwurf (ungespeicherter Zustand), Toleranz, Sparkline (kleine Verlaufslinie), `<polyline>`.
 - **Zum Auftrag:** Geholfen hat „Resume“ nach dem Neustart: kurz und eindeutig. Gefehlt hat nichts.
+
+## Session 8, Runde 1: Laborwerte und Symptome (14.11.2026)
+
+- **Was und warum:** Zwei Unterseiten von Health. Laborwerte tragen ihren Referenzbereich selbst, weil er je Labor verschieden ist. Symptome lassen sich Einträgen des Tagebuchs zuordnen; eine Tabelle zählt, was öfter davor gegessen wurde.
+- **Befehle:** `git fetch -q origin main && git merge -q --ff-only origin/main` (wie nach jedem Merge) · `npm test 2>&1 | grep -E "^not ok|^# (pass|fail)"` (wie gehabt).
+- **Entscheidung:** Die App deutet nichts medizinisch. Sie sagt „über dem Bereich 3,5 bis 5“, nicht „zu hoch“. Verworfen: eigene Bewertungen oder Ampelfarben, weil die App die Lage des Nutzers nicht kennt.
+- **Entscheidung 2:** Die Übersicht nennt zu jeder Zählung auch, an wie vielen Tagen das Lebensmittel gegessen wurde. Ohne diese Zahl stünde alles, was man täglich isst, verdächtig weit oben.
+- **Entscheidung 3:** Ein bekannter Name schlägt Einheit und Bereich vom letzten Mal vor. Das spart Tipparbeit und hält die Schreibweise gleich, damit der Verlauf je Name stimmt.
+- **Fehler:** Keiner in dieser Runde. Tests und Durchlauf waren beim ersten Mal grün; die Lehren aus den Vorrunden (Selektoren mit `exact`, Erwartungen aus dem Schema ableiten) haben gehalten.
+- **Fachbegriffe:** Referenzbereich, Korrelation (zusammen auftreten heißt nicht verursachen), `<datalist>` (Vorschläge für ein Eingabefeld), n-zu-m-Beziehung.
+- **Zum Auftrag:** Geholfen hat die klare Grenze „keine Gesundheitsdaten in Tests“. Alle Beispielwerte heißen „Testwert“ oder „Testsymptom“.

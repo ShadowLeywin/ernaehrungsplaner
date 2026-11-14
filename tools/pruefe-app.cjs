@@ -714,6 +714,97 @@ async function healthLauf(browser) {
   await kontext.close();
 }
 
+async function befundLauf(browser) {
+  // Alle Werte in diesem Lauf sind erfunden.
+  const { kontext, seite, fehler } = await neueSeite(browser);
+  await seite.goto(`${URL_APP}#/health`, { waitUntil: 'networkidle' });
+  await seite.getByRole('link', { name: 'Laborwerte' }).click();
+  await seite.locator('h1', { hasText: 'Laborwerte' }).waitFor();
+  const leer = await seite.locator('.leer').innerText();
+
+  const gestern = await seite.evaluate(() => { const d = new Date(); d.setHours(12); d.setDate(d.getDate() - 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; });
+  await seite.getByRole('button', { name: 'Wert eintragen' }).click();
+  await seite.getByRole('button', { name: 'Laborwert speichern' }).click();
+  const pflicht = await seite.locator('dialog .fehlertext').allInnerTexts();
+  await seite.locator('#f-labor-name').fill('Testwert A');
+  await seite.locator('#f-labor-wert').fill('6,1');
+  await seite.locator('#f-labor-einheit').fill('mmol/l');
+  await seite.locator('#f-labor-refMin').fill('3,5');
+  await seite.locator('#f-labor-refMax').fill('5');
+  await seite.locator('#f-labor-datum').fill(gestern);
+  await seite.getByRole('button', { name: 'Laborwert speichern' }).click();
+  await seite.locator('.laborgruppe').waitFor();
+  const drueber = await seite.locator('.laborgruppe .merkzettel').innerText();
+  pruefe('Laborwert mit Datum und Referenzbereich; außerhalb wird markiert', leer.includes('Noch kein') && pflicht.length === 2 && drueber === 'über dem Bereich 3,5 bis 5 mmol/l', `Pflichtfehler: ${pflicht.join(' | ')}; danach „${drueber}“`);
+
+  await seite.getByRole('button', { name: 'Wert eintragen' }).click();
+  await seite.locator('#f-labor-name').fill('testwert a');
+  await seite.locator('#f-labor-name').blur();
+  await seite.locator('#f-labor-einheit').waitFor();
+  await seite.waitForFunction(() => document.getElementById('f-labor-einheit')?.value === 'mmol/l');
+  const vorschlag = `${await seite.locator('#f-labor-name').inputValue()}, ${await seite.locator('#f-labor-refMin').inputValue()} bis ${await seite.locator('#f-labor-refMax').inputValue()} ${await seite.locator('#f-labor-einheit').inputValue()}`;
+  await seite.locator('#f-labor-wert').fill('4,2');
+  await seite.getByRole('button', { name: 'Laborwert speichern' }).click();
+  await seite.locator('.laborgruppe details').waitFor();
+  const neuester = (await seite.locator('.laborwert').innerText()).replace(/\s+/g, ' ');
+  const status = await seite.locator('.laborgruppe > p.klein').innerText();
+  pruefe('Zweiter Wert: Einheit und Bereich werden vorgeschlagen, Verlauf je Name', vorschlag === 'Testwert A, 3,5 bis 5 mmol/l' && neuester.startsWith('4,2 mmol/l') && status.startsWith('im Bereich') && (await seite.locator('.laborgruppe').count()) === 1,
+    `Vorschlag: ${vorschlag}; neuester: ${neuester}, ${status}; ${await seite.locator('.laborgruppe summary').innerText()}`);
+  await bild(seite, '17-labor');
+
+  await seite.locator('.laborgruppe > .zeilen .rund').click();
+  await seite.locator('.laborgruppe .merkzettel').waitFor();
+  await seite.getByRole('button', { name: 'Rückgängig' }).click();
+  await seite.locator('.laborgruppe details').waitFor();
+  pruefe('Laborwert löschen und zurückholen', (await seite.locator('.laborwert').innerText()).startsWith('4,2'), 'nach Rückgängig wieder 2 Werte');
+
+  /* Symptome */
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.locator('.slot').first().waitFor();
+  await trageEin(seite, 'Frühstück', 'apfel', 150);
+  await trageEin(seite, 'Mittagessen', 'reis', 200);
+  await seite.goto(`${URL_APP}#/health/symptome`);
+  await seite.locator('h1', { hasText: 'Symptome' }).waitFor();
+  const trage = async (art, staerke, haken) => {
+    await seite.getByRole('button', { name: 'Symptom eintragen' }).click();
+    await seite.locator('#symptom-mahlzeiten .haken').first().waitFor();
+    await seite.locator('#f-symptom-art').fill(art);
+    await seite.locator('dialog .wahl-knopf', { hasText: String(staerke) }).click();
+    for (const index of haken) await seite.locator('#symptom-mahlzeiten input').nth(index).check();
+    await seite.getByRole('button', { name: 'Symptom speichern' }).click();
+    await seite.locator('dialog').waitFor({ state: 'detached' });
+  };
+  await seite.getByRole('button', { name: 'Symptom eintragen' }).click();
+  await seite.getByRole('button', { name: 'Symptom speichern' }).click();
+  const artFehler = await seite.locator('dialog .fehlertext').first().innerText();
+  await seite.locator('dialog').getByRole('button', { name: 'Schließen' }).click();
+  await trage('Testsymptom', 4, [0, 1]);
+  await trage('Testsymptom', 2, [0]);
+  const zeilen = await seite.locator('.seite > .zeilen .zeile-name').allInnerTexts();
+  pruefe('Symptom mit Stärke, Uhrzeit und Zuordnung zu Mahlzeiten', zeilen.length === 2 && zeilen.some((t) => t.includes('Stärke 4') && t.includes('Davor: ') && t.includes('Uhr')), `„${artFehler}“ ohne Angabe; gespeichert: ${zeilen.map((t) => t.replace(/\n/g, ' | ')).join(' ; ')}`);
+  const tabelle = (await seite.locator('#vor-symptomen').innerText()).replace(/\s+/g, ' ');
+  pruefe('Übersicht: was öfter vor Symptomen gegessen wurde', (await seite.locator('#vor-symptomen tr').count()) === 1 && tabelle.includes('bei 2 von 2 Symptomen'), tabelle);
+  await bild(seite, '18-symptome');
+  await seite.reload({ waitUntil: 'networkidle' });
+  await seite.locator('.seite > .zeilen .zeile').first().waitFor();
+
+  const unsinn = [];
+  const mass = [];
+  for (const [route, warteAuf] of [['health/labor', '.laborgruppe'], ['health/symptome', '#vor-symptomen']]) {
+    await seite.goto(`${URL_APP}#/${route}`);
+    await seite.locator(warteAuf).first().waitFor();
+    const b = await seite.evaluate(() => ({ inhalt: document.documentElement.scrollWidth, fenster: window.innerWidth }));
+    mass.push(`${route} ${b.inhalt}/${b.fenster}`);
+    if (b.inhalt > b.fenster) unsinn.push(`${route} zu breit`);
+    if (/\b(null|undefined|NaN)\b/.test(await seite.locator('body').innerText())) unsinn.push(`${route}: null/undefined/NaN im Text`);
+    const klein = await seite.evaluate(() => [...document.querySelectorAll('button, a, select, summary, input:not([type=checkbox])')].filter((e) => e.offsetParent).map((e) => ({ t: (e.getAttribute('aria-label') || e.textContent).trim().slice(0, 18), h: Math.round(e.getBoundingClientRect().height) })).filter((e) => e.h < 40));
+    if (klein.length) unsinn.push(`${route}: Tippflächen unter 40 px ${JSON.stringify(klein)}`);
+  }
+  pruefe('Labor und Symptome: Daten bleiben nach Neuladen; Breite, Text, Tippflächen', unsinn.length === 0, unsinn.join(' | ') || mass.join(', '));
+  pruefe('Befund-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
+  await kontext.close();
+}
+
 async function migrationsLauf(browser) {
   const { kontext, seite, fehler } = await neueSeite(browser);
   // Datenbank im Aufbau von Schema-Version 1 anlegen, bevor die App sie öffnet (Seite ohne App-Code, gleiche Herkunft)
@@ -745,7 +836,7 @@ async function migrationsLauf(browser) {
     const speicher = await new Promise((ok) => { const a = indexedDB.open('elan'); a.onsuccess = () => { const n = [...a.result.objectStoreNames]; a.result.close(); ok(n); }; });
     return { version: info.version, speicher };
   });
-  pruefe('Migration: Datenbank aus Version 1 wird angehoben, Einträge bleiben', stand.version === SCHEMA_VERSION && stand.speicher.includes('rezepte') && stand.speicher.includes('plan') && stand.speicher.includes('vorlieben') && stand.speicher.includes('messungen') && (await seite.locator('.eintrag').count()) === 1,
+  pruefe('Migration: Datenbank aus Version 1 wird angehoben, Einträge bleiben', stand.version === SCHEMA_VERSION && stand.speicher.includes('rezepte') && stand.speicher.includes('plan') && stand.speicher.includes('vorlieben') && stand.speicher.includes('messungen') && stand.speicher.includes('labor') && (await seite.locator('.eintrag').count()) === 1,
     `Version ${stand.version}, Speicher ${stand.speicher.join(', ')}, alter Eintrag: ${(await seite.locator('.eintrag').innerText()).replace(/\n/g, ' | ')}`);
 
   await seite.goto(`${URL_APP}#/mehr`);
@@ -774,6 +865,7 @@ async function migrationsLauf(browser) {
     await wochenLauf(browser);
     await vorkochLauf(browser);
     await healthLauf(browser);
+    await befundLauf(browser);
     await migrationsLauf(browser);
     await offlineLauf(browser);
     await dunkelLauf(browser);

@@ -7,7 +7,7 @@ Regeln und Wissen für jede Claude-Session in diesem Repo. Erst lesen, dann arbe
 - **Was:** Progressive Web App für Android/Chrome, komplett deutsch, offline-first.
 - **Umfang:** nur Ernährung und Health-Daten. Kein Trainingslog; der Tagestyp (Gym, Calisthenics, Rest) bestimmt nur die Ziele.
 - **Nutzer:** Léon baut privat. Später nutzen Freunde die App, jeder mit eigenen lokalen Daten.
-- **Stand:** Version 0.6 (Tagebuch, Wochenplan mit Einkaufsliste, Rezepte mit Meal-Prep, Zutaten mit Mag-Liste, Health, Ziele, Backup), Schema-Version 5. Plan: `docs/PHASENPLAN.md`.
+- **Stand:** Version 0.7 (Tagebuch, Wochenplan mit Einkaufsliste, Rezepte mit Meal-Prep, Zutaten mit Mag-Liste, Health mit Laborwerten und Symptomen, Ziele, Backup), Schema-Version 6. Plan: `docs/PHASENPLAN.md`.
 
 ## Feste Entscheidungen (gelten, bis Léon widerspricht)
 
@@ -16,6 +16,7 @@ Regeln und Wissen für jede Claude-Session in diesem Repo. Erst lesen, dann arbe
 | Form | PWA, kein APK |
 | Daten | nur lokal in IndexedDB, kein Konto, kein Sync, kein Server |
 | Gesundheitsdaten | niemals ins Repo, in Tests, Logs, Commits oder Cloud-Dienste |
+| Medizin | Die App deutet nichts: Sie vergleicht mit eingetragenen Bereichen, zählt und verweist bei Beschwerden auf ärztliche Abklärung |
 | Technik | Vanilla JavaScript mit ES-Modulen, kein Framework, kein Build-Schritt |
 | Hosting | GitHub Pages aus `main`, alle Pfade relativ (`./`) |
 | Schrift | selbst gehostet (`schrift/`), keine Abrufe bei Schriftdiensten |

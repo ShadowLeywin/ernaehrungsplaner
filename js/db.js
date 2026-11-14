@@ -34,6 +34,11 @@ export const MIGRATIONEN = [
     db.createObjectStore('messungen', { keyPath: 'id' }).createIndex('datum', 'datum');
     db.createObjectStore('supplements', { keyPath: 'id' });
   },
+  // Version 6: Laborwerte und Symptome
+  (db) => {
+    db.createObjectStore('labor', { keyPath: 'id' });
+    db.createObjectStore('symptome', { keyPath: 'id' }).createIndex('datum', 'datum');
+  },
 ];
 
 let offen;

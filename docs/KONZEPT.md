@@ -12,7 +12,7 @@ Elan ist eine Ernährungs- und Health-App als PWA: offline, deutsch, alle Daten 
 | 4 | Wochenplan, Einkauf, Meal-Prep | Woche planen, Einkaufsliste automatisch, Portionen, Haltbarkeit, Einfrieren | 0.5: vorhanden. Offen: gekochte Chargen mit Restportionen verfolgen |
 | 5 | Angebote | Angebote bei den Zutaten zeigen | geplant, Session 6; Datenquelle ungeklärt |
 | 6 | Mag-Liste | je Obst und Gemüse: J (roh und gekocht), R (nur roh), K (nur gekocht), N (nein), S (Sonderfall); steuert Vorschläge | 0.5: vorhanden, wirkt in Suchlisten. Offen: eigene Essens-Vorschläge |
-| 7 | Health | Gewicht mit 7-Tage-Schnitt gegen Wochenziel, Maße, Laborwerte, Schlaf, Wasser, Supplements, Symptome mit Bezug zu Mahlzeiten, Schritte | 0.6: Gewicht mit 7-Tage-Schnitt, Wasser, Schlaf, Schritte, Supplements, Körpermaße vorhanden. Offen: Laborwerte, Symptome (Session 8), Verläufe |
+| 7 | Health | Gewicht mit 7-Tage-Schnitt gegen Wochenziel, Maße, Laborwerte, Schlaf, Wasser, Supplements, Symptome mit Bezug zu Mahlzeiten, Schritte | 0.7: vollständig bis auf Verläufe für Maße, Schlaf und Schritte |
 | 8 | Import | Rezept aus eingefügtem Text, Android Share Target, später Schema.org | geplant, Session 9 |
 | 9 | Export | Backup als JSON, Coach-Export als Wochenbericht | Backup in 0.1 vorhanden; Coach-Export Session 9 |
 

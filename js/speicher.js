@@ -138,6 +138,13 @@ export const speichereSupplement = (s) => db.speichere('supplements', { ...s, id
 export const loescheSupplement = (id) => db.loesche('supplements', id);
 export const ladeGesundheit = async () => bereinigeGesundheit(await einstellung('gesundheit'));
 
+export const alleLaborwerte = () => db.alle('labor');
+export const speichereLaborwert = (w) => db.speichere('labor', { ...w, id: w.id ?? crypto.randomUUID() });
+export const loescheLaborwert = (id) => db.loesche('labor', id);
+export const symptomeZwischen = (von, bis) => db.imBereich('symptome', 'datum', von, bis);
+export const speichereSymptom = (s) => db.speichere('symptome', { ...s, id: s.id ?? crypto.randomUUID() });
+export const loescheSymptom = (id) => db.loesche('symptome', id);
+
 /* ---------- Einstellungen ---------- */
 
 export async function einstellung(schluessel, standard = null) {
