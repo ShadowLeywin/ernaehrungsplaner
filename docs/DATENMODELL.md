@@ -1,6 +1,6 @@
 # Datenmodell
 
-Stand: Schema-Version 7 (App 0.10.0). Maßgeblich im Code: `js/logik/schema.js` und `js/db.js`.
+Stand: Schema-Version 7 (App 1.0.0). Maßgeblich im Code: `js/logik/schema.js` und `js/db.js`.
 
 ## Grundsätze
 
@@ -22,7 +22,7 @@ Stand: Schema-Version 7 (App 0.10.0). Maßgeblich im Code: `js/logik/schema.js` 
 | `labor` (ab 6) | `id` | `name`, `wert`, `einheit`, `datum`, freiwillig `refMin`, `refMax`, `notiz` | – |
 | `angebote` (ab 7) | `id` | `zutatId`, `zutatName`, `markt`, `preis`, `quelle` (`hand`, `datei`); freiwillig `menge`, `gueltigVon`, `gueltigBis`, `notiz` | – |
 | `symptome` (ab 6) | `id` | `art`, `staerke` (1 bis 5), `datum`, freiwillig `zeit`, `notiz`; `eintragIds` (zugeordnete Tagebuch-Einträge) | `datum` |
-| `einstellungen` | `schluessel` | `wert`; Schlüssel: `ziele`, `woche`, `slotAnteile` (Prozent je Slot, Summe 100), `gesundheit` (Wochenziel Gewicht, Wasser, Schlaf, Schritte), `letztesBackup` | – |
+| `einstellungen` | `schluessel` | `wert`; Schlüssel: `ziele`, `woche`, `slotAnteile` (Prozent je Slot, Summe 100), `gesundheit` (Wochenziel Gewicht, Wasser, Schlaf, Schritte), `referenzgruppe` (`geschlecht`, `alter`), `letztesBackup` | – |
 | `plan` (ab 3) | `id` | wie `eintraege` (`datum`, `slot`, `zutatId`, `name`, `gramm`, `je100`, `rezeptId`), dazu `uebernommen` | `datum` |
 | `einkauf` (ab 3) | `id` | `woche` (Datum des Montags); Häkchen: `schluessel`, `erledigt`, Kennung `<woche>\|<zutatId>`; eigener Posten: `eigen`, `name`, `erledigt` | `woche` |
 | `rezepte` (ab 2) | `id` | `name`, `portionen`, `zutaten` [{`zutatId`, `name`, `marke`, `gramm`, `je100` (Kopie)}], `schritte` [{`text`, `prinzip`}], `erstellt`, `geaendert`; freiwillig fürs Vorkochen: `gewichtGekocht`, `haltbarTage`, `einfrierbar` | – |

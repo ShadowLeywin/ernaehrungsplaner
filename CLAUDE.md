@@ -4,20 +4,23 @@ Regeln und Wissen für jede Claude-Session in diesem Repo. Erst lesen, dann arbe
 
 ## Projekt
 
-- **Was:** Progressive Web App für Android/Chrome, komplett deutsch, offline-first.
+- **Was:** Android-App (APK mit Capacitor) und dieselbe App als Progressive Web App, komplett deutsch, offline-first.
 - **Umfang:** nur Ernährung und Health-Daten. Kein Trainingslog; der Tagestyp (Gym, Calisthenics, Rest) bestimmt nur die Ziele.
 - **Nutzer:** Léon baut privat. Später nutzen Freunde die App, jeder mit eigenen lokalen Daten.
-- **Stand:** Version 0.10 (alle neun Module in einer ersten Fassung, erster Feinschliff), Schema-Version 7. Offen: Referenzwerte, automatischer Abruf von Angeboten, Tests am Handy. Léons Aufgaben: `docs/AUFGABEN-LEON.md`. Plan: `docs/PHASENPLAN.md`.
+- **Stand:** Version 1.0.0 als APK und PWA, alle neun Module, Referenzwerte der DGE, Schema-Version 7. Offen: Tests am echten Gerät, automatischer APK-Bau auf GitHub, automatischer Abruf von Angeboten. Léons Aufgaben: `docs/AUFGABEN-LEON.md`. Plan: `docs/PHASENPLAN.md`.
 
 ## Feste Entscheidungen (gelten, bis Léon widerspricht)
 
 | Thema | Entscheidung |
 |---|---|
-| Form | PWA, kein APK |
+| Form | Android-App per Capacitor (seit 1.0.0, auf Léons Wunsch) und PWA aus demselben Code. Bau: `docs/ANDROID.md` |
 | Daten | nur lokal in IndexedDB, kein Konto, kein Sync, kein Server |
 | Gesundheitsdaten | niemals ins Repo, in Tests, Logs, Commits oder Cloud-Dienste |
 | Medizin | Die App deutet nichts: Sie vergleicht mit eingetragenen Bereichen, zählt und verweist bei Beschwerden auf ärztliche Abklärung |
-| Technik | Vanilla JavaScript mit ES-Modulen, kein Framework, kein Build-Schritt |
+| Technik | Vanilla JavaScript mit ES-Modulen, kein Framework, kein Build-Schritt für die Web-App. Abhängigkeiten nur für das APK |
+| Lizenz | MIT |
+| Signatur | Signierschlüssel nie ins Repo; `android/keystore.properties` ist ausgeschlossen |
+| Plattform | Unterschiede Browser/App nur in `js/plattform.js` |
 | Hosting | GitHub Pages aus `main`, alle Pfade relativ (`./`) |
 | Schrift | selbst gehostet (`schrift/`), keine Abrufe bei Schriftdiensten |
 | Zielwerte | neutrale Startwerte im Code, alles in der App einstellbar |
@@ -75,7 +78,10 @@ Léon kann mehrere Runden am Stück freigeben („mach durch bis …“). Dann d
 | `sw.js` | Service Worker, Cache zuerst |
 | `data/zutaten-basis.json` | mitgelieferte Zutaten, nur lesen |
 | `test/` | Unit-Tests und Beispieldaten |
-| `tools/` | Server, Browser-Prüfung, Icon-Erzeugung |
+| `tools/` | Server, Browser-Prüfung, Icon-Erzeugung, APK-Vorbereitung |
+| `android/` | Android-Projekt (Capacitor); `www/` entsteht beim Bau |
+| `js/plattform.js` | Datei geben, Text teilen, JSON holen: im Browser und in der App |
+| `data/referenzwerte.json` | Referenzwerte der DGE mit Quelle und Abrufdatum |
 
 ## Konventionen
 
@@ -94,7 +100,7 @@ Léon kann mehrere Runden am Stück freigeben („mach durch bis …“). Dann d
 1. `VERSION` in `sw.js` erhöhen, sonst sehen installierte Geräte die Änderung nicht.
 2. Neue Dateien in `DATEIEN` in `sw.js` eintragen (`test/projekt.test.js` prüft das).
 3. Datenmodell geändert: `SCHEMA_VERSION` erhöhen, Migration in `js/db.js` anhängen, Backup-Migration in `js/logik/backup.js` ergänzen, `docs/DATENMODELL.md` nachziehen.
-4. Neue Fassung: `APP_VERSION` in `js/logik/schema.js` und `version` in `package.json` gleich setzen.
+4. Neue Fassung: `APP_VERSION` in `js/logik/schema.js` und `version` in `package.json` gleich setzen. Sie bestimmt auch die Version des APK.
 
 ## Befehle
 
@@ -104,10 +110,11 @@ Léon kann mehrere Runden am Stück freigeben („mach durch bis …“). Dann d
 | `node tools/pruefe-app.cjs` | spielt die App im Handy-Emulator durch, braucht Playwright |
 | `BILDER=<ordner> node tools/pruefe-app.cjs` | dasselbe, speichert zusätzlich Bilder |
 | `node tools/server.cjs` | lokaler Server auf http://127.0.0.1:8080/ |
-| `node tools/icons-erzeugen.cjs` | Icons neu erzeugen |
+| `node tools/icons-erzeugen.cjs` | Icons für Web und Android neu erzeugen |
+| `npm run apk:bauen` | APK bauen (braucht Android-SDK, siehe `docs/ANDROID.md`) |
 
 Lokal ist der Service Worker aus. Mit `?sw=1` in der Adresse läuft er wie auf dem Handy.
 
 ## Doku
 
-`docs/KONZEPT.md` (neun Module, Technik), `docs/DATENMODELL.md`, `docs/PHASENPLAN.md`, `docs/OFFENE-FRAGEN.md`, `docs/AUFGABEN-LEON.md`, `docs/COACH-PROMPT.md`, `docs/ANGEBOTE-FORMAT.md`, `docs/IST-ANALYSE.md` (alter Stand, verworfen).
+`docs/KONZEPT.md` (neun Module, Technik), `docs/DATENMODELL.md`, `docs/PHASENPLAN.md`, `docs/OFFENE-FRAGEN.md`, `docs/AUFGABEN-LEON.md`, `docs/COACH-PROMPT.md`, `docs/ANGEBOTE-FORMAT.md`, `docs/ANDROID.md`, `docs/IST-ANALYSE.md` (alter Stand, verworfen).

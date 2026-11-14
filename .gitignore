@@ -12,3 +12,9 @@ node_modules/
 
 # Backups der App (enthalten persönliche Daten)
 elan-backup-*.json
+
+# Android-App: www/ wird bei jedem Bau neu erzeugt, Signierschlüssel nie einchecken
+/www/
+*.keystore
+*.jks
+keystore.properties

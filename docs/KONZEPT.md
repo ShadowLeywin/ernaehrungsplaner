@@ -1,6 +1,6 @@
 # Konzept
 
-Elan ist eine Ernährungs- und Health-App als PWA: offline, deutsch, alle Daten auf dem Gerät. Kein Trainingslog.
+Elan ist eine Ernährungs- und Health-App als Android-App und PWA aus demselben Code: offline, deutsch, alle Daten auf dem Gerät. Kein Trainingslog.
 
 ## Die neun Module
 
@@ -8,7 +8,7 @@ Elan ist eine Ernährungs- und Health-App als PWA: offline, deutsch, alle Daten 
 |---|---|---|---|
 | 1 | Zutaten | lokale Datenbank, eigene Zutaten, Suche bei Open Food Facts | 0.1: vorhanden. Offen: USDA-Suche, BLS 4.0, Barcode per Kamera |
 | 2 | Rezepte | anlegen und ändern, Portionen, Nährwerte automatisch, je Schritt ein Feld „Prinzip dahinter“ | 0.10: vorhanden, mit Kopieren und Umsortieren der Schritte |
-| 3 | Tagebuch | 6 Slots, Makros, Ballaststoffe, Ziele je Tagestyp | 0.3: vorhanden, mit allen Nährwerten für Tag und Wochenschnitt, Kopieren, einstellbaren Anteilen. Offen: Referenzwerte |
+| 3 | Tagebuch | 6 Slots, Makros, Ballaststoffe, Ziele je Tagestyp | 1.0: vollständig, mit Vergleich zu den Referenzwerten der DGE |
 | 4 | Wochenplan, Einkauf, Meal-Prep | Woche planen, Einkaufsliste automatisch, Portionen, Haltbarkeit, Einfrieren | 0.5: vorhanden. Offen: gekochte Chargen mit Restportionen verfolgen |
 | 5 | Angebote | Angebote bei den Zutaten zeigen | 0.9: von Hand und per eigener Datei vorhanden. Automatischer Abruf bleibt aus, bis die Quelle geklärt ist |
 | 6 | Mag-Liste | je Obst und Gemüse: J (roh und gekocht), R (nur roh), K (nur gekocht), N (nein), S (Sonderfall); steuert Vorschläge | 0.5: vorhanden, wirkt in Suchlisten. Offen: eigene Essens-Vorschläge |
@@ -31,6 +31,7 @@ Elan ist eine Ernährungs- und Health-App als PWA: offline, deutsch, alle Daten 
 | Speicher | IndexedDB mit eigener dünner Schicht | reicht für Mengen dieser App, keine Abhängigkeit | Bibliothek Dexie: bequemer, aber eine Abhängigkeit mehr |
 | Tests | `node --test` für Logik, Playwright-Skript für die Oberfläche | Logik in Millisekunden prüfbar, Oberfläche wie am Handy | Vitest und Playwright Test: mehr Komfort, braucht `node_modules` |
 | Hosting | GitHub Pages | kostenlos, HTTPS, aus dem Repo | Cloudflare Pages oder Netlify: gleiche Leistung, zusätzliches Konto |
+| Android-App | Capacitor 8 | packt die vorhandene Web-App, keine zweite Codebasis, native Plugins für Teilen und Dateien | Trusted Web Activity: kleiner, braucht aber eine Datei auf der Domain-Wurzel, die GitHub Pages für dieses Repo nicht liefert |
 | Offline | Service Worker, Cache zuerst, Dateiliste von Hand | alle Dateien einer Version passen zusammen | Workbox: erzeugt die Liste automatisch, braucht Build |
 | Schrift | Bricolage Grotesque, selbst gehostet (OFL) | kein Abruf bei Dritten, offline da | Systemschrift: 41 KB weniger, weniger Charakter |
 

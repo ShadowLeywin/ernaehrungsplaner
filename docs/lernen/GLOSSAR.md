@@ -50,3 +50,10 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | Prompt | Der Auftragstext an eine KI. | `docs/COACH-PROMPT.md` |
 | Herkunftsfeld | Ein Feld, das festhält, woher ein Datensatz stammt, damit man ihn später gezielt ersetzen kann. | `quelle` in `ersetzeDateiAngebote()` in `js/speicher.js` |
 | `export` | Das Schlüsselwort, mit dem eine Datei eine Funktion für andere Dateien freigibt. | `findeZutat` in `js/logik/import.js` |
+| APK | Die Installationsdatei einer Android-App. | `android/app/build/outputs/apk/release/` |
+| Capacitor | Ein Werkzeug, das eine Web-App in eine native App packt und Zugriff auf Handy-Funktionen gibt. | `capacitor.config.json`, `android/` |
+| Signierschlüssel | Der Schlüssel, mit dem ein APK unterschrieben wird; Updates müssen denselben haben. | `docs/ANDROID.md`, Abschnitt „Signieren“ |
+| versionCode | Die ganze Zahl, an der Android erkennt, ob ein APK neuer ist. | `tools/apk-vorbereiten.cjs` |
+| Intent-Filter | Eintrag im Android-Manifest, mit dem eine App sich für Aktionen wie „Teilen“ meldet. | `android/app/src/main/AndroidManifest.xml` |
+| Edge-to-Edge | Die App zeichnet bis unter Status- und Gestenleiste; Abstände muss sie selbst halten. | `--rand-top` in `css/app.css` |
+| Rate Limit | Ein Server beantwortet zu viele Anfragen in kurzer Zeit mit „429“ und bremst. | Lernlog Session 12 |

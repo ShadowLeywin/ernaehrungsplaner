@@ -151,3 +151,14 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Fehler:** Im PDF stand A15 vor A14, weil die Zeile nachträglich eingefügt worden war. Aufgefallen beim Ansehen der Seiten. Lösung: Reihenfolge in der Quelle korrigiert, PDF neu erzeugt.
 - **Fachbegriffe:** PDF-Druck im Headless-Browser, Schwellenwert, Entwurf ohne Kennung.
 - **Zum Auftrag:** Geholfen hat „gib mir die Aufgaben als PDF“: klares Ziel, klares Format. Gefehlt hat nichts.
+
+## Session 12, Runde 1: Android-App und Referenzwerte (14.11.2026)
+
+- **Was und warum:** Auf Léons Wunsch ein echtes APK. Capacitor packt die vorhandene Web-App; was in der App anders läuft (Backup, Teilen, Netz), steht in `js/plattform.js`. Dazu Referenzwerte der DGE mit Quelle, MIT-Lizenz, Aufgabenliste.
+- **Befehle:** `sdkmanager "platforms;android-36" "build-tools;36.0.0"` (Android-Bauteile laden) · `npx cap add android` (Android-Projekt erzeugen) · `./gradlew assembleRelease` (APK bauen) · `apksigner verify --print-certs` (Signatur prüfen) · `keytool -genkeypair` (Signierschlüssel erzeugen).
+- **Entscheidung:** Capacitor statt Trusted Web Activity. Verworfen: TWA, weil sie eine Bestätigungsdatei an der Wurzel der Domain braucht, die GitHub Pages für ein Projekt-Repo nicht liefert.
+- **Entscheidung 2:** Android-Cloud-Sicherung aus (`allowBackup=false`). Sonst lägen Gesundheitsdaten automatisch in der Google-Cloud.
+- **Sackgassen:** `dl.google.com` und `www.dge.de` waren gesperrt (Freigabe beantragt, erteilt). Maven Central drosselte mit „429“; Lösung: ein Download zur Zeit und Wiederholen mit Pausen. Das Anlegen eines GitHub-Workflows wurde blockiert; es bleibt eine Frage an Léon.
+- **Fehler im Test:** `getAttribute('open')` liefert bei offenem Bereich eine leere Zeichenkette, die in JavaScript als „falsch“ gilt. Lösung: auf `=== null` prüfen. Zweimal zuvor: Testschritte in falscher Reihenfolge nach einem Umbau.
+- **Fachbegriffe:** APK, Capacitor, Signierschlüssel, versionCode, Intent-Filter, Edge-to-Edge, Drosselung (Rate Limit).
+- **Zum Auftrag:** Geholfen hat die klare Ansage „als APK“. Widerspruch zur alten Entscheidung „PWA statt APK“ ist damit von dir aufgehoben; beides läuft jetzt aus einem Code.
