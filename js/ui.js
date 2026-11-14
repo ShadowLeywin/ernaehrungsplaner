@@ -27,6 +27,14 @@ export const el = (tag, attribute, ...kinder) => fuelle(document.createElement(t
  */
 export const haenge = (knoten, ...kinder) => fuelle(knoten, null, kinder);
 
+/**
+ * Farbiges Symbol vor einem Titel: mitBild('💧', 'wasser', 'Wasser').
+ * farbe ist der Name einer Farbvariable aus css/app.css. Das Symbol ist für Screenreader ausgeblendet,
+ * damit der Name des Titels gleich bleibt.
+ */
+export const mitBild = (symbol, farbe, ...text) => [
+  el('span', { class: 'titel-bild', style: `--bild-farbe:var(--${farbe})`, 'aria-hidden': 'true' }, symbol), ...text];
+
 /** SVG-Element bauen (braucht einen eigenen Namensraum) */
 export const svg = (tag, attribute, ...kinder) => fuelle(document.createElementNS(SVG_NS, tag), attribute, kinder);
 

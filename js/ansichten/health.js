@@ -8,7 +8,7 @@ import {
 import { APP_NAME } from '../logik/schema.js';
 import { neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
-import { el, feld, haenge, hinweis, icon, svg, zahl } from '../ui.js';
+import { el, feld, haenge, hinweis, icon, mitBild, svg, zahl } from '../ui.js';
 import { zeigeLabor, zeigeSymptome } from './befunde.js';
 
 const MASSE = ARTEN.filter((a) => a.gruppe === 'mass');
@@ -32,15 +32,15 @@ export async function zeigeHealth(wurzel, [parameter]) {
   const nah = relativ(datum, heute);
 
   haenge(wurzel,
+    // Kopf wie auf „Heute“: Datum klein darüber, großer Titel, Blättern rechts
     el('header', { class: 'tageskopf' },
-      el('a', { class: 'rund', href: `#/health/${verschiebe(datum, -1)}`, 'aria-label': 'Einen Tag zurück' }, icon('zurueck')),
       el('div', { class: 'tagestitel' },
+        el('p', { class: 'ueberzeile' }, nah ? `${nah}, ${formatLang(datum)}` : formatLang(datum)),
         el('h1', {}, 'Health'),
-        el('p', {}, nah ? `${nah}, ${formatLang(datum)}` : formatLang(datum)),
         datum !== heute ? el('a', { class: 'textlink', href: '#/health' }, 'Zu heute') : null),
-      datum < heute
-        ? el('a', { class: 'rund', href: `#/health/${verschiebe(datum, 1)}`, 'aria-label': 'Einen Tag weiter' }, icon('vor'))
-        : el('span', { class: 'rund' })),
+      el('div', { class: 'blaettern' },
+        el('a', { class: 'rund', href: `#/health/${verschiebe(datum, -1)}`, 'aria-label': 'Einen Tag zurück' }, icon('zurueck')),
+        datum < heute ? el('a', { class: 'rund', href: `#/health/${verschiebe(datum, 1)}`, 'aria-label': 'Einen Tag weiter' }, icon('vor')) : null)),
     el('div', { class: 'knopfreihe mitte' },
       el('a', { class: 'knopf leise klein', href: '#/health/labor' }, 'Laborwerte'),
       el('a', { class: 'knopf leise klein', href: '#/health/symptome' }, 'Symptome')),
@@ -93,7 +93,7 @@ function tageswerte(datum, messungen, ziele) {
     const schlaf = tagesWert(messungen, 'schlaf', datum);
     const schritte = tagesWert(messungen, 'schritte', datum);
     bereich.replaceChildren(
-      el('h2', {}, 'Tageswerte'),
+      el('h2', { class: 'titel-mit-bild' }, mitBild('⚖️', 'grapefruit', 'Tageswerte')),
       el('form', {
         class: 'stapel', novalidate: true,
         onsubmit: async (e) => {
@@ -153,7 +153,7 @@ function wasser(datum, messungen, ziele) {
   zurueck.addEventListener('click', async () => { await speicher.loescheMessung(eintraege.pop().id); zeige(); });
   zeige();
   return el('section', { class: 'bereich makro-wasser' },
-    el('h2', {}, 'Wasser'),
+    el('h2', { class: 'titel-mit-bild' }, mitBild('💧', 'wasser', 'Wasser')),
     stand,
     el('span', { class: 'balken' }, fuellung),
     el('div', { class: 'chips' }, [250, 500, 750].map((ml) => el('button', { type: 'button', class: 'chip', onclick: () => trinke(ml) }, `+ ${ml} ml`))),
@@ -171,7 +171,7 @@ function supplementBereich(datum, supplements, tag) {
   const dosisFeld = el('input', { id: 'f-supplement-dosis', 'aria-label': 'Dosis', placeholder: 'Dosis, z. B. 5 g', maxlength: 40, autocomplete: 'off' });
   zeigeStand();
   return el('section', { class: 'bereich' },
-    el('h2', {}, 'Supplements'),
+    el('h2', { class: 'titel-mit-bild' }, mitBild('💊', 'heidelbeere', 'Supplements')),
     sortiert.length ? stand : el('p', { class: 'leer' }, 'Lege an, was du täglich nimmst. Dann hakst du es hier ab.'),
     sortiert.length ? el('ul', { class: 'zeilen' }, sortiert.map((s) => el('li', { class: genommen.has(s.id) ? 'haken erledigt' : 'haken' },
       el('label', {},
@@ -211,7 +211,7 @@ function masseBereich(datum, messungen) {
   const bereich = el('details', { class: 'bereich aufklappen', open: aufgeklappt.has('masse') ? true : null, ontoggle: (e) => { if (e.target.open) aufgeklappt.add('masse'); else aufgeklappt.delete('masse'); } });
   const zeichne = (fehler = null) => {
     bereich.replaceChildren(
-      el('summary', {}, 'Körpermaße'),
+      el('summary', {}, mitBild('📏', 'mandarine', 'Körpermaße')),
       el('form', {
         class: 'stapel', novalidate: true,
         onsubmit: async (e) => {
@@ -241,7 +241,7 @@ function verlaufBereich(datum, messungen) {
     .map(({ art, tage }) => ({ art, tage, punkte: verlaufJeTag(messungen, art.id, datum, tage) }))
     .filter((r) => r.punkte.length >= 2);
   return el('details', { class: 'bereich aufklappen', id: 'verlaeufe', open: aufgeklappt.has('verlaeufe') ? true : null, ontoggle: (e) => { if (e.target.open) aufgeklappt.add('verlaeufe'); else aufgeklappt.delete('verlaeufe'); } },
-    el('summary', {}, 'Verläufe'),
+    el('summary', {}, mitBild('📈', 'avocado', 'Verläufe')),
     reihen.length === 0 ? el('p', { class: 'leer' }, 'Sobald es von einem Wert zwei Einträge gibt, erscheint hier seine Linie.') : null,
     reihen.map(({ art, tage, punkte }) => {
       const werte = punkte.map((p) => p.wert);
@@ -263,7 +263,7 @@ function zielBereich(ziele) {
   });
   const zeichne = (fehler = {}) => {
     bereich.replaceChildren(
-      el('summary', {}, 'Ziele für Health'),
+      el('summary', {}, mitBild('🎯', 'limette', 'Ziele für Health')),
       el('form', {
         class: 'stapel', novalidate: true,
         onsubmit: async (e) => {

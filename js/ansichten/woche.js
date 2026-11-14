@@ -39,12 +39,14 @@ export async function zeigeWoche(wurzel, teile) {
   document.title = `${wochenTitel(tage[0], heute)} – ${APP_NAME}`;
 
   haenge(wurzel,
+    // Kopf wie auf „Heute“: Zeitraum klein darüber, großer Titel, Blättern rechts
     el('header', { class: 'tageskopf' },
-      el('a', { class: 'rund', href: `#/woche/${verschiebe(tage[0], -7)}`, 'aria-label': 'Eine Woche zurück' }, icon('zurueck')),
       el('div', { class: 'tagestitel' },
-        el('h1', {}, wochenTitel(tage[0], heute)),
-        el('p', {}, `${formatTag(tage[0])} bis ${formatTag(tage[6])}`)),
-      el('a', { class: 'rund', href: `#/woche/${verschiebe(tage[0], 7)}`, 'aria-label': 'Eine Woche weiter' }, icon('vor'))),
+        el('p', { class: 'ueberzeile' }, `${formatTag(tage[0])} bis ${formatTag(tage[6])}`),
+        el('h1', {}, wochenTitel(tage[0], heute))),
+      el('div', { class: 'blaettern' },
+        el('a', { class: 'rund', href: `#/woche/${verschiebe(tage[0], -7)}`, 'aria-label': 'Eine Woche zurück' }, icon('zurueck')),
+        el('a', { class: 'rund', href: `#/woche/${verschiebe(tage[0], 7)}`, 'aria-label': 'Eine Woche weiter' }, icon('vor')))),
     el('div', { class: 'knopfreihe mitte' },
       el('a', { class: 'knopf leise', href: '#/angebote' }, 'Angebote'),
       el('a', { class: 'knopf', href: `#/woche/${tage[0]}/einkauf` }, 'Einkaufsliste')),
@@ -76,7 +78,9 @@ function tagBereich({ datum, istHeute, posten, typ, ziele, warnungen }) {
 
   return el('section', { class: istHeute ? 'slot plantag heute' : 'slot plantag', id: `tag-${datum}` },
     el('div', { class: 'slot-kopf' },
-      el('div', {},
+      // Kürzel des Wochentags, gefärbt nach Tagestyp: so sieht man die Woche auf einen Blick
+      el('span', { class: `slot-bild tagestyp-${typ}`, 'aria-hidden': 'true' }, wochentag.slice(0, 2)),
+      el('div', { class: 'slot-text' },
         el('h2', {}, `${wochentag}, ${formatTag(datum)}`, istHeute ? el('span', { class: 'marke' }, 'heute') : null),
         el('p', { class: 'slot-stand' }, `${typName}, ${zahl(geplant)} von ${zahl(ziele[typ].kcal)} kcal geplant`)),
       el('button', {

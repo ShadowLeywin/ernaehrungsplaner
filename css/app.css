@@ -43,6 +43,7 @@
   --zettel: #fff2bf;
   --flaeche-2: #eef3e3;
   --wasser: var(--heidelbeere);
+  --mandarine: #f28c28;
   --ueber: var(--avocado);
   --auf-limette: #14241a;
   --schrift: 'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -262,6 +263,8 @@ button.kachel:active { transform: scale(0.97); }
 .ring circle { fill: none; stroke-width: 7; }
 .ring-grund { stroke: var(--ring-farbe, var(--blatt)); opacity: 0.2; }
 .ring-voll { stroke: var(--ring-farbe, var(--blatt)); stroke-linecap: round; transition: stroke-dasharray 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+/* Zweite Runde über 100 %: dieselbe Farbe, zur Schrift hin gemischt (hell: dunkler, dunkel: heller) */
+.ring-runde2 { stroke: color-mix(in srgb, var(--ring-farbe, var(--blatt)) 55%, var(--tinte)); stroke-linecap: round; }
 .ring-bild { position: absolute; inset: 0; display: grid; place-items: center; font-size: 1.25rem; line-height: 1; }
 .kachel-wert { font-size: 1.0625rem; font-weight: 720; letter-spacing: -0.01em; white-space: nowrap; }
 .kachel-ziel { font-size: 0.75rem; color: var(--tinte-leise); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
@@ -367,10 +370,10 @@ input[type='date'] { appearance: none; -webkit-appearance: none; }
 .makro-wasser .balken-voll { background: var(--wasser); transition: width 0.25s ease-out; }
 .zusatz.zweifach { flex-wrap: wrap; }
 .zusatz.zweifach input { flex: 1 1 8rem; }
-details.bereich > summary { font-size: 1.1875rem; font-weight: 680; color: var(--tinte); justify-content: space-between; list-style: none; }
+details.bereich > summary { font-size: 1.1875rem; font-weight: 680; color: var(--tinte); justify-content: flex-start; gap: 0.75rem; list-style: none; }
 details.bereich > summary::-webkit-details-marker { display: none; }
 /* Zeichen statt Pfeil: zeigt, dass sich der Bereich öffnen lässt */
-details.bereich > summary::after { content: '+'; font-size: 1.5rem; font-weight: 500; color: var(--blatt); line-height: 1; }
+details.bereich > summary::after { content: '+'; margin-left: auto; font-size: 1.5rem; font-weight: 500; color: var(--blatt); line-height: 1; }
 details.bereich[open] > summary::after { content: '−'; }
 details.bereich[open] > summary { margin-bottom: 0.5rem; }
 
@@ -533,6 +536,21 @@ body:has(.seite-willkommen) .navigation { display: none; }
 .neuigkeiten ul { margin-top: 0.5rem; padding-left: 1.125rem; list-style: disc; }
 .neuigkeiten ul li + li { margin-top: 0.25rem; }
 
+.titel-mit-bild { display: flex; align-items: center; gap: 0.75rem; }
+.titel-bild {
+  display: inline-grid; place-items: center; flex: none; width: 2.25rem; height: 2.25rem; border-radius: 0.625rem;
+  background: var(--flaeche-2); font-size: 1.125rem; line-height: 1;
+}
+
+/* Woche: jeder Tag eine Karte, Kürzel des Wochentags in der Farbe des Tagestyps */
+.seite-woche .slots { display: grid; gap: 0.75rem; margin-top: 1rem; }
+.seite-woche .slot { padding: 0.75rem 1rem; border-top: 0; border-radius: 1.25rem; background: var(--flaeche); }
+.seite-woche .slot.heute { box-shadow: inset 0 0 0 2px var(--limette); }
+.seite-woche .slot-bild { font-size: 0.9375rem; font-weight: 750; color: var(--bild-farbe, var(--tinte)); }
+.tagestyp-gym { --bild-farbe: var(--grapefruit); }
+.tagestyp-calisthenics { --bild-farbe: var(--mandarine); }
+.tagestyp-rest { --bild-farbe: var(--avocado); }
+
 /* ==========================================================================
    Blatt: Standard-Design. Schlicht im Stil von iOS, in Elans Grün.
    Große fette Titel, gruppierte Listen mit farbigen Symbolen, ruhige Leiste
@@ -652,3 +670,11 @@ body:has(.seite-willkommen) .navigation { display: none; }
 :root[data-thema='blatt'] .schritt, :root[data-thema='blatt'] .prinzip { background: var(--flaeche); }
 :root[data-thema='blatt'] .hinweis { background: #24302a; color: #eef5e4; }
 :root[data-thema='blatt'] .hinweis-aktion { color: var(--limette); }
+
+/* Abschnitte als Karten (Health, Laborwerte, Unterseiten von Mehr); Felder darin eine Stufe getönt */
+:root[data-thema='blatt'] .bereich { margin-top: 0.75rem !important; padding: 1rem; border-top: 0; border-radius: 1.25rem; background: var(--flaeche); }
+:root[data-thema='blatt'] .bereich :is(input:not([type='file']):not([type='checkbox']), select, textarea, .zeilen, .beispiel) { background: var(--flaeche-2); }
+:root[data-thema='blatt'] .bereich .chip { background: var(--flaeche-2); }
+:root[data-thema='blatt'] details.bereich > summary { min-height: 2.75rem; }
+:root[data-thema='blatt'] .titel-bild { background: color-mix(in srgb, var(--bild-farbe, var(--limette)) 22%, transparent); }
+:root[data-thema='blatt'] .seite-woche .slot-bild { background: color-mix(in srgb, var(--bild-farbe, var(--limette)) 20%, transparent); }

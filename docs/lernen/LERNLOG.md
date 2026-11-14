@@ -191,3 +191,11 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Entscheidung:** Ballaststoffe in Lila statt Grün, damit Grün allein den Akzent trägt. Verworfen: Glut nur umfärben und den Namen behalten; der Name passte nicht mehr.
 - **Technik:** `color-mix(in srgb, Farbe 22%, transparent)` tönt die Symbolflächen aus derselben Farbvariable.
 - **Zum Auftrag:** Geholfen hat die klare Ablehnung des Glases. Unklar war „mehr in den Farbtönen“; Annahme [A]: mehr kräftige Farben je Nährwert und Mahlzeit.
+
+## Session 13, Runde 4: Blatt überall (14.11.2026)
+
+- **Was und warum:** Léon: „Ja, mach das alles“. Health und Woche haben jetzt den Kopf von „Heute“ und Abschnitte als Karten mit farbigem Symbol. Wochentage tragen die Farbe ihres Tagestyps. Ringe laufen über 100 % in einer zweiten Runde weiter. Das Icon hat einen dunkelgrünen Grund.
+- **Befehle:** `node tools/icons-erzeugen.cjs` (Icons und Startbilder neu) · `BILDER=… node tools/pruefe-app.cjs` (119 Kriterien, Bilder geprüft).
+- **Entscheidung:** Das Symbol steht in einem eigenen `span` mit `aria-hidden`. So bleibt der Name des Titels für Screenreader und Tests gleich. Verworfen: Symbol per CSS `::before`, weil Chrome erzeugten Inhalt in den Namen aufnimmt.
+- **Fehler:** In der Woche rückte das Plus nicht mehr nach rechts, weil der Kopf der Mahlzeiten kein `space-between` mehr hat. Lösung: Textblock mit `slot-text` (wächst mit `flex: 1`).
+- **Zum Auftrag:** Die Freigabe für alle drei Vorschläge sparte eine Runde.
