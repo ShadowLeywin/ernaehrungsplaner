@@ -1,0 +1,98 @@
+# Baut die Android-App (APK) bei jeder Änderung an main und auf Knopfdruck (Reiter "Actions").
+# Mit den Secrets ELAN_KEYSTORE_BASE64 und ELAN_KEYSTORE_PASSWORT wird mit dem Elan-Schlüssel signiert
+# und das APK auf der Release-Seite abgelegt. Ohne sie entsteht nur ein Test-APK (Debug-Schlüssel),
+# das sich nicht als Update über eine installierte Elan-App spielen lässt.
+name: Android-App bauen
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['docs/**', '**.md']
+  pull_request:
+    paths-ignore: ['docs/**', '**.md']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # die Baunummer zählt alle Commits
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Abhängigkeiten
+        run: npm ci
+
+      - name: Tests der Rechenlogik
+        run: npm test
+
+      - name: Web-Dateien in die App übernehmen
+        run: |
+          node tools/apk-vorbereiten.cjs
+          npx cap sync android
+
+      - name: Signierschlüssel einrichten (falls hinterlegt)
+        id: schluessel
+        env:
+          KEYSTORE: ${{ secrets.ELAN_KEYSTORE_BASE64 }}
+          PASSWORT: ${{ secrets.ELAN_KEYSTORE_PASSWORT }}
+        run: |
+          if [ -n "$KEYSTORE" ] && [ -n "$PASSWORT" ]; then
+            echo "$KEYSTORE" | base64 -d > "$RUNNER_TEMP/elan.keystore"
+            printf 'storeFile=%s\nstorePassword=%s\nkeyAlias=elan\nkeyPassword=%s\n' "$RUNNER_TEMP/elan.keystore" "$PASSWORT" "$PASSWORT" > android/keystore.properties
+            echo "signiert=ja" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Kein Signierschlüssel hinterlegt: Es entsteht nur ein Test-APK."
+            echo "signiert=nein" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: APK bauen
+        working-directory: android
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: APK benennen
+        id: apk
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          ZUSATZ=$([ "${{ steps.schluessel.outputs.signiert }}" = "ja" ] && echo "" || echo "-test")
+          NAME="Elan-$VERSION$ZUSATZ.apk"
+          cp android/app/build/outputs/apk/release/app-release.apk "$NAME"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.apk.outputs.name }}
+          path: ${{ steps.apk.outputs.name }}
+          retention-days: 30
+
+      - name: APK auf der Release-Seite ablegen
+        if: github.ref == 'refs/heads/main' && steps.schluessel.outputs.signiert == 'ja'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="v${{ steps.apk.outputs.version }}"
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" "${{ steps.apk.outputs.name }}" --clobber
+          else
+            gh release create "$TAG" "${{ steps.apk.outputs.name }}" --title "Elan ${{ steps.apk.outputs.version }}" \
+              --notes "Android-App: Datei unten antippen, herunterladen, öffnen. Updates installieren sich über die vorhandene App, die Daten bleiben."
+          fi

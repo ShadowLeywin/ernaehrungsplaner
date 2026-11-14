@@ -57,3 +57,8 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | Intent-Filter | Eintrag im Android-Manifest, mit dem eine App sich für Aktionen wie „Teilen“ meldet. | `android/app/src/main/AndroidManifest.xml` |
 | Edge-to-Edge | Die App zeichnet bis unter Status- und Gestenleiste; Abstände muss sie selbst halten. | `--rand-top` in `css/app.css` |
 | Rate Limit | Ein Server beantwortet zu viele Anfragen in kurzer Zeit mit „429“ und bremst. | Lernlog Session 12 |
+| Onboarding | Die kurze Einrichtung beim ersten Start einer App. | `js/ansichten/willkommen.js` |
+| Reibung (Friction) | Alles, was eine Handlung mühsamer macht: Tipps, Wartezeit, Rückfragen. | Eintragen mit einem Tipp in `js/ansichten/eintrag.js` |
+| Informationsarchitektur | Wie Inhalte und Einstellungen gegliedert und auffindbar sind. | `MENUE` in `js/ansichten/mehr.js` |
+| Patchnotes | Die Liste der Änderungen einer App, neueste zuerst. | `js/daten/neuigkeiten.js` |
+| GitHub-Secret | Ein geheimer Wert, den ein Workflow lesen kann, der aber nie im Repo steht. | `.github/workflows/apk.yml` |

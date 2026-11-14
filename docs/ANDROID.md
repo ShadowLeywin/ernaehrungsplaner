@@ -54,11 +54,23 @@ keyPassword=…
 
 ## Version
 
-`APP_VERSION` in `js/logik/schema.js` ist die einzige Quelle. Daraus macht `tools/apk-vorbereiten.cjs` `versionName` und `versionCode` (Haupt × 1.000.000 + Neben × 1.000 + Flick). Jede neue Fassung braucht eine höhere Version, sonst lehnt Android das Update ab.
+`APP_VERSION` in `js/logik/schema.js` ist die einzige Quelle für den Namen. `tools/apk-vorbereiten.cjs` macht daraus `versionName` und `versionCode` = Haupt × 10⁸ + Neben × 10⁶ + Flick × 10⁴ + Baunummer (Commits, höchstens 9999). So wächst der Code mit jedem Bau, auch bei gleichem Namen.
+
+## Automatischer Bau auf GitHub
+
+`.github/workflows/apk.yml` baut das APK bei jeder Änderung an `main` (außer reiner Doku), bei Pull Requests und auf Knopfdruck.
+
+| Secret | Inhalt |
+|---|---|
+| `ELAN_KEYSTORE_BASE64` | der Schlüsselspeicher als Base64 |
+| `ELAN_KEYSTORE_PASSWORT` | Passwort von Speicher und Schlüssel |
+
+Mit beiden Secrets: signiertes APK unter „Releases“ (`v1.0.0`, bei jedem Bau ersetzt). Ohne sie: nur ein Test-APK als Artefakt des Laufs, mit Debug-Schlüssel.
+
+Der `versionCode` enthält die Zahl der Commits (Baunummer). Der angezeigte Name bleibt `1.0.0`, bis Léon eine neue Version freigibt; Android nimmt trotzdem jedes neue APK als Update an.
 
 ## Offen
 
-- Automatischer Bau auf GitHub (Workflow mit dem Schlüssel als Secret): vorbereitet, braucht Léons Ja.
 - Test auf einem echten Gerät; in der Arbeitsumgebung gibt es keinen Emulator.
 
 ## Annahmen [A]

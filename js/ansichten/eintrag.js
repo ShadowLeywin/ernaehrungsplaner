@@ -3,7 +3,7 @@
 import { isoDatum } from '../logik/datum.js';
 import { fuerMenge } from '../logik/naehrwerte.js';
 import { rezeptAlsZutat } from '../logik/rezepte.js';
-import { sucheZutaten, zuletztVerwendet } from '../logik/suche.js';
+import { letzteMengen, sucheZutaten, zuletztVerwendet } from '../logik/suche.js';
 import { magHinweis, sortiereNachVorliebe } from '../logik/vorlieben.js';
 import { SLOTS, slotFuerUhrzeit } from '../logik/ziele.js';
 import { pruefeMenge } from '../logik/zutat.js';
@@ -14,7 +14,7 @@ import { blatt, el, gramm, hinweis, zahl } from '../ui.js';
 const slotName = (id) => SLOTS.find((s) => s.id === id)?.name ?? '';
 
 /** Suchfeld mit Trefferliste. beiWahl bekommt die angetippte Zutat (oder das als Zutat verpackte Rezept). */
-function suchListe({ auswahl, zuletzt = [], vorlieben = new Map(), beiWahl, beiNeu }) {
+function suchListe({ auswahl, zuletzt = [], vorlieben = new Map(), mengen = new Map(), beiWahl, beiNeu, beiSchnell = null }) {
   const liste = el('div', { class: 'wahl-liste' });
   const klein = (zutat) => {
     const text = zutat.istRezept ? 'Rezept' : (magHinweis(vorlieben.get(zutat.id)) || zutat.marke);
@@ -28,7 +28,14 @@ function suchListe({ auswahl, zuletzt = [], vorlieben = new Map(), beiWahl, beiN
     const zeigeZuletzt = !begriff.trim() && zuletzt.length > 0;
     liste.replaceChildren(
       zeigeZuletzt ? el('h3', { class: 'zwischentitel' }, 'Zuletzt eingetragen') : '',
-      zeigeZuletzt ? el('ul', { class: 'zeilen' }, zuletzt.map(zeile)) : '',
+      zeigeZuletzt ? el('ul', { class: 'zeilen' }, zuletzt.map((zutat) => (beiSchnell && mengen.has(zutat.id)
+        ? el('li', { class: 'zeile-schnell' },
+          zeile(zutat).firstChild,
+          el('button', {
+            type: 'button', class: 'chip schnell', 'aria-label': `${zutat.name}: ${zahl(mengen.get(zutat.id), 1)} g sofort eintragen`,
+            onclick: () => beiSchnell(zutat, mengen.get(zutat.id)),
+          }, `+ ${zahl(mengen.get(zutat.id), 1)} g`))
+        : zeile(zutat)))) : '',
       zeigeZuletzt ? el('h3', { class: 'zwischentitel' }, 'Alles') : '',
       treffer.length ? el('ul', { class: 'zeilen' }, treffer.map(zeile)) : el('p', { class: 'leer' }, `Nichts passt zu „${begriff.trim()}“.`),
       el('button', { type: 'button', class: 'textlink', onclick: beiNeu }, 'Nicht dabei? Neue Zutat anlegen'),
@@ -61,7 +68,18 @@ export async function oeffneZutatWahl({ datum, slot, beiFertig, ziel = 'tagebuch
       auswahl,
       zuletzt,
       vorlieben,
+      mengen: letzteMengen(alleEintraege),
       beiNeu: () => { b.schliessen(); gehe('/zutaten/neu'); },
+      // Ein Tipp: dieselbe Menge wie beim letzten Mal, mit Rückgängig statt Rückfrage
+      beiSchnell: async (zutat, menge) => {
+        const gespeichert = await (plan ? speicher.speicherePlan : speicher.speichereEintrag)(neuerEintrag(zutat, datum, { gramm: menge, slot }));
+        b.schliessen();
+        beiFertig();
+        hinweis(`${zutat.name}, ${zahl(menge, 1)} g ${plan ? 'eingeplant' : 'eingetragen'}.`, {
+          aktion: 'Rückgängig',
+          beiAktion: async () => { await (plan ? speicher.loeschePlan : speicher.loescheEintrag)(gespeichert.id); beiFertig(); },
+        });
+      },
       beiWahl: (zutat) => b.setze(zutat.name, mengenFormular({
         name: zutat.name, je100: zutat.je100, portionen: zutat.portionen, slot, speichernText: plan ? 'Einplanen' : 'Eintragen',
         gramm: zutat.istRezept ? zutat.portionen[0].gramm : undefined,

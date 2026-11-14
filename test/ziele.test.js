@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
-  SLOTS, STANDARD_WOCHE, STANDARD_ZIELE, TAGESTYPEN, bereinigeWoche, bereinigeZiele, fortschritt, makroAbweichung, slotZiele, tagestypFuer,
+  SLOTS, STANDARD_WOCHE, skaliereZiel, STANDARD_ZIELE, TAGESTYPEN, bereinigeWoche, bereinigeZiele, fortschritt, makroAbweichung, slotZiele, tagestypFuer,
 } from '../js/logik/ziele.js';
 
 test('sechs Slots, Anteile ergeben zusammen 100 %', () => {
@@ -49,4 +49,16 @@ test('slotZiele verteilt das Tagesziel vollständig', () => {
   const z = slotZiele(2000);
   assert.equal(z.fruehstueck, 500);
   assert.ok(Math.abs(Object.values(z).reduce((a, b) => a + b, 0) - 2000) < 1e-6);
+});
+
+test('skaliereZiel: Eiweiß bleibt, Kohlenhydrate und Fett im alten Verhältnis, Energie passt', () => {
+  const alt = { kcal: 2700, protein: 150, kh: 345, fett: 80, ballaststoffe: 30 };
+  const neu = skaliereZiel(alt, 3000);
+  assert.equal(neu.protein, 150);
+  assert.equal(neu.ballaststoffe, 30);
+  assert.equal(neu.kcal, 3000);
+  assert.ok(neu.kh > alt.kh && neu.fett > alt.fett);
+  assert.ok(Math.abs(makroAbweichung(neu).abweichung) <= 10, String(makroAbweichung(neu).abweichung));
+  const knapp = skaliereZiel(alt, 500); // weniger als das Eiweiß allein
+  assert.deepEqual([knapp.kh, knapp.fett], [0, 0]);
 });

@@ -14,7 +14,7 @@ android {
         applicationId "io.github.shadowleywin.elan"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1000000
+        versionCode 100000080
         versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {

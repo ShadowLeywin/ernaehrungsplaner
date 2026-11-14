@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { normalisiere, sucheZutaten, zuletztVerwendet } from '../js/logik/suche.js';
+import { letzteMengen, normalisiere, sucheZutaten, zuletztVerwendet } from '../js/logik/suche.js';
 
 const z = (name, marke) => ({ id: name, name, marke });
 const LISTE = [z('Haferflocken'), z('Haferdrink'), z('Käse, Gouda'), z('Quark', 'Hofgut Käsemann'), z('Apfel'), z('Vollkornbrot mit Hafer')];
@@ -43,4 +43,14 @@ test('zuletztVerwendet: neueste zuerst, jede Zutat einmal', () => {
   ];
   assert.deepEqual(zuletztVerwendet(eintraege), ['a', 'b']);
   assert.deepEqual(zuletztVerwendet(eintraege, 1), ['a']);
+});
+
+test('letzteMengen: die Menge des jüngsten Eintrags je Zutat', () => {
+  const m = letzteMengen([
+    { zutatId: 'hafer', gramm: 60, erstellt: '2026-11-10T07:00:00Z' },
+    { zutatId: 'hafer', gramm: 80, erstellt: '2026-11-13T07:00:00Z' },
+    { zutatId: 'apfel', gramm: 170, erstellt: '2026-11-12T07:00:00Z' },
+    { zutatId: 'leer', gramm: 0, erstellt: '2026-11-14T07:00:00Z' },
+  ]);
+  assert.deepEqual([...m.entries()], [['hafer', 80], ['apfel', 170]]);
 });

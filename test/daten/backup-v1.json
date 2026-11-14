@@ -1,0 +1,15 @@
+{
+  "app": "elan",
+  "schemaVersion": 1,
+  "erstelltAm": "2026-11-01T08:00:00.000Z",
+  "daten": {
+    "zutaten": [
+      { "id": "eigen:beispiel-1", "name": "Beispielmüsli", "marke": "Muster", "kategorie": "getreide", "quelle": "eigen", "je100": { "kcal": 380, "protein": 12, "kh": 60, "fett": 8 }, "portionen": [{ "name": "Schale", "gramm": 60 }], "unvollstaendig": false }
+    ],
+    "eintraege": [
+      { "id": "beispiel-eintrag-1", "datum": "2026-11-01", "slot": "fruehstueck", "zutatId": "eigen:beispiel-1", "name": "Beispielmüsli", "marke": "Muster", "gramm": 60, "je100": { "kcal": 380, "protein": 12, "kh": 60, "fett": 8 }, "erstellt": "2026-11-01T07:30:00.000Z" }
+    ],
+    "tage": [{ "datum": "2026-11-01", "tagestyp": "rest" }],
+    "einstellungen": [{ "schluessel": "woche", "wert": ["gym", "gym", "gym", "gym", "gym", "rest", "rest"] }]
+  }
+}

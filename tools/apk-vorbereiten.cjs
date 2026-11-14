@@ -13,10 +13,24 @@ function dateiliste() {
   return [...sw.matchAll(/^\s*'\.\/([^']*)',$/gm)].map((m) => m[1]).filter(Boolean);
 }
 
-/** "0.11.0" → 1100: Android braucht eine ganze Zahl, die mit jeder Version wächst. */
-function versionsNummer(version) {
+/**
+ * Android braucht eine ganze Zahl (versionCode), die mit jedem Update wächst.
+ * Aufbau: Haupt·10^8 + Neben·10^6 + Flick·10^4 + Baunummer (0 bis 9999).
+ * So bleibt der Name "1.0.0", und trotzdem nimmt Android jedes neue APK als Update an.
+ */
+function versionsNummer(version, bau = 0) {
   const [haupt, neben, flick] = version.split('.').map(Number);
-  return haupt * 1000000 + neben * 1000 + flick;
+  return haupt * 100000000 + neben * 1000000 + flick * 10000 + Math.min(Math.max(0, bau), 9999);
+}
+
+/** Baunummer: aus der Umgebung (BAUNUMMER) oder die Zahl der Git-Commits */
+function baunummer() {
+  if (process.env.BAUNUMMER) return Number(process.env.BAUNUMMER);
+  try {
+    return Number(require('node:child_process').execSync('git rev-list --count HEAD', { cwd: WURZEL }).toString().trim());
+  } catch {
+    return 0;
+  }
 }
 
 async function main() {
@@ -34,10 +48,10 @@ async function main() {
   if (fs.existsSync(gradle)) {
     const alt = fs.readFileSync(gradle, 'utf8');
     const neu = alt
-      .replace(/versionCode \d+/, `versionCode ${versionsNummer(APP_VERSION)}`)
+      .replace(/versionCode \d+/, `versionCode ${versionsNummer(APP_VERSION, baunummer())}`)
       .replace(/versionName "[^"]*"/, `versionName "${APP_VERSION}"`);
     fs.writeFileSync(gradle, neu);
-    console.log(`build.gradle: versionName ${APP_VERSION}, versionCode ${versionsNummer(APP_VERSION)}`);
+    console.log(`build.gradle: versionName ${APP_VERSION}, versionCode ${versionsNummer(APP_VERSION, baunummer())}`);
   }
 }
 

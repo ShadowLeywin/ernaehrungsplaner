@@ -12,28 +12,86 @@ import { parseZahl } from '../logik/zutat.js';
 import { gibDatei, istApp, teileText } from '../plattform.js';
 import { neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
-import { bestaetige, el, feld, haenge, hinweis, zahl } from '../ui.js';
+import { FUNKTIONEN, NEUIGKEITEN } from '../daten/neuigkeiten.js';
+import { bestaetige, el, feld, haenge, hinweis, icon, svg, zahl } from '../ui.js';
 
 let gewaehlterTyp = 'gym';
 
-export async function zeigeMehr(wurzel) {
+/** Unterseiten von „Mehr“, in Gruppen. Das Häufigste steht oben. */
+const MENUE = [
+  { gruppe: 'Ziele und Tagebuch', eintraege: [
+    { id: 'ziele', titel: 'Ziele je Tagestyp', text: 'Energie und Makros für Gym, Calisthenics, Rest', icon: 'ziel' },
+    { id: 'wochenplan', titel: 'Wochenplan', text: 'Welcher Wochentag welcher Tagestyp ist', icon: 'kalender' },
+    { id: 'mahlzeiten', titel: 'Anteile der Mahlzeiten', text: 'Wie sich das Tagesziel auf sechs Mahlzeiten verteilt', icon: 'scheibe' },
+    { id: 'referenz', titel: 'Referenzwerte', text: 'Geschlecht und Alter für den Vergleich mit der DGE', icon: 'waage' },
+  ] },
+  { gruppe: 'Lebensmittel', eintraege: [
+    { id: 'zutaten', titel: 'Zutaten und Mag-Liste', text: 'Eigene Zutaten, Open Food Facts, Vorlieben', icon: 'zutaten', adresse: '#/zutaten' },
+    { id: 'angebote', titel: 'Angebote', text: 'Preise je Zutat und Markt', icon: 'preis', adresse: '#/angebote' },
+  ] },
+  { gruppe: 'Daten', eintraege: [
+    { id: 'backup', titel: 'Backup', text: 'Alle Daten als Datei sichern und einspielen', icon: 'sicherung' },
+    { id: 'coach', titel: 'Coach-Export', text: 'Wochenbericht als Text für einen Chat', icon: 'bericht' },
+  ] },
+  { gruppe: 'App', eintraege: [
+    { id: 'darstellung', titel: 'Darstellung', text: 'Hell, dunkel oder wie das Handy', icon: 'darstellung' },
+    { id: 'ueber', titel: 'Über Elan', text: 'Alle Funktionen in Kürze, Datenschutz, Quellen', icon: 'info' },
+    { id: 'neu', titel: 'Was ist neu', text: 'Patchnotes', icon: 'neu' },
+  ] },
+];
+
+const MENUE_ICONS = {
+  ziel: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM12 11a1 1 0 1 0 0 2 1 1 0 0 0 0-2z',
+  kalender: 'M5 6h14v13H5zM5 10h14M9 4v4M15 4v4',
+  scheibe: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9',
+  waage: 'M12 4v16M6 20h12M5 8h14M5 8l-2.5 6a3 3 0 0 0 5 0zM19 8l-2.5 6a3 3 0 0 0 5 0z',
+  zutaten: 'M5 19c0-8 5-14 14-14 0 9-6 14-14 14zM5 19l8-8',
+  preis: 'M3 12l9-9h8v8l-9 9zM16 7.5a.5.5 0 1 0 0 1 .5.5 0 0 0 0-1z',
+  sicherung: 'M12 4v11M7 10l5 5 5-5M5 19h14',
+  bericht: 'M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5',
+  darstellung: 'M12 3a9 9 0 1 0 0 18zM12 3a9 9 0 0 1 0 18',
+  info: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 11v6M12 7.5v.5',
+  neu: 'M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z',
+};
+
+const menueIcon = (name) => svg('svg', { viewBox: '0 0 24 24', width: 22, height: 22, fill: 'none', stroke: 'currentColor', 'stroke-width': 2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'aria-hidden': 'true' }, svg('path', { d: MENUE_ICONS[name] }));
+
+export async function zeigeMehr(wurzel, [unterseite]) {
+  const eintrag = MENUE.flatMap((g) => g.eintraege).find((e) => e.id === unterseite && !e.adresse);
+  if (!eintrag) return zeigeMenue(wurzel);
+  document.title = `${eintrag.titel} – ${APP_NAME}`;
+  const bauen = {
+    ziele: async () => zielBereich(await speicher.ladeZiele()),
+    wochenplan: async () => wochenBereich(await speicher.ladeWoche()),
+    mahlzeiten: async () => anteileBereich(bereinigeAnteile(await speicher.einstellung('slotAnteile'))),
+    referenz: async () => referenzBereich(await speicher.ladeReferenz()),
+    backup: async () => {
+      const [letztesBackup, daten, status] = await Promise.all([speicher.einstellung('letztesBackup'), speicher.exportiere(), speicher.speicherStatus()]);
+      return [backupBereich(letztesBackup, daten.daten), istApp() ? null : speicherBereich(status)];
+    },
+    coach: async () => coachBereich(),
+    darstellung: async () => darstellungBereich(),
+    ueber: async () => ueberBereich(),
+    neu: async () => neuBereich(),
+  };
+  haenge(wurzel,
+    el('a', { class: 'zurueck', href: '#/mehr' }, icon('zurueck', 18), 'Mehr'),
+    el('header', { class: 'seitenkopf' }, el('h1', {}, eintrag.titel)),
+    el('div', { class: 'unterseite' }, await bauen[eintrag.id]()));
+}
+
+function zeigeMenue(wurzel) {
   document.title = `Mehr – ${APP_NAME}`;
-  const [ziele, woche, letztesBackup, status, daten, anteile, referenz] = await Promise.all([
-    speicher.ladeZiele(), speicher.ladeWoche(), speicher.einstellung('letztesBackup'), speicher.speicherStatus(), speicher.exportiere(),
-    speicher.einstellung('slotAnteile'), speicher.ladeReferenz(),
-  ]);
-  haenge(wurzel, 
+  haenge(wurzel,
     el('header', { class: 'seitenkopf' }, el('h1', {}, 'Mehr')),
-    el('p', {}, el('a', { class: 'textlink', href: '#/zutaten' }, 'Zutaten und Mag-Liste verwalten')),
-    zielBereich(ziele),
-    wochenBereich(woche),
-    anteileBereich(bereinigeAnteile(anteile)),
-    referenzBereich(referenz),
-    backupBereich(letztesBackup, daten.daten),
-    coachBereich(),
-    darstellungBereich(),
-    istApp() ? null : speicherBereich(status),
-    ueberBereich());
+    MENUE.map((g) => el('section', { class: 'menuegruppe', 'aria-label': g.gruppe },
+      el('h2', { class: 'menuegruppe-titel' }, g.gruppe),
+      el('ul', { class: 'menue' }, g.eintraege.map((e) => el('li', {},
+        el('a', { class: 'menuepunkt', href: e.adresse ?? `#/mehr/${e.id}` },
+          el('span', { class: 'menue-icon' }, menueIcon(e.icon)),
+          el('span', { class: 'menue-text' }, e.titel, el('small', {}, e.text)),
+          icon('vor', 18))))))),
+    el('p', { class: 'klein fusszeile' }, `${APP_NAME} ${APP_VERSION}`));
 }
 
 /* ---------- Ziele ---------- */
@@ -313,9 +371,19 @@ function speicherBereich(status) {
 }
 
 function ueberBereich() {
-  return el('section', { class: 'bereich' },
-    el('h2', {}, `Über ${APP_NAME}`),
-    el('p', {}, `Version ${APP_VERSION}. Kein Konto, kein Server, keine Auswertung deiner Nutzung.`),
-    el('p', { class: 'klein' }, 'Ins Internet geht nur, was du selbst auslöst: ein Suchbegriff oder Barcode an Open Food Facts.'),
-    el('p', { class: 'klein' }, 'Nährwerte der mitgelieferten Zutaten: USDA FoodData Central (SR Legacy, gemeinfrei). Online-Suche: Open Food Facts (Open Database License). Die Angaben dienen der Orientierung und ersetzen keine ärztliche Beratung.'));
+  return el('div', { class: 'stapel' },
+    el('p', {}, `${APP_NAME} hilft dir, Ernährung und Gesundheitswerte im Blick zu behalten. Version ${APP_VERSION}.`),
+    el('ul', { class: 'funktionen' }, FUNKTIONEN.map((f) => el('li', {}, el('h2', {}, f.titel), el('p', {}, f.text)))),
+    el('section', { class: 'bereich' },
+      el('h2', {}, 'Quellen'),
+      el('p', { class: 'klein' }, 'Nährwerte der mitgelieferten Zutaten: USDA FoodData Central (SR Legacy, gemeinfrei). Online-Suche: Open Food Facts (Open Database License). Referenzwerte: Deutsche Gesellschaft für Ernährung (DGE). Schrift: Bricolage Grotesque (SIL Open Font License). Elan selbst steht unter der MIT-Lizenz.'),
+      el('p', { class: 'klein' }, 'Die Angaben dienen der Orientierung und ersetzen keine ärztliche Beratung.')),
+    el('p', {}, el('a', { class: 'textlink', href: '#/mehr/neu' }, 'Was ist neu')));
+}
+
+function neuBereich() {
+  return el('ol', { class: 'neuigkeiten' }, NEUIGKEITEN.map((n) => el('li', {},
+    el('p', { class: 'neu-kopf' }, el('span', { class: 'marke' }, n.version), ` ${formatKurz(n.datum)}`),
+    el('h2', {}, n.titel),
+    el('ul', {}, n.punkte.map((p) => el('li', {}, p))))));
 }

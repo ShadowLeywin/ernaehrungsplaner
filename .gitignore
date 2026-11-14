@@ -18,3 +18,6 @@ elan-backup-*.json
 *.keystore
 *.jks
 keystore.properties
+
+# Erfundene Beispieldaten für Tests dürfen ins Repo (echte Backups bleiben ausgeschlossen)
+!test/daten/*.json
