@@ -7,7 +7,7 @@ Regeln und Wissen für jede Claude-Session in diesem Repo. Erst lesen, dann arbe
 - **Was:** Progressive Web App für Android/Chrome, komplett deutsch, offline-first.
 - **Umfang:** nur Ernährung und Health-Daten. Kein Trainingslog; der Tagestyp (Gym, Calisthenics, Rest) bestimmt nur die Ziele.
 - **Nutzer:** Léon baut privat. Später nutzen Freunde die App, jeder mit eigenen lokalen Daten.
-- **Stand:** Version 0.1 (Tagebuch, Zutaten, Ziele, Backup). Plan: `docs/PHASENPLAN.md`.
+- **Stand:** Version 0.2 (Tagebuch, Zutaten, Rezepte, Ziele, Backup), Schema-Version 2. Plan: `docs/PHASENPLAN.md`.
 
 ## Feste Entscheidungen (gelten, bis Léon widerspricht)
 
@@ -70,7 +70,7 @@ Léon kann mehrere Runden am Stück freigeben („mach durch bis …“). Dann d
 | `js/speicher.js` | Datenzugriff für die Ansichten |
 | `js/ansichten/` | je Seite eine Datei, baut DOM-Elemente |
 | `js/ui.js` | `el`, `svg`, `haenge`, `blatt`, `hinweis`, `bestaetige`, `feld` |
-| `js/router.js` | Hash-Router (`#/heute`, `#/zutaten`, `#/mehr`) |
+| `js/router.js` | Hash-Router (`#/heute`, `#/rezepte`, `#/zutaten`, `#/mehr`) |
 | `sw.js` | Service Worker, Cache zuerst |
 | `data/zutaten-basis.json` | mitgelieferte Zutaten, nur lesen |
 | `test/` | Unit-Tests und Beispieldaten |

@@ -68,6 +68,16 @@ export function fortschritt(ist = 0, ziel = 0) {
   return { anteil: ist / ziel, rest: ziel - ist, ueber: ist > ziel };
 }
 
+/** Welcher Slot passt zur Uhrzeit? Vorbelegung beim Eintragen, der Nutzer kann ändern. */
+export function slotFuerUhrzeit(stunde) {
+  if (stunde < 10) return 'fruehstueck';
+  if (stunde < 12) return 'morgensnack';
+  if (stunde < 15) return 'mittag';
+  if (stunde < 18) return 'nachmittagssnack';
+  if (stunde < 21) return 'abend';
+  return 'abendsnack';
+}
+
 /** kcal-Ziel je Slot aus dem Tagesziel */
 export function slotZiele(kcal) {
   return Object.fromEntries(SLOTS.map((s) => [s.id, kcal * s.anteil]));

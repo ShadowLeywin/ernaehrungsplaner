@@ -16,6 +16,10 @@ export const MIGRATIONEN = [
     db.createObjectStore('tage', { keyPath: 'datum' });
     db.createObjectStore('einstellungen', { keyPath: 'schluessel' });
   },
+  // Version 2: Rezepte
+  (db) => {
+    db.createObjectStore('rezepte', { keyPath: 'id' });
+  },
 ];
 
 let offen;

@@ -52,3 +52,14 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Lehre:** Beide echten Fehler fand das Bild, nicht der Test. Danach bekam jeder Fehler einen Test, damit er nicht wiederkommt.
 - **Fachbegriffe:** End-to-End-Test, Headless-Browser, Geräte-Emulation, abgefangene Netzanfrage (Mock), Regressionstest.
 - **Zum Auftrag:** Geholfen hat „teste so oft, bis es steht“. Gefehlt hat, was „erste Version“ mindestens können muss; ich habe Tagebuch, Zutaten, Ziele und Backup gewählt.
+
+## Session 2, Runde 1: Rezepte (14.11.2026)
+
+- **Was und warum:** Version 0.1 nach `main` gebracht (Pull Request 2), dann Rezepte gebaut: Zutaten mit Mengen, Portionen, Schritte mit „Prinzip dahinter“. Ein Rezept wird fürs Tagebuch wie eine Zutat verpackt, damit keine zweite Rechenlogik nötig ist.
+- **Befehle:** `git fetch origin main && git merge --ff-only origin/main` (Arbeitsbranch nach dem Merge wieder auf den Stand von main heben) · `node tools/pruefe-app.cjs 2>&1 | grep -E "FEHLER|Kriterien"` (nur Fehlschläge und Summe zeigen).
+- **Entscheidung:** Schema-Version 2 mit eigener Migration, die nur den Speicher `rezepte` anlegt. Verworfen: Rezepte in `einstellungen` ablegen (ginge ohne Migration, wäre aber wieder ein großer Block statt einer Entität).
+- **Entscheidung 2:** Rezept-Zutaten speichern eine Kopie der Nährwerte, Tagebuch-Einträge eine Kopie der Rezeptwerte. Ein geändertes Rezept ändert alte Tage nicht (per Test belegt: 449 kcal bleiben, obwohl das Rezept jetzt 898 hat).
+- **Fehler:** Der Test „Backup speichern“ schlug fehl, weil er Schema-Version 1 erwartete. Das war richtig so: Der Test hat die Änderung bemerkt. Lösung: Erwartung anheben, dazu ein Test mit einem echten Backup aus Version 1.
+- **Wie die Migration getestet wird:** Das Prüfskript legt auf einer Seite ohne App-Code eine Datenbank im alten Aufbau an und öffnet erst dann die App.
+- **Fachbegriffe:** `onupgradeneeded`, `oldVersion`, Fixture (Beispieldatei für Tests), Entität, Adapter (ein Ding so verpacken, dass es wie ein anderes benutzt werden kann).
+- **Zum Auftrag:** Geholfen hat „mach von allein weiter“ mit klarer Berechtigung. Gefehlt hat ein Ziel für die Nacht; ich arbeite den Phasenplan in Reihenfolge ab.

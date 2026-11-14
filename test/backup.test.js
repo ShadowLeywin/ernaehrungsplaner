@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { backupDateiname, erstelleBackup, pruefeBackup } from '../js/logik/backup.js';
 import { SCHEMA_VERSION, STORES } from '../js/logik/schema.js';
@@ -8,6 +9,7 @@ const DATEN = {
   eintraege: [{ id: 'e1', datum: '2026-11-13', slot: 'mittag', gramm: 50, je100: { kcal: 400 } }],
   tage: [{ datum: '2026-11-13', tagestyp: 'rest' }],
   einstellungen: [{ schluessel: 'woche', wert: ['gym'] }],
+  rezepte: [{ id: 'r1', name: 'Testeintopf', portionen: 2, zutaten: [], schritte: [] }],
 };
 
 test('Backup enthält Kennung, Schema-Version, Zeitpunkt und alle Speicher', () => {
@@ -24,7 +26,7 @@ test('Hin und zurück: ein erstelltes Backup besteht die Prüfung unverändert',
   const p = pruefeBackup(kopie);
   assert.equal(p.ok, true);
   assert.deepEqual(p.daten, DATEN);
-  assert.deepEqual(p.anzahl, { zutaten: 1, eintraege: 1, tage: 1, einstellungen: 1 });
+  assert.deepEqual(p.anzahl, { zutaten: 1, eintraege: 1, tage: 1, einstellungen: 1, rezepte: 1 });
 });
 
 test('fremde und kaputte Dateien werden abgelehnt', () => {
@@ -56,4 +58,18 @@ test('fehlende Bereiche gelten als leer', () => {
 
 test('Dateiname trägt das Datum', () => {
   assert.equal(backupDateiname(new Date(2026, 10, 3)), 'elan-backup-2026-11-03.json');
+});
+
+test('ein Backup aus Schema-Version 1 wird angehoben: Rezepte kommen leer dazu, der Rest bleibt', () => {
+  const alt = JSON.parse(readFileSync(new URL('./daten/backup-v1.json', import.meta.url), 'utf8'));
+  const p = pruefeBackup(alt);
+  assert.equal(p.ok, true);
+  assert.deepEqual(p.daten.rezepte, []);
+  assert.deepEqual(p.daten.eintraege, alt.daten.eintraege);
+  assert.equal(p.anzahl.zutaten, 1);
+});
+
+test('für jede ältere Schema-Version gibt es eine Backup-Migration', async () => {
+  const { BACKUP_MIGRATIONEN } = await import('../js/logik/backup.js');
+  for (let v = 1; v < SCHEMA_VERSION; v += 1) assert.equal(typeof BACKUP_MIGRATIONEN[v], 'function', `Version ${v}`);
 });

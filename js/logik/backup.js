@@ -5,9 +5,12 @@ import { APP_KENNUNG, SCHEMA_VERSION, STORES } from './schema.js';
 
 /**
  * Umbauten für Backups aus älteren Schema-Versionen: BACKUP_MIGRATIONEN[1] hebt ein
- * Backup von Version 1 auf Version 2 und so weiter. Noch leer, weil es nur Version 1 gibt.
+ * Backup von Version 1 auf Version 2 und so weiter.
  */
-export const BACKUP_MIGRATIONEN = {};
+export const BACKUP_MIGRATIONEN = {
+  // Version 1 kannte noch keine Rezepte
+  1: (daten) => ({ ...daten, rezepte: [] }),
+};
 
 export function erstelleBackup(daten, jetzt = new Date()) {
   const inhalt = {};

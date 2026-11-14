@@ -1,7 +1,7 @@
 // Service Worker: hält die App offline bereit.
 // Bei JEDER Änderung an einer App-Datei VERSION erhöhen, sonst sehen installierte Geräte die Änderung nicht.
 // Neue Dateien in DATEIEN eintragen. Der Test test/sw.test.js prüft, dass die Liste vollständig ist.
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE = `elan-${VERSION}`;
 
 const DATEIEN = [
@@ -31,9 +31,11 @@ const DATEIEN = [
   './js/logik/off.js',
   './js/logik/backup.js',
   './js/logik/scheibe.js',
+  './js/logik/rezepte.js',
   './js/ansichten/heute.js',
   './js/ansichten/eintrag.js',
   './js/ansichten/zutaten.js',
+  './js/ansichten/rezepte.js',
   './js/ansichten/mehr.js',
 ];
 

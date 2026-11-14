@@ -118,7 +118,7 @@ function slotBereich(slot, eintraege, kcal, zielKcal, datum) {
       }, icon('plus'))),
     eintraege.length ? el('ul', { class: 'eintraege' }, eintraege.map((e) => el('li', {},
       el('button', { type: 'button', class: 'eintrag', onclick: () => oeffneEintrag({ eintrag: e, beiFertig: neuZeichnen }) },
-        el('span', { class: 'eintrag-name' }, e.name, e.marke ? el('small', {}, e.marke) : null),
+        el('span', { class: 'eintrag-name' }, e.name, e.rezeptId ? el('small', {}, 'Rezept') : (e.marke ? el('small', {}, e.marke) : null)),
         el('span', { class: 'eintrag-menge' }, `${zahl(e.gramm, 1)} g`),
         el('span', { class: 'eintrag-kcal' }, `${zahl(fuerMenge(e.je100, e.gramm).kcal ?? 0)} kcal`))))) : null);
 }

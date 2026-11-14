@@ -7,7 +7,7 @@ Elan ist eine Ernährungs- und Health-App als PWA: offline, deutsch, alle Daten 
 | Nr. | Modul | Kern | Stand |
 |---|---|---|---|
 | 1 | Zutaten | lokale Datenbank, eigene Zutaten, Suche bei Open Food Facts | 0.1: vorhanden. Offen: USDA-Suche, BLS 4.0, Barcode per Kamera |
-| 2 | Rezepte | anlegen und ändern, Portionen, Nährwerte automatisch, je Schritt ein Feld „Prinzip dahinter“ | geplant, Session 2 |
+| 2 | Rezepte | anlegen und ändern, Portionen, Nährwerte automatisch, je Schritt ein Feld „Prinzip dahinter“ | 0.2: vorhanden. Offen: Schritte umsortieren, Rezept kopieren |
 | 3 | Tagebuch | 6 Slots, Makros, Ballaststoffe, Ziele je Tagestyp | 0.1: vorhanden. Offen: Mikronährstoffe Tag und Woche |
 | 4 | Wochenplan, Einkauf, Meal-Prep | Woche planen, Einkaufsliste automatisch, Portionen, Haltbarkeit, Einfrieren | geplant, Sessions 4 und 5 |
 | 5 | Angebote | Angebote bei den Zutaten zeigen | geplant, Session 6; Datenquelle ungeklärt |
@@ -18,7 +18,7 @@ Elan ist eine Ernährungs- und Health-App als PWA: offline, deutsch, alle Daten 
 
 ## Bedienung
 
-- Drei Seiten in 0.1: Heute, Zutaten, Mehr. Ziel sind fünf: Heute, Rezepte, Woche, Health, Mehr (Zutaten wandern unter Rezepte oder Mehr).
+- Vier Seiten in 0.2: Heute, Rezepte, Zutaten, Mehr. Ziel sind fünf: Heute, Rezepte, Woche, Health, Mehr (Zutaten wandern unter Rezepte oder Mehr).
 - Signatur der App ist die **Tagesscheibe**: sechs Segmente wie eine aufgeschnittene Zitrusfrucht, eines je Mahlzeit. Breite = Anteil am Tagesziel, Füllung = gegessen.
 - Fruchtfarben je Makro: Eiweiß Grapefruit, Kohlenhydrate Zitrone, Fett Avocado, Ballaststoffe Heidelbeere.
 - Über dem Ziel liegen ist kein Fehler: kein Rot, nur ein dunkleres Grün.

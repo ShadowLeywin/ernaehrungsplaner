@@ -3,11 +3,13 @@
 import './darstellung.js';
 import { zeigeHeute } from './ansichten/heute.js';
 import { zeigeMehr } from './ansichten/mehr.js';
+import { zeigeRezepte } from './ansichten/rezepte.js';
 import { zeigeZutaten } from './ansichten/zutaten.js';
 import { route, starte } from './router.js';
 import { hinweis } from './ui.js';
 
 route('heute', zeigeHeute);
+route('rezepte', zeigeRezepte);
 route('zutaten', zeigeZutaten);
 route('mehr', zeigeMehr);
 starte(document.getElementById('inhalt'), 'heute');

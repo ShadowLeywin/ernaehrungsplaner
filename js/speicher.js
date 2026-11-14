@@ -2,6 +2,7 @@
 
 import * as db from './db.js';
 import { erstelleBackup } from './logik/backup.js';
+import { rezeptAlsZutat } from './logik/rezepte.js';
 import { bereinigeWoche, bereinigeZiele } from './logik/ziele.js';
 
 /* ---------- Zutaten ---------- */
@@ -31,6 +32,10 @@ export async function alleZutaten() {
 
 export async function holeZutat(id) {
   if (String(id).startsWith('basis:')) return (await ladeBasis()).find((z) => z.id === id) ?? null;
+  if (String(id).startsWith('rezept:')) {
+    const rezept = await db.hole('rezepte', String(id).slice(7));
+    return rezept ? rezeptAlsZutat(rezept) : null;
+  }
   return (await db.hole('zutaten', id)) ?? null;
 }
 
@@ -43,6 +48,18 @@ export function speichereZutat(zutat) {
 }
 
 export const loescheZutat = (id) => db.loesche('zutaten', id);
+
+/* ---------- Rezepte ---------- */
+
+export const alleRezepte = () => db.alle('rezepte');
+export const holeRezept = async (id) => (await db.hole('rezepte', id)) ?? null;
+
+export function speichereRezept(rezept) {
+  const jetzt = new Date().toISOString();
+  return db.speichere('rezepte', { ...rezept, id: rezept.id ?? crypto.randomUUID(), erstellt: rezept.erstellt ?? jetzt, geaendert: jetzt });
+}
+
+export const loescheRezept = (id) => db.loesche('rezepte', id);
 
 /* ---------- Tagebuch ---------- */
 
