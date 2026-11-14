@@ -125,16 +125,19 @@ Die App deutet nichts medizinisch: Sie vergleicht mit dem eingetragenen Bereich 
 
 Module: 7 (zweiter Teil).
 
-### Session 9: Import und Coach-Export
+### Session 9: Import und Coach-Export (erledigt, Version 0.8)
 
 Ziel: Rezepte hereinholen, Wochenbericht herausgeben.
 
-| Abnahmekriterium | Testbefehl |
+| Abnahmekriterium | Beleg |
 |---|---|
-| Eingefügter Rezepttext wird in Zutaten, Mengen und Schritte zerlegt; Unsicheres ist markiert | `npm test` mit Beispieltexten |
-| Android Share Target: geteilter Text öffnet den Import | `pruefe-app.cjs` (Manifest), am Handy manuell |
-| Schema.org-Rezeptdaten aus eingefügtem HTML lesen | `npm test` |
-| Coach-Export: kompakter Wochenbericht als Text, den der Nutzer selbst kopiert | `npm test`, `pruefe-app.cjs` |
+| Eingefügter Rezepttext wird in Zutaten, Mengen und Schritte zerlegt; Unsicheres ist markiert | `npm test`: `import.test.js`, 13 Tests mit Beispieltexten; `pruefe-app.cjs`: „Import aus Text“ |
+| Zuordnung nur bei ganzen Wörtern, sonst kein Treffer | `npm test`: „Wasser ist keine Wassermelone“ |
+| Android Share Target: geteilter Text öffnet den Import | `pruefe-app.cjs`: „Share Target“ (Aufruf mit Parametern); **am Handy noch zu prüfen** |
+| Schema.org-Rezeptdaten aus eingefügtem HTML lesen | `npm test`; `pruefe-app.cjs`: „Import aus Schema.org-Daten“ |
+| Coach-Export: kompakter Wochenbericht als Text, den der Nutzer selbst kopiert | `npm test`: `coach.test.js`; `pruefe-app.cjs`: „Coach-Export“ |
+
+Die App ruft beim Import keine fremden Seiten ab.
 
 Module: 8, 9 (Coach-Export).
 
@@ -151,14 +154,14 @@ Ziel: Die App fühlt sich am Handy fertig an.
 
 Module: alle.
 
-### Session 11: Coach-Prompt
+### Session 11: Coach-Prompt (Dokument erledigt, Probelauf offen)
 
 Ziel: Ein Prompt, der den Coach-Export in einem KI-Chat auswertet.
 
-| Abnahmekriterium | Testbefehl |
+| Abnahmekriterium | Beleg |
 |---|---|
-| Prompt-Datei unter `docs/` mit Rolle, Kontext, Aufgabe, Regeln, Format, Stopp | Durchsicht |
-| Probelauf mit erfundenem Export liefert eine verwertbare Antwort | manuell, Ergebnis im Lernlog |
+| Prompt-Datei unter `docs/` mit Rolle, Kontext, Aufgabe, Regeln, Format, Stopp | `docs/COACH-PROMPT.md` |
+| Probelauf mit erfundenem Export liefert eine verwertbare Antwort | **offen**: Léon testet und hält das Ergebnis im Lernlog fest |
 
 Module: 9.
 
@@ -192,4 +195,5 @@ Jede Session hat eine Tabelle mit prüfbaren Kriterien und einem Testbefehl.
 - Testausgaben vom 14.11.2026 (Version 0.5): `npm test` 97 von 97, `node tools/pruefe-app.cjs` 68 von 68.
 - Testausgaben vom 14.11.2026 (Version 0.6): `npm test` 106 von 106, `node tools/pruefe-app.cjs` 76 von 76.
 - Testausgaben vom 14.11.2026 (Version 0.7): `npm test` 113 von 113, `node tools/pruefe-app.cjs` 83 von 83.
+- Testausgaben vom 14.11.2026 (Version 0.8): `npm test` 130 von 130, `node tools/pruefe-app.cjs` 91 von 91.
 - BLS 4.0 kostenfrei: [heise](https://heise.de/-11123877), [Agrolab](https://agrolab.com/en/news/food-news/6105-bls-datenbank-radar-01-26-en.html), abgerufen 13.11.2026.

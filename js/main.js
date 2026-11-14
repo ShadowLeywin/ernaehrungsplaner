@@ -10,6 +10,15 @@ import { zeigeZutaten } from './ansichten/zutaten.js';
 import { route, starte } from './router.js';
 import { hinweis } from './ui.js';
 
+// Android "Teilen": Die App wird mit ?titel=…&text=…&url=… geöffnet (siehe share_target im Manifest).
+// Den Inhalt merken, die Adresse aufräumen und zum Import springen.
+const geteilt = new URLSearchParams(location.search);
+if (geteilt.has('text') || geteilt.has('titel') || geteilt.has('url')) {
+  const inhalt = [geteilt.get('titel'), geteilt.get('text'), geteilt.get('url')].filter(Boolean).join('\n');
+  try { sessionStorage.setItem('elan.geteilt', inhalt); } catch { /* dann bleibt das Importfeld leer */ }
+  history.replaceState(null, '', `${location.pathname}#/rezepte/import`);
+}
+
 route('heute', zeigeHeute);
 route('woche', zeigeWoche);
 route('rezepte', zeigeRezepte);

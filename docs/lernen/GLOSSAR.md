@@ -42,3 +42,9 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | Referenzbereich | Die Spanne, in der ein Laborwert laut Labor üblicherweise liegt. | `laborStatus()` in `js/logik/befunde.js` |
 | Korrelation | Zwei Dinge treten zusammen auf; das beweist nicht, dass eines das andere verursacht. | Hinweistext in `zeigeSymptome()` in `js/ansichten/befunde.js` |
 | `<datalist>` | Eine Liste von Vorschlägen, die der Browser unter einem Eingabefeld anbietet. | `oeffneLaborFormular()` in `js/ansichten/befunde.js` |
+| Parser | Code, der Text in seine Bestandteile zerlegt. | `leseRezeptText()` in `js/logik/import.js` |
+| Heuristik | Eine Faustregel, die meistens stimmt, aber nicht immer. | Umrechnung von Löffeln in Gramm in `js/logik/import.js` |
+| JSON-LD | Maschinenlesbare Daten in einer Webseite, zum Beispiel ein Rezept nach schema.org. | `leseSchemaOrg()` in `js/logik/import.js` |
+| Share Target | Ein Eintrag im Manifest, durch den die App im „Teilen“-Menü von Android erscheint. | `share_target` in `manifest.webmanifest`, Auswertung in `js/main.js` |
+| Falsch-positiver Treffer | Die Suche meldet einen Fund, der keiner ist. | Test „Wasser ist keine Wassermelone“ in `test/import.test.js` |
+| Prompt | Der Auftragstext an eine KI. | `docs/COACH-PROMPT.md` |

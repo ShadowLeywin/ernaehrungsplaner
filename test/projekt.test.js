@@ -46,6 +46,9 @@ test('Manifest: Pflichtfelder und vorhandene Icons', () => {
   assert.ok(m.icons.some((i) => i.sizes === '192x192') && m.icons.some((i) => i.sizes === '512x512'));
   assert.ok(m.icons.some((i) => i.purpose === 'maskable'));
   for (const icon of m.icons) assert.ok(existsSync(new URL(icon.src, wurzel)), icon.src);
+  // Teilen-Ziel: die Namen der Parameter müssen zu js/main.js passen
+  assert.deepEqual(m.share_target.params, { title: 'titel', text: 'text', url: 'url' });
+  assert.equal(m.share_target.method, 'GET');
 });
 
 test('Basis-Zutaten: eindeutige ids, bekannte Kategorien und Nährstoffe, plausible Werte', () => {

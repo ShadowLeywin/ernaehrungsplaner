@@ -2,8 +2,10 @@
 
 import { MODI, leseDarstellung, setzeDarstellung } from '../darstellung.js';
 import { backupDateiname, pruefeBackup } from '../logik/backup.js';
-import { WOCHENTAGE, formatKurz, isoDatum } from '../logik/datum.js';
+import { coachBericht } from '../logik/coach.js';
+import { WOCHENTAGE, formatKurz, isoDatum, verschiebe } from '../logik/datum.js';
 import { APP_NAME, APP_VERSION } from '../logik/schema.js';
+import { wochenTage } from '../logik/woche.js';
 import { SLOTS, STANDARD_ANTEILE, STANDARD_ZIELE, TAGESTYPEN, ZIEL_FELDER, bereinigeAnteile, makroAbweichung, pruefeAnteile } from '../logik/ziele.js';
 import { parseZahl } from '../logik/zutat.js';
 import { neuZeichnen } from '../router.js';
@@ -25,6 +27,7 @@ export async function zeigeMehr(wurzel) {
     wochenBereich(woche),
     anteileBereich(bereinigeAnteile(anteile)),
     backupBereich(letztesBackup, daten.daten),
+    coachBereich(),
     darstellungBereich(),
     speicherBereich(status),
     ueberBereich());
@@ -210,6 +213,48 @@ function backupBereich(letztesBackup, daten) {
       el('label', { class: 'knopf leise', for: 'f-backup-datei' }, 'Backup einspielen'),
       dateiWahl,
       el('button', { type: 'button', class: 'knopf', onclick: sichern }, 'Backup speichern')));
+}
+
+/* ---------- Coach-Export ---------- */
+
+let coachWoche = 'diese';
+
+function coachBereich() {
+  const ausgabe = el('div', { class: 'stapel', id: 'coach-ausgabe' });
+  const erstelle = async () => {
+    const heute = isoDatum();
+    const tage = wochenTage(coachWoche === 'diese' ? heute : verschiebe(heute, -7));
+    const stichtag = heute < tage[6] ? heute : tage[6];
+    const [eintraege, ziele, wochenplan, messungen, gesundheit, symptome, supplements, saetze] = await Promise.all([
+      speicher.eintraegeZwischen(tage[0], tage[6]), speicher.ladeZiele(), speicher.ladeWoche(), speicher.messungenZwischen(verschiebe(tage[0], -14), tage[6]),
+      speicher.ladeGesundheit(), speicher.symptomeZwischen(tage[0], tage[6]), speicher.alleSupplements(), Promise.all(tage.map(speicher.holeTag)),
+    ]);
+    const tagSaetze = new Map(saetze.filter(Boolean).map((t) => [t.datum, t]));
+    const text = coachBericht({ tage, stichtag, eintraege, ziele, wochenplan, tagSaetze, messungen, gesundheit, symptome, supplements });
+    const kopiere = async () => {
+      try { await navigator.clipboard.writeText(text); hinweis('Bericht kopiert.'); } catch { hinweis('Kopieren hat nicht geklappt. Markiere den Text von Hand.'); }
+    };
+    ausgabe.replaceChildren(
+      el('textarea', { id: 'f-coach-text', rows: 14, readonly: true, 'aria-label': 'Wochenbericht' }, text),
+      el('div', { class: 'knopfreihe' },
+        navigator.share ? el('button', { type: 'button', class: 'knopf leise', onclick: () => navigator.share({ text }).catch(() => {}) }, 'Teilen') : null,
+        el('button', { type: 'button', class: 'knopf', onclick: kopiere }, 'Bericht kopieren')));
+  };
+  const wahl = (id, name) => el('button', {
+    type: 'button', class: 'wahl-knopf', 'aria-pressed': String(coachWoche === id),
+    onclick: (e) => {
+      coachWoche = id;
+      for (const knopf of e.target.parentElement.children) knopf.setAttribute('aria-pressed', String(knopf === e.target));
+      if (ausgabe.childElementCount) erstelle();
+    },
+  }, name);
+  return el('section', { class: 'bereich' },
+    el('h2', {}, 'Coach-Export'),
+    el('p', {}, 'Ein Wochenbericht als Text: Ernährung, Gewicht, Alltag, Supplements und Symptome. Zum Einfügen in einen Chat mit deinem Coach oder einer KI.'),
+    el('p', { class: 'klein' }, 'Der Bericht enthält Gesundheitsdaten. Die App sendet ihn nirgendwohin; du entscheidest, wohin du ihn kopierst.'),
+    el('div', { class: 'wahl', role: 'group', 'aria-label': 'Woche für den Bericht' }, wahl('diese', 'Diese Woche'), wahl('letzte', 'Letzte Woche')),
+    el('div', { class: 'knopfreihe' }, el('button', { type: 'button', class: 'knopf leise', onclick: erstelle }, 'Bericht erstellen')),
+    ausgabe);
 }
 
 /* ---------- Darstellung, Speicher, Über ---------- */

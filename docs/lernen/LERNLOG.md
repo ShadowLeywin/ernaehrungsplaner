@@ -118,3 +118,14 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Fehler:** Keiner in dieser Runde. Tests und Durchlauf waren beim ersten Mal grün; die Lehren aus den Vorrunden (Selektoren mit `exact`, Erwartungen aus dem Schema ableiten) haben gehalten.
 - **Fachbegriffe:** Referenzbereich, Korrelation (zusammen auftreten heißt nicht verursachen), `<datalist>` (Vorschläge für ein Eingabefeld), n-zu-m-Beziehung.
 - **Zum Auftrag:** Geholfen hat die klare Grenze „keine Gesundheitsdaten in Tests“. Alle Beispielwerte heißen „Testwert“ oder „Testsymptom“.
+
+## Session 9, Runde 1: Import und Coach-Export (14.11.2026)
+
+- **Was und warum:** Rezepte aus eingefügtem Text und aus Schema.org-Daten erkennen, Android „Teilen“ als Eingang, Wochenbericht als Text. Der Import ist ein Vorschlag, der im normalen Rezeptformular landet; gespeichert wird erst nach deiner Prüfung.
+- **Befehle:** `node -e "import('./js/logik/import.js').then(m => …)"` (die Zuordnung gegen die echte Zutatenliste ausgeben und mit den Augen prüfen) · `npm test`.
+- **Entscheidung:** Die App ruft keine fremden Seiten ab. Eine geteilte Adresse wird erklärt statt geladen. Verworfen: Seite nachladen, weil das Scraping wäre und im Browser ohnehin an fremden Servern scheitert.
+- **Fehler 1 (ernst):** „1,5 l Wasser“ wurde zu 1.500 g Wassermelone, „200 g Reis“ zu Reiswaffeln. Alle Tests waren grün; aufgefallen ist es beim Lesen der Testausgabe („6 von 7 zugeordnet“, obwohl es Wasser nicht gibt). Ursache: Die Suche akzeptiert Wortanfänge. Lösung: Der Import ordnet nur bei ganzen Wörtern zu; neuer Test mit genau diesen Fällen.
+- **Fehler 2:** „2 Karotten“ fand „Karotte“ nicht. Lösung: Einzahl-Suche über typische Endungen.
+- **Lehre:** Grüne Tests prüfen nur, was man gefragt hat. Ausgaben lesen und sich fragen „kann das stimmen?“ findet die Fehler, an die man nicht gedacht hat.
+- **Fachbegriffe:** Parser, Heuristik, JSON-LD, Share Target, Wortgrenze, falsch-positiver Treffer.
+- **Zum Auftrag:** Geholfen hat die Regel „kein Scraping“: Sie hat die Grenze des Imports von Anfang an klar gemacht.
