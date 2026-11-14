@@ -14,6 +14,8 @@ Die Android-App ist dieselbe Web-App, verpackt mit Capacitor. Alle Dateien liege
 | Offline | Service Worker | Dateien liegen im APK; Service Worker ist aus |
 | Speicher | Browser kann aufräumen, daher „Speicher schützen“ | Daten liegen in der App, „Speicher schützen“ entfällt |
 | Cloud-Sicherung | – | **ausgeschaltet**, Gesundheitsdaten gehen nicht in die Google-Cloud |
+| Vibration | `navigator.vibrate`, falls vorhanden | Plugin Haptics |
+| Widget | – | Widget „Elan · heute“ (kcal übrig, Wasser), siehe unten |
 
 Alle Unterschiede stehen in `js/plattform.js`. Der Browser-Test `tools/pruefe-app.cjs` prüft die App-Zweige mit einer nachgebildeten Capacitor-Brücke („App-Lauf“).
 
@@ -69,6 +71,13 @@ Mit beiden Secrets: signiertes APK unter „Releases“ (`v1.0.0`, bei jedem Bau
 
 Der `versionCode` enthält die Zahl der Commits (Baunummer). Der angezeigte Name bleibt `1.0.0`, bis Léon eine neue Version freigibt; Android nimmt trotzdem jedes neue APK als Update an.
 
+## Widget
+
+- Dateien: `ElanWidget.java` (zeichnet), `WidgetPlugin.java` (nimmt Werte aus der Web-App an), `res/layout/elan_widget.xml`, `res/xml/elan_widget_info.xml`, Eintrag `<receiver>` im Manifest (nicht exportiert, wie von Android empfohlen).
+- Die Web-App schickt die Werte über `aktualisiereWidget()` in `js/plattform.js`, sobald „Heute“ gezeichnet wird oder Wasser dazukommt.
+- Nach Mitternacht zeigt das Widget keine alten Zahlen, sondern „Öffne Elan für heute“. Android fragt es alle 30 Minuten neu ab.
+- Datenschutz: Das Widget zeigt kcal und Wasser auf dem Startbildschirm. Es erscheint nur, wenn man es selbst hinzufügt.
+
 ## Offen
 
 - Test auf einem echten Gerät; in der Arbeitsumgebung gibt es keinen Emulator.
@@ -79,4 +88,5 @@ Der `versionCode` enthält die Zahl der Commits (Baunummer). Der angezeigte Name
 
 ## Quellen (mit Datum)
 
+- Android-Dokumentation „Create a simple widget“ (developer.android.com/guide/topics/appwidgets): Receiver mit `exported="false"`, abgerufen 14.11.2026.
 - Capacitor 8.6.2, Pakete `@capacitor/android`, `@capacitor/cli`, Typen der Konfiguration in `node_modules/@capacitor/cli/dist/declarations.d.ts`, gelesen 14.11.2026.

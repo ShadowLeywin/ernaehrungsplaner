@@ -251,7 +251,7 @@ input:focus-visible, select:focus-visible { outline: none; border-color: var(--b
 }
 
 /* Kacheln: 3 × 2, je ein Ring */
-.kacheln { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.625rem; }
+.kacheln { display: grid; grid-template-columns: repeat(var(--spalten, 3), minmax(0, 1fr)); gap: 0.625rem; }
 .kachel {
   display: flex; flex-direction: column; align-items: center; gap: 0.0625rem; min-width: 0;
   padding: 0.875rem 0.375rem 0.75rem; border: 0; border-radius: 1.125rem;
@@ -264,7 +264,7 @@ button.kachel:active { transform: scale(0.97); }
 .ring-grund { stroke: var(--ring-farbe, var(--blatt)); opacity: 0.2; }
 .ring-voll { stroke: var(--ring-farbe, var(--blatt)); stroke-linecap: round; transition: stroke-dasharray 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
 /* Zweite Runde über 100 %: dieselbe Farbe, zur Schrift hin gemischt (hell: dunkler, dunkel: heller) */
-.ring-runde2 { stroke: color-mix(in srgb, var(--ring-farbe, var(--blatt)) 55%, var(--tinte)); stroke-linecap: round; }
+.ring-runde2 { stroke: color-mix(in srgb, var(--ring-farbe, var(--blatt)) 55%, var(--tinte)); stroke-linecap: round; transition: stroke-dasharray 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s; }
 .ring-bild { position: absolute; inset: 0; display: grid; place-items: center; font-size: 1.25rem; line-height: 1; }
 .kachel-wert { font-size: 1.0625rem; font-weight: 720; letter-spacing: -0.01em; white-space: nowrap; }
 .kachel-ziel { font-size: 0.75rem; color: var(--tinte-leise); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
@@ -450,8 +450,60 @@ input[type='time'] { appearance: none; -webkit-appearance: none; }
 .hinweis-aktion { background: none; border: 0; min-height: 2.5rem; margin: -0.5rem -0.5rem -0.5rem 0; padding: 0 0.5rem; color: var(--limette); font-weight: 700; white-space: nowrap; }
 :root[data-modus='dunkel'] .hinweis-aktion { color: #2c6b12; }
 
+/* ---------- Übergänge: kurz, mit Richtung, nie im Weg ---------- */
+
+/* Seitenwechsel: neue Seite gleitet aus der Richtung der Bewegung herein */
+.seite.einblenden { animation: seite-rein 0.24s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.seite.richtung-vor { --von-x: 1.25rem; }
+.seite.richtung-zurueck { --von-x: -1.25rem; }
+@keyframes seite-rein { from { opacity: 0; transform: translateX(var(--von-x, 0)) translateY(var(--von-y, 0.375rem)); } }
+.seite.richtung-vor, .seite.richtung-zurueck { --von-y: 0; }
+
+/* Blatt: von unten herein und wieder hinaus, Hintergrund blendet mit */
+.blatt[open]::backdrop { animation: abdunkeln 0.22s ease-out; }
+.blatt.schliesst { animation: runter 0.2s ease-in both; }
+.blatt.schliesst::backdrop { animation: abdunkeln 0.2s ease-in reverse both; }
+@keyframes runter { to { transform: translateY(2rem); opacity: 0; } }
+@keyframes abdunkeln { from { opacity: 0; } }
+
+/* Hinweis gleitet von unten herein */
+.hinweis { animation: hinweis-rein 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes hinweis-rein { from { opacity: 0; transform: translateY(0.75rem) scale(0.98); } }
+
+/* Ringe füllen sich vom zuletzt gezeigten Stand aus (--von-*, beim ersten Öffnen 0).
+   „backwards“ statt „both“: Nach der Animation gilt wieder das Attribut, damit spätere Änderungen gleiten. */
+.ring-voll { animation: ring-voll-rein 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+.ring-runde2 { animation: ring-runde2-rein 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s backwards; }
+@keyframes ring-voll-rein { from { stroke-dasharray: var(--von-voll, 0) 100; } }
+@keyframes ring-runde2-rein { from { stroke-dasharray: var(--von-runde2, 0) 100; } }
+.ring circle.leer { opacity: 0; }
+
+/* Ziel erreicht: Kachel leuchtet in ihrer Farbe auf, das Symbol hüpft einmal */
+.kachel.gefeiert { animation: feier 0.9s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.kachel.gefeiert .ring-bild { animation: huepfen 0.6s cubic-bezier(0.3, 1.6, 0.5, 1); }
+@keyframes feier {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ring-farbe) 55%, transparent); }
+  35% { transform: scale(1.05); }
+  100% { box-shadow: 0 0 0 0.875rem color-mix(in srgb, var(--ring-farbe) 0%, transparent); transform: scale(1); }
+}
+@keyframes huepfen { 40% { transform: scale(1.35); } }
+
+/* Aufgeklappter Inhalt blendet ein */
+details[open] > :not(summary) { animation: aufklappen 0.2s ease-out; }
+@keyframes aufklappen { from { opacity: 0; transform: translateY(-0.25rem); } }
+
+/* Antippen fühlbar machen: leicht eindrücken */
+.knopf, .chip, .rund, .wahl-knopf, .kachel, .fab, .menuepunkt, .zeile, .navigation a {
+  transition: transform 0.12s ease, background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+:is(.knopf, .chip, .rund, .wahl-knopf, .kachel):active { transform: scale(0.96); }
+:is(.menuepunkt, .zeile):active { background-color: var(--flaeche-2); }
+.navigation .nav-bild { transition: background-color 0.2s ease, transform 0.2s ease; }
+.navigation a:active .nav-bild { transform: scale(0.92); }
+
+/* Wer weniger Bewegung eingestellt hat, bekommt sofortige Wechsel */
 @media (prefers-reduced-motion: reduce) {
-  .segment-voll, .blatt[open] { animation: none; }
+  *, *::before, *::after, ::backdrop { animation-duration: 0.01ms !important; animation-delay: 0s !important; transition-duration: 0.01ms !important; }
 }
 
 .zeile-schnell { display: flex; align-items: center; gap: 0.5rem; padding-right: 0.625rem; }

@@ -33,7 +33,8 @@ Was nur du erledigen kannst, weil es ein echtes Handy oder dein GitHub-Konto bra
 | A14 | Mehr → Darstellung: Design Blatt und Zitrus, dazu Hell und Dunkel durchschalten | Alles bleibt lesbar, die Wahl bleibt nach Neustart |
 | A15 | Mehr → „Was ist neu“ und „Über Elan“ lesen | Liste der Neuerungen, Funktionen kurz erklärt |
 | A16 | Bei einer Mahlzeit auf das Plus: Steht oben „Zuletzt eingetragen“ mit „+ 80 g“? Antippen | Eintrag ist sofort da, unten „Rückgängig“ |
-| A17 | Zwei Minuten frei herumtippen | Notiere, was hakt, zu klein ist oder unklar heißt |
+| A17 | Startbildschirm lange drücken → Widgets → Elan → „Elan · heute“ hinzufügen. Danach Wasser eintragen | Widget zeigt kcal übrig und das neue Wasser |
+| A18 | Zwei Minuten frei herumtippen | Notiere, was hakt, zu klein ist oder unklar heißt |
 
 ## B. Automatischer Bau einrichten (5 Minuten, am Rechner oder Handy)
 

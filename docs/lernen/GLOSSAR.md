@@ -70,3 +70,6 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | `color-mix()` | CSS-Funktion, die zwei Farben mischt, hier eine Farbe mit Durchsichtigkeit zu einer Tönung. | `.slot-bild` im Blatt-Teil von `css/app.css` |
 | Streuwert (Hash) | Eine aus einem Text berechnete Zahl; gleicher Text gibt immer dieselbe Zahl. | `streuwert()` in `js/logik/rezeptbild.js` |
 | Haptik | Rückmeldung über den Vibrationsmotor, zum Beispiel ein kurzes Antippen beim Speichern. | `tippGefuehl()` in `js/plattform.js` |
+| inert | Ein Element mit `inert` reagiert auf keine Tipps und keinen Fokus; ein modales Blatt macht den Rest der Seite inert. | `zu()` in `blatt()` in `js/ui.js` |
+| RemoteViews | Die einfachen Bausteine, aus denen Android ein Widget zeichnet; das Widget läuft nicht in der App selbst. | `ElanWidget.java` |
+| SharedPreferences | Kleiner privater Schlüssel-Wert-Speicher einer Android-App. | `WidgetPlugin.java` |

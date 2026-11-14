@@ -8,8 +8,8 @@ import { APP_NAME } from '../logik/schema.js';
 import { alsEintraege } from '../logik/plan.js';
 import { prozent } from '../logik/referenz.js';
 import { kopiereEintraege, wochenSchnitt, wochenTage } from '../logik/woche.js';
-import { TAGESTYPEN, fortschritt, slotFuerUhrzeit, tagestypFuer } from '../logik/ziele.js';
-import { tippGefuehl } from '../plattform.js';
+import { FEIER_RINGE, TAGESTYPEN, bereinigeRinge, fortschritt, kachelSpalten, neuErreicht, slotFuerUhrzeit, tagestypFuer } from '../logik/ziele.js';
+import { aktualisiereWidget, tippGefuehl } from '../plattform.js';
 import { gehe, neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { blatt, el, gramm, haenge, hinweis, icon, svg, zahl } from '../ui.js';
@@ -25,11 +25,11 @@ export async function zeigeHeute(wurzel, [parameter]) {
   const heute = isoDatum();
   const datum = istGueltig(parameter) ? parameter : heute;
   const woche = wochenTage(datum);
-  const [eintraege, ziele, wochenplan, tag, slots, wochenEintraege, vortag, plan, letztesBackup, anzahlEintraege, referenz, wasserHeute, gesundheit] = await Promise.all([
+  const [eintraege, ziele, wochenplan, tag, slots, wochenEintraege, vortag, plan, letztesBackup, anzahlEintraege, referenz, wasserHeute, gesundheit, ringe] = await Promise.all([
     speicher.eintraegeAm(datum), speicher.ladeZiele(), speicher.ladeWoche(), speicher.holeTag(datum), speicher.ladeSlots(),
     speicher.eintraegeZwischen(woche[0], woche[6]), speicher.eintraegeAm(verschiebe(datum, -1)), speicher.planAm(datum),
     speicher.einstellung('letztesBackup'), speicher.anzahlEintraege(), speicher.ladeReferenz(),
-    speicher.messungenZwischen(datum, datum), speicher.ladeGesundheit(),
+    speicher.messungenZwischen(datum, datum), speicher.ladeGesundheit(), speicher.einstellung('ringe').then(bereinigeRinge),
   ]);
   const lautPlan = tagestypFuer(datum, wochenplan, null);
   const typ = tagestypFuer(datum, wochenplan, tag);
@@ -39,12 +39,16 @@ export async function zeigeHeute(wurzel, [parameter]) {
   const kcalJeSlot = Object.fromEntries(slots.map((s) => [s.id, summeEintraege(imSlot(eintraege, s)).kcal ?? 0]));
 
   document.title = `${relativ(datum, heute) ?? formatLang(datum)} – ${APP_NAME}`;
+  // Widget zeigt immer den heutigen Tag, auch wenn man gerade einen anderen ansieht
+  const widget = datum === heute ? (wasserMl) => aktualisiereWidget({
+    datum, kcalUebrig: ziel.kcal - (ist.kcal ?? 0), wasserMl, wasserZielMl: gesundheit.wasserZielMl,
+  }) : () => {};
   haenge(wurzel,
     kopf(datum, heute),
     tagestypWahl(datum, typ, lautPlan),
     geplantHinweis(plan.filter((p) => !p.uebernommen), datum),
     uebersicht(ist, ziel, slots, kcalJeSlot),
-    kacheln(ist, ziel, datum, wasserHeute.filter((m) => m.art === 'wasser'), gesundheit.wasserZielMl),
+    kacheln({ ist, ziel, datum, ringe, widget, wasser: wasserHeute.filter((m) => m.art === 'wasser'), wasserZielMl: gesundheit.wasserZielMl }),
     eintraege.length === 0 && !plan.some((p) => !p.uebernommen) ? el('p', { class: 'leer' }, 'Noch nichts eingetragen. Tippe bei einer Mahlzeit auf das Plus.') : null,
     el('section', { class: 'karte mahlzeiten', 'aria-label': 'Mahlzeiten' },
       el('h2', { class: 'kartentitel' }, 'Mahlzeiten'),
@@ -158,56 +162,99 @@ function springeZu(ereignis, slotId) {
 const KACHEL_NAME = { kh: 'Kohlen\u00ADhydrate', ballaststoffe: 'Ballast\u00ADstoffe' };
 const EMOJI = { protein: '🥚', kh: '🍞', fett: '🥑', ballaststoffe: '🥦', wasser: '💧', alle: '📊' };
 
+// Letzter angezeigter Stand je Tag und Ring. Daraus: Ringe gleiten vom alten Wert aus, und eine Feier
+// gibt es nur, wenn ein Ring gerade voll wird, nicht schon beim Öffnen der Seite.
+const letzterStand = new Map();
+
+const prozentVon = (anteil) => Math.max(0, Math.min(1, anteil)) * 100;
+const runde2Von = (anteil) => Math.max(0, Math.min(1, anteil - 1)) * 100;
+
 /**
  * Ring wie bei Aktivitäts-Apps: pathLength=100, damit der Strich direkt in Prozent angegeben wird.
  * Über 100 % läuft eine zweite, dunklere Runde weiter (höchstens bis 200 %).
+ * vorher: der zuletzt gezeigte Anteil, von dem aus die Füll-Animation startet.
  */
-function ring(anteil, emoji) {
-  const prozent = Math.max(0, Math.min(1, anteil)) * 100;
-  const runde2 = Math.max(0, Math.min(1, anteil - 1)) * 100;
-  return el('span', { class: 'ring' },
-    svg('svg', { viewBox: '0 0 64 64', 'aria-hidden': 'true' },
-      svg('circle', { class: 'ring-grund', cx: 32, cy: 32, r: 27, pathLength: 100 }),
-      prozent > 0.5 ? svg('circle', { class: 'ring-voll', cx: 32, cy: 32, r: 27, pathLength: 100, 'stroke-dasharray': `${prozent.toFixed(1)} 100` }) : null,
-      runde2 > 0.5 ? svg('circle', { class: 'ring-runde2', cx: 32, cy: 32, r: 27, pathLength: 100, 'stroke-dasharray': `${runde2.toFixed(1)} 100` }) : null),
+function ring(anteil, emoji, vorher = 0) {
+  const kreis = (klasse) => svg('circle', { class: klasse, cx: 32, cy: 32, r: 27, pathLength: 100 });
+  const span = el('span', { class: 'ring', style: `--von-voll:${prozentVon(vorher).toFixed(1)};--von-runde2:${runde2Von(vorher).toFixed(1)}` },
+    svg('svg', { viewBox: '0 0 64 64', 'aria-hidden': 'true' }, kreis('ring-grund'), kreis('ring-voll'), kreis('ring-runde2')),
     el('span', { class: 'ring-bild', 'aria-hidden': 'true' }, emoji));
+  setzeRing(span, anteil);
+  return span;
 }
 
-function kacheln(ist, ziel, datum, wasser, wasserZielMl) {
-  return el('section', { class: 'kacheln', 'aria-label': 'Makros' },
-    MAKROS.map((id) => makroKachel(id, ist[id] ?? 0, ziel[id])),
-    wasserKachel(datum, wasser, wasserZielMl),
-    el('button', { type: 'button', class: 'kachel kachel-alle', onclick: zeigeAlleNaehrwerte },
+/** Ring auf einen neuen Anteil setzen, ohne ihn neu zu bauen: Die Änderung gleitet über die CSS-Transition. */
+function setzeRing(span, anteil) {
+  for (const [klasse, wert] of [['ring-voll', prozentVon(anteil)], ['ring-runde2', runde2Von(anteil)]]) {
+    const kreis = span.querySelector(`.${klasse}`);
+    kreis.setAttribute('stroke-dasharray', `${wert.toFixed(1)} 100`);
+    kreis.classList.toggle('leer', wert < 0.5); // sonst zeichnet das runde Linienende einen Punkt
+  }
+}
+
+/** Stand merken; meldet true, wenn ein feierwürdiger Ring gerade voll geworden ist. */
+function merkeStand(datum, id, anteil) {
+  const schluessel = `${datum}:${id}`;
+  const vorher = letzterStand.get(schluessel);
+  letzterStand.set(schluessel, anteil);
+  return { vorher: vorher ?? 0, feiern: FEIER_RINGE.includes(id) && neuErreicht(vorher, anteil) };
+}
+
+/** Kurz aufleuchten und vibrieren. Ein Hinweis wäre schöner, würde aber „Rückgängig“ vom Eintragen verdrängen. */
+function feiere(kachel) {
+  kachel.classList.remove('gefeiert');
+  void kachel.offsetWidth; // Animation neu starten, falls sie gerade lief
+  kachel.classList.add('gefeiert');
+  tippGefuehl('feier');
+}
+
+function kacheln({ ist, ziel, datum, ringe, widget, wasser, wasserZielMl }) {
+  widget(wasser.reduce((s, m) => s + m.wert, 0));
+  if (!ringe.length) return null;
+  const bauen = {
+    wasser: () => wasserKachel(datum, wasser, wasserZielMl, widget),
+    alle: () => el('button', { type: 'button', class: 'kachel kachel-alle', onclick: zeigeAlleNaehrwerte },
       ring(0, EMOJI.alle),
       el('strong', { class: 'kachel-wert' }, 'Alle'),
       el('span', { class: 'kachel-ziel' }, 'Vitamine, Mineralstoffe'),
-      el('span', { class: 'kachel-name' }, 'Nährwerte')));
+      el('span', { class: 'kachel-name' }, 'Nährwerte')),
+  };
+  return el('section', { class: 'kacheln', 'aria-label': 'Makros', style: `--spalten:${kachelSpalten(ringe.length)}` },
+    ringe.map((id) => (bauen[id] ? bauen[id]() : makroKachel(datum, id, ist[id] ?? 0, ziel[id]))));
 }
 
-function makroKachel(id, ist, ziel) {
+function makroKachel(datum, id, ist, ziel) {
   const stand = fortschritt(ist, ziel);
-  return el('div', {
+  const { vorher, feiern } = merkeStand(datum, id, stand.anteil);
+  const kachel = el('div', {
     class: `kachel makro-${id}${stand.ueber ? ' ueber' : ''}`, role: 'progressbar', 'aria-label': nameVon(id),
     'aria-valuemin': 0, 'aria-valuemax': Math.round(ziel), 'aria-valuenow': Math.round(ist), 'aria-valuetext': `${gramm(ist)} von ${zahl(ziel)} g`,
   },
-  ring(stand.anteil, EMOJI[id]),
+  ring(stand.anteil, EMOJI[id], vorher),
   el('strong', { class: 'kachel-wert' }, `${gramm(ist)} g`),
   el('span', { class: 'kachel-ziel' }, `von ${zahl(ziel)} g`),
   el('span', { class: 'kachel-name' }, KACHEL_NAME[id] ?? nameVon(id)));
+  if (feiern) requestAnimationFrame(() => feiere(kachel));
+  return kachel;
 }
 
-/** Wasser zählen mit einem Tipp. Ändert sich an Ort und Stelle, die Seite wird nicht neu gezeichnet. */
-function wasserKachel(datum, eintraege, zielMl) {
-  const knopf = el('button', { type: 'button', class: 'kachel makro-wasser' });
+/** Wasser zählen mit einem Tipp. Ändert sich an Ort und Stelle: Zahl und Ring, die Seite wird nicht neu gezeichnet. */
+function wasserKachel(datum, eintraege, zielMl, widget) {
+  const anteil = () => (zielMl > 0 ? eintraege.reduce((s, m) => s + m.wert, 0) / zielMl : 0);
+  const start = merkeStand(datum, 'wasser', anteil());
+  const ringEl = ring(anteil(), EMOJI.wasser, start.vorher);
+  const wert = el('strong', { class: 'kachel-wert' });
+  const knopf = el('button', { type: 'button', class: 'kachel makro-wasser' },
+    ringEl, wert,
+    el('span', { class: 'kachel-ziel' }, `von ${zahl(zielMl)} ml`),
+    el('span', { class: 'kachel-name' }, 'Wasser ', el('span', { class: 'kachel-plus' }, '+250')));
   const zeige = () => {
     const summe = eintraege.reduce((s, m) => s + m.wert, 0);
+    wert.textContent = `${zahl(summe)} ml`;
     knopf.setAttribute('aria-label', `Wasser: ${zahl(summe)} von ${zahl(zielMl)} ml. Tippen für 250 ml mehr`);
-    knopf.replaceChildren();
-    haenge(knopf,
-      ring(zielMl > 0 ? summe / zielMl : 0, EMOJI.wasser),
-      el('strong', { class: 'kachel-wert' }, `${zahl(summe)} ml`),
-      el('span', { class: 'kachel-ziel' }, `von ${zahl(zielMl)} ml`),
-      el('span', { class: 'kachel-name' }, 'Wasser ', el('span', { class: 'kachel-plus' }, '+250')));
+    setzeRing(ringEl, anteil());
+    widget(summe);
+    if (merkeStand(datum, 'wasser', anteil()).feiern) feiere(knopf);
   };
   knopf.addEventListener('click', async () => {
     tippGefuehl();

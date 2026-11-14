@@ -367,11 +367,53 @@ async function dunkelLauf(browser) {
   await seite.keyboard.press('Escape');
   await seite.locator('dialog').waitFor({ state: 'detached' });
 
+  // Doppeltipp auf „Eintragen“ legt nur einen Eintrag an
+  await seite.getByRole('button', { name: 'Zu Abendessen hinzufügen' }).click();
+  await seite.locator('dialog input[type=search]').fill('lachs');
+  await seite.locator('dialog .zeilen .zeile').first().click();
+  await seite.locator('#f-gramm').fill('150');
+  await seite.getByRole('button', { name: 'Eintragen', exact: true }).dblclick();
+  await seite.locator('dialog').waitFor({ state: 'detached' });
+  await seite.waitForTimeout(300);
+  const abend = await seite.locator('#slot-abend .eintrag').count();
+  pruefe('Stabil: Doppeltipp auf „Eintragen“ legt nur einen Eintrag an', abend === 1, `${abend} Eintrag/Einträge im Abendessen`);
+
   // Über dem Ziel: 12 × 250 ml = 3.000 ml bei 2.500 ml Ziel, die zweite Runde zeigt 20 %
   for (let i = 0; i < 12; i++) await seite.locator('.kachel.makro-wasser').click();
   await seite.locator('.kachel.makro-wasser .kachel-wert', { hasText: '3.000 ml' }).waitFor();
+  const gefeiert = await seite.locator('.kachel.makro-wasser.gefeiert').count();
+  pruefe('Ziel-Feier: Wasser-Ring leuchtet auf, sobald er voll wird', gefeiert === 1, `${gefeiert} gefeierte Kachel nach 2.500 ml`);
   const runde2 = await seite.locator('.kachel.makro-wasser .ring-runde2').getAttribute('stroke-dasharray');
   pruefe('Ring über 100 %: zweite Runde zeigt den Überschuss', runde2 === '20.0 100', `Wasser 3.000 von 2.500 ml, zweite Runde „${runde2}“`);
+
+  // Übergänge: Richtung beim Seitenwechsel, Ruhe beim Neuzeichnen, offene Blätter schließen beim Seitenwechsel
+  await seite.goto(`${URL_APP}#/woche`);
+  await seite.locator('.seite-woche').waitFor();
+  const klasseWoche = await seite.locator('.seite').getAttribute('class');
+  await seite.getByRole('button', { name: 'Für Montag einplanen' }).click();
+  await seite.locator('dialog').waitFor();
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.locator('.seite-heute').waitFor();
+  const offeneBlaetter = await seite.locator('dialog').count();
+  const klasseHeute = await seite.locator('.seite').getAttribute('class');
+  await seite.locator('.kachel.makro-wasser').click();
+  await seite.getByRole('button', { name: 'Rückgängig' }).click();
+  await trageEin(seite, 'Frühstück', 'banane', 100);
+  await seite.waitForTimeout(200);
+  const klasseNachSpeichern = await seite.locator('.seite').getAttribute('class');
+  pruefe('Übergänge: Seite gleitet in Richtung der Leiste, Speichern bleibt ruhig, Blatt schließt beim Seitenwechsel',
+    klasseWoche.includes('richtung-vor') && klasseHeute.includes('richtung-zurueck') && !klasseNachSpeichern.includes('einblenden') && offeneBlaetter === 0,
+    `Woche: ${klasseWoche}; Heute: ${klasseHeute}; nach Speichern: ${klasseNachSpeichern}; offene Blätter nach Wechsel: ${offeneBlaetter}`);
+
+  // Ringe abwählen: Fett und „Alle Nährwerte“ aus, Heute zeigt 4 Kacheln als 2 × 2
+  await seite.goto(`${URL_APP}#/mehr/ziele`);
+  await seite.locator('#ring-fett').uncheck();
+  await seite.locator('#ring-alle').uncheck();
+  await seite.waitForFunction(async () => ((await (await import('./js/speicher.js')).einstellung('ringe')) ?? []).length === 4);
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.locator('.kacheln').waitFor();
+  const kachelStand = await seite.locator('.kacheln').evaluate((k) => `${k.children.length} Kacheln, Spalten ${k.style.getPropertyValue('--spalten')}, ${[...k.children].map((c) => c.className.match(/makro-(\w+)/)?.[1] ?? 'alle').join(',')}`);
+  pruefe('Ringe abwählbar: Auswahl gilt auf „Heute“, 4 Kacheln als 2 × 2', kachelStand === '4 Kacheln, Spalten 2, protein,kh,ballaststoffe,wasser', kachelStand);
 
   // Das erste Design bleibt wählbar und wirkt sofort
   await seite.goto(`${URL_APP}#/mehr/darstellung`);
@@ -432,8 +474,11 @@ async function rezeptLauf(browser) {
   await seite.getByRole('button', { name: /½ Portion/ }).click();
   await seite.getByRole('button', { name: 'Eintragen', exact: true }).click();
   await seite.locator('dialog').waitFor({ state: 'detached' });
-  const halb = Number((await seite.locator('#slot-abendsnack .eintrag-kcal').innerText()).replace(/[^\d]/g, ''));
-  pruefe('Rezept ist im Tagebuch suchbar, halbe Portion möglich', marke === 'Rezept' && Math.abs(halb * 2 - kcalPortion) <= 2, `Kennzeichnung „${marke}“, ½ Portion = ${halb} kcal`);
+  // Gezielt die halbe Portion: Je nach Uhrzeit landet auch die Portion von der Rezeptseite im Abendsnack
+  const abendsnack = await seite.locator('#slot-abendsnack .eintrag').allInnerTexts();
+  const halbeZeile = seite.locator('#slot-abendsnack .eintrag').filter({ has: seite.locator('.eintrag-menge', { hasText: /^150 g$/ }) });
+  const halb = Number((await halbeZeile.locator('.eintrag-kcal').innerText()).replace(/[^\d]/g, ''));
+  pruefe('Rezept ist im Tagebuch suchbar, halbe Portion möglich', marke === 'Rezept' && Math.abs(halb * 2 - kcalPortion) <= 2, `Kennzeichnung „${marke}“, ½ Portion = ${halb} kcal; Abendsnack: ${abendsnack.map((t) => t.replace(/\n/g, ' ')).join(' / ')}`);
 
   await seite.goto(`${URL_APP}#/rezepte`);
   await seite.locator('.zeilen a.zeile').first().click();
@@ -664,7 +709,11 @@ async function vorkochLauf(browser) {
   await seite.locator('#f-mag-notiz').waitFor();
   await seite.locator('#f-mag-notiz').fill('nur geschält');
   await seite.locator('#f-mag-notiz').blur();
-  await seite.locator('.hinweis', { hasText: 'Gemerkt' }).waitFor();
+  // Der Hinweis „Gemerkt“ von der Auswahl steht noch da und taugt nicht als Signal: auf den gespeicherten Wert warten
+  await seite.waitForFunction(async () => {
+    const speicher = await import('./js/speicher.js');
+    return (await speicher.alleVorlieben()).get('basis:apfel')?.notiz === 'nur geschält';
+  });
   await seite.reload({ waitUntil: 'networkidle' });
   await seite.locator('#f-mag-notiz').waitFor();
   pruefe('Sonderfall mit Beschreibung an der Zutat', (await seite.locator('#f-mag').inputValue()) === 'S' && (await seite.locator('#f-mag-notiz').inputValue()) === 'nur geschält', `Auswahl S, Notiz „${await seite.locator('#f-mag-notiz').inputValue()}“`);
@@ -1189,6 +1238,12 @@ async function appLauf(browser) {
   }));
   pruefe('App: Abstand zu Status- und Gestenleiste aus den Werten von Capacitor', abstaende.oben >= 32 && abstaende.unten >= 24, `oben ${abstaende.oben} px, unten ${abstaende.unten} px (vorgegeben 32 und 24)`);
   await bild(seite, '24-app-heute');
+
+  // Widget: Heute schickt die Werte des Tages an das Android-Widget
+  const widget = await seite.evaluate(() => window.__aufrufe.filter((a) => a.plugin === 'ElanWidget').at(-1)?.optionen);
+  const heuteIso = await seite.evaluate(() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; });
+  pruefe('App: Widget bekommt kcal übrig und Wasser von heute', widget?.datum === heuteIso && Number.isInteger(widget?.kcalUebrig) && widget?.wasserZielMl === 2500,
+    widget ? `${widget.datum}: ${widget.kcalUebrig} kcal übrig, ${widget.wasserMl} von ${widget.wasserZielMl} ml` : 'kein Aufruf');
 
   // Vibration: Wasser tippt leicht an; unter Darstellung abschaltbar
   await seite.evaluate(() => { window.__aufrufe = []; });

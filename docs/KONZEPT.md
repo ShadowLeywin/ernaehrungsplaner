@@ -24,6 +24,7 @@ Elan ist eine Ernährungs- und Health-App als Android-App und PWA aus demselben 
 - Fünf Seiten seit 0.6: Heute, Woche, Rezepte, Health, Mehr. Zutaten und Mag-Liste sind über „Rezepte“ und „Mehr“ erreichbar; man braucht sie selten direkt, weil die Suche beim Eintragen alles findet.
 - Zwei Designs: **Blatt** (Standard, schlicht im Stil von iOS, in Elans Grün: große Titel, gruppierte Listen mit farbigen Symbolen, ruhige Leiste ohne Glas, Ringe je Nährwert, Farbton je Mahlzeit) und **Zitrus** (das erste, helle Design). Beide in hell und dunkel.
 - „Heute“: Kalorien-Karte mit Tagesscheibe, sechs Kacheln (Eiweiß, Kohlenhydrate, Fett, Ballaststoffe, Wasser zum Antippen, alle Nährwerte), eine Karte mit allen Mahlzeiten, Plus-Knopf für die Mahlzeit zur Uhrzeit.
+- Bewegung: Seiten gleiten in Richtung der Leiste, Blätter gleiten hinein und hinaus, Ringe füllen sich vom letzten Stand. Alles unter 0,3 Sekunden; bei „Bewegung reduzieren“ des Systems fällt sie weg.
 - Signatur der App ist die **Tagesscheibe**: sechs Segmente wie eine aufgeschnittene Zitrusfrucht, eines je Mahlzeit. Breite = Anteil am Tagesziel, Füllung = gegessen.
 - Farben je Makro: in Zitrus Fruchtfarben (Eiweiß Grapefruit, Kohlenhydrate Zitrone, Fett Avocado, Ballaststoffe Heidelbeere), in Blatt kräftige Töne nach iOS (Eiweiß Pink, Kohlenhydrate Gelb, Fett Blau, Ballaststoffe Lila, Wasser Cyan); Grün bleibt dem Akzent vorbehalten.
 - Über dem Ziel liegen ist kein Fehler: kein Rot, nur ein dunkleres Grün.

@@ -4,4 +4,7 @@
     <string name="title_activity_main">Elan</string>
     <string name="package_name">io.github.shadowleywin.elan</string>
     <string name="custom_url_scheme">io.github.shadowleywin.elan</string>
+    <string name="widget_titel">Elan · heute</string>
+    <string name="widget_oeffnen">Öffne Elan für heute</string>
+    <string name="widget_beschreibung">kcal übrig und Wasser von heute</string>
 </resources>

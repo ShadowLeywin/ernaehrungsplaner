@@ -39,6 +39,20 @@ if (!istEingerichtet() && startseite) {
 }
 starte(document.getElementById('inhalt'), 'heute');
 
+/* ---------- Unerwartete Fehler ---------- */
+
+// Was nirgends abgefangen wird, soll trotzdem sichtbar werden, statt dass ein Knopf „nichts tut“.
+// Höchstens ein Hinweis alle 3 Sekunden, damit eine Fehlerschleife die Seite nicht zuschüttet.
+let letzterFehler = 0;
+const zeigeFehler = (fehler) => {
+  console.error(fehler);
+  if (Date.now() - letzterFehler < 3000) return;
+  letzterFehler = Date.now();
+  hinweis('Etwas ist schiefgelaufen. Deine Daten sind sicher; lade die Seite neu, falls etwas hängt.', { aktion: 'Neu laden', beiAktion: () => location.reload() });
+};
+window.addEventListener('unhandledrejection', (e) => zeigeFehler(e.reason));
+window.addEventListener('error', (e) => { if (e.error) zeigeFehler(e.error); });
+
 /* ---------- Offline-Anzeige ---------- */
 
 const offline = document.getElementById('offline');
