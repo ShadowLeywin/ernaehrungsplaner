@@ -5,7 +5,7 @@
 
 import { formatKurz, isoDatum, verschiebe } from '../logik/datum.js';
 import {
-  ARTEN, artVon, gewichtsTrend, linienPunkte, pruefeGesundheit, pruefeMesswert, pruefeWasserMengen, sichtbareMasse, standUndAenderung,
+  ARTEN, WAEHLBARE_MASSE, artVon, bereinigeMasseAuswahl, gewichtsTrend, linienPunkte, pruefeGesundheit, pruefeMesswert, pruefeWasserMengen, sichtbareMasse, standUndAenderung,
   tagesSumme, tagesWert, trendRichtung, verlauf, verlaufJeTag,
 } from '../logik/gesundheit.js';
 import { QUELLE_HC } from '../logik/healthconnect.js';
@@ -13,7 +13,7 @@ import { APP_NAME } from '../logik/schema.js';
 import { tippGefuehl } from '../plattform.js';
 import { neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
-import { blatt, el, gruppe, haenge, hinweis, icon, mitBild, svg, zahl, zeileFeld } from '../ui.js';
+import { blatt, el, gruppe, haenge, hinweis, icon, mitBild, svg, zahl, zeileFeld, zeileSchalter } from '../ui.js';
 import { zeigeLabor, zeigeSymptome } from './befunde.js';
 
 const alsText = (wert) => (typeof wert === 'number' ? String(wert).replace('.', ',') : '');
@@ -189,14 +189,16 @@ export async function zeigeFortschritt(wurzel, [parameter]) {
   if (parameter === 'labor') return zeigeLabor(wurzel);
   if (parameter === 'symptome') return zeigeSymptome(wurzel);
   const heute = isoDatum();
-  const [messungen, ziele, massNamen] = await Promise.all([
+  const [messungen, ziele, massNamen, masseAuswahl] = await Promise.all([
     speicher.messungenZwischen(verschiebe(heute, -400), heute), speicher.ladeGesundheit(), speicher.einstellung('massNamen', {}),
+    speicher.einstellung('masseSichtbar').then(bereinigeMasseAuswahl),
   ]);
   document.title = `Fortschritt – ${APP_NAME}`;
   haenge(wurzel,
     el('header', { class: 'seitenkopf' }, el('h1', {}, 'Fortschritt')),
     gewichtKarte(heute, messungen, ziele),
-    masseBereich(heute, messungen, massNamen ?? {}),
+    koerperwerteBereich(heute, messungen),
+    masseBereich(heute, messungen, massNamen ?? {}, masseAuswahl),
     verlaufBereich(heute, messungen),
     gruppe({ titel: 'Gesundheit' },
       el('a', { class: 'ezeile', href: '#/fortschritt/labor' }, el('span', { class: 'ezeile-text' }, 'Laborwerte'), icon('vor', 18)),
@@ -251,27 +253,67 @@ const kurzName = (name) => {
   return seite ? [name.slice(0, seite.index), el('span', { class: 'mass-seite' }, seite[1] === 'links' ? 'L' : 'R')] : [name];
 };
 
-function masseBereich(datum, messungen, namen) {
+/** Eine Kachel für einen Messwert (Maß oder Körperwert); Tippen öffnet das Eintragen. */
+function messKachel(art, name, messungen, datum, namen) {
+  const stand = standUndAenderung(messungen, art.id, datum);
+  const einheit = art.einheit;
+  return el('button', {
+    type: 'button', class: stand ? 'mass-kachel' : 'mass-kachel leer', id: `mass-${art.id.replace('mass:', '')}`,
+    'aria-label': `${name}: ${stand ? `${zahl(stand.wert, art.stellen)} ${einheit}` : 'noch kein Wert'}. Tippen zum Eintragen`,
+    onclick: () => oeffneMass(art, name, messungen, datum, namen),
+  },
+  // „Handgelenk rechts“ passt nicht in eine halbe Zeile: Seite als kleines L/R hinter dem Namen
+  el('span', { class: 'mass-name' }, ...kurzName(name)),
+  el('span', { class: 'mass-wert' }, el('strong', {}, stand ? zahl(stand.wert, art.stellen) : '–'), ` ${einheit}`),
+  stand?.aenderung ? el('span', { class: 'mass-aenderung' }, `${mitVorzeichen(stand.aenderung, art.stellen)} seit ${formatKurz(stand.datum).slice(0, 6)}`) : null);
+}
+
+/** Ruhepuls und Körperfett: meist aus Health Connect, auch von Hand. */
+function koerperwerteBereich(datum, messungen) {
+  return el('section', { class: 'egruppe masse', 'aria-label': 'Körperwerte' },
+    el('h2', { class: 'egruppe-titel' }, 'Körperwerte'),
+    el('div', { class: 'mass-kacheln' }, ARTEN.filter((a) => a.gruppe === 'koerper').map((art) => messKachel(art, art.name, messungen, datum, {}))));
+}
+
+function masseBereich(datum, messungen, namen, auswahl) {
   return el('section', { class: 'egruppe masse', 'aria-label': 'Körpermaße' },
-    el('h2', { class: 'egruppe-titel' }, 'Körpermaße'),
-    el('div', { class: 'mass-kacheln' }, sichtbareMasse(messungen).map((art) => {
-      const stand = standUndAenderung(messungen, art.id, datum);
-      const name = massName(art, namen);
-      return el('button', {
-        type: 'button', class: stand ? 'mass-kachel' : 'mass-kachel leer', id: `mass-${art.id.slice(5)}`,
-        'aria-label': `${name}: ${stand ? `${zahl(stand.wert, 1)} cm` : 'noch kein Wert'}. Tippen zum Eintragen`,
-        onclick: () => oeffneMass(art, name, messungen, datum, namen),
-      },
-      // „Handgelenk rechts“ passt nicht in eine halbe Zeile: Seite als kleines L/R hinter dem Namen
-      el('span', { class: 'mass-name' }, ...kurzName(name)),
-      el('span', { class: 'mass-wert' }, el('strong', {}, stand ? zahl(stand.wert, 1) : '–'), ' cm'),
-      stand?.aenderung ? el('span', { class: 'mass-aenderung' }, `${mitVorzeichen(stand.aenderung)} seit ${formatKurz(stand.datum).slice(0, 6)}`) : null);
-    })),
+    el('div', { class: 'masse-kopf' },
+      el('h2', { class: 'egruppe-titel' }, 'Körpermaße'),
+      el('button', { type: 'button', class: 'textlink', onclick: () => waehleMasse(auswahl, namen) }, 'Maße wählen')),
+    el('div', { class: 'mass-kacheln' }, sichtbareMasse(messungen, auswahl).map((art) => messKachel(art, massName(art, namen), messungen, datum, namen))),
     el('div', { class: 'egruppe-fuss' }, 'Immer an derselben Stelle und zur selben Tageszeit messen, sonst sind die Werte nicht vergleichbar.'));
 }
 
+/** Welche Maße als Kachel erscheinen. Schalter speichern sofort; beim Schließen wird die Seite neu gezeichnet. */
+function waehleMasse(auswahl, namen) {
+  const an = new Set(auswahl);
+  blatt({
+    titel: 'Maße wählen',
+    beiSchliessen: () => neuZeichnen(),
+    inhalt: () => el('div', { class: 'stapel' },
+      el('p', { class: 'klein' }, 'Blende aus, was du nicht misst. Gespeicherte Werte bleiben erhalten.'),
+      el('div', { class: 'eliste' }, WAEHLBARE_MASSE.map((id) => zeileSchalter({
+        id: `f-zeige-${id.slice(5)}`, beschriftung: massName(artVon(id), namen), an: an.has(id),
+        onchange: async (e) => {
+          if (e.target.checked) an.add(id); else an.delete(id);
+          await speicher.setzeEinstellung('masseSichtbar', WAEHLBARE_MASSE.filter((x) => an.has(x)));
+        },
+      })))),
+  });
+}
+
+/** Kleine Linie aller Werte eines Maßes, alt nach neu. */
+function massLinie(art, werteNachDatum) {
+  const werte = werteNachDatum.map((m) => m.wert);
+  return el('figure', { class: 'verlauf mass-linie' },
+    svg('svg', { viewBox: '0 0 300 56', role: 'img', 'aria-label': `Verlauf ${art.name}: ${werte.length} Werte von ${zahl(Math.min(...werte), art.stellen)} bis ${zahl(Math.max(...werte), art.stellen)} ${art.einheit}`, preserveAspectRatio: 'none' },
+      svg('polyline', { points: linienPunkte(werte, 300, 56, 6), fill: 'none', 'stroke-width': 3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' })),
+    el('figcaption', { class: 'klein' }, `${werte.length} Werte seit ${formatKurz(werteNachDatum[0].datum)}, von ${zahl(Math.min(...werte), art.stellen)} bis ${zahl(Math.max(...werte), art.stellen)} ${art.einheit}`));
+}
+
 function oeffneMass(art, name, messungen, datum, namen) {
-  const frueher = messungen.filter((m) => m.art === art.id).sort((a, b) => b.datum.localeCompare(a.datum)).slice(0, 6);
+  const alle = messungen.filter((m) => m.art === art.id).sort((a, b) => a.datum.localeCompare(b.datum));
+  const frueher = [...alle].reverse().slice(0, 6);
   let text = alsText(tagesWert(messungen, art.id, datum));
   let neuerName = name;
   blatt({
@@ -288,16 +330,19 @@ function oeffneMass(art, name, messungen, datum, namen) {
           await speicher.speichereMessung({ art: art.id, datum, wert: pruefung.wert });
           b.schliessen();
           tippGefuehl('erfolg');
-          hinweis(`${neuerName.trim() || name}: ${zahl(pruefung.wert, 1)} cm gespeichert.`);
+          hinweis(`${neuerName.trim() || name}: ${zahl(pruefung.wert, art.stellen)} ${art.einheit} gespeichert.`);
           neuZeichnen();
         },
       },
       el('div', { class: 'eliste' },
         art.eigen ? zeileFeld({ name: 'mass-name', beschriftung: 'Name', value: name, maxlength: 30, oninput: (e) => { neuerName = e.target.value; } }) : null,
-        zeileFeld({ name: 'mass-wert', beschriftung: 'Heute', einheit: 'cm', inputmode: 'decimal', value: text, oninput: (e) => { text = e.target.value; } })),
+        zeileFeld({ name: 'mass-wert', beschriftung: 'Heute', einheit: art.einheit, inputmode: 'decimal', value: text, oninput: (e) => { text = e.target.value; } })),
       fehler,
+      // Verlauf direkt im Blatt: Entwicklung sehen, ohne die Seite zu wechseln
+      alle.length >= 2 ? massLinie(art, alle) : null,
       frueher.length ? el('ul', { class: 'zeilen mass-verlauf' }, frueher.map((m) => el('li', { class: 'zeile' },
-        el('span', { class: 'zeile-name' }, formatKurz(m.datum)), el('span', { class: 'zeile-wert' }, `${zahl(m.wert, 1)} cm`)))) : null,
+        el('span', { class: 'zeile-name' }, formatKurz(m.datum), m.quelle === QUELLE_HC ? el('small', {}, 'aus Health Connect') : null),
+        el('span', { class: 'zeile-wert' }, `${zahl(m.wert, art.stellen)} ${art.einheit}`)))) : null,
       el('div', { class: 'einstell-knoepfe' }, el('button', { type: 'submit', class: 'knopf' }, 'Speichern')));
     },
   });

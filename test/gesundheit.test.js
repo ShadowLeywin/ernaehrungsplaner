@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
-  ARTEN, STANDARD_GESUNDHEIT, STANDARD_WASSER_MENGEN, bereinigeWasserMengen, pruefeWasserMengen, sichtbareMasse, standUndAenderung, bereinigeGesundheit, gewichtsTrend, trendRichtung, gleitenderSchnitt, letzterWert, linienPunkte, messungId,
+  ARTEN, STANDARD_GESUNDHEIT, STANDARD_WASSER_MENGEN, bereinigeWasserMengen, pruefeWasserMengen, sichtbareMasse, standUndAenderung, bereinigeMasseAuswahl, WAEHLBARE_MASSE, bereinigeGesundheit, gewichtsTrend, trendRichtung, gleitenderSchnitt, letzterWert, linienPunkte, messungId,
   pruefeGesundheit, pruefeMesswert, tagesSumme, tagesWert, verlauf,
 } from '../js/logik/gesundheit.js';
 import { verschiebe } from '../js/logik/datum.js';
@@ -137,4 +137,10 @@ test('Wasser-Mengen: drei eigene Knöpfe, Grenzen und Startwerte', () => {
   const falsch = pruefeWasserMengen(['200', '33,5', '']);
   assert.equal(falsch.ok, false);
   assert.deepEqual(falsch.fehler.map(Boolean), [false, true, true]);
+});
+
+test('Maß-Auswahl: Standard alle, nur bekannte, Kacheln folgen der Auswahl', () => {
+  assert.deepEqual(bereinigeMasseAuswahl(null), WAEHLBARE_MASSE);
+  assert.deepEqual(bereinigeMasseAuswahl(['mass:wade-links', 'mass:hals', 'quatsch']), ['mass:hals', 'mass:wade-links']);
+  assert.deepEqual(sichtbareMasse([], ['mass:taille']).map((a) => a.id), ['mass:taille']);
 });

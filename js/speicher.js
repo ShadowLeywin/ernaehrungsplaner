@@ -140,10 +140,20 @@ export async function ersetzeDateiAngebote(neue) {
 
 export const holeTag = (datum) => db.hole('tage', datum);
 
-/** Tagestyp für einen Tag festlegen; null entfernt die Abweichung vom Wochenplan. */
+/**
+ * Tagestyp für einen Tag selbst festlegen; null heißt „wie im Wochenplan“.
+ * Die eigene Wahl wird als 'eigen' markiert, damit ein Training aus Health Connect sie nicht überschreibt.
+ */
 export const setzeTagestyp = (datum, tagestyp) => aendereTag(datum, (tag) => {
   if (tagestyp) tag.tagestyp = tagestyp;
   else delete tag.tagestyp;
+  tag.tagestypQuelle = 'eigen';
+});
+
+/** Tagestyp aus einem Training in Health Connect (nur wenn du nichts selbst gewählt hast, das prüft abgleich.js). */
+export const setzeTagestypAusTraining = (datum, tagestyp) => aendereTag(datum, (tag) => {
+  tag.tagestyp = tagestyp;
+  tag.tagestypQuelle = 'healthconnect';
 });
 
 /** Ein Supplement für einen Tag abhaken oder das Häkchen entfernen */

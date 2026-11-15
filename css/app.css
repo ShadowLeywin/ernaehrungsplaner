@@ -789,6 +789,24 @@ a.ezeile > svg { color: var(--tinte-leise); flex: none; }
 .datenschutz ul { list-style: disc; padding-left: 1.25rem; }
 .datenschutz p + p, .datenschutz ul { margin-top: 0.5rem; }
 
+/* ---------- Unterseiten im Kartenstil wie das Menü: Titel und Erklärung in der Karte ---------- */
+
+.egruppe:not(.masse) { padding: 0 1.25rem; border-radius: 1.5rem; background: var(--flaeche); }
+.egruppe:not(.masse) > .egruppe-titel { margin: 0; padding-top: 1.125rem; font-size: 0.8125rem; font-weight: 650; letter-spacing: 0.05em; }
+.egruppe:not(.masse) > .eliste { background: none; border-radius: 0; overflow: visible; }
+.egruppe:not(.masse) .ezeile { padding-left: 0; padding-right: 0; min-height: 3.5rem; }
+.egruppe:not(.masse) .ezeile + .ezeile::before { left: 0; }
+.egruppe:not(.masse) > .egruppe-fuss { margin: 0; padding: 0.875rem 0 1.125rem; border-top: 1px solid var(--linie); }
+.egruppe:not(.masse) > .eliste:last-child { padding-bottom: 0.25rem; }
+.coach-erklaerung { margin: 1rem 0 0; }
+.backup-alles { margin-top: 1rem !important; }
+.masse-kopf { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+.masse-kopf .egruppe-titel { margin-bottom: 0; }
+.masse-kopf .textlink { min-height: 2.5rem; padding: 0; font-size: 0.9375rem; }
+.mass-linie { margin-top: 0.25rem; }
+.mass-linie svg { height: 3.5rem; }
+.tagestyp-quelle { margin-top: 0.375rem !important; text-align: center; }
+
 /* ==========================================================================
    Blatt: Standard-Design. Schlicht im Stil von iOS, in Elans Grün.
    Große fette Titel, gruppierte Listen mit farbigen Symbolen, ruhige Leiste

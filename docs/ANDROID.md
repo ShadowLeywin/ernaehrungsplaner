@@ -82,7 +82,7 @@ Der `versionCode` enthält die Zahl der Commits (Baunummer). Der angezeigte Name
 ## Health Connect
 
 - Plugin `@capgo/capacitor-health` 8.11.13 (MPL-2.0, unverändert genutzt). Es verlangt Android 8 (API 26); deshalb `minSdkVersion = 26`.
-- Das Plugin meldet viele Berechtigungen an. Das App-Manifest entfernt alle außer `READ_STEPS`, `READ_WEIGHT`, `READ_SLEEP` (`tools:node="remove"`). Nach jedem Plugin-Update mit `aapt2 dump permissions` prüfen.
+- Das Plugin meldet viele Berechtigungen an. Das App-Manifest entfernt alle außer `READ_STEPS`, `READ_WEIGHT`, `READ_SLEEP`, `READ_RESTING_HEART_RATE`, `READ_BODY_FAT`, `READ_EXERCISE` (`tools:node="remove"`). Nach jedem Plugin-Update mit `aapt2 dump permissions` prüfen.
 - Datenschutzseite: `privacypolicy.html` im Wurzelverzeichnis; das Plugin zeigt sie, wenn man in Health Connect auf „Datenschutzerklärung“ tippt.
 - Umrechnung: `js/logik/healthconnect.js` (getestet), Abgleich: `js/abgleich.js`, Aufrufe: `js/plattform.js`.
 - Beim Bau meldet der Lint-Schritt „Module was compiled with an incompatible version of Kotlin“. Das kommt aus `lintVitalAnalyzeRelease` (älteres Kotlin im Lint), nicht aus dem Kompilieren; der Bau ist grün.

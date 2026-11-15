@@ -10,6 +10,9 @@ export const ARTEN = [
   { id: 'wasser', name: 'Wasser', einheit: 'ml', min: 1, max: 5000, stellen: 0, proTag: 'summe' },
   { id: 'schlaf', name: 'Schlaf', einheit: 'h', min: 0, max: 24, stellen: 1, proTag: 'einmal' },
   { id: 'schritte', name: 'Schritte', einheit: '', min: 0, max: 200000, stellen: 0, proTag: 'einmal' },
+  // Körperwerte (meist aus Health Connect, auch von Hand)
+  { id: 'ruhepuls', name: 'Ruhepuls', einheit: 'bpm', min: 25, max: 150, stellen: 0, proTag: 'einmal', gruppe: 'koerper' },
+  { id: 'koerperfett', name: 'Körperfett', einheit: '%', min: 2, max: 70, stellen: 1, proTag: 'einmal', gruppe: 'koerper' },
   // Körpermaße. Reihenfolge = Reihenfolge der Kacheln: Paare links/rechts stehen nebeneinander.
   { id: 'mass:hals', name: 'Hals', einheit: 'cm', min: 20, max: 80, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
   { id: 'mass:schultern', name: 'Schultern', einheit: 'cm', min: 60, max: 220, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
@@ -37,10 +40,19 @@ export const ARTEN = [
 
 export const artVon = (id) => ARTEN.find((a) => a.id === id);
 
-/** Maße für die Kacheln: alte Arten nur, wenn es von ihnen Werte gibt. */
-export function sichtbareMasse(messungen) {
+/** Wählbare Maße (ohne die alten ohne Seite). */
+export const WAEHLBARE_MASSE = ARTEN.filter((a) => a.gruppe === 'mass' && !a.alt).map((a) => a.id);
+
+/** Gespeicherte Auswahl der Maß-Kacheln prüfen: nur bekannte, feste Reihenfolge; nichts Gültiges gespeichert: alle. */
+export function bereinigeMasseAuswahl(roh) {
+  if (!Array.isArray(roh)) return [...WAEHLBARE_MASSE];
+  return WAEHLBARE_MASSE.filter((id) => roh.includes(id));
+}
+
+/** Maße für die Kacheln: gewählte Maße; alte Arten ohne Seite nur, wenn es von ihnen Werte gibt. */
+export function sichtbareMasse(messungen, auswahl = WAEHLBARE_MASSE) {
   const mitWerten = new Set(messungen.map((m) => m.art));
-  return ARTEN.filter((a) => a.gruppe === 'mass' && (!a.alt || mitWerten.has(a.id)));
+  return ARTEN.filter((a) => a.gruppe === 'mass' && (a.alt ? mitWerten.has(a.id) : auswahl.includes(a.id)));
 }
 
 /** Letzter Wert und Änderung zum vorletzten: { wert, datum, aenderung } oder null. Für die Maß-Kacheln. */

@@ -72,8 +72,8 @@ export function aktualisiereWidget(werte) {
 
 /* ---------- Health Connect (nur App, Plugin @capgo/capacitor-health) ---------- */
 
-/** Nur lesen, nur diese drei. Das Manifest erlaubt auch nicht mehr (android/app/src/main/AndroidManifest.xml). */
-export const HC_LESEN = ['steps', 'weight', 'sleep'];
+/** Nur lesen, nur diese sechs. Das Manifest erlaubt auch nicht mehr (android/app/src/main/AndroidManifest.xml). */
+export const HC_LESEN = ['steps', 'weight', 'sleep', 'restingHeartRate', 'bodyFat', 'workouts'];
 
 /** { verfuegbar, grund }. Im Browser nie verfügbar. */
 export async function hcVerfuegbar() {
@@ -100,17 +100,20 @@ export async function hcErlaubt() {
 export const hcEinstellungen = () => nativ('Health', 'openHealthConnectSettings', {}).catch(() => {});
 
 /**
- * Rohdaten der letzten Tage: { steps: [Tagessummen], weight: [Proben], sleep: [Proben] }.
+ * Rohdaten der letzten Tage: { steps: [Tagessummen], weight, sleep, restingHeartRate, bodyFat: [Proben], workouts: [Trainings] }.
  * Nicht erlaubte Arten liefern eine leere Liste statt eines Fehlers.
  */
 export async function hcLesen(vonIso, bisIso) {
   const sicher = async (aufruf) => { try { return (await aufruf())?.samples ?? []; } catch { return []; } };
-  const [steps, weight, sleep] = await Promise.all([
+  const lies = (dataType, limit = 500) => sicher(() => nativ('Health', 'readSamples', { dataType, startDate: vonIso, endDate: bisIso, limit }));
+  const [steps, weight, sleep, restingHeartRate, bodyFat, workouts] = await Promise.all([
     sicher(() => nativ('Health', 'queryAggregated', { dataType: 'steps', startDate: vonIso, endDate: bisIso, bucket: 'day', aggregation: 'sum' })),
     sicher(() => nativ('Health', 'readSamples', { dataType: 'weight', startDate: vonIso, endDate: bisIso, limit: 500 })),
     sicher(() => nativ('Health', 'readSamples', { dataType: 'sleep', startDate: vonIso, endDate: bisIso, limit: 1000 })),
+    lies('restingHeartRate'), lies('bodyFat'),
+    (async () => { try { return (await nativ('Health', 'queryWorkouts', { startDate: vonIso, endDate: bisIso, limit: 200 }))?.workouts ?? []; } catch { return []; } })(),
   ]);
-  return { steps, weight, sleep };
+  return { steps, weight, sleep, restingHeartRate, bodyFat, workouts };
 }
 
 /** Bricht der Nutzer das Teilen-Menü ab, ist das kein Fehler. */

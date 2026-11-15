@@ -17,7 +17,7 @@ Stand: Schema-Version 7 (App 1.0.0). Maßgeblich im Code: `js/logik/schema.js` u
 | `zutaten` | `id` | `name`, `marke`, `kategorie`, `quelle` (`eigen`, `off`), `quelleId`, `je100` (Nährwerte), `portionen` [{`name`, `gramm`}], `unvollstaendig`, `geaendert` | – |
 | `eintraege` | `id` | `datum` (JJJJ-MM-TT), `slot`, `zutatId`, `name`, `marke`, `gramm`, `je100` (Kopie), `erstellt`; bei Rezepten zusätzlich `rezeptId` | `datum` |
 | `tage` | `datum` | `tagestyp` (nur bei Abweichung vom Wochenplan), `supplements` (Kennungen der an diesem Tag genommenen) | – |
-| `messungen` (ab 5) | `id` | `datum`, `art` (`gewicht`, `wasser`, `schlaf`, `schritte`, Körpermaße `mass:hals` … `mass:wade-rechts`, `mass:eigen1/2`), `wert`; freiwillig `erstellt` (Zeitpunkt der Eingabe, seit 15.11.2026) und `quelle` (`healthconnect` bei übernommenen Werten). Kennung `<art>\|<datum>` bei einem Wert je Tag, bei Wasser mit Zufallsteil. Neue Felder brauchen keine neue Schema-Version: Ältere Einträge ohne sie bleiben gültig | `datum` |
+| `messungen` (ab 5) | `id` | `datum`, `art` (`gewicht`, `wasser`, `schlaf`, `schritte`, Körpermaße `mass:hals` … `mass:wade-rechts`, `mass:eigen1/2`, Körperwerte `ruhepuls`, `koerperfett`), `wert`; freiwillig `erstellt` (Zeitpunkt der Eingabe, seit 15.11.2026) und `quelle` (`healthconnect` bei übernommenen Werten). Kennung `<art>\|<datum>` bei einem Wert je Tag, bei Wasser mit Zufallsteil. Neue Felder brauchen keine neue Schema-Version: Ältere Einträge ohne sie bleiben gültig | `datum` |
 | `supplements` (ab 5) | `id` | `name`, `dosis` | – |
 | `labor` (ab 6) | `id` | `name`, `wert`, `einheit`, `datum`, freiwillig `refMin`, `refMax`, `notiz` | – |
 | `angebote` (ab 7) | `id` | `zutatId`, `zutatName`, `markt`, `preis`, `quelle` (`hand`, `datei`); freiwillig `menge`, `gueltigVon`, `gueltigBis`, `notiz` | – |
@@ -112,3 +112,5 @@ Health-Speicher brauchen keine Sonderbehandlung im Backup: neue Speicher kommen 
 - `massNamen`: Namen der eigenen Maße, z. B. `{ "mass:eigen1": "Unterbauch" }`.
 - `ringe`: sichtbare Ringe auf „Heute“.
 - Gerätebezogen in `localStorage`: `elan.hc.automatisch`, `elan.hc.zuletzt` (Health Connect), `elan.vibration`, `elan.thema`, `elan.darstellung`.
+- `masseSichtbar`: Liste der Maß-Kacheln unter „Fortschritt“ (Start: alle).
+- Speicher `tage`: freiwillig `tagestypQuelle` = `eigen` (selbst gewählt, auch „wie im Plan“) oder `healthconnect` (aus einem Training). Eigene Wahl wird nie überschrieben.

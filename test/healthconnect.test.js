@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { QUELLE_HC, gewichtJeTag, lokalerTag, schlafJeNacht, schritteJeTag, zuUebernehmen } from '../js/logik/healthconnect.js';
+import { QUELLE_HC, darfTagestypSetzen, gewichtJeTag, koerperfettJeTag, lokalerTag, ruhepulsJeTag, schlafJeNacht, schritteJeTag, tagestypAusTraining, tagestypJeTag, zuUebernehmen } from '../js/logik/healthconnect.js';
 
 // Alle Werte sind erfunden. Zeiten um die Mittagszeit, damit der Kalendertag in jeder Zeitzone gleich bleibt.
 
@@ -47,4 +47,28 @@ test('Zusammenführen: eigene Werte bleiben, leere Tage und alte Health-Connect-
   const neu = zuUebernehmen(vorhandene, gelesen);
   assert.deepEqual(neu.map((n) => `${n.art} ${n.datum} ${n.wert}`), ['gewicht 2026-11-15 80.3', 'schlaf 2026-11-15 7.5']);
   assert.ok(neu.every((n) => n.quelle === QUELLE_HC));
+});
+
+test('Ruhepuls und Körperfett: letzter Wert des Tages, Bruchteil wird zu Prozent', () => {
+  assert.deepEqual(ruhepulsJeTag([{ startDate: '2026-11-15T06:00:00Z', value: 62.4 }, { startDate: '2026-11-15T12:00:00Z', value: 58.6 }]).map((r) => r.wert), [59]);
+  assert.deepEqual(koerperfettJeTag([{ startDate: '2026-11-14T12:00:00Z', value: 18.24 }, { startDate: '2026-11-15T12:00:00Z', value: 0.175 }]).map((r) => r.wert), [18.2, 17.5]);
+});
+
+test('Tagestyp aus Trainings: Kraft = Gym, Calisthenics = Calisthenics, Laufen bleibt offen', () => {
+  assert.equal(tagestypAusTraining('weightlifting'), 'gym');
+  assert.equal(tagestypAusTraining('calisthenics'), 'calisthenics');
+  assert.equal(tagestypAusTraining('running'), null);
+  const tage = tagestypJeTag([
+    { workoutType: 'strengthTraining', startDate: '2026-11-15T10:00:00Z', endDate: '2026-11-15T10:30:00Z' },
+    { workoutType: 'calisthenics', startDate: '2026-11-15T12:00:00Z', endDate: '2026-11-15T13:00:00Z' },
+    { workoutType: 'running', startDate: '2026-11-14T12:00:00Z', endDate: '2026-11-14T13:00:00Z' },
+  ]);
+  assert.deepEqual(tage, [{ datum: lokalerTag('2026-11-15T10:00:00Z'), tagestyp: 'calisthenics' }], 'längere Zeit gewinnt, Laufen setzt nichts');
+});
+
+test('darfTagestypSetzen: eigene Wahl geht vor', () => {
+  assert.equal(darfTagestypSetzen(undefined), true);
+  assert.equal(darfTagestypSetzen({ datum: 'x', tagestyp: 'gym', tagestypQuelle: QUELLE_HC }), true);
+  assert.equal(darfTagestypSetzen({ datum: 'x', tagestyp: 'rest' }), false, 'älterer Satz ohne Quelle = selbst gewählt');
+  assert.equal(darfTagestypSetzen({ datum: 'x', tagestypQuelle: 'eigen' }), false, 'bewusst den Plan gewählt');
 });
