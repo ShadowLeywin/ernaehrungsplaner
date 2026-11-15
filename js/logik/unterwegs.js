@@ -89,3 +89,70 @@ export function leseUnterwegsDatei(inhalt) {
 
 /** Geladene Gerichte zur eigenen Liste nehmen; gleiche (Restaurant + Name) werden ersetzt */
 export const fuegeZusammen = (alt, neu) => bereinigeGerichte([...alt, ...neu]);
+
+/* ---------- Vorschläge: Was passt in mein Budget? ---------- */
+
+/** Wonach sortiert wird. Neutral benannt: Elan bewertet nicht, es sortiert nach deiner Wahl. */
+export const ZIELE_VORSCHLAG = [
+  { id: 'eiweiss', name: 'Viel Eiweiß' },
+  { id: 'fett', name: 'Wenig Fett' },
+  { id: 'satt', name: 'Budget voll' },
+];
+
+const wert = (g, w) => (typeof g[w] === 'number' ? g[w] : 0);
+
+/**
+ * Kombinationen aus 1 bis maxTeile Gerichten eines Restaurants (jedes Gericht höchstens einmal), die ins
+ * Budget passen und es zu mindestens untergrenze (Anteil) nutzen. Sortiert nach ziel, dann näher am Budget.
+ * Ergebnis: [{ ids, gerichte, kcal, protein, kh, fett }], höchstens anzahl Stück, ohne Kombinationen, die nur
+ * eine schlechtere Obermenge einer besseren sind.
+ * Bei 100 Gerichten sind das gut 160.000 Dreier: durchprobieren ist schnell genug und findet sicher das Beste.
+ */
+export function vorschlaege(gerichte, { restaurant, budget, ziel = 'eiweiss', maxTeile = 3, anzahl = 5, untergrenze = 0.6 }) {
+  if (!(budget > 0)) return [];
+  const auswahl = gerichte.filter((g) => g.restaurant === restaurant && g.kcal > 0 && g.kcal <= budget);
+  const ergebnis = [];
+  const pruefe = (teile) => {
+    const s = { kcal: 0, protein: 0, kh: 0, fett: 0 };
+    for (const g of teile) for (const w of WERTE) s[w] += wert(g, w);
+    if (s.kcal > budget || s.kcal < budget * untergrenze) return;
+    ergebnis.push({ ids: teile.map((g) => g.id), gerichte: teile, ...s });
+  };
+  const n = auswahl.length;
+  for (let i = 0; i < n; i += 1) {
+    pruefe([auswahl[i]]);
+    if (maxTeile < 2) continue;
+    for (let j = i + 1; j < n; j += 1) {
+      if (auswahl[i].kcal + auswahl[j].kcal > budget) continue;
+      pruefe([auswahl[i], auswahl[j]]);
+      if (maxTeile < 3) continue;
+      for (let k = j + 1; k < n; k += 1) pruefe([auswahl[i], auswahl[j], auswahl[k]]);
+    }
+  }
+  const bewertung = {
+    eiweiss: (v) => -v.protein,
+    fett: (v) => v.fett,
+    satt: (v) => budget - v.kcal,
+  }[ziel] ?? ((v) => -v.protein);
+  // Gleichstand: weniger Teile zuerst (eine Cola Zero dazu bringt nichts), dann näher am Budget
+  ergebnis.sort((a, b) => bewertung(a) - bewertung(b) || a.ids.length - b.ids.length || (budget - a.kcal) - (budget - b.kcal));
+  // Abwechslung: kein Vorschlag, der nur ein früherer plus ein Extra ist
+  const gewaehlt = [];
+  for (const v of ergebnis) {
+    if (gewaehlt.some((x) => x.ids.every((id) => v.ids.includes(id)) || v.ids.every((id) => x.ids.includes(id)))) continue;
+    gewaehlt.push(v);
+    if (gewaehlt.length >= anzahl) break;
+  }
+  return gewaehlt;
+}
+
+/**
+ * Wie viel ist noch offen? Für die Mahlzeit (Tagesziel × Anteil der Mahlzeit minus schon Gegessenes) und
+ * für den ganzen Tag. Nie unter 0, auf 10 kcal gerundet. slots: [{ id, anteil }], eintraege: des Tages.
+ */
+export function offeneKcal({ zielKcal, slots, slot, eintraege }) {
+  const kcal = (liste) => liste.reduce((s, e) => s + ((e.je100?.kcal ?? 0) * (e.gramm ?? 0)) / 100, 0);
+  const runde = (x) => Math.max(0, Math.round(x / 10) * 10);
+  const anteil = slots.find((s) => s.id === slot)?.anteil ?? 0;
+  return { mahlzeit: runde(zielKcal * anteil - kcal(eintraege.filter((e) => e.slot === slot))), tag: runde(zielKcal - kcal(eintraege)) };
+}

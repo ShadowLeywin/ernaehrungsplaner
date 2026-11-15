@@ -301,3 +301,11 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Umbau:** Das Formular von „Schnell eintragen“ liegt jetzt in `js/ansichten/schnellformular.js`, damit Eintragen und Unterwegs es teilen, ohne sich gegenseitig zu importieren. Beim Ausschneiden rutschte `mengenFormular` mit; `node --check` und `grep` zeigten es sofort.
 - **Fehler:** Der gewählte Restaurant-Chip sah grau aus, weil die Chip-Regel des Themas spezifischer war. Lösung: `:root` vor die Auswahl-Regel.
 - **Fachbegriffe:** Spezifität (welche CSS-Regel gewinnt), Datalist (Vorschläge für ein Textfeld).
+
+## Session 14, Runde 10: Unterwegs als Budget-Rechner (15.11.2026)
+
+- **Was und warum:** Léon: „wenn ich sag, ich hab 600 kcal offen, dann schlägt es Gerichte vor für die besten Nährwerte.“ Gebaut: Budget (vorbelegt mit dem, was für die Mahlzeit oder den Tag offen ist), Sortierung „Viel Eiweiß“, „Wenig Fett“, „Budget voll“, bis zu fünf Kombinationen aus 1 bis 3 Gerichten, „Übernehmen“ füllt die Bestellung.
+- **Befehle:** `npm test` (199) · `node tools/pruefe-app.cjs` (141 Kriterien).
+- **Entscheidung:** Alle Kombinationen durchprobieren statt schlauer Suche: bei 100 Gerichten gut 160.000 Dreier, auf dem Handy Millisekunden, und sicher das Beste. Nur Kombinationen mit 60–100 % des Budgets. Bei Gleichstand weniger Teile zuerst, sonst gewinnt „+ Cola Zero“ (1 kcal näher am Budget). Kein Vorschlag, der nur ein früherer plus ein Extra ist.
+- **Offen:** Werte von McDonald's, Burger King, KFC, Subway. Deren Seiten sperrt die Umgebung (Proxy 403); Freigabe angefragt.
+- **Fachbegriffe:** Brute Force (alle Möglichkeiten durchprobieren), Tie-Break (Regel für Gleichstand).

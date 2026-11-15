@@ -51,3 +51,37 @@ test('Datei lesen: Format prüfen, Gerichte übernehmen, Unbrauchbares zählen',
   const zusammen = fuegeZusammen(bereinigeGerichte([{ ...burger, kcal: 1 }, wrap]), r.gerichte);
   assert.deepEqual(zusammen.map((g) => `${g.name}:${g.kcal}`), ['Pommes M:330', 'Testburger:500', 'Wrap:450']);
 });
+
+test('Vorschläge: passt ins Budget, sortiert nach Eiweiß, Fett oder Nähe zum Budget', async () => {
+  const { vorschlaege } = await import('../js/logik/unterwegs.js');
+  const liste = bereinigeGerichte([
+    { restaurant: 'Testgrill', name: 'Hähnchenwrap', kcal: 400, protein: 30, kh: 40, fett: 12 },
+    { restaurant: 'Testgrill', name: 'Doppelburger', kcal: 580, protein: 32, kh: 40, fett: 30 },
+    { restaurant: 'Testgrill', name: 'Pommes M', kcal: 330, protein: 4, kh: 42, fett: 16 },
+    { restaurant: 'Testgrill', name: 'Salat', kcal: 120, protein: 6, kh: 8, fett: 6 },
+    { restaurant: 'Testgrill', name: 'Cola Zero', kcal: 1 },
+    { restaurant: 'Anderswo', name: 'Riesenbox', kcal: 550, protein: 60, kh: 10, fett: 20 },
+  ]);
+  const eiweiss = vorschlaege(liste, { restaurant: 'Testgrill', budget: 600, ziel: 'eiweiss' });
+  assert.ok(eiweiss.length > 0);
+  assert.ok(eiweiss.every((v) => v.kcal <= 600 && v.kcal >= 360));
+  assert.ok(eiweiss.every((v) => v.gerichte.every((g) => g.restaurant === 'Testgrill')), 'nur das gewählte Restaurant');
+  assert.deepEqual(eiweiss[0].gerichte.map((g) => g.name).sort(), ['Hähnchenwrap', 'Salat']); // 36 g Eiweiß in 520 kcal
+  assert.equal(eiweiss[0].protein, 36);
+  // keine Obermenge eines Vorschlags („Wrap + Salat + Cola Zero“ bringt nichts Neues)
+  assert.ok(!eiweiss.some((v) => v.ids.length === 3 && v.gerichte.some((g) => g.name === 'Cola Zero') && v.gerichte.some((g) => g.name === 'Salat') && v.gerichte.some((g) => g.name === 'Hähnchenwrap')));
+  const fett = vorschlaege(liste, { restaurant: 'Testgrill', budget: 600, ziel: 'fett' });
+  assert.ok(fett[0].fett <= Math.min(...eiweiss.map((v) => v.fett)));
+  const satt = vorschlaege(liste, { restaurant: 'Testgrill', budget: 600, ziel: 'satt' });
+  assert.ok(satt[0].kcal >= Math.max(...eiweiss.map((v) => v.kcal)));
+  assert.deepEqual(vorschlaege(liste, { restaurant: 'Testgrill', budget: 0 }), []);
+  assert.deepEqual(vorschlaege(liste, { restaurant: 'Testgrill', budget: 50 }), []);
+});
+
+test('Offene Kalorien: für die Mahlzeit und den Tag, nie unter 0', async () => {
+  const { offeneKcal } = await import('../js/logik/unterwegs.js');
+  const slots = [{ id: 'mittag', anteil: 0.3 }, { id: 'abend', anteil: 0.25 }];
+  const e = (slot, kcal) => ({ slot, gramm: 100, je100: { kcal } });
+  assert.deepEqual(offeneKcal({ zielKcal: 2400, slots, slot: 'abend', eintraege: [e('mittag', 900), e('abend', 104)] }), { mahlzeit: 500, tag: 1400 });
+  assert.deepEqual(offeneKcal({ zielKcal: 2000, slots, slot: 'mittag', eintraege: [e('mittag', 2500)] }), { mahlzeit: 0, tag: 0 });
+});

@@ -87,3 +87,4 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | Zeitliche tote Zone (TDZ) | Eine mit `const` oder `let` deklarierte Variable existiert erst ab ihrer Zeile; ein früherer Zugriff wirft einen Fehler. | `oeffneEintrag` in `js/ansichten/eintrag.js` |
 | Spezifität | Gewicht eines CSS-Selektors; bei Konflikten gewinnt die spezifischere Regel, nicht die spätere. | `.unterwegs-restaurants .chip[aria-pressed]` in `css/app.css` |
 | Datalist | HTML-Liste mit Vorschlägen für ein Textfeld; man darf trotzdem frei tippen. | Feld „Wo?“ in `js/ansichten/schnellformular.js` |
+| Brute Force | Alle Möglichkeiten durchprobieren; bei kleinen Mengen schnell genug und sicher optimal. | `vorschlaege` in `js/logik/unterwegs.js` |

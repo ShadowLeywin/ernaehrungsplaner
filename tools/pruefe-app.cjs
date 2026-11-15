@@ -924,13 +924,25 @@ async function healthLauf(browser) {
     await seite.locator('#f-schnell-kcal').fill(kcal);
     if (protein) await seite.locator('#f-schnell-protein').fill(protein);
     await seite.locator('dialog').getByRole('button', { name: 'Anlegen' }).click();
-    await seite.locator('.unterwegs-zeile', { hasText: name }).waitFor();
+    await seite.locator('#gericht-neu').waitFor();
   };
   await gerichtAnlegen('Testgrill', 'Testburger', '500', '25');
   await gerichtAnlegen('Testgrill', 'Pommes M', '330', '4');
   await gerichtAnlegen('Wrapladen', 'Wrap', '450', '');
+  await gerichtAnlegen('Testgrill', 'Salat', '150', '8');
+  // Vorschläge: Budget 700 kcal, meiste Eiweiß zuerst; „Übernehmen“ füllt die Bestellung
   await seite.getByRole('button', { name: 'Testgrill' }).click();
-  await seite.getByRole('button', { name: 'Testburger dazu' }).click();
+  await seite.locator('#f-unterwegs-budget').fill('700');
+  await seite.getByRole('button', { name: 'Viel Eiweiß' }).click();
+  const ersterVorschlag = (await seite.locator('.vorschlag').first().innerText()).replace(/\s+/g, ' ');
+  await bild(seite, '44-vorschlaege', false);
+  await seite.getByRole('button', { name: 'Wenig Fett' }).click();
+  await seite.locator('#f-unterwegs-budget').fill('700');
+  await seite.getByRole('button', { name: 'Viel Eiweiß' }).click();
+  await seite.locator('#vorschlag-0').click();
+  await seite.locator('.unterwegs-zeile').first().waitFor();
+  const uebernommen = (await seite.locator('#unterwegs-summe').innerText()).replace(/\s+/g, ' ');
+  await seite.getByRole('button', { name: 'Salat weniger' }).click();
   await seite.getByRole('button', { name: 'Testburger dazu' }).click();
   await seite.getByRole('button', { name: 'Pommes M dazu' }).click();
   await seite.getByRole('button', { name: 'Wrapladen' }).click();
@@ -938,6 +950,7 @@ async function healthLauf(browser) {
   await seite.getByRole('button', { name: 'Wrap weniger' }).click();
   await seite.getByRole('button', { name: 'Testgrill' }).click();
   const korbText = (await seite.locator('#unterwegs-summe').innerText()).replace(/\s+/g, ' ');
+
   const nochDa = await seite.locator('.unterwegs-zeile', { hasText: 'Testburger' }).locator('.zaehler-wert').innerText();
   await bild(seite, '43-unterwegs', false);
   await seite.locator('#unterwegs-eintragen').click();
@@ -956,11 +969,12 @@ async function healthLauf(browser) {
   const chips = await seite.locator('.unterwegs-restaurants .chip').allInnerTexts();
   await seite.keyboard.press('Escape');
   await seite.locator('dialog').waitFor({ state: 'detached' });
-  pruefe('Unterwegs: Bestellung zusammentippen und eintragen, Liste aus Datei laden',
+  pruefe('Unterwegs: Vorschläge fürs Budget übernehmen, Bestellung eintragen, Liste aus Datei laden',
+    /650 kcal E 33 g/.test(ersterVorschlag) && /Testburger/.test(ersterVorschlag) && /Salat/.test(ersterVorschlag) && /^650 kcal · 2 Gerichte · E 33 g/.test(uebernommen) &&
     /Leg einmal an/.test(leerText) && /1\.330 kcal · 3 Gerichte · E 54 g$/.test(korbText) && nochDa === '2'
       && /2× Testburger/.test(abend) && /Testgrill/.test(abend) && /Pommes M/.test(abend) && !/Wrap/.test(abend)
       && /2 Gerichte von 1 Restaurant geladen, Stand 01\.11\.2026; 1 ohne brauchbare Werte/.test(geladen) && chips.join() === 'Dateigrill,Testgrill,Wrapladen',
-    `Korb „${korbText}“ (Burger ${nochDa}); Abendessen „${abend.slice(0, 120)}“; Datei: „${geladen}“; Restaurants ${chips.join(', ')}`);
+    `Vorschlag „${ersterVorschlag}“, übernommen „${uebernommen}“; Korb „${korbText}“ (Burger ${nochDa}); Abendessen „${abend.slice(0, 120)}“; Datei: „${geladen}“; Restaurants ${chips.join(', ')}`);
 
   // Körpermaße: Kacheln wie beim Maßband, Eintragen im Blatt, eigenes Maß mit Namen
   await seite.goto(`${URL_APP}#/fortschritt`);

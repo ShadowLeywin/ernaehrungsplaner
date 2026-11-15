@@ -3,16 +3,25 @@
 // einer Datei (docs/UNTERWEGS-FORMAT.md). Elan liefert keine Werte von Ketten mit: die ändern sich, und
 // ein falscher Nährwert ist schlimmer als keiner.
 
-import { bereinigeGerichte, fuegeZusammen, korbEintraege, korbSumme, leseUnterwegsDatei, pruefeGericht, restaurants, setzeGericht } from '../logik/unterwegs.js';
+import { ZIELE_VORSCHLAG, bereinigeGerichte, fuegeZusammen, korbEintraege, korbSumme, leseUnterwegsDatei, offeneKcal, pruefeGericht, restaurants, setzeGericht, vorschlaege } from '../logik/unterwegs.js';
 import { formatKurz } from '../logik/datum.js';
-import { SLOTS } from '../logik/ziele.js';
+import { SLOTS, tagestypFuer } from '../logik/ziele.js';
+import { parseZahl } from '../logik/zutat.js';
 import { tippGefuehl } from '../plattform.js';
 import * as speicher from '../speicher.js';
 import { el, gramm, hinweis, icon, zahl } from '../ui.js';
 import { schnellFormular } from './schnellformular.js';
 
-// Bleibt beim Öffnen und Schließen erhalten: zuletzt gewähltes Restaurant
+// Bleibt beim Öffnen und Schließen erhalten: zuletzt gewähltes Restaurant, Ansicht und Sortierung
 let gewaehlt = null;
+let modus = 'vorschlag';
+let zielVorschlag = 'eiweiss';
+
+/** Offene kcal für Mahlzeit und Tag, aus Tagesziel, Anteilen der Mahlzeiten und dem schon Gegessenen */
+async function ladeOffen(datum, slot) {
+  const [ziele, woche, tag, slots, eintraege] = await Promise.all([speicher.ladeZiele(), speicher.ladeWoche(), speicher.holeTag(datum), speicher.ladeSlots(), speicher.eintraegeAm(datum)]);
+  return offeneKcal({ zielKcal: ziele[tagestypFuer(datum, woche, tag)].kcal, slots, slot, eintraege });
+}
 
 const ladeGerichte = async () => bereinigeGerichte(await speicher.einstellung('unterwegs'));
 const sichere = (gerichte) => speicher.setzeEinstellung('unterwegs', gerichte);
@@ -22,11 +31,13 @@ const kurzWerte = (g) => [`${zahl(g.kcal)} kcal`, typeof g.protein === 'number' 
  * Zeigt den Rechner im Blatt b (Steuerung aus blatt()). Die Bestellung (korb) überlebt Wechsel des
  * Restaurants und das Anlegen eines Gerichts, nicht aber das Schließen des Blatts.
  */
-export async function zeigeUnterwegs({ b, datum, slot, beiFertig, korb = new Map() }) {
-  const gerichte = await ladeGerichte();
+export async function zeigeUnterwegs({ b, datum, slot, beiFertig, korb = new Map(), budget = null }) {
+  const [gerichte, offen] = await Promise.all([ladeGerichte(), ladeOffen(datum, slot)]);
+  // Budget: was für diese Mahlzeit offen ist; ist sie schon voll, was für den Tag offen ist
+  let budgetWert = budget ?? (offen.mahlzeit || offen.tag || 600);
   const namen = restaurants(gerichte);
   if (!namen.includes(gewaehlt)) gewaehlt = namen[0] ?? null;
-  const neuZeigen = () => zeigeUnterwegs({ b, datum, slot, beiFertig, korb });
+  const neuZeigen = () => zeigeUnterwegs({ b, datum, slot, beiFertig, korb, budget: budgetWert });
 
   const bearbeiten = (gericht = null) => b.setze(gericht ? gericht.name : 'Gericht anlegen', schnellFormular({
     werte: gericht ? { restaurant: gericht.restaurant, name: gericht.name, ...Object.fromEntries(['kcal', 'protein', 'kh', 'fett'].map((w) => [w, typeof gericht[w] === 'number' ? String(gericht[w]).replace('.', ',') : ''])) }
@@ -114,11 +125,54 @@ export async function zeigeUnterwegs({ b, datum, slot, beiFertig, korb = new Map
       gewaehlt = n;
       for (const k of wahl.children) k.setAttribute('aria-pressed', String(k === e.currentTarget));
       zeigeListe();
+      zeigeVorschlaege();
     },
   }, n)));
   const slotWahl = el('select', { id: 'f-unterwegs-slot', 'aria-label': 'Mahlzeit' }, SLOTS.map((s) => el('option', { value: s.id, selected: s.id === slot }, s.name)));
+
+  /* Vorschläge: Budget eingeben, Sortierung wählen, passende Kombinationen sehen und übernehmen */
+  const vorschlagListe = el('div', { class: 'stapel vorschlag-liste', 'aria-live': 'polite', id: 'vorschlaege' });
+  const zeigeVorschlaege = () => {
+    const treffer = vorschlaege(gerichte, { restaurant: gewaehlt, budget: budgetWert, ziel: zielVorschlag });
+    vorschlagListe.replaceChildren(...(treffer.length ? treffer.map((v, i) => el('div', { class: 'vorschlag' },
+      el('div', { class: 'vorschlag-kopf' },
+        el('strong', {}, `${zahl(v.kcal)} kcal`),
+        el('span', { class: 'klein' }, [['E', v.protein], ['K', v.kh], ['F', v.fett]].filter(([, w]) => w > 0).map(([k, w]) => `${k} ${gramm(w)} g`).join(' · '))),
+      el('ul', { class: 'vorschlag-teile' }, v.gerichte.map((g) => el('li', {}, g.name, el('small', {}, ` ${zahl(g.kcal)} kcal`)))),
+      el('button', {
+        type: 'button', class: 'knopf leise', id: `vorschlag-${i}`,
+        onclick: () => { korb.clear(); for (const id of v.ids) korb.set(id, 1); modus = 'selbst'; neuZeigen(); },
+      }, 'Übernehmen')))
+      : [el('p', { class: 'leer' }, gerichte.some((g) => g.restaurant === gewaehlt && g.kcal <= budgetWert)
+        ? 'Keine Kombination nutzt das Budget zu mindestens 60 %. Leg mehr Gerichte an oder senk das Budget.'
+        : `Bei ${gewaehlt} passt nichts in ${zahl(budgetWert)} kcal.`)]));
+  };
+  const budgetFeld = el('input', {
+    id: 'f-unterwegs-budget', inputmode: 'numeric', autocomplete: 'off', value: String(budgetWert),
+    oninput: (e) => { const w = parseZahl(e.target.value); if (Number.isFinite(w) && w > 0) { budgetWert = Math.min(5000, w); zeigeVorschlaege(); } },
+  });
+  const setzeBudget = (w) => { budgetWert = w; budgetFeld.value = String(w); zeigeVorschlaege(); };
+  const vorschlagBereich = el('div', { class: 'stapel' },
+    el('div', { class: 'feld' },
+      el('label', { for: 'f-unterwegs-budget' }, 'Wie viel hast du offen?'),
+      el('div', { class: 'eingabe' }, budgetFeld, el('span', { class: 'einheit' }, 'kcal')),
+      el('div', { class: 'chips budget-chips' },
+        offen.mahlzeit > 0 ? el('button', { type: 'button', class: 'chip', onclick: () => setzeBudget(offen.mahlzeit) }, `${SLOTS.find((s) => s.id === slot)?.name ?? 'Mahlzeit'} ${zahl(offen.mahlzeit)}`) : null,
+        offen.tag > 0 ? el('button', { type: 'button', class: 'chip', onclick: () => setzeBudget(offen.tag) }, `Tag ${zahl(offen.tag)}`) : null)),
+    el('div', { class: 'wahl schmal-voll', role: 'group', 'aria-label': 'Sortieren nach' }, ZIELE_VORSCHLAG.map((z) => el('button', {
+      type: 'button', class: 'wahl-knopf', 'aria-pressed': String(z.id === zielVorschlag),
+      onclick: (e) => { zielVorschlag = z.id; for (const k of e.currentTarget.parentElement.children) k.setAttribute('aria-pressed', String(k === e.currentTarget)); zeigeVorschlaege(); },
+    }, z.name))),
+    vorschlagListe,
+    el('p', { class: 'klein' }, 'Kombinationen aus bis zu drei Gerichten, die dein Budget zu 60 bis 100 % nutzen. Elan sortiert nur nach deiner Wahl, ohne zu bewerten.'));
+
+  const modusWahl = el('div', { class: 'wahl', role: 'group', 'aria-label': 'Ansicht' }, [['vorschlag', 'Vorschläge'], ['selbst', 'Selbst wählen']].map(([id, name]) => el('button', {
+    type: 'button', class: 'wahl-knopf', 'aria-pressed': String(id === modus), onclick: () => { modus = id; neuZeigen(); },
+  }, name)));
+  modusWahl.classList.add('schmal-voll');
   zeigeListe();
   zeigeSumme();
+  zeigeVorschlaege();
 
   b.setze('Unterwegs', el('form', {
     class: 'stapel unterwegs', novalidate: true,
@@ -137,8 +191,9 @@ export async function zeigeUnterwegs({ b, datum, slot, beiFertig, korb = new Map
       });
     },
   },
+  modusWahl,
   wahl,
-  liste,
+  modus === 'vorschlag' ? vorschlagBereich : liste,
   verwalten,
-  el('div', { class: 'unterwegs-fuss' }, summeText, el('div', { class: 'unterwegs-aktion' }, slotWahl, eintragen))));
+  modus === 'selbst' ? el('div', { class: 'unterwegs-fuss' }, summeText, el('div', { class: 'unterwegs-aktion' }, slotWahl, eintragen)) : null));
 }

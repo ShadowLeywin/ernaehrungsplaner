@@ -847,6 +847,16 @@ a.ezeile > svg { color: var(--tinte-leise); flex: none; }
 .zaehler .rund { width: 2.5rem; height: 2.5rem; }
 .zaehler .rund:disabled { opacity: 0.35; }
 .zaehler-wert { min-width: 1.5rem; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+/* Vorschläge im Unterwegs-Rechner: je Kombination eine Karte */
+.vorschlag { display: grid; gap: 0.5rem; padding: 0.875rem 1rem; border-radius: 1rem; background: var(--flaeche-2, var(--flaeche)); }
+.vorschlag-kopf { display: flex; justify-content: space-between; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; }
+.vorschlag-kopf strong { font-size: 1.125rem; }
+.vorschlag-teile { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.125rem; }
+.vorschlag-teile li { font-weight: 560; }
+.vorschlag-teile small { color: var(--tinte-leise); font-weight: 400; }
+.vorschlag .knopf { justify-self: start; }
+.budget-chips { margin-top: 0.5rem; }
+.wahl.schmal-voll .wahl-knopf { flex: 1 1 0; font-size: 0.875rem; padding: 0 0.375rem; }
 .unterwegs-links { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; }
 .unterwegs-fuss {
   position: sticky; bottom: calc(-1.25rem - var(--rand-bottom)); margin: 0 -1.125rem calc(-1.25rem - var(--rand-bottom));
