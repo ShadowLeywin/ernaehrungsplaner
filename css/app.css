@@ -854,7 +854,11 @@ a.ezeile > svg { color: var(--tinte-leise); flex: none; }
 .vorschlag-teile { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.125rem; }
 .vorschlag-teile li { font-weight: 560; }
 .vorschlag-teile small { color: var(--tinte-leise); font-weight: 400; }
-.vorschlag .knopf { justify-self: start; }
+.vorschlag-aktionen { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.vorschlag .chip.getraenk { font-size: 0.875rem; min-height: 2.5rem; }
+/* Knöpfe heben sich von der Karte ab (sonst gleiche Farbe wie die Karte); :root schlägt den Chip-Stil des Themas */
+:root[data-thema] .vorschlag :is(.knopf.leise, .chip) { background: var(--flaeche); border: 1.5px solid var(--linie); color: var(--tinte); }
+:root[data-thema] .vorschlag .knopf.leise { color: var(--blatt); font-weight: 650; }
 .budget-chips { margin-top: 0.5rem; }
 .wahl.schmal-voll .wahl-knopf { flex: 1 1 0; font-size: 0.875rem; padding: 0 0.375rem; }
 .unterwegs-links { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; }

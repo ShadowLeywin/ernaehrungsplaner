@@ -88,7 +88,7 @@ test('Offene Kalorien: für die Mahlzeit und den Tag, nie unter 0', async () => 
 
 test('Vorschläge: ohne Getränke und Saucen, höchstens eine Form je Gericht', async () => {
   const { istGetraenkOderSauce, vorschlaege } = await import('../js/logik/unterwegs.js');
-  for (const name of ['Coca-Cola Classic 0,5l', 'Cappuccino', 'Iced Latte', 'Ketchup 20ml', 'BBQ Sauce', 'Café Grande']) assert.equal(istGetraenkOderSauce(name), true, name);
+  for (const name of ['Coca-Cola Classic 0,5l', 'Cappuccino', 'Iced Latte', 'Ketchup 20ml', 'BBQ Sauce', 'Café Grande', 'Whey Protein', 'Collagen Matcha (Large)', 'Extra Käse', 'Americano (Medium)', 'Chai Latte (Small)']) assert.equal(istGetraenkOderSauce(name), true, name);
   for (const name of ['Big Mac', 'Chicken Teriyaki (Salat)', '9 Chicken McNuggets', 'Whopper', 'Teriyaki Sub', 'Dippers', 'KFC Salat ohne Dressing', 'McSundae Original mit Karamell-Sauce']) assert.equal(istGetraenkOderSauce(name), false, name);
   const liste = bereinigeGerichte([
     { restaurant: 'T', name: 'Huhn (Sub)', kcal: 300, protein: 25 },
@@ -102,3 +102,40 @@ test('Vorschläge: ohne Getränke und Saucen, höchstens eine Form je Gericht', 
   assert.deepEqual(v[0].gerichte.map((g) => g.name), ['Brot', 'Huhn (Sub)']);
 });
 
+
+test('Ketten-Liste: einmal einmischen, nur bei neuerem Stand wieder; eigene Gerichte bleiben', async () => {
+  const { mischeKetten } = await import('../js/logik/unterwegs.js');
+  const paket = (stand, kcal) => ({ format: 'elan-unterwegs', version: 1, stand, restaurants: [{ name: 'Kette', gerichte: [{ name: 'Burger', kcal }] }] });
+  const eigene = bereinigeGerichte([{ restaurant: 'Imbiss', name: 'Döner', kcal: 700 }]);
+  const erst = mischeKetten(eigene, paket('2026-11-15', 500), null);
+  assert.equal(erst.geaendert, true);
+  assert.deepEqual(erst.gerichte.map((g) => `${g.restaurant}/${g.name}/${g.kcal}`), ['Imbiss/Döner/700', 'Kette/Burger/500']);
+  assert.equal(mischeKetten(erst.gerichte, paket('2026-11-15', 999), erst.stand).geaendert, false);
+  const neuer = mischeKetten(erst.gerichte, paket('2027-02-01', 520), erst.stand);
+  assert.deepEqual(neuer.gerichte.map((g) => g.kcal), [700, 520]);
+  assert.equal(mischeKetten(eigene, { kaputt: true }, null).geaendert, false);
+});
+
+test('Frühstück nur für Frühstück und Morgensnack vorschlagen', async () => {
+  const { istFruehstueck, vorschlaege } = await import('../js/logik/unterwegs.js');
+  for (const name of ['McMuffin Egg', '6 Mini Pancakes', 'Big Morning Egg', 'King Toasty Bacon Egg', 'Breakfast Tortilla']) assert.equal(istFruehstueck(name), true, name);
+  for (const name of ['Big Mac', 'Veggie Delite (Salat)', 'McVeggie TS', 'Buttercroissant']) assert.equal(istFruehstueck(name), false, name);
+  const liste = bereinigeGerichte([{ restaurant: 'M', name: 'McMuffin Egg', kcal: 300, protein: 18 }, { restaurant: 'M', name: 'Burger', kcal: 300, protein: 12 }]);
+  assert.deepEqual(vorschlaege(liste, { restaurant: 'M', budget: 350, fruehstueck: false }).flatMap((v) => v.gerichte.map((g) => g.name)), ['Burger']);
+  assert.equal(vorschlaege(liste, { restaurant: 'M', budget: 350 })[0].gerichte[0].name, 'McMuffin Egg');
+});
+
+test('Getränk-Tipp: ohne Kalorien, Zero zuerst, je Getränk eine Größe, keine Saucen', async () => {
+  const { nullGetraenke } = await import('../js/logik/unterwegs.js');
+  const liste = bereinigeGerichte([
+    { restaurant: 'K', name: 'Coca-Cola Zero 0,25 l', kcal: 0 },
+    { restaurant: 'K', name: 'Coca-Cola Zero 0,5 l', kcal: 1 },
+    { restaurant: 'K', name: 'Wasser Still 0,5l', kcal: 0 },
+    { restaurant: 'K', name: 'Espresso', kcal: 1 },
+    { restaurant: 'K', name: 'Fanta 0,5 l', kcal: 185 },
+    { restaurant: 'K', name: 'Senf Sauce 25ml', kcal: 3 },
+    { restaurant: 'Anders', name: 'Pepsi Zero 0,5 l', kcal: 1 },
+  ]);
+  assert.deepEqual(nullGetraenke(liste, 'K', 3).map((g) => g.name), ['Coca-Cola Zero 0,5 l', 'Wasser Still 0,5l', 'Espresso']);
+  assert.deepEqual(nullGetraenke(liste, 'Nirgends'), []);
+});

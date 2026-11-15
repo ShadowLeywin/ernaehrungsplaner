@@ -317,3 +317,18 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Verbesserungen:** Vorschläge ohne Getränke und Saucen (Cappuccino füllte sonst das Budget), höchstens eine Form je Gericht, „Wenig Fett“ ersetzt durch „Mager“ (Eiweiß minus Fett; vorher gewannen Süßes und Softeis), nach kcal sortiert mit frühem Abbruch (Burger King 242 → 6 ms), Eingabe 250 ms verzögert.
 - **Fehler:** `\b` in JavaScript-Regex kennt kein „é“: „Café Grande“ rutschte durch. Lösung: `(?<!\p{L})…(?!\p{L})` mit Flag `u`. „KFC Salat ohne Dressing“ galt als Sauce: Zusätze mit „ohne“/„mit“ werden vor der Prüfung abgeschnitten.
 - **Fachbegriffe:** Plausibilitätsprüfung, Pruning (Suche früh abbrechen), Debounce (erst nach kurzer Tipp-Pause rechnen), Unicode-Eigenschaften in Regex (`\p{L}`).
+
+## Session 14, Runde 12: Ketten in der App, Frühstück nur morgens (15.11.2026)
+
+- **Was und warum:** Léon: „Mach alles selber, hast die Erlaubnis.“ Damit Ja zu Vorschlag 1 (Frühstück nur morgens) und 2 (Ketten-Liste in der App, Risiko Datenbankrecht trägt Léon). `data/unterwegs-ketten.json` wird beim Öffnen von „Unterwegs“ eingemischt, nur wenn ihr Stand neuer ist (`mischeKetten`, Einstellung `unterwegsStand`). Der Umwandler liegt jetzt als `tools/ketten-listen.py` im Repo, mit Ablauf im Kopf.
+- **Befehle:** `npm test` (202; `test/projekt.test.js` meldete die fehlende Datei in `sw.js` sofort) · `node tools/pruefe-app.cjs` (141 Kriterien).
+- **Entscheidung:** Frühstück am Namen erkennen (McMuffin, Pancake, Rührei, Morning, McGriddle, Breakfast, King Toasty) und an der Mahlzeit statt an der Uhrzeit: Öffnungszeiten fürs Frühstück sind nicht belegt [vermutet bis 10:30], die Mahlzeit ist eindeutig und testbar. Erster Entwurf mit „egg“ traf „Veggie“; deshalb nur eindeutige Wörter.
+- **Fachbegriffe:** Daten-Stand (Versionsdatum einer mitgelieferten Liste), Einmischen (Merge mit Vorrang der neueren Liste für gleiche Schlüssel).
+
+## Session 14, Runde 13: Mehr Ketten, Getränk-Tipp, Aktualisierung (15.11.2026)
+
+- **Was und warum:** Léon: „Setze alles um.“ Vier weitere Ketten mit deutscher Karte (dean&david, Hans im Glück, Peter Pane, Coffee Fellows), zusammen 1.026 Gerichte. Getränk ohne Kalorien als Chip an jedem Vorschlag (`nullGetraenke`). Vierteljährliche geplante Aufgabe, die die Listen neu baut und einen PR anlegt.
+- **Entscheidung:** Sieben weitere Ketten bei nutriscan nutzen nur US- oder kanadische Karten. Sie fehlen bewusst: andere Rezepturen und Portionen, lieber kein Wert als ein falscher.
+- **Fehler:** Die Obergrenze von 1.000 Gerichten schnitt 26 ab (Elans Leser meldete „verworfen 26“); jetzt 3.000. Extras wie „Whey Protein“, „Collagen Matcha“, „Americano (Medium)“ landeten in Vorschlägen; Liste der Ausschlusswörter erweitert, Größen in Klammern gelten als Getränk. Geräte mit Stand „2026-11-15“ hätten die neuen Ketten nicht bekommen: `stand` darf jetzt eine Uhrzeit haben.
+- **Fehler:** Knöpfe auf der Vorschlagskarte waren unsichtbar (gleiche Farbe wie die Karte), die Theme-Regel gewann bei gleicher Spezifität, weil sie später steht. Lösung: `:root[data-thema]` davor.
+- **Befehle:** `python3 -I tools/ketten-listen.py <ordner> 2026-11-15T16:00` (Liste bauen) · `npm test` (203) · `node tools/pruefe-app.cjs` (141).
