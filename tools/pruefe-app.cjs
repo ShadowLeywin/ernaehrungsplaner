@@ -883,6 +883,36 @@ async function healthLauf(browser) {
     gewaehlt.join() === 'Energie 4 von 5,Stimmung 3 von 5' && entwurfBleibt === '82' && /Energie Ø 4 von 5/i.test(rueckblickCheckin) && /Kalorien Ø/i.test(rueckblickCheckin) && !/Stress Ø/i.test(rueckblickCheckin),
     `gespeichert: ${gewaehlt.join(' / ')}; Gewichtsfeld behält „${entwurfBleibt}“; Rückblick: ${rueckblickCheckin.match(/Energie Ø[^↑↓→]*/i)?.[0] ?? 'kein Energie-Wert'}`);
 
+  // Schnell eintragen: Suchbegriff wird zum Namen, kcal aus Makros, Fehler am Feld, ändern und löschen
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.getByRole('button', { name: 'Zu Mittagessen hinzufügen' }).click();
+  await seite.locator('dialog .suchfeld').fill('Mensa Pasta');
+  await seite.locator('#nur-kcal').click();
+  await seite.locator('#f-schnell-kcal').waitFor();
+  const vorbelegtName = await seite.locator('#f-schnell-name').inputValue();
+  await seite.locator('dialog').getByRole('button', { name: 'Eintragen' }).click();
+  const leerFehler = await seite.locator('#f-schnell-kcal-fehler').innerText();
+  await seite.locator('#f-schnell-protein').fill('30');
+  await seite.locator('#f-schnell-kh').fill('80');
+  await seite.locator('#f-schnell-fett').fill('15');
+  const makroHinweis = `${await seite.locator('#f-schnell-kcal').getAttribute('placeholder')}|${await seite.locator('#f-schnell-kcal-fehler').innerText()}`;
+  await bild(seite, '42-schnell', false);
+  await seite.locator('dialog').getByRole('button', { name: 'Eintragen' }).click();
+  await seite.locator('dialog').waitFor({ state: 'detached' }).catch(async (f) => { console.log('DIAGNOSE', (await seite.locator('dialog').innerText()).replace(/\s+/g, ' ')); throw f; });
+  const schnellZeile = (await seite.locator('#slot-mittag .eintrag', { hasText: 'Mensa Pasta' }).innerText()).replace(/\s+/g, ' ');
+  await seite.locator('#slot-mittag .eintrag', { hasText: 'Mensa Pasta' }).click();
+  await seite.locator('#f-schnell-kcal').fill('600');
+  await seite.locator('dialog').getByRole('button', { name: 'Speichern' }).click();
+  await seite.locator('dialog').waitFor({ state: 'detached' });
+  const geaendert = (await seite.locator('#slot-mittag .eintrag', { hasText: 'Mensa Pasta' }).innerText()).replace(/\s+/g, ' ');
+  await seite.locator('#slot-mittag .eintrag', { hasText: 'Mensa Pasta' }).click();
+  await seite.locator('dialog').getByRole('button', { name: 'Löschen' }).click();
+  await seite.locator('dialog').waitFor({ state: 'detached' });
+  const weg = await seite.locator('#slot-mittag .eintrag', { hasText: 'Mensa Pasta' }).count();
+  pruefe('Schnell eintragen: nur Kalorien oder Makros, ändern und löschen',
+    vorbelegtName === 'Mensa Pasta' && /Kalorien/.test(leerFehler) && makroHinweis === '575 aus Makros|' && /Portion/.test(schnellZeile) && /575 kcal/.test(schnellZeile) && /600 kcal/.test(geaendert) && weg === 0,
+    `Name „${vorbelegtName}“; leer: „${leerFehler}“; mit Makros: „${makroHinweis}“; eingetragen „${schnellZeile}“; geändert „${geaendert}“; nach Löschen ${weg}`);
+
   // Körpermaße: Kacheln wie beim Maßband, Eintragen im Blatt, eigenes Maß mit Namen
   await seite.goto(`${URL_APP}#/fortschritt`);
   await seite.locator('.mass-kachel').first().waitFor();

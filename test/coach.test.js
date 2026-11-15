@@ -64,3 +64,22 @@ test('Gewicht, Alltag, Supplements und Symptome erscheinen, wenn Daten da sind',
   assert.match(text, /- Mi 11\.11\. 14:30 Testsymptom, Stärke 3 von 5; davor: Testmilch; nach dem Essen/);
   assert.match(text, /Selbstangaben aus der App Elan\.$/);
 });
+
+test('Körper und Befinden: Ruhepuls, HRV, Check-in und Trainings nur, wenn es sie gibt', () => {
+  const m = (art, i, wert) => ({ id: `${art}|${tage[i]}`, art, datum: tage[i], wert });
+  const ohne = coachBericht(basis);
+  assert.doesNotMatch(ohne, /KÖRPER UND BEFINDEN/);
+  const text = coachBericht({
+    ...basis,
+    messungen: [m('ruhepuls', 0, 60), m('ruhepuls', 1, 62), m('hrv', 0, 45), m('energie', 0, 4), m('energie', 1, 3), m('stress', 2, 2)],
+    tagSaetze: new Map([[tage[3], { datum: tage[3], tagestyp: 'gym', tagestypQuelle: 'healthconnect' }]]),
+  });
+  assert.match(text, /KÖRPER UND BEFINDEN/);
+  assert.match(text, /Ruhepuls: 61 bpm im Schnitt aus 2 Tagen/);
+  assert.match(text, /HRV: 45 ms im Schnitt aus 1 Tag\b/);
+  assert.match(text, /Energie: 3,5 von 5 im Schnitt aus 2 Tagen \(1 = müde, 5 = voller Energie\)/);
+  assert.doesNotMatch(text, /Stimmung:/);
+  assert.match(text, /Stress: 2 von 5/);
+  assert.match(text, /Trainings laut Health Connect: 1 Tag/);
+});
+

@@ -212,10 +212,11 @@ export function verlaufJeTag(messungen, artId, datum, tage = 30) {
 }
 
 /** Punkte für eine kleine Verlaufslinie: "x,y x,y …" in einem Feld von breite × hoehe. */
-export function linienPunkte(werte, breite, hoehe, rand = 4) {
+export function linienPunkte(werte, breite, hoehe, rand = 4, bereich = null) {
   if (werte.length < 2) return '';
-  const min = Math.min(...werte);
-  const max = Math.max(...werte);
+  // Mit festem Bereich (z. B. Check-in 1 bis 5) sieht ein Schritt von 3 auf 4 nicht wie ein Absturz aus
+  const min = bereich?.min ?? Math.min(...werte);
+  const max = bereich?.max ?? Math.max(...werte);
   const spanne = max - min || 1;
   return werte.map((w, i) => {
     const x = rand + (i * (breite - 2 * rand)) / (werte.length - 1);

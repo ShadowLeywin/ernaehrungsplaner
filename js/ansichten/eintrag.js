@@ -3,10 +3,11 @@
 import { isoDatum } from '../logik/datum.js';
 import { fuerMenge } from '../logik/naehrwerte.js';
 import { rezeptAlsZutat } from '../logik/rezepte.js';
+import { kcalAusMakros, pruefeSchnell, schnellAlsText, schnellEintrag } from '../logik/schnell.js';
 import { letzteMengen, sucheZutaten, zuletztVerwendet } from '../logik/suche.js';
 import { magHinweis, sortiereNachVorliebe } from '../logik/vorlieben.js';
 import { SLOTS, slotFuerUhrzeit } from '../logik/ziele.js';
-import { pruefeMenge } from '../logik/zutat.js';
+import { parseZahl, pruefeMenge } from '../logik/zutat.js';
 import { tippGefuehl } from '../plattform.js';
 import { gehe } from '../router.js';
 import * as speicher from '../speicher.js';
@@ -15,7 +16,7 @@ import { blatt, el, gramm, hinweis, zahl } from '../ui.js';
 const slotName = (id) => SLOTS.find((s) => s.id === id)?.name ?? '';
 
 /** Suchfeld mit Trefferliste. beiWahl bekommt die angetippte Zutat (oder das als Zutat verpackte Rezept). */
-function suchListe({ auswahl, zuletzt = [], vorlieben = new Map(), mengen = new Map(), beiWahl, beiNeu, beiSchnell = null }) {
+function suchListe({ auswahl, zuletzt = [], vorlieben = new Map(), mengen = new Map(), beiWahl, beiNeu, beiSchnell = null, beiNurKcal = null }) {
   const liste = el('div', { class: 'wahl-liste' });
   const klein = (zutat) => {
     const text = zutat.istRezept ? 'Rezept' : (magHinweis(vorlieben.get(zutat.id)) || zutat.marke);
@@ -39,6 +40,9 @@ function suchListe({ auswahl, zuletzt = [], vorlieben = new Map(), mengen = new 
         : zeile(zutat)))) : '',
       zeigeZuletzt ? el('h3', { class: 'zwischentitel' }, 'Alles') : '',
       treffer.length ? el('ul', { class: 'zeilen' }, treffer.map(zeile)) : el('p', { class: 'leer' }, `Nichts passt zu „${begriff.trim()}“.`),
+      // Mensa, Restaurant, Snack bei Freunden: ohne Datenbank, nur mit Kalorien. Der Suchbegriff wird zum Namen
+      beiNurKcal ? el('button', { type: 'button', class: 'chip schnell nur-kcal', id: 'nur-kcal', onclick: () => beiNurKcal(begriff.trim()) },
+        begriff.trim() ? `„${begriff.trim()}“ mit Kalorien eintragen` : 'Nur Kalorien eintragen') : '',
       el('button', { type: 'button', class: 'textlink', onclick: beiNeu }, 'Nicht dabei? Neue Zutat anlegen'),
     );
   };
@@ -71,6 +75,19 @@ export async function oeffneZutatWahl({ datum, slot, beiFertig, ziel = 'tagebuch
       vorlieben,
       mengen: letzteMengen(alleEintraege),
       beiNeu: () => { b.schliessen(); gehe('/zutaten/neu'); },
+      // Im Plan nicht: Ein Posten ohne Zutat hätte keinen Platz auf der Einkaufsliste
+      beiNurKcal: plan ? null : (begriff) => b.setze('Schnell eintragen', schnellFormular({
+        werte: { name: begriff }, slot, speichernText: 'Eintragen',
+        beiSpeichern: async (daten, wahlSlot) => {
+          const gespeichert = await speicher.speichereEintrag(schnellEintrag(daten, datum, wahlSlot));
+          tippGefuehl('erfolg');
+          b.schliessen();
+          beiFertig();
+          hinweis(`${daten.name}, ${zahl(daten.je100.kcal)} kcal eingetragen.`, {
+            aktion: 'Rückgängig', beiAktion: async () => { await speicher.loescheEintrag(gespeichert.id); beiFertig(); },
+          });
+        },
+      })),
       // Ein Tipp: dieselbe Menge wie beim letzten Mal, mit Rückgängig statt Rückfrage
       beiSchnell: async (zutat, menge) => {
         const gespeichert = await (plan ? speicher.speicherePlan : speicher.speichereEintrag)(neuerEintrag(zutat, datum, { gramm: menge, slot }));
@@ -141,8 +158,30 @@ export async function oeffneEintrag({ eintrag, beiFertig, ziel = 'tagebuch' }) {
   const plan = ziel === 'plan';
   const speichere = plan ? speicher.speicherePlan : speicher.speichereEintrag;
   const loesche = plan ? speicher.loeschePlan : speicher.loescheEintrag;
-  const zutat = await speicher.holeZutat(eintrag.zutatId).catch(() => null);
-  const b = blatt({
+  let b = null; // das Blatt; „Löschen“ braucht es, egal welches Formular es zeigt
+  const loeschen = async () => {
+    await loesche(eintrag.id);
+    b.schliessen();
+    beiFertig();
+    hinweis(plan ? 'Aus dem Plan entfernt.' : 'Eintrag gelöscht.', { aktion: 'Rückgängig', beiAktion: async () => { await speichere(eintrag); beiFertig(); } });
+  };
+  if (eintrag.schnell) {
+    b = blatt({
+      titel: eintrag.name,
+      inhalt: schnellFormular({
+        werte: schnellAlsText(eintrag), slot: eintrag.slot, speichernText: 'Speichern', beiLoeschen: () => loeschen(),
+        beiSpeichern: async ({ name, je100 }, slot) => {
+          await speichere({ ...eintrag, name, je100, slot });
+          b.schliessen();
+          hinweis('Gespeichert.');
+          beiFertig();
+        },
+      }),
+    });
+    return;
+  }
+  const zutat = eintrag.zutatId ? await speicher.holeZutat(eintrag.zutatId).catch(() => null) : null;
+  b = blatt({
     titel: eintrag.name,
     inhalt: mengenFormular({
       name: eintrag.name, je100: eintrag.je100, portionen: zutat?.portionen, slot: eintrag.slot, gramm: eintrag.gramm, speichernText: 'Speichern',
@@ -152,14 +191,58 @@ export async function oeffneEintrag({ eintrag, beiFertig, ziel = 'tagebuch' }) {
         hinweis('Gespeichert.');
         beiFertig();
       },
-      beiLoeschen: async () => {
-        await loesche(eintrag.id);
-        b.schliessen();
-        beiFertig();
-        hinweis(plan ? 'Aus dem Plan entfernt.' : 'Eintrag gelöscht.', { aktion: 'Rückgängig', beiAktion: async () => { await speichere(eintrag); beiFertig(); } });
-      },
+      beiLoeschen: loeschen,
     }),
   });
+}
+
+/**
+ * Formular für „Schnell eintragen“: Name, Kalorien, Makros freiwillig. Fehler stehen am Feld,
+ * das Getippte bleibt stehen (das Formular wird nicht neu gebaut).
+ */
+function schnellFormular({ werte = {}, slot, speichernText, beiSpeichern, beiLoeschen = null }) {
+  const felder = {};
+  const fehlerOrt = {};
+  const eingabe = (id, beschriftung, einheit, extra = {}) => {
+    fehlerOrt[id] = el('p', { class: 'fehlertext', id: `f-schnell-${id}-fehler` });
+    felder[id] = el('input', {
+      id: `f-schnell-${id}`, name: id, autocomplete: 'off', value: werte[id] ?? '', 'aria-describedby': `f-schnell-${id}-fehler`,
+      oninput: () => { fehlerOrt[id].textContent = ''; felder[id].removeAttribute('aria-invalid'); if (['protein', 'kh', 'fett'].includes(id)) zeigeMakroKcal(); }, ...extra,
+    });
+    return el('div', { class: 'feld' }, el('label', { for: `f-schnell-${id}` }, beschriftung),
+      el('div', { class: 'eingabe' }, felder[id], einheit ? el('span', { class: 'einheit' }, einheit) : null), fehlerOrt[id]);
+  };
+  const zahlFeld = { inputmode: 'decimal', enterkeyhint: 'next' };
+  // Was Elan aus den Makros rechnen würde, steht grau im leeren Kalorienfeld; der Hinweis „fehlt“ verschwindet dann
+  const zeigeMakroKcal = () => {
+    const makros = Object.fromEntries(['protein', 'kh', 'fett'].map((m) => [m, parseZahl(felder[m].value)]).filter(([, w]) => Number.isFinite(w) && w >= 0));
+    felder.kcal.placeholder = Object.keys(makros).length ? `${zahl(kcalAusMakros(makros))} aus Makros` : '';
+    if (Object.keys(makros).length && !felder.kcal.value.trim()) { fehlerOrt.kcal.textContent = ''; felder.kcal.removeAttribute('aria-invalid'); }
+  };
+  const slotWahl = el('select', { id: 'f-schnell-slot', name: 'slot' }, SLOTS.map((s) => el('option', { value: s.id, selected: s.id === slot }, s.name)));
+  queueMicrotask(() => { zeigeMakroKcal(); (felder.name.value ? felder.kcal : felder.name).focus(); });
+  return el('form', {
+    class: 'stapel schnell-formular', novalidate: true, 'aria-label': 'Schnell eintragen',
+    onsubmit: async (e) => {
+      e.preventDefault();
+      const pruefung = pruefeSchnell(Object.fromEntries(Object.entries(felder).map(([id, f]) => [id, f.value])));
+      if (!pruefung.ok) {
+        for (const [id, text] of Object.entries(pruefung.fehler)) { fehlerOrt[id].textContent = text; felder[id].setAttribute('aria-invalid', 'true'); }
+        felder[Object.keys(pruefung.fehler)[0]].focus();
+        return;
+      }
+      await beiSpeichern(pruefung, slotWahl.value);
+    },
+  },
+  eingabe('name', 'Was war es?', '', { placeholder: 'z. B. Mensa Pasta', maxlength: 80, enterkeyhint: 'next' }),
+  eingabe('kcal', 'Kalorien', 'kcal', zahlFeld),
+  el('div', { class: 'makro-felder' },
+    eingabe('protein', 'Eiweiß', 'g', zahlFeld), eingabe('kh', 'Kohlenh.', 'g', zahlFeld), eingabe('fett', 'Fett', 'g', zahlFeld)),
+  el('p', { class: 'klein' }, 'Makros sind freiwillig. Lässt du die Kalorien leer, rechnet Elan sie aus den Makros.'),
+  el('div', { class: 'feld' }, el('label', { for: 'f-schnell-slot' }, 'Mahlzeit'), slotWahl),
+  el('div', { class: 'knopfreihe' },
+    beiLoeschen ? el('button', { type: 'button', class: 'knopf leise', onclick: beiLoeschen }, 'Löschen') : null,
+    el('button', { type: 'submit', class: 'knopf' }, speichernText)));
 }
 
 /** Formular für Menge und Slot, mit Vorschau der Nährwerte */

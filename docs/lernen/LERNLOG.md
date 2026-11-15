@@ -283,3 +283,12 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Befehle:** Messskript mit Playwright (`getBoundingClientRect` von Knopf und Leiste) · Gegenprobe mit `git stash` (alter Stand: Knopf 1.712 px unter dem Bild) · `node tools/pruefe-app.cjs` (139 Kriterien).
 - **Lösung:** `backwards` statt `both`, der Knopf blendet erst nach dem Übergang ein. Dazu ein Puffer: Er verschwindet nach 12 px nach unten und kommt erst nach 48 px nach oben zurück, geprüft einmal je Bild (`requestAnimationFrame`).
 - **Fachbegriffe:** Containing Block (Bezugsrahmen für die Lage eines Elements), Hysterese (Puffer, damit kleine Gegenbewegungen nichts umschalten).
+
+## Session 14, Runde 8: Schnell eintragen, Coach mit Befinden (15.11.2026)
+
+- **Was und warum:** Léon: „Baue weiter und nutze dein volles Potenzial.“ Gewählt, was täglich hilft und keine neuen Rechte braucht: „Schnell eintragen“ (nur kcal, Makros freiwillig), Coach-Bericht mit Ruhepuls, HRV, Check-in und Trainings, Check-in-Verlauf mit fester Skala 1–5, HRV-Kachel erst mit Wert, Erinnerungen nach Backup neu planen.
+- **Befehle:** `npm test` (192, neu `test/schnell.test.js`) · `node tools/pruefe-app.cjs` (140 Kriterien).
+- **Entscheidung:** Ein Schnell-Eintrag ist eine Portion mit `gramm: 100` und `je100` = Werte der Portion. So rechnen Summen, Woche und Coach ohne Sonderfall. Im Wochenplan nicht angeboten, weil ein Posten ohne Zutat nicht auf die Einkaufsliste passt.
+- **Verworfen:** BLS 4.0 als große Lebensmittel-Datenbank. Lizenz nicht prüfbar, beide Quellen in der Umgebung gesperrt. Erst mit belegter Lizenz.
+- **Fehler:** „Löschen“ im Schnell-Blatt griff auf eine Variable `b` zu, die in diesem Zweig nie belegt wurde (zeitliche tote Zone von `const`). Der Browsertest fand es, weil das Blatt offen blieb. Lösung: ein `let b` für beide Zweige.
+- **Fachbegriffe:** Atwater-Faktoren (4 kcal je g Eiweiß und Kohlenhydrate, 9 je g Fett), zeitliche tote Zone (TDZ).

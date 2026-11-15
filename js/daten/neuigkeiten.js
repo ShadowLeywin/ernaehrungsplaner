@@ -5,6 +5,17 @@ export const NEUIGKEITEN = [
   {
     version: '1.0.0',
     datum: '2026-11-15',
+    titel: 'Schnell eintragen',
+    punkte: [
+      'Schnell eintragen: Mensa, Restaurant oder Snack ohne Datenbank, nur mit Kalorien. Makros sind freiwillig; ohne Kalorien rechnet Elan sie aus den Makros. Der Suchbegriff wird gleich zum Namen.',
+      'Coach-Export: neuer Abschnitt „Körper und Befinden“ mit Ruhepuls, HRV, Check-in und Trainings der Woche.',
+      'Check-in-Verläufe zeigen immer die ganze Skala von 1 bis 5, damit ein kleiner Schritt nicht wie ein Absturz aussieht.',
+      'Die HRV-Kachel erscheint erst, wenn es einen Wert gibt. Nach dem Einspielen eines Backups sind die Erinnerungen sofort wieder geplant.',
+    ],
+  },
+  {
+    version: '1.0.0',
+    datum: '2026-11-15',
     titel: 'Check-in, HRV, Erinnerungen',
     punkte: [
       'Check-in auf „Heute“: Energie, Stimmung und Stress mit je einem Tipp von 1 bis 5. Nochmal tippen nimmt den Wert zurück.',
@@ -129,7 +140,7 @@ export const NEUIGKEITEN = [
 
 /** Die Funktionen der App in Kürze, für „Über Elan“ */
 export const FUNKTIONEN = [
-  { titel: 'Heute', text: 'Was du isst, in sechs Mahlzeiten. Die Scheibe zeigt, wie viel vom Tagesziel erreicht ist; darunter je ein Ring für Eiweiß, Kohlenhydrate, Fett, Ballaststoffe und Wasser. Der Plus-Knopf trägt in die Mahlzeit zur Uhrzeit ein.' },
+  { titel: 'Heute', text: 'Was du isst, in sechs Mahlzeiten. Die Scheibe zeigt, wie viel vom Tagesziel erreicht ist; darunter je ein Ring für Eiweiß, Kohlenhydrate, Fett, Ballaststoffe und Wasser. Der Plus-Knopf trägt in die Mahlzeit zur Uhrzeit ein. Ohne passende Zutat: schnell nur mit Kalorien.' },
   { titel: 'Tagestypen', text: 'Gym, Calisthenics oder Rest: Jeder Typ hat eigene Ziele. Der Wochenplan legt fest, welcher Tag welcher ist.' },
   { titel: 'Alle Nährwerte', text: 'Vitamine und Mineralstoffe für den Tag oder als Wochenschnitt, mit Anteil am Referenzwert der DGE.' },
   { titel: 'Woche und Einkauf', text: 'Mahlzeiten vormerken, mit einem Tipp ins Tagebuch übernehmen. Die Einkaufsliste rechnet Rezepte in Zutaten um und zeigt Angebote.' },

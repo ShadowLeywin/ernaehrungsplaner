@@ -83,3 +83,5 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | Exakter Wecker | Android-Recht für sekundengenaue Alarme; Elan verzichtet darauf, Erinnerungen dürfen ein paar Minuten später kommen. | `docs/ANDROID.md`, Abschnitt Erinnerungen |
 | Containing Block | Der Rahmen, auf den sich die Lage eines Elements bezieht; ein Vorfahr mit `transform` wird es auch für `position: fixed`. | `.seite.einblenden` in `css/app.css` |
 | Hysterese | Ein Puffer zwischen zwei Schwellen, damit kleine Gegenbewegungen nicht hin- und herschalten. | `beobachteFab` in `js/ansichten/heute.js` |
+| Atwater-Faktoren | Faustwerte für Energie: 4 kcal je Gramm Eiweiß und Kohlenhydrate, 9 kcal je Gramm Fett. | `kcalAusMakros` in `js/logik/schnell.js` |
+| Zeitliche tote Zone (TDZ) | Eine mit `const` oder `let` deklarierte Variable existiert erst ab ihrer Zeile; ein früherer Zugriff wirft einen Fehler. | `oeffneEintrag` in `js/ansichten/eintrag.js` |

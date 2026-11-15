@@ -115,3 +115,4 @@ Health-Speicher brauchen keine Sonderbehandlung im Backup: neue Speicher kommen 
 - `masseSichtbar`: Liste der Maß-Kacheln unter „Fortschritt“ (Start: alle).
 - `erinnerungen`: `{ wasser: { an, zeiten: ['10:00', …] }, supplements: { an, zeit }, checkin: { an, zeit } }`, geprüft von `bereinigeErinnerungen` (`js/logik/erinnerungen.js`). Geplant werden die Benachrichtigungen auf dem Handy; nach dem Einspielen eines Backups erst wieder, wenn man die Seite „Erinnerungen“ ändert.
 - Speicher `tage`: freiwillig `tagestypQuelle` = `eigen` (selbst gewählt, auch „wie im Plan“) oder `healthconnect` (aus einem Training). Eigene Wahl wird nie überschrieben.
+- Speicher `eintraege`: freiwillig `schnell: true` (seit 15.11.2026) für „Schnell eintragen“. Solche Einträge haben keine `zutatId`; `gramm` ist 100 und `je100` enthält die Werte der Portion (`kcal`, freiwillig `protein`, `kh`, `fett`), damit alle Summen ohne Sonderfall rechnen. Keine neue Schema-Version nötig.

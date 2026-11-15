@@ -353,11 +353,11 @@ function trendZusatz(messungen, artId, datum) {
   return `Ø 7 Tage ${zahl(trend.schnitt)}${trend.aenderung === null ? '' : ` · ${mitVorzeichen(trend.aenderung, 0)}`}`;
 }
 
-/** Ruhepuls, Körperfett und HRV: meist aus Health Connect, auch von Hand. */
+/** Ruhepuls, Körperfett und HRV: meist aus Health Connect, auch von Hand. HRV misst niemand von Hand: Kachel erst, wenn ein Wert da ist. */
 function koerperwerteBereich(datum, messungen) {
   return el('section', { class: 'egruppe masse', 'aria-label': 'Körperwerte' },
     el('h2', { class: 'egruppe-titel' }, 'Körperwerte'),
-    el('div', { class: 'mass-kacheln' }, ARTEN.filter((a) => a.gruppe === 'koerper').map((art) => messKachel(art, art.name, messungen, datum, {}, ['ruhepuls', 'hrv'].includes(art.id) ? trendZusatz(messungen, art.id, datum) : null))));
+    el('div', { class: 'mass-kacheln' }, ARTEN.filter((a) => a.gruppe === 'koerper' && (a.id !== 'hrv' || messungen.some((m) => m.art === 'hrv'))).map((art) => messKachel(art, art.name, messungen, datum, {}, ['ruhepuls', 'hrv'].includes(art.id) ? trendZusatz(messungen, art.id, datum) : null))));
 }
 
 function masseBereich(datum, messungen, namen, auswahl) {
@@ -450,7 +450,7 @@ function verlaufBereich(datum, messungen) {
       return el('figure', { class: 'verlauf' },
         el('figcaption', {}, el('strong', {}, art.name), ` ${punkte.length} Werte in ${tage} Tagen, von ${zahl(Math.min(...werte), art.stellen)} bis ${zahl(Math.max(...werte), art.stellen)}${einheit}, zuletzt ${zahl(werte.at(-1), art.stellen)}${einheit}`),
         svg('svg', { viewBox: '0 0 300 48', role: 'img', 'aria-label': `Verlauf ${art.name}`, preserveAspectRatio: 'none' },
-          svg('polyline', { points: linienPunkte(werte, 300, 48, 6), fill: 'none', 'stroke-width': 3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' })));
+          svg('polyline', { points: linienPunkte(werte, 300, 48, 6, art.gruppe === 'checkin' ? { min: art.min, max: art.max } : null), fill: 'none', 'stroke-width': 3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' })));
     }));
 }
 

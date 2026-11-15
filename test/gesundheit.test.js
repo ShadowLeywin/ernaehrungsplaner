@@ -73,6 +73,7 @@ test('verlauf und linienPunkte', () => {
   assert.equal(linienPunkte([80], 100, 40), '');
   assert.equal(linienPunkte([80, 82, 81], 100, 40, 0), '0.0,40.0 50.0,0.0 100.0,20.0');
   assert.equal(linienPunkte([5, 5], 100, 40, 0), '0.0,40.0 100.0,40.0'); // gleiche Werte: flache Linie statt Division durch null
+  assert.equal(linienPunkte([3, 4], 100, 40, 0, { min: 1, max: 5 }), '0.0,20.0 100.0,10.0'); // fester Bereich: kleiner Schritt bleibt klein
 });
 
 test('Health-Ziele: Startwerte, Bereinigung, Prüfung', () => {
