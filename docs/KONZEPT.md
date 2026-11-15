@@ -21,7 +21,7 @@ Elan ist eine Ernährungs- und Health-App als Android-App und PWA aus demselben 
 - „Mehr“ ist ein gruppiertes Menü mit Unterseiten (Ziele und Tagebuch, Lebensmittel, Daten, App), darin „Über Elan“ und „Was ist neu“.
 - Beim ersten Start führt eine kurze Einrichtung in drei Schritten zum ersten Eintrag.
 - Eintragen braucht möglichst wenige Tipps: Zuletzt Gegessenes mit einem Tipp und der Menge vom letzten Mal; Wasser direkt auf „Heute“.
-- Fünf Seiten seit 0.6: Heute, Woche, Rezepte, Health, Mehr. Zutaten und Mag-Liste sind über „Rezepte“ und „Mehr“ erreichbar; man braucht sie selten direkt, weil die Suche beim Eintragen alles findet.
+- Fünf Seiten: Heute, Woche, Rezepte, Fortschritt, Mehr (seit 15.11.2026 „Fortschritt“ statt „Health“). Zutaten und Mag-Liste sind über „Rezepte“ und „Mehr“ erreichbar; man braucht sie selten direkt, weil die Suche beim Eintragen alles findet.
 - Zwei Designs: **Blatt** (Standard, schlicht im Stil von iOS, in Elans Grün: große Titel, gruppierte Listen mit farbigen Symbolen, ruhige Leiste ohne Glas, Ringe je Nährwert, Farbton je Mahlzeit) und **Zitrus** (das erste, helle Design). Beide in hell und dunkel.
 - „Heute“: Kalorien-Karte mit Tagesscheibe, sechs Kacheln (Eiweiß, Kohlenhydrate, Fett, Ballaststoffe, Wasser zum Antippen, alle Nährwerte), eine Karte mit allen Mahlzeiten, Plus-Knopf für die Mahlzeit zur Uhrzeit.
 - Bewegung: Seiten gleiten in Richtung der Leiste, Blätter gleiten hinein und hinaus, Ringe füllen sich vom letzten Stand. Alles unter 0,3 Sekunden; bei „Bewegung reduzieren“ des Systems fällt sie weg.
@@ -54,7 +54,8 @@ Elan ist eine Ernährungs- und Health-App als Android-App und PWA aus demselben 
 | Reibung beim Eintragen ist der Hauptgrund aufzuhören; man misst Tipps je Mahlzeit | Vergleiche von MacroFactor und Cronometer, Ratgeber zu Ernährungs-Apps | Eintragen mit einem Tipp aus „Zuletzt“, Rückgängig statt Rückfrage |
 | Kurze Einrichtung, schnell zum ersten Eintrag | Ratgeber zu Onboarding von Ernährungs-Apps | drei Schritte, überspringbar, Backup einspielen gleich am Anfang |
 | Viele Einstellungen in Gruppen und Unterseiten, Wichtiges zuerst | Android-Designrichtlinien zu Einstellungen | Menü „Mehr“ mit vier Gruppen |
-| Navigationsleiste mit drei bis fünf Zielen | Android-Richtlinien zu Navigation | fünf Ziele: Heute, Woche, Rezepte, Health, Mehr |
+| Navigationsleiste mit drei bis fünf Zielen | Android-Richtlinien zu Navigation | fünf Ziele: Heute, Woche, Rezepte, Fortschritt, Mehr |
+| Eintragen ist die Startseite, Fortschritt ein eigener Bereich | MyFitnessPal (Tagebuch als Startseite, eigener Tab „Progress“), Foodnoms (Eintragen im Mittelpunkt, eigenes Insights-Dashboard) | Tageswerte, Wasser, Supplements auf „Heute“; Gewicht, Maße, Verläufe unter „Fortschritt“ |
 | Dunkles Design mit Ring-Kacheln, Mahlzeiten-Karte, rundem Plus-Knopf | Bildschirmfotos einer Fitness-App von Léon (14.11.2026) | Blatt: Aufbau übernommen, Farben, Schrift und Symbole eigen |
 | Apple-Stil: große Titel, gruppierte Listen, farbige Symbole, Ringe | Léons Wunsch „allgemein der Apple-Style“, dann „schlicht, ohne Glas, das Grüne“ | Blatt, mit Inter statt SF Pro |
 
@@ -65,6 +66,7 @@ Elan ist eine Ernährungs- und Health-App als Android-App und PWA aus demselben 
 
 ## Quellen (mit Datum)
 
+- [MyFitnessPal: Progress Overview](https://support.myfitnesspal.com/hc/en-us/articles/45246617814669), [Foodnoms für iOS 26](https://foodnoms.com/news/ios-26-liquid-glass), [Gestaltung von Kalorien-Apps](https://screensdesign.com/articles/calorie-tracker-app-design/), [Health-Connect-Datentypen](https://developer.android.com/health-and-fitness/health-connect/data-types), [Plugin @capgo/capacitor-health](https://capgo.app/de/docs/plugins/health/getting-started/), abgerufen 15.11.2026.
 - [MacroFactor vs Cronometer](https://macrofactor.com/macrofactor-vs-cronometer/) (Herstellerangabe), [Fitia: was einen Kalorienzähler einfach macht](https://fitia.app/learn/article/what-makes-calorie-counter-simple-easy-app-2026/), [Android: Einstellungen](https://developer.android.com/design/ui/mobile/guides/patterns/settings), [Android: Layout- und Navigationsmuster](https://developer.android.google.cn/design/ui/mobile/guides/layout-and-content/layout-and-nav-patterns?hl=en), abgerufen 14.11.2026.
 
 - Startauftrag „Session 0“ von Léon, 13.11.2026.

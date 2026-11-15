@@ -1,4 +1,4 @@
-// Unterseiten von Health: Laborwerte mit Referenzbereich und Symptome mit Zuordnung zu Mahlzeiten.
+// Unterseiten von Fortschritt: Laborwerte mit Referenzbereich und Symptome mit Zuordnung zu Mahlzeiten.
 // Die App deutet nichts medizinisch. Sie zeigt, was eingetragen wurde, und zählt.
 
 import { bereichText, laborGruppen, laborStatus, pruefeLaborwert, pruefeSymptom, STAERKEN, vorSymptomen } from '../logik/befunde.js';
@@ -38,7 +38,7 @@ export async function zeigeLabor(wurzel) {
     el('button', { type: 'button', class: 'rund', 'aria-label': `Wert vom ${formatKurz(w.datum)} löschen`, onclick: () => entferne(w) }, icon('zu', 20)));
 
   haenge(wurzel,
-    el('a', { class: 'zurueck', href: '#/health' }, icon('zurueck', 18), 'Health'),
+    el('a', { class: 'zurueck', href: '#/fortschritt' }, icon('zurueck', 18), 'Fortschritt'),
     el('header', { class: 'seitenkopf' },
       el('h1', {}, 'Laborwerte'),
       el('button', { type: 'button', class: 'knopf klein', onclick: () => oeffneLaborFormular(gruppen) }, icon('plus', 18), 'Wert eintragen')),
@@ -123,7 +123,7 @@ export async function zeigeSymptome(wurzel) {
   };
 
   haenge(wurzel,
-    el('a', { class: 'zurueck', href: '#/health' }, icon('zurueck', 18), 'Health'),
+    el('a', { class: 'zurueck', href: '#/fortschritt' }, icon('zurueck', 18), 'Fortschritt'),
     el('header', { class: 'seitenkopf' },
       el('h1', {}, 'Symptome'),
       el('button', { type: 'button', class: 'knopf klein', onclick: () => oeffneSymptomFormular([...new Set(symptome.map((s) => s.art))].sort()) }, icon('plus', 18), 'Symptom eintragen')),

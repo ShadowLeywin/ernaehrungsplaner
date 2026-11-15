@@ -35,6 +35,7 @@ Was nur du erledigen kannst, weil es ein echtes Handy oder dein GitHub-Konto bra
 | A16 | Bei einer Mahlzeit auf das Plus: Steht oben „Zuletzt eingetragen“ mit „+ 80 g“? Antippen | Eintrag ist sofort da, unten „Rückgängig“ |
 | A17 | Startbildschirm lange drücken → Widgets → Elan → „Elan · heute“ hinzufügen. Danach Wasser eintragen | Widget zeigt kcal übrig und das neue Wasser |
 | A18 | Zwei Minuten frei herumtippen | Notiere, was hakt, zu klein ist oder unklar heißt |
+| A19 | Mehr → Health Connect → „Mit Health Connect verbinden“, Schritte, Gewicht, Schlaf erlauben | Heute zeigt die Werte mit „aus Health Connect“. Falls kein Erlaubnis-Fenster kommt: Bildschirmfoto an Claude |
 
 ## B. Automatischer Bau einrichten (5 Minuten, am Rechner oder Handy)
 

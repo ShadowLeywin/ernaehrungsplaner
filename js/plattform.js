@@ -70,6 +70,49 @@ export function aktualisiereWidget(werte) {
   } catch { /* ältere App ohne Widget */ }
 }
 
+/* ---------- Health Connect (nur App, Plugin @capgo/capacitor-health) ---------- */
+
+/** Nur lesen, nur diese drei. Das Manifest erlaubt auch nicht mehr (android/app/src/main/AndroidManifest.xml). */
+export const HC_LESEN = ['steps', 'weight', 'sleep'];
+
+/** { verfuegbar, grund }. Im Browser nie verfügbar. */
+export async function hcVerfuegbar() {
+  if (!istApp()) return { verfuegbar: false, grund: 'browser' };
+  try {
+    const antwort = await nativ('Health', 'isAvailable', {});
+    return { verfuegbar: Boolean(antwort?.available), grund: antwort?.reason ?? null };
+  } catch (fehler) {
+    return { verfuegbar: false, grund: String(fehler?.message ?? fehler) };
+  }
+}
+
+/** Öffnet den Erlaubnis-Dialog von Health Connect. Liefert die erlaubten Arten. */
+export async function hcVerbinden() {
+  const status = await nativ('Health', 'requestAuthorization', { read: HC_LESEN });
+  return status?.readAuthorized ?? [];
+}
+
+export async function hcErlaubt() {
+  if (!istApp()) return [];
+  try { return (await nativ('Health', 'checkAuthorization', { read: HC_LESEN }))?.readAuthorized ?? []; } catch { return []; }
+}
+
+export const hcEinstellungen = () => nativ('Health', 'openHealthConnectSettings', {}).catch(() => {});
+
+/**
+ * Rohdaten der letzten Tage: { steps: [Tagessummen], weight: [Proben], sleep: [Proben] }.
+ * Nicht erlaubte Arten liefern eine leere Liste statt eines Fehlers.
+ */
+export async function hcLesen(vonIso, bisIso) {
+  const sicher = async (aufruf) => { try { return (await aufruf())?.samples ?? []; } catch { return []; } };
+  const [steps, weight, sleep] = await Promise.all([
+    sicher(() => nativ('Health', 'queryAggregated', { dataType: 'steps', startDate: vonIso, endDate: bisIso, bucket: 'day', aggregation: 'sum' })),
+    sicher(() => nativ('Health', 'readSamples', { dataType: 'weight', startDate: vonIso, endDate: bisIso, limit: 500 })),
+    sicher(() => nativ('Health', 'readSamples', { dataType: 'sleep', startDate: vonIso, endDate: bisIso, limit: 1000 })),
+  ]);
+  return { steps, weight, sleep };
+}
+
 /** Bricht der Nutzer das Teilen-Menü ab, ist das kein Fehler. */
 const abgebrochen = (fehler) => fehler?.name === 'AbortError' || /cancel/i.test(String(fehler?.message ?? fehler));
 

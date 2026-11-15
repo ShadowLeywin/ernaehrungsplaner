@@ -8,12 +8,14 @@ import { APP_NAME } from '../logik/schema.js';
 import { alsEintraege } from '../logik/plan.js';
 import { prozent } from '../logik/referenz.js';
 import { kopiereEintraege, wochenSchnitt, wochenTage } from '../logik/woche.js';
+import { bereinigeWasserMengen } from '../logik/gesundheit.js';
 import { FEIER_RINGE, TAGESTYPEN, bereinigeRinge, fortschritt, kachelSpalten, neuErreicht, slotFuerUhrzeit, tagestypFuer } from '../logik/ziele.js';
 import { aktualisiereWidget, tippGefuehl } from '../plattform.js';
 import { gehe, neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { blatt, el, gramm, haenge, hinweis, icon, svg, zahl } from '../ui.js';
 import { oeffneEintrag, oeffneZutatWahl } from './eintrag.js';
+import { supplementKarte, tageswerteKarte } from './health.js';
 
 const nameVon = (id) => NAEHRSTOFFE.find((n) => n.id === id).name;
 const eintraegeText = (n) => `${n} ${n === 1 ? 'Eintrag' : 'Einträge'}`;
@@ -25,11 +27,12 @@ export async function zeigeHeute(wurzel, [parameter]) {
   const heute = isoDatum();
   const datum = istGueltig(parameter) ? parameter : heute;
   const woche = wochenTage(datum);
-  const [eintraege, ziele, wochenplan, tag, slots, wochenEintraege, vortag, plan, letztesBackup, anzahlEintraege, referenz, wasserHeute, gesundheit, ringe] = await Promise.all([
+  const [eintraege, ziele, wochenplan, tag, slots, wochenEintraege, vortag, plan, letztesBackup, anzahlEintraege, referenz, wasserHeute, gesundheit, ringe, supplements, wasserMengen] = await Promise.all([
     speicher.eintraegeAm(datum), speicher.ladeZiele(), speicher.ladeWoche(), speicher.holeTag(datum), speicher.ladeSlots(),
     speicher.eintraegeZwischen(woche[0], woche[6]), speicher.eintraegeAm(verschiebe(datum, -1)), speicher.planAm(datum),
     speicher.einstellung('letztesBackup'), speicher.anzahlEintraege(), speicher.ladeReferenz(),
     speicher.messungenZwischen(datum, datum), speicher.ladeGesundheit(), speicher.einstellung('ringe').then(bereinigeRinge),
+    speicher.alleSupplements(), speicher.einstellung('wasserMengen').then(bereinigeWasserMengen),
   ]);
   const lautPlan = tagestypFuer(datum, wochenplan, null);
   const typ = tagestypFuer(datum, wochenplan, tag);
@@ -48,7 +51,7 @@ export async function zeigeHeute(wurzel, [parameter]) {
     tagestypWahl(datum, typ, lautPlan),
     geplantHinweis(plan.filter((p) => !p.uebernommen), datum),
     uebersicht(ist, ziel, slots, kcalJeSlot),
-    kacheln({ ist, ziel, datum, ringe, widget, wasser: wasserHeute.filter((m) => m.art === 'wasser'), wasserZielMl: gesundheit.wasserZielMl }),
+    kacheln({ ist, ziel, datum, ringe, widget, wasser: wasserHeute.filter((m) => m.art === 'wasser'), wasserZielMl: gesundheit.wasserZielMl, wasserMl: wasserMengen[0] }),
     el('section', { class: 'karte mahlzeiten', 'aria-label': 'Mahlzeiten' },
       el('h2', { class: 'kartentitel' }, 'Mahlzeiten'),
       // Leer-Hinweis in der Karte, wo man gleich tippt, statt als loser Satz dazwischen
@@ -56,6 +59,9 @@ export async function zeigeHeute(wurzel, [parameter]) {
       el('div', { class: 'slots' }, slots.map((slot) => slotBereich({
         slot, datum, eintraege: imSlot(eintraege, slot), vortag: imSlot(vortag, slot), kcal: kcalJeSlot[slot.id], zielKcal: ziel.kcal * slot.anteil,
       })))),
+    // Alles, was man am Tag einträgt, an einem Ort: erst Essen, dann Körperwerte und Supplements
+    tageswerteKarte({ datum, messungen: wasserHeute, ziele: gesundheit, mengen: wasserMengen }),
+    supplementKarte(datum, supplements, tag),
     alleNaehrwerte(eintraege, wochenEintraege, woche, referenz),
     eintraege.length ? el('div', { class: 'knopfreihe' },
       el('button', { type: 'button', class: 'knopf leise', onclick: () => oeffneTagKopieren(datum, heute, eintraege) }, 'Diesen Tag kopieren')) : null,
@@ -230,11 +236,11 @@ function feiere(kachel) {
   tippGefuehl('feier');
 }
 
-function kacheln({ ist, ziel, datum, ringe, widget, wasser, wasserZielMl }) {
+function kacheln({ ist, ziel, datum, ringe, widget, wasser, wasserZielMl, wasserMl }) {
   widget(wasser.reduce((s, m) => s + m.wert, 0));
   if (!ringe.length) return null;
   const bauen = {
-    wasser: () => wasserKachel(datum, wasser, wasserZielMl, widget),
+    wasser: () => wasserKachel(datum, wasser, wasserZielMl, widget, wasserMl),
     alle: () => el('button', { type: 'button', class: 'kachel kachel-alle', onclick: zeigeAlleNaehrwerte },
       ring(0, EMOJI.alle),
       el('strong', { class: 'kachel-wert' }, 'Alle'),
@@ -261,7 +267,7 @@ function makroKachel(datum, id, ist, ziel) {
 }
 
 /** Wasser zählen mit einem Tipp. Ändert sich an Ort und Stelle: Zahl und Ring, die Seite wird nicht neu gezeichnet. */
-function wasserKachel(datum, eintraege, zielMl, widget) {
+function wasserKachel(datum, eintraege, zielMl, widget, menge) {
   const anteil = () => (zielMl > 0 ? eintraege.reduce((s, m) => s + m.wert, 0) / zielMl : 0);
   const start = merkeStand(datum, 'wasser', anteil());
   const ringEl = ring(anteil(), EMOJI.wasser, start.vorher);
@@ -269,21 +275,23 @@ function wasserKachel(datum, eintraege, zielMl, widget) {
   const knopf = el('button', { type: 'button', class: 'kachel makro-wasser' },
     ringEl, wert,
     el('span', { class: 'kachel-ziel' }, `von ${zahl(zielMl)} ml`),
-    el('span', { class: 'kachel-name' }, 'Wasser ', el('span', { class: 'kachel-plus' }, '+250')));
+    el('span', { class: 'kachel-name' }, 'Wasser ', el('span', { class: 'kachel-plus' }, `+${zahl(menge)}`)));
   const zeige = () => {
     const summe = eintraege.reduce((s, m) => s + m.wert, 0);
     wert.textContent = `${zahl(summe)} ml`;
-    knopf.setAttribute('aria-label', `Wasser: ${zahl(summe)} von ${zahl(zielMl)} ml. Tippen für 250 ml mehr`);
+    knopf.setAttribute('aria-label', `Wasser: ${zahl(summe)} von ${zahl(zielMl)} ml. Tippen für ${zahl(menge)} ml mehr`);
     setzeRing(ringEl, anteil());
     widget(summe);
+    // Die Wasser-Zeile in den Tageswerten zeigt dieselbe Zahl
+    document.querySelector('.wasser-bereich')?.zeige?.([...eintraege]);
     if (merkeStand(datum, 'wasser', anteil()).feiern) feiere(knopf);
   };
   knopf.addEventListener('click', async () => {
     tippGefuehl();
-    const neu = await speicher.speichereMessung({ art: 'wasser', datum, wert: 250 });
+    const neu = await speicher.speichereMessung({ art: 'wasser', datum, wert: menge });
     eintraege.push(neu);
     zeige();
-    hinweis('250 ml Wasser.', { aktion: 'Rückgängig', beiAktion: async () => { await speicher.loescheMessung(neu.id); eintraege.splice(eintraege.indexOf(neu), 1); zeige(); } });
+    hinweis(`${zahl(menge)} ml Wasser.`, { aktion: 'Rückgängig', beiAktion: async () => { await speicher.loescheMessung(neu.id); eintraege.splice(eintraege.indexOf(neu), 1); zeige(); } });
   });
   zeige();
   return knopf;

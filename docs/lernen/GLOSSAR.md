@@ -74,3 +74,6 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | RemoteViews | Die einfachen Bausteine, aus denen Android ein Widget zeichnet; das Widget läuft nicht in der App selbst. | `ElanWidget.java` |
 | SharedPreferences | Kleiner privater Schlüssel-Wert-Speicher einer Android-App. | `WidgetPlugin.java` |
 | Verschattung (Shadowing) | Ein innerer Name (z. B. ein Parameter) verdeckt einen gleichnamigen äußeren, etwa einen Import. | `referenzBereich` in `js/ansichten/mehr.js` |
+| Health Connect | Die Sammelstelle von Android für Gesundheitsdaten aus Apps und Geräten (Schrittzähler, Waage, Uhr). | `js/abgleich.js`, `docs/ANDROID.md` |
+| Manifest-Zusammenführung | Android führt die Manifeste aller Bibliotheken zu einem zusammen; mit `tools:node="remove"` streicht die App Einträge daraus. | `android/app/src/main/AndroidManifest.xml` |
+| MPL-2.0 | Lizenz, bei der nur Änderungen an den Dateien der Bibliothek offen bleiben müssen; die eigene App darf eine andere Lizenz haben. | Plugin `@capgo/capacitor-health` |

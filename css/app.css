@@ -100,6 +100,9 @@ h2 { font-size: 1.1875rem; line-height: 1.25; font-weight: 680; letter-spacing: 
 
 :focus-visible { outline: 2.5px solid var(--blatt); outline-offset: 2px; }
 
+/* hidden muss gewinnen, auch wenn eine Klasse display setzt (z. B. .textlink) */
+[hidden] { display: none !important; }
+
 .unsichtbar {
   position: absolute; width: 1px; height: 1px; overflow: hidden;
   clip-path: inset(50%); white-space: nowrap;
@@ -662,7 +665,7 @@ body:has(.seite-willkommen) .navigation { display: none; }
 .ezeile-text small { display: block; font-size: 0.8125rem; font-weight: 400; color: var(--tinte-leise); }
 .ezeile-wert { display: flex; align-items: center; gap: 0.25rem; flex: none; max-width: 60%; }
 .ezeile-wert input {
-  width: 5.75rem; min-height: 2.5rem; padding: 0 0.5rem; border: 0 !important; border-radius: 0.5rem;
+  width: 4.75rem; min-height: 2.5rem; padding: 0 0.5rem; border: 0 !important; border-radius: 0.5rem;
   background: transparent !important; box-shadow: none !important; text-align: right; font-weight: 600; color: var(--tinte);
 }
 .ezeile-wert input:focus-visible { background: var(--flaeche-2) !important; }
@@ -709,6 +712,46 @@ body:has(.seite-willkommen) .navigation { display: none; }
 .einstell-knoepfe { display: grid; gap: 0.25rem; margin-top: 1rem !important; }
 .einstell-knoepfe .knopf { width: 100%; }
 .einstell-knoepfe .textlink { justify-self: center; }
+
+/* ---------- Tageswerte und Supplements auf „Heute“ ---------- */
+
+.karte .eliste { background: var(--flaeche-2); }
+.tageswerte > * + *, .supplemente > * + * { margin-top: 0.625rem; }
+.tageswerte .kartentitel, .supplemente .kartentitel { margin-bottom: 0.125rem; }
+.tageswerte-stand { margin-top: 0.5rem; }
+.tageswerte .einstell-knoepfe { margin-top: 0.75rem !important; }
+.wasser-bereich { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--linie); }
+.wasser-bereich > * + * { margin-top: 0.5rem; }
+.wasser-bereich h3 { font-size: 1.0625rem; gap: 0.5rem; }
+.wasser-bereich .titel-bild { width: 1.875rem; height: 1.875rem; font-size: 1rem; }
+.wasser-bereich .balken { display: block; }
+.wasser-bereich .balken-voll { background: var(--wasser); transition: width 0.3s ease-out; }
+.wasser-bereich .textlink { min-height: 2.5rem; padding: 0; }
+.wasser-kopf { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+.wasser-stand { color: var(--tinte-leise); font-size: 0.9375rem; }
+.supplemente .zeilen { background: var(--flaeche-2); }
+/* Felder in Karten eine Stufe getönt, sonst verschwinden sie in der Karte */
+:root[data-thema='blatt'] .karte :is(input:not([type='file']):not([type='checkbox']):not([type='radio']), select, textarea) { background: var(--flaeche-2); }
+.wasser-knoepfe { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
+.wasser-knoepfe .chip { padding: 0 0.25rem; white-space: nowrap; }
+.mass-kachel.leer .mass-wert strong { font-size: 1.25rem; font-weight: 500; }
+
+/* ---------- Fortschritt: Körpermaße als Kacheln, Paare links/rechts nebeneinander ---------- */
+
+.mass-kacheln { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+.mass-kachel {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 0.125rem; min-height: 5rem; min-width: 0;
+  padding: 0.75rem 0.875rem; border: 0; border-radius: 1rem; background: var(--flaeche); color: var(--tinte); text-align: left; font: inherit;
+}
+.mass-name { font-size: 0.8125rem; color: var(--tinte-leise); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.mass-wert { font-size: 0.9375rem; color: var(--tinte-leise); }
+.mass-wert strong { font-size: 1.75rem; line-height: 1.1; font-weight: 740; letter-spacing: -0.02em; color: var(--tinte); }
+.mass-kachel.leer .mass-wert strong { color: var(--tinte-leise); }
+.mass-aenderung { font-size: 0.75rem; color: var(--tinte-leise); }
+.mass-seite { display: inline-grid; place-items: center; min-width: 1.125rem; height: 1.125rem; margin-left: 0.375rem; padding: 0 0.25rem; border-radius: 0.375rem; background: var(--flaeche-2); font-size: 0.6875rem; font-weight: 700; color: var(--tinte); vertical-align: 0.05em; }
+.mass-verlauf { margin-top: 0.25rem; }
+a.ezeile { text-decoration: none; }
+a.ezeile > svg { color: var(--tinte-leise); flex: none; }
 
 /* ==========================================================================
    Blatt: Standard-Design. Schlicht im Stil von iOS, in Elans Grün.

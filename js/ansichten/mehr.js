@@ -9,7 +9,11 @@ import { APP_NAME, APP_VERSION } from '../logik/schema.js';
 import { wochenTage } from '../logik/woche.js';
 import { RINGE, SLOTS, STANDARD_ANTEILE, STANDARD_ZIELE, TAGESTYPEN, ZIEL_FELDER, bereinigeAnteile, bereinigeRinge, makroAbweichung, pruefeAnteile } from '../logik/ziele.js';
 import { parseZahl } from '../logik/zutat.js';
-import { gibDatei, istApp, setzeVibration, teileText, tippGefuehl, vibrationAn } from '../plattform.js';
+import { gibDatei, hcEinstellungen, hcErlaubt, hcVerbinden, hcVerfuegbar, istApp, setzeVibration, teileText, tippGefuehl, vibrationAn } from '../plattform.js';
+import { automatischAn, gleicheAb, setzeAutomatisch, zuletztAbgeglichen } from '../abgleich.js';
+import { bereinigeWasserMengen } from '../logik/gesundheit.js';
+import { HC_ARTEN } from '../logik/healthconnect.js';
+import { koerperZielBereich } from './health.js';
 import { neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { FUNKTIONEN, NEUIGKEITEN } from '../daten/neuigkeiten.js';
@@ -21,6 +25,7 @@ let gewaehlterTyp = 'gym';
 const MENUE = [
   { gruppe: 'Ziele und Tagebuch', eintraege: [
     { id: 'ziele', farbe: '#ff3b30', titel: 'Ziele je Tagestyp', text: 'Energie und Makros für Gym, Calisthenics, Rest', icon: 'ziel' },
+    { id: 'koerper', farbe: '#34c759', titel: 'Ziele für Körper und Wasser', text: 'Gewicht je Woche, Wasser, Schlaf, Schritte, Wasser-Knöpfe', icon: 'waage' },
     { id: 'wochenplan', farbe: '#ff9500', titel: 'Wochenplan', text: 'Welcher Wochentag welcher Tagestyp ist', icon: 'kalender' },
     { id: 'mahlzeiten', farbe: '#ff2d55', titel: 'Anteile der Mahlzeiten', text: 'Wie sich das Tagesziel auf sechs Mahlzeiten verteilt', icon: 'scheibe' },
     { id: 'referenz', farbe: '#5856d6', titel: 'Referenzwerte', text: 'Geschlecht und Alter für den Vergleich mit der DGE', icon: 'waage' },
@@ -32,6 +37,7 @@ const MENUE = [
   { gruppe: 'Daten', eintraege: [
     { id: 'backup', farbe: '#007aff', titel: 'Backup', text: 'Alle Daten als Datei sichern und einspielen', icon: 'sicherung' },
     { id: 'coach', farbe: '#af52de', titel: 'Coach-Export', text: 'Wochenbericht als Text für einen Chat', icon: 'bericht' },
+    { id: 'healthconnect', farbe: '#ff2d55', titel: 'Health Connect', text: 'Schritte, Gewicht und Schlaf vom Handy übernehmen', icon: 'herz' },
   ] },
   { gruppe: 'App', eintraege: [
     { id: 'darstellung', farbe: '#8e8e93', titel: 'Darstellung', text: 'Blatt oder Zitrus, dunkel oder hell, Vibration', icon: 'darstellung' },
@@ -50,6 +56,7 @@ const MENUE_ICONS = {
   sicherung: 'M12 4v11M7 10l5 5 5-5M5 19h14',
   bericht: 'M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5',
   darstellung: 'M12 3a9 9 0 1 0 0 18zM12 3a9 9 0 0 1 0 18',
+  herz: 'M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z',
   info: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 11v6M12 7.5v.5',
   neu: 'M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z',
 };
@@ -71,6 +78,8 @@ export async function zeigeMehr(wurzel, [unterseite]) {
     },
     coach: async () => coachBereich(),
     darstellung: async () => darstellungBereich(),
+    koerper: async () => koerperZielBereich(await speicher.ladeGesundheit(), bereinigeWasserMengen(await speicher.einstellung('wasserMengen'))),
+    healthconnect: async () => healthConnectBereich(),
     ueber: async () => ueberBereich(),
     neu: async () => neuBereich(),
   };
@@ -256,7 +265,7 @@ function referenzBereich({ daten, gruppe: referenzgruppe }) {
 
 /* ---------- Backup ---------- */
 
-const BEREICHE = { eintraege: 'Einträge im Tagebuch', plan: 'geplante Mahlzeiten', rezepte: 'Rezepte', zutaten: 'eigene Zutaten', vorlieben: 'Angaben in der Mag-Liste', messungen: 'Health-Werte', supplements: 'Supplements', labor: 'Laborwerte', symptome: 'Symptome', angebote: 'Angebote', tage: 'abweichende Tagestypen', einstellungen: 'Einstellungen' };
+const BEREICHE = { eintraege: 'Einträge im Tagebuch', plan: 'geplante Mahlzeiten', rezepte: 'Rezepte', zutaten: 'eigene Zutaten', vorlieben: 'Angaben in der Mag-Liste', messungen: 'Körperwerte', supplements: 'Supplements', labor: 'Laborwerte', symptome: 'Symptome', angebote: 'Angebote', tage: 'abweichende Tagestypen', einstellungen: 'Einstellungen' };
 const zaehle = (anzahl) => Object.entries(BEREICHE).map(([id, name]) => `${name}: ${zahl(anzahl[id] ?? 0)}`).join(', ');
 
 function backupBereich(letztesBackup, daten) {
@@ -356,6 +365,53 @@ function coachBereich() {
 }
 
 /* ---------- Darstellung, Speicher, Über ---------- */
+
+/* ---------- Health Connect ---------- */
+
+/**
+ * Health Connect ist die Sammelstelle von Android für Gesundheitsdaten (Schrittzähler, Waage, Uhr).
+ * Elan liest dort nur Schritte, Gewicht und Schlaf, nur nach deinem Ja, und schreibt nichts zurück.
+ */
+async function healthConnectBereich() {
+  const erklaerung = 'Elan liest nur Schritte, Gewicht und Schlaf der letzten 30 Tage, nichts sonst, und schreibt nichts zurück. Eigene Eingaben in Elan gehen immer vor. Die Daten bleiben auf dem Handy.';
+  if (!istApp()) {
+    return gruppe({ fuss: [el('p', {}, 'Health Connect gibt es nur in der Android-App.'), el('p', {}, erklaerung)] },
+      el('div', { class: 'ezeile' }, el('span', { class: 'ezeile-text' }, 'Im Browser nicht verfügbar')));
+  }
+  const [stand, erlaubt] = await Promise.all([hcVerfuegbar(), hcErlaubt()]);
+  const zuletzt = zuletztAbgeglichen();
+  const abgleichen = async () => {
+    const anzahl = await gleicheAb();
+    hinweis(anzahl ? `${anzahl} ${anzahl === 1 ? 'Wert' : 'Werte'} übernommen.` : 'Alles schon da.');
+    neuZeichnen();
+  };
+  const verbinden = async () => {
+    const neu = await hcVerbinden();
+    if (neu.length) { tippGefuehl('erfolg'); await abgleichen(); } else hinweis('Keine Erlaubnis erteilt. Du kannst es jederzeit erneut versuchen.');
+  };
+  if (!stand.verfuegbar) {
+    return gruppe({ fuss: [el('p', {}, 'Health Connect ist auf diesem Handy nicht eingerichtet. Ab Android 14 ist es eingebaut, davor gibt es die App „Health Connect“ im Play Store.'), el('p', {}, erklaerung)] },
+      el('div', { class: 'ezeile' }, el('span', { class: 'ezeile-text' }, 'Nicht verfügbar')));
+  }
+  return [
+    gruppe({ titel: 'Daten', fuss: erklaerung },
+      HC_ARTEN.map((a) => el('div', { class: 'ezeile' },
+        el('span', { class: 'ezeile-text' }, a.name),
+        el('span', { class: 'ezeile-wert klein' }, erlaubt.includes(a.hc) ? 'erlaubt' : 'nicht erlaubt')))),
+    gruppe({ titel: 'Abgleich', fuss: zuletzt ? `Zuletzt: ${new Date(zuletzt).toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'short' })}` : null },
+      zeileSchalter({
+        id: 'f-hc-automatisch', beschriftung: 'Beim Öffnen abgleichen', text: 'Holt neue Werte, sobald du Elan öffnest', an: automatischAn(),
+        onchange: (e) => setzeAutomatisch(e.target.checked),
+      })),
+    el('div', { class: 'einstell-knoepfe' },
+      erlaubt.length
+        ? el('button', { type: 'button', class: 'knopf', onclick: abgleichen }, 'Jetzt abgleichen')
+        : el('button', { type: 'button', class: 'knopf', onclick: verbinden }, 'Mit Health Connect verbinden'),
+      erlaubt.length ? el('button', { type: 'button', class: 'textlink', onclick: verbinden }, 'Erlaubnis ändern') : null,
+      el('button', { type: 'button', class: 'textlink', onclick: hcEinstellungen }, 'Health Connect öffnen'),
+      el('a', { class: 'textlink', href: './privacypolicy.html' }, 'Datenschutz')),
+  ];
+}
 
 function darstellungBereich() {
   // Kleine Farbprobe je Design: Grund, Fläche, Akzent

@@ -10,14 +10,68 @@ export const ARTEN = [
   { id: 'wasser', name: 'Wasser', einheit: 'ml', min: 1, max: 5000, stellen: 0, proTag: 'summe' },
   { id: 'schlaf', name: 'Schlaf', einheit: 'h', min: 0, max: 24, stellen: 1, proTag: 'einmal' },
   { id: 'schritte', name: 'Schritte', einheit: '', min: 0, max: 200000, stellen: 0, proTag: 'einmal' },
-  { id: 'mass:taille', name: 'Taille', einheit: 'cm', min: 20, max: 300, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
-  { id: 'mass:brust', name: 'Brust', einheit: 'cm', min: 20, max: 300, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
-  { id: 'mass:huefte', name: 'Hüfte', einheit: 'cm', min: 20, max: 300, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
-  { id: 'mass:oberarm', name: 'Oberarm', einheit: 'cm', min: 5, max: 150, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
-  { id: 'mass:oberschenkel', name: 'Oberschenkel', einheit: 'cm', min: 10, max: 200, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
+  // Körpermaße. Reihenfolge = Reihenfolge der Kacheln: Paare links/rechts stehen nebeneinander.
+  { id: 'mass:hals', name: 'Hals', einheit: 'cm', min: 20, max: 80, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
+  { id: 'mass:schultern', name: 'Schultern', einheit: 'cm', min: 60, max: 220, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
+  { id: 'mass:brust', name: 'Brust', einheit: 'cm', min: 40, max: 250, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
+  { id: 'mass:taille', name: 'Taille', einheit: 'cm', min: 30, max: 250, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
+  { id: 'mass:bauch', name: 'Bauch', einheit: 'cm', min: 30, max: 250, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
+  { id: 'mass:huefte', name: 'Hüfte', einheit: 'cm', min: 40, max: 250, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
+  { id: 'mass:oberarm-links', name: 'Oberarm links', einheit: 'cm', min: 10, max: 80, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
+  { id: 'mass:oberarm-rechts', name: 'Oberarm rechts', einheit: 'cm', min: 10, max: 80, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
+  { id: 'mass:unterarm-links', name: 'Unterarm links', einheit: 'cm', min: 10, max: 70, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
+  { id: 'mass:unterarm-rechts', name: 'Unterarm rechts', einheit: 'cm', min: 10, max: 70, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
+  { id: 'mass:handgelenk-links', name: 'Handgelenk links', einheit: 'cm', min: 8, max: 40, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
+  { id: 'mass:handgelenk-rechts', name: 'Handgelenk rechts', einheit: 'cm', min: 8, max: 40, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
+  { id: 'mass:oberschenkel-links', name: 'Oberschenkel links', einheit: 'cm', min: 20, max: 120, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
+  { id: 'mass:oberschenkel-rechts', name: 'Oberschenkel rechts', einheit: 'cm', min: 20, max: 120, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
+  { id: 'mass:wade-links', name: 'Wade links', einheit: 'cm', min: 15, max: 80, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
+  { id: 'mass:wade-rechts', name: 'Wade rechts', einheit: 'cm', min: 15, max: 80, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
+  { id: 'mass:gesaess', name: 'Gesäß', einheit: 'cm', min: 40, max: 250, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
+  { id: 'mass:eigen1', name: 'Eigenes Maß 1', einheit: 'cm', min: 1, max: 300, stellen: 1, proTag: 'einmal', gruppe: 'mass', eigen: true },
+  { id: 'mass:eigen2', name: 'Eigenes Maß 2', einheit: 'cm', min: 1, max: 300, stellen: 1, proTag: 'einmal', gruppe: 'mass', eigen: true },
+  // Aus Version 1.0 ohne Seite; erscheinen nur, wenn es Werte gibt (keine Daten umdeuten)
+  { id: 'mass:oberarm', name: 'Oberarm (ohne Seite)', einheit: 'cm', min: 5, max: 150, stellen: 1, proTag: 'einmal', gruppe: 'mass', alt: true },
+  { id: 'mass:oberschenkel', name: 'Oberschenkel (ohne Seite)', einheit: 'cm', min: 10, max: 200, stellen: 1, proTag: 'einmal', gruppe: 'mass', alt: true },
 ];
 
 export const artVon = (id) => ARTEN.find((a) => a.id === id);
+
+/** Maße für die Kacheln: alte Arten nur, wenn es von ihnen Werte gibt. */
+export function sichtbareMasse(messungen) {
+  const mitWerten = new Set(messungen.map((m) => m.art));
+  return ARTEN.filter((a) => a.gruppe === 'mass' && (!a.alt || mitWerten.has(a.id)));
+}
+
+/** Letzter Wert und Änderung zum vorletzten: { wert, datum, aenderung } oder null. Für die Maß-Kacheln. */
+export function standUndAenderung(messungen, artId, datum) {
+  const werte = messungen.filter((m) => m.art === artId && m.datum <= datum).sort((a, b) => b.datum.localeCompare(a.datum));
+  if (!werte.length) return null;
+  return { wert: werte[0].wert, datum: werte[0].datum, aenderung: werte.length > 1 ? werte[0].wert - werte[1].wert : null };
+}
+
+/* ---------- Wasser-Knöpfe: drei eigene Mengen ---------- */
+
+export const STANDARD_WASSER_MENGEN = [250, 500, 750];
+const WASSER_MENGE = [10, 2000];
+
+/** Gespeicherte Mengen prüfen: genau drei ganze Zahlen von 10 bis 2.000 ml, sonst die Startwerte. */
+export function bereinigeWasserMengen(roh) {
+  const gueltig = Array.isArray(roh) && roh.length === 3
+    && roh.every((m) => Number.isInteger(m) && m >= WASSER_MENGE[0] && m <= WASSER_MENGE[1]);
+  return gueltig ? [...roh] : [...STANDARD_WASSER_MENGEN];
+}
+
+/** Eingabe aus den Einstellungen: ['200', '330', '1000'] → { ok, fehler: [text|null ×3], mengen } */
+export function pruefeWasserMengen(eingabe) {
+  const fehler = [0, 1, 2].map((i) => {
+    const wert = parseZahl(eingabe?.[i]);
+    return wert === null || Number.isNaN(wert) || !Number.isInteger(wert) || wert < WASSER_MENGE[0] || wert > WASSER_MENGE[1]
+      ? 'Ganze Zahl von 10 bis 2.000 ml.' : null;
+  });
+  const ok = fehler.every((f) => f === null);
+  return { ok, fehler, mengen: ok ? [0, 1, 2].map((i) => parseZahl(eingabe[i])) : null };
+}
 
 export const STANDARD_GESUNDHEIT = { wochenzielKg: 0, wasserZielMl: 2500, schlafZielH: 8, schritteZiel: 8000 };
 

@@ -16,6 +16,7 @@ Die Android-App ist dieselbe Web-App, verpackt mit Capacitor. Alle Dateien liege
 | Cloud-Sicherung | – | **ausgeschaltet**, Gesundheitsdaten gehen nicht in die Google-Cloud |
 | Vibration | `navigator.vibrate`, falls vorhanden | Plugin Haptics |
 | Widget | – | Widget „Elan · heute“ (kcal übrig, Wasser), siehe unten |
+| Health Connect | – | Schritte, Gewicht, Schlaf lesen (Plugin `@capgo/capacitor-health` 8.11.13), siehe unten |
 
 Alle Unterschiede stehen in `js/plattform.js`. Der Browser-Test `tools/pruefe-app.cjs` prüft die App-Zweige mit einer nachgebildeten Capacitor-Brücke („App-Lauf“).
 
@@ -78,13 +79,22 @@ Der `versionCode` enthält die Zahl der Commits (Baunummer). Der angezeigte Name
 - Nach Mitternacht zeigt das Widget keine alten Zahlen, sondern „Öffne Elan für heute“. Android fragt es alle 30 Minuten neu ab.
 - Datenschutz: Das Widget zeigt kcal und Wasser auf dem Startbildschirm. Es erscheint nur, wenn man es selbst hinzufügt.
 
+## Health Connect
+
+- Plugin `@capgo/capacitor-health` 8.11.13 (MPL-2.0, unverändert genutzt). Es verlangt Android 8 (API 26); deshalb `minSdkVersion = 26`.
+- Das Plugin meldet viele Berechtigungen an. Das App-Manifest entfernt alle außer `READ_STEPS`, `READ_WEIGHT`, `READ_SLEEP` (`tools:node="remove"`). Nach jedem Plugin-Update mit `aapt2 dump permissions` prüfen.
+- Datenschutzseite: `privacypolicy.html` im Wurzelverzeichnis; das Plugin zeigt sie, wenn man in Health Connect auf „Datenschutzerklärung“ tippt.
+- Umrechnung: `js/logik/healthconnect.js` (getestet), Abgleich: `js/abgleich.js`, Aufrufe: `js/plattform.js`.
+- Beim Bau meldet der Lint-Schritt „Module was compiled with an incompatible version of Kotlin“. Das kommt aus `lintVitalAnalyzeRelease` (älteres Kotlin im Lint), nicht aus dem Kompilieren; der Bau ist grün.
+- Offen [vermutet]: Ob Health Connect einer App erlaubt, die nicht aus dem Play Store kommt, ist nicht dokumentiert. Ein Bericht von GrapheneOS sagt nein; auf normalem Android wird es meist gehen. Test am Gerät: Aufgabe A19 in `docs/AUFGABEN-LEON.md`.
+
 ## Offen
 
 - Test auf einem echten Gerät; in der Arbeitsumgebung gibt es keinen Emulator.
 
 ## Annahmen [A]
 
-- [A] Mindestversion Android 7 (API 24), Ziel Android 16 (API 36), wie von Capacitor 8.6 vorgegeben.
+- [A] Mindestversion Android 8 (API 26, wegen Health Connect), Ziel Android 16 (API 36).
 
 ## Quellen (mit Datum)
 
