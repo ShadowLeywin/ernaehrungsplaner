@@ -824,6 +824,52 @@ a.ezeile > svg { color: var(--tinte-leise); flex: none; }
 .makro-felder .eingabe input { min-width: 0; }
 .chip.schnell.nur-kcal { align-self: flex-start; margin-top: 0.5rem; white-space: normal; text-align: left; line-height: 1.25; padding-block: 0.5rem; }
 
+/* Abkürzung „Unterwegs“ oben im Eintragen-Blatt: eine Zeile wie in den Einstellungen */
+.schnellweg {
+  display: flex; align-items: center; gap: 0.75rem; width: 100%; min-height: 3.25rem; padding: 0.5rem 0.875rem;
+  border: 0; border-radius: 0.875rem; background: var(--flaeche-2, var(--flaeche)); color: var(--tinte); text-align: left; font: inherit;
+}
+.schnellweg-bild { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 0.625rem; background: var(--limette-blass); color: var(--blatt); flex: none; }
+.schnellweg-text { flex: 1; min-width: 0; font-weight: 620; }
+.schnellweg-text small { display: block; font-weight: 400; font-size: 0.8125rem; color: var(--tinte-leise); }
+.schnellweg > svg { color: var(--tinte-leise); }
+
+/* Unterwegs-Rechner: Restaurant-Chips, Zeilen mit Zähler, Summe unten klebend */
+.unterwegs-restaurants { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 0.125rem; }
+/* :root davor, damit der Chip-Stil des Themas („Blatt“) die Auswahl nicht wieder grau macht */
+:root .unterwegs-restaurants .chip[aria-pressed='true'] { background: var(--akzent); color: var(--auf-akzent); border-color: transparent; font-weight: 700; }
+.unterwegs-zeile { display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.375rem 0.25rem 0; }
+.unterwegs-zeile + .unterwegs-zeile { border-top: 1px solid var(--linie); }
+.unterwegs-name { flex: 1; min-width: 0; min-height: 2.75rem; padding: 0.375rem 0.75rem; border: 0; background: none; color: var(--tinte); text-align: left; font: inherit; font-weight: 560; }
+.unterwegs-name small { display: block; font-size: 0.8125rem; font-weight: 400; color: var(--tinte-leise); }
+.unterwegs-zeile.gewaehlt .unterwegs-name { color: var(--blatt); }
+.zaehler { display: flex; align-items: center; gap: 0.25rem; flex: none; }
+.zaehler .rund { width: 2.5rem; height: 2.5rem; }
+.zaehler .rund:disabled { opacity: 0.35; }
+.zaehler-wert { min-width: 1.5rem; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+/* Vorschläge im Unterwegs-Rechner: je Kombination eine Karte */
+.vorschlag { display: grid; gap: 0.5rem; padding: 0.875rem 1rem; border-radius: 1rem; background: var(--flaeche-2, var(--flaeche)); }
+.vorschlag-kopf { display: flex; justify-content: space-between; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; }
+.vorschlag-kopf strong { font-size: 1.125rem; }
+.vorschlag-teile { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.125rem; }
+.vorschlag-teile li { font-weight: 560; }
+.vorschlag-teile small { color: var(--tinte-leise); font-weight: 400; }
+.vorschlag .knopf { justify-self: start; }
+.budget-chips { margin-top: 0.5rem; }
+.wahl.schmal-voll .wahl-knopf { flex: 1 1 0; font-size: 0.875rem; padding: 0 0.375rem; }
+.unterwegs-links { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; }
+.unterwegs-fuss {
+  position: sticky; bottom: calc(-1.25rem - var(--rand-bottom)); margin: 0 -1.125rem calc(-1.25rem - var(--rand-bottom));
+  padding: 0.75rem 1.125rem calc(1rem + var(--rand-bottom)); background: inherit; border-top: 1px solid var(--linie);
+  display: grid; gap: 0.625rem; background: var(--papier);
+}
+:root[data-thema='blatt'][data-modus='dunkel'] .unterwegs-fuss { background: var(--flaeche); }
+.unterwegs-summe { margin: 0; font-size: 0.9375rem; color: var(--tinte-leise); }
+.unterwegs-summe strong { color: var(--tinte); font-size: 1.0625rem; }
+.unterwegs-aktion { display: flex; gap: 0.5rem; }
+.unterwegs-aktion select { flex: 1; min-width: 0; }
+.unterwegs-aktion .knopf:disabled { opacity: 0.45; }
+
 /* Check-in: fünf gleich breite Stufen je Frage, Worte an den Enden */
 .checkin-reihe + .checkin-reihe { margin-top: 0.875rem; }
 .checkin .kartentitel { margin-bottom: 0.75rem; }

@@ -80,6 +80,9 @@ export const gramm = (wert) => zahl(wert, Math.abs(wert) < 10 ? 1 : 0);
 
 const PFADE = {
   plus: 'M12 5v14M5 12h14',
+  minus: 'M5 12h14',
+  // Tüte zum Mitnehmen, für „Unterwegs“
+  unterwegs: 'M6 8h12l-1 12H7L6 8zM9 8V6a3 3 0 0 1 6 0v2',
   zurueck: 'M15 5l-7 7 7 7',
   vor: 'M9 5l7 7-7 7',
   haken: 'M5 12.5l4.5 4.5L19 7.5',

@@ -128,4 +128,4 @@ Lokal ist der Service Worker aus. Mit `?sw=1` in der Adresse läuft er wie auf d
 
 ## Doku
 
-`docs/KONZEPT.md` (neun Module, Technik), `docs/DATENMODELL.md`, `docs/PHASENPLAN.md`, `docs/OFFENE-FRAGEN.md`, `docs/AUFGABEN-LEON.md`, `docs/COACH-PROMPT.md`, `docs/ANGEBOTE-FORMAT.md`, `docs/ANDROID.md`, `docs/IST-ANALYSE.md` (alter Stand, verworfen).
+`docs/KONZEPT.md` (neun Module, Technik), `docs/DATENMODELL.md`, `docs/PHASENPLAN.md`, `docs/OFFENE-FRAGEN.md`, `docs/AUFGABEN-LEON.md`, `docs/COACH-PROMPT.md`, `docs/ANGEBOTE-FORMAT.md`, `docs/UNTERWEGS-FORMAT.md`, `docs/ANDROID.md`, `docs/IST-ANALYSE.md` (alter Stand, verworfen).

@@ -85,3 +85,6 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | Hysterese | Ein Puffer zwischen zwei Schwellen, damit kleine Gegenbewegungen nicht hin- und herschalten. | `beobachteFab` in `js/ansichten/heute.js` |
 | Atwater-Faktoren | Faustwerte für Energie: 4 kcal je Gramm Eiweiß und Kohlenhydrate, 9 kcal je Gramm Fett. | `kcalAusMakros` in `js/logik/schnell.js` |
 | Zeitliche tote Zone (TDZ) | Eine mit `const` oder `let` deklarierte Variable existiert erst ab ihrer Zeile; ein früherer Zugriff wirft einen Fehler. | `oeffneEintrag` in `js/ansichten/eintrag.js` |
+| Spezifität | Gewicht eines CSS-Selektors; bei Konflikten gewinnt die spezifischere Regel, nicht die spätere. | `.unterwegs-restaurants .chip[aria-pressed]` in `css/app.css` |
+| Datalist | HTML-Liste mit Vorschlägen für ein Textfeld; man darf trotzdem frei tippen. | Feld „Wo?“ in `js/ansichten/schnellformular.js` |
+| Brute Force | Alle Möglichkeiten durchprobieren; bei kleinen Mengen schnell genug und sicher optimal. | `vorschlaege` in `js/logik/unterwegs.js` |
