@@ -149,6 +149,8 @@ export function blatt({ titel, inhalt, beiSchliessen }) {
   dialog.addEventListener('click', (e) => { if (e.target === dialog) zu(); }); // Tippen neben das Blatt
   dialog.addEventListener('cancel', (e) => { e.preventDefault(); zu(); }); // Zurück-Taste oder Escape
   dialog.addEventListener('close', () => { dialog.remove(); beiSchliessen?.(); });
+  // Ein Blatt, das gerade hinausgleitet, sofort schließen: nie zwei Blätter mit gleichen Feldern gleichzeitig
+  for (const alt of document.querySelectorAll('dialog.blatt.schliesst')) alt.close();
   document.body.append(dialog);
   dialog.showModal();
   return steuerung;

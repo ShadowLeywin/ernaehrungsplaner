@@ -753,6 +753,42 @@ body:has(.seite-willkommen) .navigation { display: none; }
 a.ezeile { text-decoration: none; }
 a.ezeile > svg { color: var(--tinte-leise); flex: none; }
 
+/* ---------- Mehr: ruhige Karten, jede Zeile mit Titel und aktuellem Stand ---------- */
+
+.menuekarte { margin-top: 1rem !important; padding: 0 1.25rem; border-radius: 1.5rem; background: var(--flaeche); }
+.menuekarte-titel { padding-top: 1.125rem; font-size: 0.8125rem; font-weight: 650; letter-spacing: 0.05em; text-transform: uppercase; color: var(--tinte-leise); }
+.menuekarte .menue { background: none; border-radius: 0; overflow: visible; }
+.menuekarte .menue li + li { border-top: 1px solid var(--linie); }
+.menuekarte .menuepunkt {
+  display: flex; align-items: center; gap: 0.75rem; min-height: 4.5rem; padding: 0.875rem 0;
+  color: var(--tinte); text-decoration: none;
+}
+.menuekarte .menuepunkt:active { background: none; opacity: 0.7; }
+.menuekarte .menue-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.125rem; font-size: 1.0625rem; font-weight: 650; }
+.menuekarte .menue-text small { font-size: 0.9375rem; font-weight: 400; color: var(--tinte-leise); }
+.menuekarte .menuepunkt > svg { flex: none; color: var(--tinte-leise); }
+.menuekarte-fuss { padding: 0.25rem 0 1.25rem; font-size: 0.9375rem; line-height: 1.45; color: var(--tinte-leise); border-top: 1px solid var(--linie); padding-top: 1rem; }
+.ueberblick { padding-bottom: 1.125rem; }
+.kennzahlen { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 0.75rem; }
+.kennzahl { display: flex; flex-direction: column; padding: 0 0.75rem; }
+.kennzahl:first-child { padding-left: 0; }
+.kennzahl + .kennzahl { border-left: 1px solid var(--linie); }
+.kennzahl strong { font-size: 1.75rem; line-height: 1.15; font-weight: 760; letter-spacing: -0.02em; }
+.kennzahl span { font-size: 0.9375rem; color: var(--tinte-leise); }
+.ueberblick .klein { margin-top: 0.5rem; }
+
+/* Unterseiten: Zurück als Kasten links neben dem großen Titel */
+.unterkopf { display: flex; align-items: center; gap: 0.875rem; }
+.unterkopf h1 { min-width: 0; overflow-wrap: anywhere; hyphens: auto; }
+.zurueck-kasten {
+  display: grid; place-items: center; flex: none; width: 3rem; height: 3rem; border-radius: 1rem;
+  background: var(--flaeche); color: var(--tinte); border: 1px solid var(--linie);
+}
+.zurueck-kasten:active { transform: scale(0.94); }
+.datenschutz h2 { font-size: 1.0625rem; margin-top: 1rem; }
+.datenschutz ul { list-style: disc; padding-left: 1.25rem; }
+.datenschutz p + p, .datenschutz ul { margin-top: 0.5rem; }
+
 /* ==========================================================================
    Blatt: Standard-Design. Schlicht im Stil von iOS, in Elans Grün.
    Große fette Titel, gruppierte Listen mit farbigen Symbolen, ruhige Leiste
@@ -852,13 +888,7 @@ a.ezeile > svg { color: var(--tinte-leise); flex: none; }
 :root[data-thema='blatt'] .blatt::backdrop { background: rgb(0 0 0 / 0.55); }
 
 /* Gruppierte Listen wie in den iOS-Einstellungen: farbige Symbole, Trennlinie ab dem Text */
-:root[data-thema='blatt'] .menue-icon { width: 2rem; height: 2rem; border-radius: 0.5rem; background: var(--icon, var(--akzent)); color: #ffffff; }
-:root[data-thema='blatt'] .menue-icon svg { width: 18px; height: 18px; }
-:root[data-thema='blatt'] .menuepunkt { grid-template-columns: 2rem 1fr auto; min-height: 3.5rem; }
-:root[data-thema='blatt'] .menue li + li { border-top: 0; position: relative; }
-:root[data-thema='blatt'] .menue li + li::before { content: ''; position: absolute; top: 0; left: 3.625rem; right: 0; border-top: 1px solid var(--linie); }
-:root[data-thema='blatt'] .menuegruppe-titel { font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; margin-left: 1rem; }
-:root[data-thema='blatt'] .menue, :root[data-thema='blatt'] .zeilen, :root[data-thema='blatt'] .eintraege { border-radius: 1rem; }
+:root[data-thema='blatt'] .zeilen, :root[data-thema='blatt'] .eintraege { border-radius: 1rem; }
 
 /* Mehr Farbe: jede Mahlzeit hat ihren Farbton hinter dem Symbol */
 :root[data-thema='blatt'] .slot-bild { background: color-mix(in srgb, var(--slot-farbe, var(--limette)) 22%, transparent); }

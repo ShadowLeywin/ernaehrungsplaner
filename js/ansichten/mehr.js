@@ -6,6 +6,7 @@ import { coachBericht } from '../logik/coach.js';
 import { GESCHLECHTER } from '../logik/referenz.js';
 import { WOCHENTAGE, formatKurz, isoDatum, verschiebe } from '../logik/datum.js';
 import { APP_NAME, APP_VERSION } from '../logik/schema.js';
+import { anteileText, anzahlText, backupText, dabeiSeit, darstellungText, kennzahlen, koerperText, referenzText, wochenplanText, zieleText } from '../logik/zusammenfassung.js';
 import { wochenTage } from '../logik/woche.js';
 import { RINGE, SLOTS, STANDARD_ANTEILE, STANDARD_ZIELE, TAGESTYPEN, ZIEL_FELDER, bereinigeAnteile, bereinigeRinge, makroAbweichung, pruefeAnteile } from '../logik/ziele.js';
 import { parseZahl } from '../logik/zutat.js';
@@ -21,47 +22,36 @@ import { bestaetige, el, gruppe, haenge, hinweis, icon, svg, zahl, zeileFeld, ze
 
 let gewaehlterTyp = 'gym';
 
-/** Unterseiten von „Mehr“, in Gruppen. Das Häufigste steht oben. */
+/**
+ * Unterseiten von „Mehr“, in Karten. Jede Zeile zeigt statt einer festen Beschreibung den aktuellen Stand
+ * (stand(w) bekommt die geladenen Werte). Das Häufigste steht oben.
+ */
 const MENUE = [
-  { gruppe: 'Ziele und Tagebuch', eintraege: [
-    { id: 'ziele', farbe: '#ff3b30', titel: 'Ziele je Tagestyp', text: 'Energie und Makros für Gym, Calisthenics, Rest', icon: 'ziel' },
-    { id: 'koerper', farbe: '#34c759', titel: 'Ziele für Körper und Wasser', text: 'Gewicht je Woche, Wasser, Schlaf, Schritte, Wasser-Knöpfe', icon: 'waage' },
-    { id: 'wochenplan', farbe: '#ff9500', titel: 'Wochenplan', text: 'Welcher Wochentag welcher Tagestyp ist', icon: 'kalender' },
-    { id: 'mahlzeiten', farbe: '#ff2d55', titel: 'Anteile der Mahlzeiten', text: 'Wie sich das Tagesziel auf sechs Mahlzeiten verteilt', icon: 'scheibe' },
-    { id: 'referenz', farbe: '#5856d6', titel: 'Referenzwerte', text: 'Geschlecht und Alter für den Vergleich mit der DGE', icon: 'waage' },
+  { eintraege: [
+    { id: 'referenz', titel: 'Über dich', stand: (w) => referenzText(w.referenz.gruppe, GESCHLECHTER, w.referenz.daten?.altersgruppen) },
+    { id: 'ziele', titel: 'Ziele je Tagestyp', stand: (w) => zieleText(w.ziele) },
+    { id: 'koerper', titel: 'Körper und Wasser', stand: (w) => koerperText(w.gesundheit, w.wasserMengen) },
+    { id: 'wochenplan', titel: 'Wochenplan', stand: (w) => wochenplanText(w.woche) },
+    { id: 'mahlzeiten', titel: 'Anteile der Mahlzeiten', stand: (w) => anteileText(w.anteile) },
   ] },
   { gruppe: 'Lebensmittel', eintraege: [
-    { id: 'zutaten', farbe: '#34c759', titel: 'Zutaten und Mag-Liste', text: 'Eigene Zutaten, Open Food Facts, Vorlieben', icon: 'zutaten', adresse: '#/zutaten' },
-    { id: 'angebote', farbe: '#30b0c7', titel: 'Angebote', text: 'Preise je Zutat und Markt', icon: 'preis', adresse: '#/angebote' },
+    { id: 'zutaten', titel: 'Zutaten und Mag-Liste', adresse: '#/zutaten', stand: (w) => anzahlText(w.vorlieben, 'Angabe in der Mag-Liste', 'Angaben in der Mag-Liste', 'Eigene Zutaten und Vorlieben') },
+    { id: 'angebote', titel: 'Angebote', adresse: '#/angebote', stand: (w) => anzahlText(w.angebote, 'Angebot', 'Angebote', 'Noch keine Angebote') },
   ] },
-  { gruppe: 'Daten', eintraege: [
-    { id: 'backup', farbe: '#007aff', titel: 'Backup', text: 'Alle Daten als Datei sichern und einspielen', icon: 'sicherung' },
-    { id: 'coach', farbe: '#af52de', titel: 'Coach-Export', text: 'Wochenbericht als Text für einen Chat', icon: 'bericht' },
-    { id: 'healthconnect', farbe: '#ff2d55', titel: 'Health Connect', text: 'Schritte, Gewicht und Schlaf vom Handy übernehmen', icon: 'herz' },
+  { gruppe: 'Daten und Verbindung', eintraege: [
+    { id: 'healthconnect', titel: 'Health Connect', stand: (w) => w.healthConnect },
+    { id: 'backup', titel: 'Backup', stand: (w) => backupText(w.letztesBackup, w.heute) },
+    { id: 'coach', titel: 'Coach-Export', stand: () => 'Wochenbericht als Text' },
   ] },
   { gruppe: 'App', eintraege: [
-    { id: 'darstellung', farbe: '#8e8e93', titel: 'Darstellung', text: 'Blatt oder Zitrus, dunkel oder hell, Vibration', icon: 'darstellung' },
-    { id: 'ueber', farbe: '#007aff', titel: 'Über Elan', text: 'Alle Funktionen in Kürze, Datenschutz, Quellen', icon: 'info' },
-    { id: 'neu', farbe: '#ff9500', titel: 'Was ist neu', text: 'Patchnotes', icon: 'neu' },
+    { id: 'darstellung', titel: 'Darstellung', stand: () => darstellungText({ thema: leseThema(), modus: leseDarstellung(), vibration: vibrationAn() }) },
+    { id: 'neu', titel: 'Was ist neu', stand: () => NEUIGKEITEN[0]?.titel ?? '' },
+    { id: 'ueber', titel: 'Über Elan', stand: () => `Version ${APP_VERSION}` },
   ] },
+  { gruppe: 'Rechtliches und Hilfe', eintraege: [
+    { id: 'datenschutz', titel: 'Datenschutz', stand: () => 'Was gespeichert wird' },
+  ], fuss: 'Elan ist kein Medizinprodukt und ersetzt keinen ärztlichen Rat. Bei Beschwerden oder gesundheitlichen Fragen wende dich an eine Ärztin oder einen Arzt.' },
 ];
-
-const MENUE_ICONS = {
-  ziel: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM12 11a1 1 0 1 0 0 2 1 1 0 0 0 0-2z',
-  kalender: 'M5 6h14v13H5zM5 10h14M9 4v4M15 4v4',
-  scheibe: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9',
-  waage: 'M12 4v16M6 20h12M5 8h14M5 8l-2.5 6a3 3 0 0 0 5 0zM19 8l-2.5 6a3 3 0 0 0 5 0z',
-  zutaten: 'M5 19c0-8 5-14 14-14 0 9-6 14-14 14zM5 19l8-8',
-  preis: 'M3 12l9-9h8v8l-9 9zM16 7.5a.5.5 0 1 0 0 1 .5.5 0 0 0 0-1z',
-  sicherung: 'M12 4v11M7 10l5 5 5-5M5 19h14',
-  bericht: 'M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5',
-  darstellung: 'M12 3a9 9 0 1 0 0 18zM12 3a9 9 0 0 1 0 18',
-  herz: 'M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z',
-  info: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 11v6M12 7.5v.5',
-  neu: 'M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z',
-};
-
-const menueIcon = (name) => svg('svg', { viewBox: '0 0 24 24', width: 22, height: 22, fill: 'none', stroke: 'currentColor', 'stroke-width': 2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'aria-hidden': 'true' }, svg('path', { d: MENUE_ICONS[name] }));
 
 export async function zeigeMehr(wurzel, [unterseite]) {
   const eintrag = MENUE.flatMap((g) => g.eintraege).find((e) => e.id === unterseite && !e.adresse);
@@ -82,25 +72,73 @@ export async function zeigeMehr(wurzel, [unterseite]) {
     healthconnect: async () => healthConnectBereich(),
     ueber: async () => ueberBereich(),
     neu: async () => neuBereich(),
+    datenschutz: async () => datenschutzBereich(),
   };
+  // Kopf wie in den Einstellungen guter Apps: Zurück als Kasten links, großer Titel daneben
   haenge(wurzel,
-    el('a', { class: 'zurueck', href: '#/mehr' }, icon('zurueck', 18), 'Mehr'),
-    el('header', { class: 'seitenkopf' }, el('h1', {}, eintrag.titel)),
+    el('header', { class: 'unterkopf' },
+      el('a', { class: 'zurueck-kasten', href: '#/mehr', 'aria-label': 'Zurück zu Mehr' }, icon('zurueck', 22)),
+      el('h1', {}, eintrag.titel)),
     el('div', { class: 'unterseite' }, await bauen[eintrag.id]()));
 }
 
-function zeigeMenue(wurzel) {
+/** Alle Werte für die Zusammenfassungen in einem Zug laden; Fehler in einer Quelle lassen die Zeile nur leer. */
+async function ladeStand() {
+  const heute = isoDatum();
+  const [eintraege, rezepte, ziele, woche, anteile, referenz, gesundheit, wasserMengen, vorlieben, angebote, letztesBackup, hc] = await Promise.all([
+    speicher.alleEintraege(), speicher.alleRezepte(), speicher.ladeZiele(), speicher.ladeWoche(),
+    speicher.einstellung('slotAnteile').then(bereinigeAnteile), speicher.ladeReferenz(), speicher.ladeGesundheit(),
+    speicher.einstellung('wasserMengen').then(bereinigeWasserMengen), speicher.alleVorlieben(), speicher.alleAngebote(),
+    speicher.einstellung('letztesBackup'), healthConnectStand(),
+  ]);
+  return {
+    heute, eintraege, rezepte, ziele, woche, anteile, referenz, gesundheit, wasserMengen, letztesBackup,
+    vorlieben: vorlieben.size, angebote: angebote.length, healthConnect: hc,
+  };
+}
+
+async function healthConnectStand() {
+  if (!istApp()) return 'Nur in der Android-App';
+  const erlaubt = await hcErlaubt();
+  if (!erlaubt.length) return 'Nicht verbunden';
+  const zuletzt = zuletztAbgeglichen();
+  return zuletzt ? `Verbunden · abgeglichen ${new Date(zuletzt).toLocaleString('de-DE', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' })}` : 'Verbunden';
+}
+
+async function zeigeMenue(wurzel) {
   document.title = `Mehr – ${APP_NAME}`;
+  const w = await ladeStand();
+  const seit = dabeiSeit(w.eintraege.map((e) => e.datum));
+  const k = kennzahlen(w);
+  const kennzahl = (wert, text) => el('div', { class: 'kennzahl' }, el('strong', {}, zahl(wert)), el('span', {}, text));
   haenge(wurzel,
     el('header', { class: 'seitenkopf' }, el('h1', {}, 'Mehr')),
-    MENUE.map((g) => el('section', { class: 'menuegruppe', 'aria-label': g.gruppe },
-      el('h2', { class: 'menuegruppe-titel' }, g.gruppe),
+    // Überblick oben: seit wann und wie viel. Ohne Einträge ein freundlicher Start statt Nullen
+    el('section', { class: 'menuekarte ueberblick', 'aria-label': 'Überblick' },
+      el('h2', { class: 'menuekarte-titel' }, seit ? `Dabei seit ${seit}` : 'Willkommen bei Elan'),
+      seit
+        ? el('div', { class: 'kennzahlen' }, kennzahl(k.tage, k.tage === 1 ? 'Tag' : 'Tage'), kennzahl(k.eintraege, k.eintraege === 1 ? 'Eintrag' : 'Einträge'), kennzahl(k.rezepte, k.rezepte === 1 ? 'Rezept' : 'Rezepte'))
+        : el('p', { class: 'klein' }, 'Sobald du etwas einträgst, siehst du hier, wie viel schon zusammengekommen ist.')),
+    MENUE.map((g) => el('section', { class: 'menuekarte', 'aria-label': g.gruppe ?? 'Einstellungen' },
+      g.gruppe ? el('h2', { class: 'menuekarte-titel' }, g.gruppe) : null,
       el('ul', { class: 'menue' }, g.eintraege.map((e) => el('li', {},
-        el('a', { class: 'menuepunkt', href: e.adresse ?? `#/mehr/${e.id}` },
-          el('span', { class: 'menue-icon', style: `--icon:${e.farbe}` }, menueIcon(e.icon)),
-          el('span', { class: 'menue-text' }, e.titel, el('small', {}, e.text)),
-          icon('vor', 18))))))),
-    el('p', { class: 'klein fusszeile' }, `${APP_NAME} ${APP_VERSION}`));
+        el('a', { class: 'menuepunkt', href: e.adresse ?? `#/mehr/${e.id}`, id: `menue-${e.id}` },
+          el('span', { class: 'menue-text' }, e.titel, el('small', {}, e.stand(w) || '')),
+          icon('vor', 18))))),
+      g.fuss ? el('p', { class: 'menuekarte-fuss' }, g.fuss) : null)));
+}
+
+/* ---------- Datenschutz: dieselbe Seite, die Health Connect zeigt, hier innerhalb der App ---------- */
+
+async function datenschutzBereich() {
+  try {
+    const text = await (await fetch('./privacypolicy.html')).text();
+    const inhalt = new DOMParser().parseFromString(text, 'text/html').querySelector('main');
+    inhalt.querySelector('h1')?.remove(); // Titel steht schon oben
+    return el('section', { class: 'bereich datenschutz' }, [...inhalt.childNodes].map((k) => document.importNode(k, true)));
+  } catch {
+    return el('p', { class: 'fehlertext' }, 'Die Datenschutzseite konnte nicht geladen werden.');
+  }
 }
 
 /* ---------- Ringe auf „Heute“ ---------- */
@@ -409,7 +447,7 @@ async function healthConnectBereich() {
         : el('button', { type: 'button', class: 'knopf', onclick: verbinden }, 'Mit Health Connect verbinden'),
       erlaubt.length ? el('button', { type: 'button', class: 'textlink', onclick: verbinden }, 'Erlaubnis ändern') : null,
       el('button', { type: 'button', class: 'textlink', onclick: hcEinstellungen }, 'Health Connect öffnen'),
-      el('a', { class: 'textlink', href: './privacypolicy.html' }, 'Datenschutz')),
+      el('a', { class: 'textlink', href: '#/mehr/datenschutz' }, 'Datenschutz')),
   ];
 }
 
