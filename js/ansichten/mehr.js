@@ -343,6 +343,8 @@ function backupBereich(letztesBackup, daten) {
     if (!ja) return;
     await speicher.importiere(pruefung.daten);
     hinweis('Backup eingespielt.');
+    // Erinnerungen aus dem Backup gleich planen, sonst kämen sie erst nach der nächsten Änderung
+    if (istApp()) await planeBenachrichtigungen(planeErinnerungen(bereinigeErinnerungen(await speicher.einstellung('erinnerungen'))), ALLE_IDS).catch(() => {});
     neuZeichnen();
   };
 

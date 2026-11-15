@@ -819,6 +819,11 @@ a.ezeile > svg { color: var(--tinte-leise); flex: none; }
 /* ---------- Fortschritt: Rückblick der letzten 7 Tage ---------- */
 
 .rueckblick > * + * { margin-top: 0.75rem; }
+/* Schnell eintragen: drei Makros nebeneinander, bei 320 px noch lesbar */
+.makro-felder { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
+.makro-felder .eingabe input { min-width: 0; }
+.chip.schnell.nur-kcal { align-self: flex-start; margin-top: 0.5rem; white-space: normal; text-align: left; line-height: 1.25; padding-block: 0.5rem; }
+
 /* Check-in: fünf gleich breite Stufen je Frage, Worte an den Enden */
 .checkin-reihe + .checkin-reihe { margin-top: 0.875rem; }
 .checkin .kartentitel { margin-bottom: 0.75rem; }

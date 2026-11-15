@@ -72,6 +72,19 @@ export function coachBericht({ tage, stichtag, eintraege, ziele, wochenplan, tag
   if (werte('schritte').length) alltag.push(`- Schritte: ${z(schnitt(werte('schritte')))} im Schnitt aus ${werte('schritte').length} ${werte('schritte').length === 1 ? 'Tag' : 'Tagen'} (Ziel ${z(gesundheit.schritteZiel)})`);
   if (alltag.length) zeilen.push('', 'ALLTAG', ...alltag);
 
+  /* Körperwerte und Befinden: nur, was es gibt. Schnitt der Woche, keine Deutung */
+  const befinden = [];
+  const schnittText = (art, stellen) => z(schnitt(werte(art)), stellen);
+  const anzahl = (art, einzahl, mehrzahl) => `${werte(art).length} ${werte(art).length === 1 ? einzahl : mehrzahl}`;
+  if (werte('ruhepuls').length) befinden.push(`- Ruhepuls: ${schnittText('ruhepuls', 0)} bpm im Schnitt aus ${anzahl('ruhepuls', 'Tag', 'Tagen')}`);
+  if (werte('hrv').length) befinden.push(`- HRV: ${schnittText('hrv', 0)} ms im Schnitt aus ${anzahl('hrv', 'Tag', 'Tagen')}`);
+  for (const [art, name, leise, laut] of [['energie', 'Energie', 'müde', 'voller Energie'], ['stimmung', 'Stimmung', 'schlecht', 'sehr gut'], ['stress', 'Stress', 'entspannt', 'sehr gestresst']]) {
+    if (werte(art).length) befinden.push(`- ${name}: ${schnittText(art, 1)} von 5 im Schnitt aus ${anzahl(art, 'Tag', 'Tagen')} (1 = ${leise}, 5 = ${laut})`);
+  }
+  const trainings = tage.filter((datum) => tagSaetze.get(datum)?.tagestypQuelle === 'healthconnect').length;
+  if (trainings) befinden.push(`- Trainings laut Health Connect: ${trainings} ${trainings === 1 ? 'Tag' : 'Tage'}`);
+  if (befinden.length) zeilen.push('', 'KÖRPER UND BEFINDEN', ...befinden);
+
   /* Supplements */
   if (supplements.length) {
     zeilen.push('', 'SUPPLEMENTS');
