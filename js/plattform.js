@@ -19,6 +19,36 @@ export function setzeSystemleisten(dunkel) {
   } catch { /* ältere App ohne Plugin: Leisten bleiben wie vom System */ }
 }
 
+/* ---------- Erinnerungen (lokale Benachrichtigungen, nur App) ---------- */
+
+/** 'granted', 'denied' oder 'prompt'; im Browser 'keineApp' (dort gibt es keine Erinnerungen). */
+export async function erinnerungErlaubnis() {
+  if (!istApp()) return 'keineApp';
+  try { return (await nativ('LocalNotifications', 'checkPermissions', {})).display ?? 'prompt'; } catch { return 'denied'; }
+}
+
+/**
+ * Plant die Erinnerungen neu: erst alle eigenen Kennungen löschen, dann die eingeschalteten täglich setzen.
+ * plan aus planeErinnerungen() in js/logik/erinnerungen.js. isExactNotification: false, weil eine Erinnerung
+ * ans Trinken keine Sekunde genau sein muss; so fragt Android nicht nach „Wecker und Erinnerungen“.
+ * Gibt 'ok', 'verweigert' (keine Erlaubnis für Benachrichtigungen) oder 'keineApp' zurück.
+ */
+export async function planeBenachrichtigungen(plan, alleIds) {
+  if (!istApp()) return 'keineApp';
+  await nativ('LocalNotifications', 'cancel', { notifications: alleIds.map((id) => ({ id })) }).catch(() => {});
+  if (!plan.length) return 'ok';
+  let erlaubnis = await erinnerungErlaubnis();
+  if (erlaubnis !== 'granted') erlaubnis = (await nativ('LocalNotifications', 'requestPermissions', {}).catch(() => ({}))).display;
+  if (erlaubnis !== 'granted') return 'verweigert';
+  await nativ('LocalNotifications', 'schedule', {
+    notifications: plan.map((n) => ({
+      id: n.id, title: n.titel, body: n.text, smallIcon: 'ic_stat_elan',
+      schedule: { on: { hour: n.stunde, minute: n.minute }, allowWhileIdle: true }, isExactNotification: false,
+    })),
+  });
+  return 'ok';
+}
+
 /* ---------- Vibration beim Tippen ---------- */
 
 const SCHLUESSEL_VIBRATION = 'elan.vibration';
@@ -72,8 +102,8 @@ export function aktualisiereWidget(werte) {
 
 /* ---------- Health Connect (nur App, Plugin @capgo/capacitor-health) ---------- */
 
-/** Nur lesen, nur diese sechs. Das Manifest erlaubt auch nicht mehr (android/app/src/main/AndroidManifest.xml). */
-export const HC_LESEN = ['steps', 'weight', 'sleep', 'restingHeartRate', 'bodyFat', 'workouts'];
+/** Nur lesen, nur diese sieben. Das Manifest erlaubt auch nicht mehr (android/app/src/main/AndroidManifest.xml). */
+export const HC_LESEN = ['steps', 'weight', 'sleep', 'restingHeartRate', 'bodyFat', 'heartRateVariability', 'workouts'];
 
 /** { verfuegbar, grund }. Im Browser nie verfügbar. */
 export async function hcVerfuegbar() {
@@ -106,14 +136,14 @@ export const hcEinstellungen = () => nativ('Health', 'openHealthConnectSettings'
 export async function hcLesen(vonIso, bisIso) {
   const sicher = async (aufruf) => { try { return (await aufruf())?.samples ?? []; } catch { return []; } };
   const lies = (dataType, limit = 500) => sicher(() => nativ('Health', 'readSamples', { dataType, startDate: vonIso, endDate: bisIso, limit }));
-  const [steps, weight, sleep, restingHeartRate, bodyFat, workouts] = await Promise.all([
+  const [steps, weight, sleep, restingHeartRate, bodyFat, heartRateVariability, workouts] = await Promise.all([
     sicher(() => nativ('Health', 'queryAggregated', { dataType: 'steps', startDate: vonIso, endDate: bisIso, bucket: 'day', aggregation: 'sum' })),
     sicher(() => nativ('Health', 'readSamples', { dataType: 'weight', startDate: vonIso, endDate: bisIso, limit: 500 })),
     sicher(() => nativ('Health', 'readSamples', { dataType: 'sleep', startDate: vonIso, endDate: bisIso, limit: 1000 })),
-    lies('restingHeartRate'), lies('bodyFat'),
+    lies('restingHeartRate'), lies('bodyFat'), lies('heartRateVariability', 1000),
     (async () => { try { return (await nativ('Health', 'queryWorkouts', { startDate: vonIso, endDate: bisIso, limit: 200 }))?.workouts ?? []; } catch { return []; } })(),
   ]);
-  return { steps, weight, sleep, restingHeartRate, bodyFat, workouts };
+  return { steps, weight, sleep, restingHeartRate, bodyFat, heartRateVariability, workouts };
 }
 
 /** Bricht der Nutzer das Teilen-Menü ab, ist das kein Fehler. */

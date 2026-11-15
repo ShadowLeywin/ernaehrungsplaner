@@ -78,3 +78,6 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | Manifest-Zusammenführung | Android führt die Manifeste aller Bibliotheken zu einem zusammen; mit `tools:node="remove"` streicht die App Einträge daraus. | `android/app/src/main/AndroidManifest.xml` |
 | MPL-2.0 | Lizenz, bei der nur Änderungen an den Dateien der Bibliothek offen bleiben müssen; die eigene App darf eine andere Lizenz haben. | Plugin `@capgo/capacitor-health` |
 | Least Privilege | Grundsatz: eine App bekommt nur die Rechte, die sie wirklich braucht. | Manifest-Einträge mit `tools:node="remove"` |
+| Lokale Benachrichtigung | Eine Benachrichtigung, die das Handy selbst zu einer Uhrzeit zeigt, ohne Server oder Internet. | `planeBenachrichtigungen` in `js/plattform.js` |
+| HRV | Herzfrequenzvariabilität: wie stark die Abstände zwischen Herzschlägen schwanken, in Millisekunden; Elan zeigt nur Werte und Trend. | `hrvJeTag` in `js/logik/healthconnect.js` |
+| Exakter Wecker | Android-Recht für sekundengenaue Alarme; Elan verzichtet darauf, Erinnerungen dürfen ein paar Minuten später kommen. | `docs/ANDROID.md`, Abschnitt Erinnerungen |

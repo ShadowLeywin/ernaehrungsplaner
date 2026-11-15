@@ -27,6 +27,10 @@ function kennzahlenFuer(tage, { eintraege, messungen, tagSaetze }) {
     schlaf: schnitt(art('schlaf').map((m) => m.wert)),
     schritte: schnitt(art('schritte').map((m) => m.wert)),
     wasser: schnitt([...wasserJeTag.values()]),
+    energie: schnitt(art('energie').map((m) => m.wert)),
+    stimmung: schnitt(art('stimmung').map((m) => m.wert)),
+    stress: schnitt(art('stress').map((m) => m.wert)),
+    hrv: schnitt(art('hrv').map((m) => m.wert)),
     // Trainings: nur echte aus Health Connect, nicht der Plan
     trainings: (tagSaetze ?? []).filter((t) => inTagen.has(t.datum) && t.tagestypQuelle === 'healthconnect' && t.tagestyp !== 'rest').length,
   };
@@ -53,9 +57,11 @@ export const aenderung = (jetzt, davor) => (typeof jetzt === 'number' && typeof 
  * Ruhepuls-Trend wie beim Gewicht: Schnitt der letzten 7 Tage gegen die 7 Tage davor.
  * Erst ab je 3 Werten, sonst sagt der Schnitt nichts. { schnitt, aenderung } oder null.
  */
-export function ruhepulsTrend(messungen, datum) {
-  const jetzt = gleitenderSchnitt(messungen, 'ruhepuls', datum);
-  const davor = gleitenderSchnitt(messungen, 'ruhepuls', verschiebe(datum, -7));
+export function wertTrend(messungen, artId, datum) {
+  const jetzt = gleitenderSchnitt(messungen, artId, datum);
+  const davor = gleitenderSchnitt(messungen, artId, verschiebe(datum, -7));
   if (jetzt.anzahl < 3) return null;
   return { schnitt: jetzt.schnitt, aenderung: davor.anzahl >= 3 ? jetzt.schnitt - davor.schnitt : null };
 }
+
+export const ruhepulsTrend = (messungen, datum) => wertTrend(messungen, 'ruhepuls', datum);

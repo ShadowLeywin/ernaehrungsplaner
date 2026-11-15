@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { QUELLE_HC, darfTagestypSetzen, gewichtJeTag, koerperfettJeTag, lokalerTag, ruhepulsJeTag, schlafJeNacht, schritteJeTag, tagestypAusTraining, tagestypJeTag, zuUebernehmen } from '../js/logik/healthconnect.js';
+import { QUELLE_HC, darfTagestypSetzen, hrvJeTag, gewichtJeTag, koerperfettJeTag, lokalerTag, ruhepulsJeTag, schlafJeNacht, schritteJeTag, tagestypAusTraining, tagestypJeTag, zuUebernehmen } from '../js/logik/healthconnect.js';
 
 // Alle Werte sind erfunden. Zeiten um die Mittagszeit, damit der Kalendertag in jeder Zeitzone gleich bleibt.
 
@@ -71,4 +71,8 @@ test('darfTagestypSetzen: eigene Wahl geht vor', () => {
   assert.equal(darfTagestypSetzen({ datum: 'x', tagestyp: 'gym', tagestypQuelle: QUELLE_HC }), true);
   assert.equal(darfTagestypSetzen({ datum: 'x', tagestyp: 'rest' }), false, 'älterer Satz ohne Quelle = selbst gewählt');
   assert.equal(darfTagestypSetzen({ datum: 'x', tagestypQuelle: 'eigen' }), false, 'bewusst den Plan gewählt');
+});
+
+test('HRV: Schnitt aller Messungen eines Tages', () => {
+  assert.deepEqual(hrvJeTag([{ startDate: '2026-11-15T01:00:00Z', value: 40 }, { startDate: '2026-11-15T03:00:00Z', value: 51 }]).map((h) => h.wert), [46]);
 });

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { verschiebe } from '../js/logik/datum.js';
-import { aenderung, ruhepulsTrend, wochenRueckblick } from '../js/logik/rueckblick.js';
+import { aenderung, ruhepulsTrend, wertTrend, wochenRueckblick } from '../js/logik/rueckblick.js';
 
 // Alle Werte sind erfunden.
 const heute = '2026-11-15';
@@ -46,4 +46,13 @@ test('Ruhepuls-Trend: ab 3 Werten, Änderung nur mit Vorwoche', () => {
   assert.equal(ruhepulsTrend([m(0, 60), m(1, 62)], heute), null);
   assert.deepEqual(ruhepulsTrend([m(0, 60), m(1, 62), m(2, 61)], heute), { schnitt: 61, aenderung: null });
   assert.deepEqual(ruhepulsTrend([m(0, 60), m(1, 62), m(2, 61), m(7, 64), m(8, 64), m(9, 64)], heute), { schnitt: 61, aenderung: -3 });
+});
+
+test('Check-in und HRV im Rückblick, Trend für jede Art', () => {
+  const r2 = wochenRueckblick({ datum: heute, messungen: [{ art: 'energie', datum: tag(0), wert: 4 }, { art: 'energie', datum: tag(1), wert: 2 }, { art: 'stress', datum: tag(0), wert: 3 }] });
+  assert.equal(r2.jetzt.energie, 3);
+  assert.equal(r2.jetzt.stress, 3);
+  assert.equal(r2.jetzt.stimmung, null);
+  const hrv = [0, 1, 2].map((n) => ({ art: 'hrv', datum: tag(n), wert: 40 + n }));
+  assert.deepEqual(wertTrend(hrv, 'hrv', heute), { schnitt: 41, aenderung: null });
 });

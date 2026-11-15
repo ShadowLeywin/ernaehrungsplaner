@@ -1,5 +1,5 @@
 // Werte aus Health Connect (Android) in Elans Messungen umrechnen. Reine Funktionen.
-// Gelesen werden nur Schritte, Gewicht, Schlaf, Ruhepuls, Körperfett und Trainings (für den Tagestyp). Eigene Eingaben in Elan haben immer Vorrang:
+// Gelesen werden nur Schritte, Gewicht, Schlaf, Ruhepuls, Körperfett, HRV und Trainings (für den Tagestyp). Eigene Eingaben in Elan haben immer Vorrang:
 // Ein Wert aus Health Connect ersetzt nur einen leeren Tag oder einen früheren Wert aus Health Connect.
 
 /** Gelesene Arten und ihre Namen in Health Connect (Plugin @capgo/capacitor-health). */
@@ -9,6 +9,7 @@ export const HC_ARTEN = [
   { hc: 'sleep', art: 'schlaf', name: 'Schlaf' },
   { hc: 'restingHeartRate', art: 'ruhepuls', name: 'Ruhepuls' },
   { hc: 'bodyFat', art: 'koerperfett', name: 'Körperfett' },
+  { hc: 'heartRateVariability', art: 'hrv', name: 'HRV (Herzfrequenzvariabilität)' },
   { hc: 'workouts', art: null, name: 'Trainings (für den Tagestyp)' },
 ];
 
@@ -91,6 +92,17 @@ export const ruhepulsJeTag = (proben) => [...letzteJeTag(proben)].map(([datum, {
 /** Körperfett: je Tag der letzte Wert in Prozent. Manche Quellen liefern einen Bruchteil (0,18 statt 18). */
 export const koerperfettJeTag = (proben) => [...letzteJeTag(proben)]
   .map(([datum, { wert }]) => ({ art: 'koerperfett', datum, wert: gerundet(wert <= 1 ? wert * 100 : wert, 1) }));
+
+/** HRV: Schnitt aller Messungen eines Tages (die Uhr oder der Ring misst nachts mehrmals), ganze Millisekunden. */
+export function hrvJeTag(proben) {
+  const jeTag = new Map();
+  for (const p of proben ?? []) {
+    if (!(p?.value > 0)) continue;
+    const tag = lokalerTag(p.startDate);
+    jeTag.set(tag, [...(jeTag.get(tag) ?? []), p.value]);
+  }
+  return [...jeTag].map(([datum, werte]) => ({ art: 'hrv', datum, wert: Math.round(werte.reduce((a, b) => a + b, 0) / werte.length) }));
+}
 
 /* ---------- Tagestyp aus Trainings ---------- */
 

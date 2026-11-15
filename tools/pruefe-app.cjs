@@ -834,6 +834,30 @@ async function healthLauf(browser) {
   await seite.locator('.supplemente .haken').waitFor();
   pruefe('Heute: Supplement anlegen und je Tag abhaken', amTag === 1 && (await seite.locator('.supplemente .haken.erledigt').count()) === 0 && blieb === '81', 'heute abgehakt, gestern offen; Entwurf im Gewichtsfeld überlebt das Neuzeichnen');
 
+  // Check-in: ein Tipp je Frage speichert sofort, ohne die Seite neu zu zeichnen; nochmal tippen nimmt zurück
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.locator('.checkin').waitFor();
+  await seite.locator('#f-gewicht').fill('82');
+  await seite.getByRole('button', { name: 'Energie 4 von 5' }).click();
+  await seite.getByRole('button', { name: 'Stimmung 3 von 5' }).click();
+  await seite.getByRole('button', { name: 'Stress 2 von 5' }).click();
+  await seite.getByRole('button', { name: 'Stress 5 von 5' }).click();
+  await seite.locator('.checkin [aria-pressed=true]', { hasText: '5' }).waitFor();
+  const entwurfBleibt = await seite.locator('#f-gewicht').inputValue();
+  await seite.locator('.checkin').scrollIntoViewIfNeeded();
+  await bild(seite, '40-checkin', false);
+  await seite.getByRole('button', { name: 'Stress 5 von 5' }).click();
+  await seite.locator('.checkin .checkin-reihe').nth(2).locator('[aria-pressed=true]').waitFor({ state: 'detached' });
+  await seite.reload({ waitUntil: 'networkidle' });
+  await seite.locator('.checkin').waitFor();
+  const gewaehlt = await seite.locator('.checkin [aria-pressed=true]').evaluateAll((k) => k.map((x) => x.getAttribute('aria-label')));
+  await seite.goto(`${URL_APP}#/fortschritt`);
+  await seite.locator('.rueckblick').waitFor();
+  const rueckblickCheckin = (await seite.locator('.rueckblick').innerText()).replace(/\s+/g, ' ');
+  pruefe('Heute: Check-in mit einem Tipp, zurücknehmbar; Rückblick zeigt den Schnitt',
+    gewaehlt.join() === 'Energie 4 von 5,Stimmung 3 von 5' && entwurfBleibt === '82' && /Energie Ø 4 von 5/i.test(rueckblickCheckin) && /Kalorien Ø/i.test(rueckblickCheckin) && !/Stress Ø/i.test(rueckblickCheckin),
+    `gespeichert: ${gewaehlt.join(' / ')}; Gewichtsfeld behält „${entwurfBleibt}“; Rückblick: ${rueckblickCheckin.match(/Energie Ø[^↑↓→]*/i)?.[0] ?? 'kein Energie-Wert'}`);
+
   // Körpermaße: Kacheln wie beim Maßband, Eintragen im Blatt, eigenes Maß mit Namen
   await seite.goto(`${URL_APP}#/fortschritt`);
   await seite.locator('.mass-kachel').first().waitFor();
@@ -866,7 +890,9 @@ async function healthLauf(browser) {
   await seite.locator('dialog').waitFor({ state: 'detached' });
   await seite.locator('#mass-hals').waitFor({ state: 'detached' });
   const nachAuswahl = await seite.locator('section[aria-label="Körpermaße"] .mass-kachel').count();
-  pruefe('Fortschritt: Maße wählbar, ausgeblendete Kachel verschwindet', nachAuswahl === kacheln - 2 - 1, `${kacheln} Kacheln (davon 2 Körperwerte), nach „Hals aus“: ${nachAuswahl}`);
+  // Körperwerte (Ruhepuls, Körperfett, HRV, …) wachsen mit der App: zählen statt fest annehmen
+  const koerperKacheln = await seite.locator('section[aria-label="Körperwerte"] .mass-kachel').count();
+  pruefe('Fortschritt: Maße wählbar, ausgeblendete Kachel verschwindet', nachAuswahl === kacheln - koerperKacheln - 1, `${kacheln} Kacheln (davon ${koerperKacheln} Körperwerte), nach „Hals aus“: ${nachAuswahl}`);
   pruefe('Fortschritt: alle Körpermaße als Kacheln, Wert und eigener Name bleiben', kacheln >= 19 && taille.includes('84,5') && eigen.startsWith('Unterbauch') && eigen.includes('88'),
     `${kacheln} Kacheln; ${taille.replace(/\n/g, ' ')}; ${eigen.replace(/\n/g, ' ')}`);
   await bild(seite, '17-koerpermasse');
@@ -1254,7 +1280,14 @@ async function appLauf(browser) {
           if (methode === 'readSamples' && optionen.dataType === 'sleep') return { samples: [{ startDate: gestern(23), endDate: heute(6, 30), value: 450, unit: 'minute', sleepState: 'light' }] };
           if (methode === 'readSamples' && optionen.dataType === 'restingHeartRate') return { samples: [{ startDate: heute(6), endDate: heute(6), value: 61, unit: 'bpm' }] };
           if (methode === 'readSamples' && optionen.dataType === 'bodyFat') return { samples: [{ startDate: heute(7), endDate: heute(7), value: 17.8, unit: 'percent' }] };
+          if (methode === 'readSamples' && optionen.dataType === 'heartRateVariability') return { samples: [{ startDate: heute(3), endDate: heute(3), value: 44, unit: 'millisecond' }, { startDate: heute(5), endDate: heute(5), value: 52, unit: 'millisecond' }] };
           if (methode === 'queryWorkouts') return { workouts: [{ workoutType: 'strengthTraining', duration: 3600, startDate: heute(10), endDate: heute(11) }] };
+        }
+        // Benachrichtigungen: Erlaubnis zuerst offen; __verweigern spielt „Nicht zulassen“ nach
+        if (plugin === 'LocalNotifications') {
+          if (methode === 'checkPermissions') return { display: window.__benachrichtigung ?? 'prompt' };
+          if (methode === 'requestPermissions') { window.__benachrichtigung = window.__verweigern ? 'denied' : 'granted'; return { display: window.__benachrichtigung }; }
+          if (methode === 'schedule') return { notifications: optionen.notifications.map((n) => ({ id: n.id })) };
         }
         return {};
       },
@@ -1353,12 +1386,40 @@ async function appLauf(browser) {
   const quelleHinweis = await seite.locator('.tagestyp-quelle').count();
   await seite.goto(`${URL_APP}#/fortschritt`);
   await seite.locator('#mass-ruhepuls').waitFor();
-  const koerperwerte = `${await seite.locator('#mass-ruhepuls .mass-wert').innerText()}|${await seite.locator('#mass-koerperfett .mass-wert').innerText()}`;
-  pruefe('App: Ruhepuls, Körperfett und Tagestyp aus dem Training übernommen', koerperwerte === '61 bpm|17,8 %' && gymGewaehlt === 'Gym' && quelleHinweis === 1,
+  const koerperwerte = `${await seite.locator('#mass-ruhepuls .mass-wert').innerText()}|${await seite.locator('#mass-koerperfett .mass-wert').innerText()}|${await seite.locator('#mass-hrv .mass-wert').innerText()}`;
+  pruefe('App: Ruhepuls, Körperfett, HRV (Tagesschnitt) und Tagestyp aus dem Training übernommen', koerperwerte === '61 bpm|17,8 %|48 ms' && gymGewaehlt === 'Gym' && quelleHinweis === 1,
     `${koerperwerte}; Tagestyp ${gymGewaehlt} mit Hinweis auf Health Connect: ${quelleHinweis}`);
-  pruefe('App: Health Connect liest nur die sechs freigegebenen Arten; eigene Eingabe geht vor',
-    angefragt.join() === 'steps+weight+sleep+restingHeartRate+bodyFat+workouts' && hcWerte === '79,9|7,5|6543' && markiert === 3 && eigenBleibt === '7000',
+  pruefe('App: Health Connect liest nur die sieben freigegebenen Arten; eigene Eingabe geht vor',
+    angefragt.join() === 'steps+weight+sleep+restingHeartRate+bodyFat+heartRateVariability+workouts' && hcWerte === '79,9|7,5|6543' && markiert === 3 && eigenBleibt === '7000',
     `angefragt ${angefragt.join()}; „${hcHinweis}“; übernommen ${hcWerte} (${markiert} markiert); nach eigener Eingabe und erneutem Abgleich: ${eigenBleibt} Schritte`);
+
+  // Erinnerungen: Einschalten fragt nach der Erlaubnis und plant täglich, ohne exakte Wecker
+  const geplant = () => seite.evaluate(() => window.__aufrufe.filter((a) => a.plugin === 'LocalNotifications' && a.methode === 'schedule').at(-1)?.optionen.notifications ?? []);
+  await seite.goto(`${URL_APP}#/mehr/erinnerungen`);
+  await seite.locator('#f-erinnerung-wasser').check();
+  await seite.locator('#f-wasser-zeit-3').waitFor();
+  const wasserPlan = await geplant();
+  await seite.locator('#wasser-zeit-dazu').click();
+  await seite.locator('#f-wasser-zeit-4').waitFor();
+  await seite.getByRole('button', { name: 'Erinnerung 1 entfernen' }).click();
+  await seite.locator('#f-wasser-zeit-4').waitFor({ state: 'detached' });
+  await seite.locator('#f-erinnerung-supplements').check();
+  await seite.locator('#f-supplements-zeit').selectOption('07:30');
+  await seite.waitForFunction(() => window.__aufrufe.some((a) => a.methode === 'schedule' && a.optionen.notifications.some((n) => n.id === 1101 && n.schedule.on.hour === 7)));
+  const endPlan = await geplant();
+  await bild(seite, '41-erinnerungen');
+  await seite.evaluate(() => { window.__verweigern = true; window.__benachrichtigung = 'prompt'; });
+  await seite.locator('#f-erinnerung-checkin').check();
+  await seite.locator('.hinweis', { hasText: 'Benachrichtigungen sind für Elan aus' }).waitFor();
+  // Die Seite zeichnet nach dem Speichern neu; erst dann zeigt der Schalter den gespeicherten Stand
+  await seite.waitForFunction(() => document.getElementById('f-erinnerung-wasser')?.checked === false, null, { timeout: 5000 }).catch(() => {});
+  const nachVerweigern = await seite.locator('#f-erinnerung-wasser').isChecked();
+  await seite.goto(`${URL_APP}#/mehr`);
+  const menueStand = await seite.locator('#menue-erinnerungen').innerText();
+  const alleTaeglich = endPlan.every((n) => n.isExactNotification === false && n.schedule.on && n.schedule.allowWhileIdle);
+  pruefe('App: Erinnerungen planen täglich, ohne exakte Wecker; ohne Erlaubnis bleibt alles aus',
+    wasserPlan.map((n) => `${n.schedule.on.hour}`).join() === '10,13,16,19' && endPlan.map((n) => n.id).join() === '1001,1002,1003,1004,1101' && alleTaeglich && !nachVerweigern && /Aus/.test(menueStand),
+    `Wasser ${wasserPlan.map((n) => n.schedule.on.hour).join('/')} Uhr; danach ${endPlan.map((n) => `${n.id}@${n.schedule.on.hour}:${String(n.schedule.on.minute).padStart(2, '0')}`).join(', ')}; täglich und ungenau: ${alleTaeglich}; nach „Nicht zulassen“ Wasser an: ${nachVerweigern}; Menü „${menueStand.replace(/\s+/g, ' ')}“`);
 
   pruefe('App: Vibration beim Tippen, abschaltbar', tipp.join() === 'impact:LIGHT' && erfolg.join() === 'impact:LIGHT,notification:SUCCESS' && ohne === 0, `Wasser: ${tipp.join() || 'kein Aufruf'}; nach Eintragen: ${erfolg.join()}; aus: ${ohne} Aufrufe`);
   pruefe('App-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');

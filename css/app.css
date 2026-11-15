@@ -661,6 +661,9 @@ body:has(.seite-willkommen) .navigation { display: none; }
 }
 /* Trennlinie erst ab dem Text, wie in iOS-Listen */
 .ezeile + .ezeile::before { content: ''; position: absolute; top: 0; left: 1rem; right: 0; border-top: 1px solid var(--linie); }
+/* Zeile als Knopf („Uhrzeit dazu“): sieht aus wie eine Zeile, Text in Akzentfarbe */
+.ezeile-knopf { width: 100%; border: 0; background: transparent; text-align: left; font: inherit; color: var(--blatt); }
+.ezeile-knopf .ezeile-text { font-weight: 600; }
 .ezeile-text { flex: 1; min-width: 0; font-weight: 500; }
 .ezeile-text small { display: block; font-size: 0.8125rem; font-weight: 400; color: var(--tinte-leise); }
 .ezeile-wert { display: flex; align-items: center; gap: 0.25rem; flex: none; max-width: 60%; }
@@ -680,6 +683,7 @@ body:has(.seite-willkommen) .navigation { display: none; }
   box-shadow: none !important; appearance: none; -webkit-appearance: none; text-align: right; text-align-last: right;
   color: var(--tinte-leise); font-weight: 500; cursor: pointer;
 }
+.zeitwahl select { font-variant-numeric: tabular-nums; }
 .wahlfeld svg { position: absolute; right: 0; pointer-events: none; color: var(--tinte-leise); transform: rotate(90deg); }
 .wahlfeld select:focus-visible { background: var(--flaeche-2) !important; border-radius: 0.5rem; }
 
@@ -810,6 +814,12 @@ a.ezeile > svg { color: var(--tinte-leise); flex: none; }
 /* ---------- Fortschritt: Rückblick der letzten 7 Tage ---------- */
 
 .rueckblick > * + * { margin-top: 0.75rem; }
+/* Check-in: fünf gleich breite Stufen je Frage, Worte an den Enden */
+.checkin-reihe + .checkin-reihe { margin-top: 0.875rem; }
+.checkin .kartentitel { margin-bottom: 0.75rem; }
+.checkin-frage { font-size: 0.9375rem; font-weight: 620; margin: 0 0 0.375rem; }
+.checkin-wahl .wahl-knopf { flex: 1 1 0; padding: 0; font-variant-numeric: tabular-nums; }
+.checkin-pole { display: flex; justify-content: space-between; gap: 1rem; margin-top: 0.25rem; }
 .rueckblick-raster { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.875rem 1rem; }
 .rueckblick-wert { display: flex; flex-direction: column; gap: 0.0625rem; min-width: 0; }
 .rueckblick-wert .kartentitel { font-size: 0.75rem; }
