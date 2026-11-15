@@ -807,6 +807,16 @@ a.ezeile > svg { color: var(--tinte-leise); flex: none; }
 .mass-linie svg { height: 3.5rem; }
 .tagestyp-quelle { margin-top: 0.375rem !important; text-align: center; }
 
+/* ---------- Fortschritt: Rückblick der letzten 7 Tage ---------- */
+
+.rueckblick > * + * { margin-top: 0.75rem; }
+.rueckblick-raster { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.875rem 1rem; }
+.rueckblick-wert { display: flex; flex-direction: column; gap: 0.0625rem; min-width: 0; }
+.rueckblick-wert .kartentitel { font-size: 0.75rem; }
+.rueckblick-wert strong { font-size: 1.5rem; line-height: 1.15; font-weight: 740; letter-spacing: -0.02em; }
+.rueckblick-wert strong span { font-size: 0.875rem; font-weight: 500; color: var(--tinte-leise); letter-spacing: 0; }
+.rueckblick-wert small { font-size: 0.75rem; color: var(--tinte-leise); }
+
 /* ==========================================================================
    Blatt: Standard-Design. Schlicht im Stil von iOS, in Elans Grün.
    Große fette Titel, gruppierte Listen mit farbigen Symbolen, ruhige Leiste

@@ -9,6 +9,7 @@ import {
   tagesSumme, tagesWert, trendRichtung, verlauf, verlaufJeTag,
 } from '../logik/gesundheit.js';
 import { QUELLE_HC } from '../logik/healthconnect.js';
+import { aenderung, ruhepulsTrend, wochenRueckblick } from '../logik/rueckblick.js';
 import { APP_NAME } from '../logik/schema.js';
 import { tippGefuehl } from '../plattform.js';
 import { neuZeichnen } from '../router.js';
@@ -189,13 +190,16 @@ export async function zeigeFortschritt(wurzel, [parameter]) {
   if (parameter === 'labor') return zeigeLabor(wurzel);
   if (parameter === 'symptome') return zeigeSymptome(wurzel);
   const heute = isoDatum();
-  const [messungen, ziele, massNamen, masseAuswahl] = await Promise.all([
+  const [messungen, ziele, massNamen, masseAuswahl, eintraege, tagSaetze] = await Promise.all([
     speicher.messungenZwischen(verschiebe(heute, -400), heute), speicher.ladeGesundheit(), speicher.einstellung('massNamen', {}),
     speicher.einstellung('masseSichtbar').then(bereinigeMasseAuswahl),
+    speicher.eintraegeZwischen(verschiebe(heute, -13), heute),
+    Promise.all(Array.from({ length: 14 }, (_, i) => speicher.holeTag(verschiebe(heute, -i)))).then((t) => t.filter(Boolean)),
   ]);
   document.title = `Fortschritt – ${APP_NAME}`;
   haenge(wurzel,
     el('header', { class: 'seitenkopf' }, el('h1', {}, 'Fortschritt')),
+    rueckblickKarte(wochenRueckblick({ datum: heute, eintraege, messungen, tagSaetze })),
     gewichtKarte(heute, messungen, ziele),
     koerperwerteBereich(heute, messungen),
     masseBereich(heute, messungen, massNamen ?? {}, masseAuswahl),
@@ -204,6 +208,36 @@ export async function zeigeFortschritt(wurzel, [parameter]) {
       el('a', { class: 'ezeile', href: '#/fortschritt/labor' }, el('span', { class: 'ezeile-text' }, 'Laborwerte'), icon('vor', 18)),
       el('a', { class: 'ezeile', href: '#/fortschritt/symptome' }, el('span', { class: 'ezeile-text' }, 'Symptome'), icon('vor', 18)),
       el('a', { class: 'ezeile', href: '#/mehr/koerper' }, el('span', { class: 'ezeile-text' }, 'Ziele für Körper und Wasser'), icon('vor', 18))));
+}
+
+/**
+ * Die letzten 7 Tage auf einen Blick, mit Änderung zur Woche davor. Kein Urteil, nur Zahlen:
+ * Ob mehr Schritte oder weniger kcal gut sind, hängt von deinem Ziel ab.
+ */
+function rueckblickKarte({ von, jetzt, davor }) {
+  const kennzahl = (titel, wert, alt, stellen, einheit) => {
+    const diff = aenderung(wert, alt);
+    const pfeil = diff === null ? '' : { hoch: '↑', runter: '↓', gleich: '→' }[trendRichtung(diff, 10 ** -stellen / 2)];
+    return el('div', { class: 'rueckblick-wert' },
+      el('span', { class: 'kartentitel' }, titel),
+      el('strong', {}, wert === null ? '–' : zahl(wert, stellen), wert === null ? null : el('span', {}, ` ${einheit}`)),
+      el('small', {}, diff === null ? 'keine Vorwoche' : `${pfeil} ${mitVorzeichen(diff, stellen)} zur Vorwoche`));
+  };
+  const hatTrainings = jetzt.trainings > 0 || davor.trainings > 0;
+  return el('section', { class: 'karte rueckblick', 'aria-label': 'Letzte 7 Tage' },
+    el('div', { class: 'gewicht-kopf' },
+      el('h2', { class: 'kartentitel' }, 'Letzte 7 Tage'),
+      el('span', { class: 'klein' }, `seit ${formatKurz(von).slice(0, 6)}`)),
+    el('div', { class: 'rueckblick-raster' },
+      kennzahl('Energie Ø', jetzt.kcal, davor.kcal, 0, 'kcal'),
+      kennzahl('Eiweiß Ø', jetzt.protein, davor.protein, 0, 'g'),
+      kennzahl('Schlaf Ø', jetzt.schlaf, davor.schlaf, 1, 'h'),
+      kennzahl('Schritte Ø', jetzt.schritte, davor.schritte, 0, ''),
+      kennzahl('Wasser Ø', jetzt.wasser, davor.wasser, 0, 'ml'),
+      hatTrainings ? kennzahl('Trainings', jetzt.trainings, davor.trainings, 0, '') : null),
+    el('p', { class: 'klein' }, jetzt.tageMitEssen
+      ? `Schnitte über die Tage mit Werten; gegessen an ${jetzt.tageMitEssen} von 7 Tagen.`
+      : 'Noch kein Essen eingetragen in den letzten 7 Tagen.'));
 }
 
 /**
@@ -254,7 +288,7 @@ const kurzName = (name) => {
 };
 
 /** Eine Kachel für einen Messwert (Maß oder Körperwert); Tippen öffnet das Eintragen. */
-function messKachel(art, name, messungen, datum, namen) {
+function messKachel(art, name, messungen, datum, namen, zusatz = null) {
   const stand = standUndAenderung(messungen, art.id, datum);
   const einheit = art.einheit;
   return el('button', {
@@ -265,14 +299,22 @@ function messKachel(art, name, messungen, datum, namen) {
   // „Handgelenk rechts“ passt nicht in eine halbe Zeile: Seite als kleines L/R hinter dem Namen
   el('span', { class: 'mass-name' }, ...kurzName(name)),
   el('span', { class: 'mass-wert' }, el('strong', {}, stand ? zahl(stand.wert, art.stellen) : '–'), ` ${einheit}`),
-  stand?.aenderung ? el('span', { class: 'mass-aenderung' }, `${mitVorzeichen(stand.aenderung, art.stellen)} seit ${formatKurz(stand.datum).slice(0, 6)}`) : null);
+  zusatz ? el('span', { class: 'mass-aenderung' }, zusatz)
+    : stand?.aenderung ? el('span', { class: 'mass-aenderung' }, `${mitVorzeichen(stand.aenderung, art.stellen)} seit ${formatKurz(stand.datum).slice(0, 6)}`) : null);
+}
+
+/** Ruhepuls: Schnitt der letzten 7 Tage und Änderung zur Vorwoche, wie beim Gewicht (ein Einzelwert schwankt stark). */
+function ruhepulsZusatz(messungen, datum) {
+  const trend = ruhepulsTrend(messungen, datum);
+  if (!trend) return null;
+  return `Ø 7 Tage ${zahl(trend.schnitt)}${trend.aenderung === null ? '' : ` · ${mitVorzeichen(trend.aenderung, 0)}`}`;
 }
 
 /** Ruhepuls und Körperfett: meist aus Health Connect, auch von Hand. */
 function koerperwerteBereich(datum, messungen) {
   return el('section', { class: 'egruppe masse', 'aria-label': 'Körperwerte' },
     el('h2', { class: 'egruppe-titel' }, 'Körperwerte'),
-    el('div', { class: 'mass-kacheln' }, ARTEN.filter((a) => a.gruppe === 'koerper').map((art) => messKachel(art, art.name, messungen, datum, {}))));
+    el('div', { class: 'mass-kacheln' }, ARTEN.filter((a) => a.gruppe === 'koerper').map((art) => messKachel(art, art.name, messungen, datum, {}, art.id === 'ruhepuls' ? ruhepulsZusatz(messungen, datum) : null))));
 }
 
 function masseBereich(datum, messungen, namen, auswahl) {

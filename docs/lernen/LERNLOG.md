@@ -260,3 +260,10 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Entscheidung:** Krafttraining = Gym, Calisthenics = Calisthenics, Laufen oder Rad setzen nichts. Lieber kein Treffer als ein falscher Tagestyp. Eigene Wahl wird als `tagestypQuelle: 'eigen'` markiert, auch wenn man „wie im Plan“ wählt.
 - **Fehler:** Die Prüfung zählte erst alle Kacheln, auch die neuen Körperwerte. Lösung: nur im Abschnitt „Körpermaße“ zählen.
 - **Fachbegriffe:** Herkunft eines Werts (`quelle`), Least Privilege (nur so viele Rechte wie nötig).
+
+## Session 14, Runde 5: Rückblick und Ruhepuls-Trend, Richtung „all in all“ (15.11.2026)
+
+- **Was und warum:** Léon: „setze das alles um, es soll eine all in all Health-App sein.“ Umgesetzt: Rückblick der letzten 7 Tage auf „Fortschritt“ und Ruhepuls mit 7-Tage-Schnitt. Die Richtung steht jetzt in `CLAUDE.md`: alles außer Training.
+- **Befehle:** `npm test` (182, neu `test/rueckblick.test.js`) · `node tools/pruefe-app.cjs` (136 Kriterien).
+- **Entscheidung:** Gleitende 7 Tage statt Kalenderwoche, weil am Montag eine Kalenderwoche fast leer wäre. Schnitte nur über Tage mit Werten. Trainings zählen nur aus Health Connect, nicht aus dem Plan.
+- **Testfalle (zum dritten Mal):** CSS `text-transform: uppercase` verändert `innerText`. Merksatz: Text in Tests ohne Rücksicht auf Großschreibung vergleichen.

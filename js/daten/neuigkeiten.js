@@ -7,6 +7,8 @@ export const NEUIGKEITEN = [
     datum: '2026-11-15',
     titel: 'Ruhepuls, Körperfett, Trainings',
     punkte: [
+      'Fortschritt: Rückblick der letzten 7 Tage (Energie, Eiweiß, Schlaf, Schritte, Wasser, Trainings) mit Änderung zur Woche davor.',
+      'Ruhepuls mit 7-Tage-Schnitt und Änderung zur Vorwoche, wie beim Gewicht.',
       'Health Connect liefert jetzt auch Ruhepuls und Körperfett; beide stehen unter „Fortschritt“ und lassen sich auch von Hand eintragen.',
       'Ein Krafttraining in Health Connect setzt den Tag auf „Gym“, Calisthenics auf „Calisthenics“. Deine eigene Wahl geht immer vor.',
       'Maße wählen: Kacheln für Maße, die du nicht misst, ausblenden.',

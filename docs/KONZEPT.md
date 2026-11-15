@@ -1,6 +1,6 @@
 # Konzept
 
-Elan ist eine Ernährungs- und Health-App als Android-App und PWA aus demselben Code: offline, deutsch, alle Daten auf dem Gerät. Kein Trainingslog.
+Elan ist die Gesundheits-App für alles außer Training, als Android-App und PWA aus demselben Code: offline, deutsch, alle Daten auf dem Gerät. Training bleibt in Léons Fitness-App; Elan liest Trainings nur über Health Connect, um den Tagestyp zu setzen.
 
 ## Die neun Module
 
