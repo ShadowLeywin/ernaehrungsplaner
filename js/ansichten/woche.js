@@ -51,14 +51,15 @@ export async function zeigeWoche(wurzel, teile) {
       el('a', { class: 'knopf leise', href: '#/angebote' }, 'Angebote'),
       el('a', { class: 'knopf', href: `#/woche/${tage[0]}/einkauf` }, 'Einkaufsliste')),
     posten.length === 0 ? el('p', { class: 'leer' }, 'Noch nichts geplant. Tippe an einem Tag auf das Plus und merke vor, was du essen willst.') : null,
-    el('div', { class: 'slots' }, tage.map((datum, i) => tagBereich({
+    // Alle Tage in einer Karte, wie die Mahlzeiten auf „Heute“: ruhiger als sieben Einzelkarten
+    el('section', { class: 'karte wochenliste', 'aria-label': 'Tage der Woche' }, el('div', { class: 'slots' }, tage.map((datum, i) => tagBereich({
       datum,
       istHeute: datum === heute,
       posten: posten.filter((p) => p.datum === datum).sort((a, b) => slotRang(a.slot) - slotRang(b.slot) || String(a.erstellt).localeCompare(String(b.erstellt))),
       typ: tagestypFuer(datum, wochenplan, tagSaetze[i]),
       ziele,
       warnungen,
-    }))));
+    })))));
 }
 
 function tagBereich({ datum, istHeute, posten, typ, ziele, warnungen }) {
@@ -78,12 +79,12 @@ function tagBereich({ datum, istHeute, posten, typ, ziele, warnungen }) {
 
   return el('section', { class: istHeute ? 'slot plantag heute' : 'slot plantag', id: `tag-${datum}` },
     el('div', { class: 'slot-kopf' },
-      // Kürzel des Wochentags, gefärbt nach Tagestyp: so sieht man die Woche auf einen Blick
-      el('span', { class: `slot-bild tagestyp-${typ}`, 'aria-hidden': 'true' }, wochentag.slice(0, 2)),
+      // Kalenderkachel „Do 12“, gefärbt nach Tagestyp: Datum und Typ auf einen Blick, ohne lange Zeile
+      el('span', { class: `slot-bild kalender tagestyp-${typ}`, 'aria-hidden': 'true' },
+        el('small', {}, wochentag.slice(0, 2)), el('strong', {}, String(ausIso(datum).getDate()))),
       el('div', { class: 'slot-text' },
-        // Kurzes Datum: „Mittwoch, 12. November“ bräche auf schmalen Handys um
-        el('h2', {}, `${wochentag}, ${formatTagKurz(datum)}`, istHeute ? el('span', { class: 'marke' }, 'heute') : null),
-        el('p', { class: 'slot-stand' }, `${typName}, ${zahl(geplant)} von ${zahl(ziele[typ].kcal)} kcal geplant`)),
+        el('h2', {}, el('span', { class: 'unsichtbar' }, `${wochentag}, ${formatTagKurz(datum)}: `), typName, istHeute ? el('span', { class: 'marke' }, 'heute') : null),
+        el('p', { class: 'slot-stand' }, `${zahl(geplant)} von ${zahl(ziele[typ].kcal)} kcal`)),
       el('button', {
         type: 'button', class: 'rund plus', 'aria-label': `Für ${wochentag} einplanen`,
         onclick: () => oeffneZutatWahl({ datum, slot: naechsterFreierSlot(posten), beiFertig: neuZeichnen, ziel: 'plan' }),
