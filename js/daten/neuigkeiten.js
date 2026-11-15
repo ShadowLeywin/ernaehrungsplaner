@@ -11,6 +11,7 @@ export const NEUIGKEITEN = [
       'Fortschritt: Der Rückblick zeigt den Wochenschnitt von Energie, Stimmung, Stress und HRV, sobald es Werte gibt. „Energie“ aus dem Essen heißt dort jetzt „Kalorien“.',
       'HRV (Herzfrequenzvariabilität) aus Health Connect, z. B. vom Galaxy Ring, als Kachel unter „Körperwerte“ mit 7-Tage-Schnitt.',
       'Erinnerungen (Android): ans Trinken bis zu sechsmal am Tag, an Supplements und abends an den Check-in. Unter Mehr → Erinnerungen.',
+      'Plus-Knopf repariert: Er bleibt fest über der Leiste, statt mit der Seite mitzurollen und am Ende über dem Inhalt zu stehen. Er verschwindet beim Runterscrollen und kommt erst bei deutlichem Hochscrollen zurück.',
     ],
   },
   {

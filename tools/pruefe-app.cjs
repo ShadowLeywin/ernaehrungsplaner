@@ -71,6 +71,31 @@ async function hauptlauf(browser) {
   await seite.keyboard.press('Escape');
   await seite.locator('dialog').waitFor({ state: 'detached' });
 
+  // Plus-Knopf: hängt am Bildschirm, nicht an der Seite; kleine Gegenbewegungen holen ihn nicht zurück;
+  // am Seitenende ist er da und verdeckt nichts
+  const fabZustand = async (y) => {
+    await seite.evaluate((z) => window.scrollTo(0, z), y);
+    await seite.waitForTimeout(120);
+    return seite.evaluate(() => {
+      const f = document.querySelector('.fab');
+      return { weg: f.classList.contains('weg'), abstand: Math.round(innerHeight - f.getBoundingClientRect().bottom) };
+    });
+  };
+  await seite.waitForTimeout(500); // Seitenübergang abwarten
+  const fabOben = await fabZustand(0);
+  const fabRunter = await fabZustand(500);
+  const fabZittern = await fabZustand(480);
+  const fabHoch = await fabZustand(400);
+  const fabEnde = await fabZustand(100000);
+  const ueberdeckt = await seite.evaluate(() => {
+    const f = document.querySelector('.fab').getBoundingClientRect();
+    return [...document.querySelectorAll('.seite > :not(.fab)')].filter((e) => { const r = e.getBoundingClientRect(); return r.height > 0 && r.bottom > f.top && r.top < f.bottom && r.right > f.left && r.left < f.right; }).map((e) => e.className || e.tagName);
+  });
+  pruefe('Plus-Knopf: fest über der Leiste, ruhig beim Scrollen, am Ende ohne zu verdecken',
+    fabOben.abstand === fabEnde.abstand && fabHoch.abstand === fabOben.abstand && !fabOben.weg && fabRunter.weg && fabZittern.weg && !fabHoch.weg && !fabEnde.weg && ueberdeckt.length === 0,
+    `Abstand unten (sichtbar) ${fabOben.abstand}/${fabHoch.abstand}/${fabEnde.abstand} px; oben ${fabOben.weg ? 'weg' : 'da'}, runter ${fabRunter.weg ? 'weg' : 'da'}, 20 px zurück ${fabZittern.weg ? 'weg' : 'da'}, 100 px hoch ${fabHoch.weg ? 'weg' : 'da'}, Ende ${fabEnde.weg ? 'weg' : 'da'}; verdeckt: ${ueberdeckt.join(', ') || 'nichts'}`);
+  await seite.evaluate(() => window.scrollTo(0, 0));
+
   /* Tagebuch */
   const name = await trageEin(seite, 'Frühstück', 'hafer', 80);
   const eintrag = seite.locator('#slot-fruehstueck .eintrag');

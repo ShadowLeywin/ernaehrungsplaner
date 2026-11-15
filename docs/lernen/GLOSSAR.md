@@ -81,3 +81,5 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | Lokale Benachrichtigung | Eine Benachrichtigung, die das Handy selbst zu einer Uhrzeit zeigt, ohne Server oder Internet. | `planeBenachrichtigungen` in `js/plattform.js` |
 | HRV | Herzfrequenzvariabilität: wie stark die Abstände zwischen Herzschlägen schwanken, in Millisekunden; Elan zeigt nur Werte und Trend. | `hrvJeTag` in `js/logik/healthconnect.js` |
 | Exakter Wecker | Android-Recht für sekundengenaue Alarme; Elan verzichtet darauf, Erinnerungen dürfen ein paar Minuten später kommen. | `docs/ANDROID.md`, Abschnitt Erinnerungen |
+| Containing Block | Der Rahmen, auf den sich die Lage eines Elements bezieht; ein Vorfahr mit `transform` wird es auch für `position: fixed`. | `.seite.einblenden` in `css/app.css` |
+| Hysterese | Ein Puffer zwischen zwei Schwellen, damit kleine Gegenbewegungen nicht hin- und herschalten. | `beobachteFab` in `js/ansichten/heute.js` |

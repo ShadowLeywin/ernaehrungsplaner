@@ -458,8 +458,13 @@ input[type='time'] { appearance: none; -webkit-appearance: none; }
 
 /* ---------- Übergänge: kurz, mit Richtung, nie im Weg ---------- */
 
-/* Seitenwechsel: neue Seite gleitet aus der Richtung der Bewegung herein */
-.seite.einblenden { animation: seite-rein 0.24s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+/* Seitenwechsel: neue Seite gleitet aus der Richtung der Bewegung herein.
+   Nur „backwards“, nicht „both“: Ein stehengebliebenes transform macht die Seite zum Bezug für position: fixed,
+   dann rollt der Plus-Knopf mit der Seite mit und landet am Seitenende über dem Inhalt. */
+.seite.einblenden { animation: seite-rein 0.24s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+/* Während die Seite hereingleitet, hängt der Knopf noch an ihr; deshalb erscheint er erst danach */
+.seite.einblenden .fab { animation: fab-rein 0.18s ease-out 0.24s backwards; }
+@keyframes fab-rein { from { opacity: 0; } }
 .seite.richtung-vor { --von-x: 1.25rem; }
 .seite.richtung-zurueck { --von-x: -1.25rem; }
 @keyframes seite-rein { from { opacity: 0; transform: translateX(var(--von-x, 0)) translateY(var(--von-y, 0.375rem)); } }
