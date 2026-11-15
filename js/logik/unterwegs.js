@@ -5,7 +5,8 @@
 
 import { pruefeSchnell, schnellEintrag } from './schnell.js';
 
-export const MAX_GERICHTE = 1000;
+// Platz für die mitgelieferten Ketten (gut 1.000) und viele eigene Gerichte
+export const MAX_GERICHTE = 3000;
 const WERTE = ['kcal', 'protein', 'kh', 'fett'];
 
 const text = (wert, max) => String(wert ?? '').trim().replace(/\s+/g, ' ').slice(0, max);
@@ -84,7 +85,7 @@ export function leseUnterwegsDatei(inhalt) {
     .flatMap((r) => (Array.isArray(r?.gerichte) ? r.gerichte : []).map((g) => ({ ...g, restaurant: r?.name })));
   const gerichte = bereinigeGerichte(roh);
   if (!gerichte.length) return { ok: false, fehler: 'In der Datei steht kein brauchbares Gericht.' };
-  return { ok: true, gerichte, quelle: text(daten.quelle, 200), stand: /^\d{4}-\d{2}-\d{2}$/.test(daten.stand ?? '') ? daten.stand : '', verworfen: roh.length - gerichte.length };
+  return { ok: true, gerichte, quelle: text(daten.quelle, 200), stand: /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$/.test(daten.stand ?? '') ? daten.stand : '', verworfen: roh.length - gerichte.length };
 }
 
 /** Geladene Gerichte zur eigenen Liste nehmen; gleiche (Restaurant + Name) werden ersetzt */
@@ -92,10 +93,10 @@ export const fuegeZusammen = (alt, neu) => bereinigeGerichte([...alt, ...neu]);
 
 /* ---------- Vorschläge: Was passt in mein Budget? ---------- */
 
-// Getränke und Saucen füllen sonst das Budget auf („+ Cappuccino“). Erkannt am Namen: Menge in l/ml oder typische Wörter.
+// Getränke, Saucen und Extras (Proteinpulver, Toppings) füllen sonst das Budget auf („+ Cappuccino“). Erkannt am Namen: Menge in l/ml oder typische Wörter.
 // Lieber einmal ein Getränk zu viel ausgeschlossen als ein Kaffee als „Mahlzeit“; im Zusammenstellen bleibt alles wählbar.
 // Wortgrenzen über Buchstaben-Klassen statt \\b: \\b kennt kein „é“, sonst rutscht „Café Grande“ durch
-const GETRAENK = /\d+([.,]\d+)?\s?(ml|l|cl)(?!\p{L})|(?<!\p{L})(latte|cappuccino|espresso|café|caffè|kaffee|coffee|macchiato|mocha|chai|tee|tea|cola|fanta|sprite|mezzo|wasser|water|schorle|saft|juice|shake|smoothie|frapp\p{L}*|kakao|bier|beer|heineken|red bull|lipton|limo\p{L}*|sauce|dip|ketchup|mayo\p{L}*|dressing)(?!\p{L})/iu;
+const GETRAENK = /\d+([.,]\d+)?\s?(ml|l|cl)(?!\p{L})|(?<!\p{L})(latte|cappuccino|espresso|café|caffè|kaffee|coffee|macchiato|mocha|chai|tee|tea|cola|fanta|sprite|mezzo|wasser|water|schorle|saft|juice|shake|smoothie|frapp\p{L}*|kakao|bier|beer|heineken|red bull|lipton|limo\p{L}*|sauce|dip|ketchup|mayo\p{L}*|dressing|matcha|collagen|whey|topping|extra|americano|lungo|flat white)(?!\p{L})|\((small|medium|large|regular)\)/iu;
 // „KFC Salat ohne Dressing“ oder „Sundae mit Karamell-Sauce“ sind keine Saucen: Zusätze mit „ohne“/„mit“ zählen nicht
 export const istGetraenkOderSauce = (name) => GETRAENK.test(String(name).replace(/\s(ohne|mit)\s.*$/i, ''));
 
@@ -198,3 +199,19 @@ export function mischeKetten(eigene, paket, gespeicherterStand) {
 const FRUEHSTUECK = /mcmuffin|pancake|rührei|morning|mcgriddle|breakfast|frühstück|king toasty/i;
 export const istFruehstueck = (name) => FRUEHSTUECK.test(name);
 export const FRUEHSTUECKS_SLOTS = ['fruehstueck', 'morgensnack'];
+
+/**
+ * Getränke ohne nennenswerte Kalorien (höchstens 5 kcal) des Restaurants, als Tipp neben jedem Vorschlag.
+ * Saucen und Dips zählen nicht, auch wenn sie wenig haben. Zero-Getränke zuerst, dann Wasser, dann der Rest;
+ * je Getränk nur eine Größe (die größte, der Name zeigt sie).
+ */
+export function nullGetraenke(gerichte, restaurant, anzahl = 2) {
+  const keineSauce = (name) => !/(?<!\p{L})(sauce|dip|ketchup|mayo\p{L}*|dressing|senf|süßstoff)(?!\p{L})/iu.test(name);
+  const rang = (name) => (/zero|light|free/i.test(name) ? 0 : /wasser|water|vio|pellegrino|panna/i.test(name) ? 1 : 2);
+  const grund = (name) => name.replace(/\s*(einweg\s*)?\d+([.,]\d+)?\s?(ml|l|cl)\b.*$/i, '').trim().toLocaleLowerCase('de');
+  const liter = (name) => { const m = /(\d+(?:[.,]\d+)?)\s?(ml|l|cl)\b/i.exec(name); if (!m) return 0; const w = Number(m[1].replace(',', '.')); return m[2].toLowerCase() === 'ml' ? w / 1000 : m[2].toLowerCase() === 'cl' ? w / 100 : w; };
+  const kandidaten = gerichte.filter((g) => g.restaurant === restaurant && g.kcal <= 5 && istGetraenkOderSauce(g.name) && keineSauce(g.name))
+    .sort((a, b) => rang(a.name) - rang(b.name) || liter(b.name) - liter(a.name) || a.name.localeCompare(b.name, 'de'));
+  const gesehen = new Set();
+  return kandidaten.filter((g) => !gesehen.has(grund(g.name)) && gesehen.add(grund(g.name))).slice(0, anzahl);
+}

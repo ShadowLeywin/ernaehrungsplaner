@@ -89,7 +89,7 @@ Léon kann mehrere Runden am Stück freigeben („mach durch bis …“). Dann d
 | `js/abgleich.js` | Abgleich mit Health Connect (lesen, umrechnen über `js/logik/healthconnect.js`, speichern) |
 | `privacypolicy.html` | Datenschutzseite, Pflicht für Health Connect |
 | `data/referenzwerte.json` | Referenzwerte der DGE mit Quelle und Abrufdatum |
-| `data/unterwegs-ketten.json` | mitgelieferte Gerichte von McDonald's, Burger King, KFC, Subway (Léons Ja vom 15.11.2026), gebaut mit `tools/ketten-listen.py` |
+| `data/unterwegs-ketten.json` | mitgelieferte Gerichte von 8 Ketten mit deutscher Karte (Léons Ja vom 15.11.2026), gebaut mit `tools/ketten-listen.py`; Aktualisierung vierteljährlich |
 | `js/daten/neuigkeiten.js` | Patchnotes und Funktionsliste für „Was ist neu“ und „Über Elan“ |
 | `js/ansichten/willkommen.js` | Ersteinrichtung beim ersten Start (Gerät merkt sich `elan.eingerichtet`) |
 | `.github/workflows/apk.yml` | baut das APK auf GitHub, Release bei hinterlegtem Schlüssel |

@@ -10,6 +10,8 @@
 #      „stand“ und Quellen anpassen, VERSION in sw.js erhöhen.
 import html, json, re, sys
 ordner = sys.argv[1]
+# Stand der Gesamtliste, JJJJ-MM-TT oder JJJJ-MM-TTTHH:MM. Nur ein neuerer Stand wird auf dem Handy neu eingemischt
+STAND = sys.argv[2] if len(sys.argv) > 2 else '2026-11-15'
 zahl = lambda t: float(t.replace(',', '.'))
 
 def ns_tabelle(datei):
@@ -39,6 +41,11 @@ quellen = {
     "McDonald's": ('ns-mcdonalds.html', "McDonald's Deutschland, Nährwert- und Allergeninformationen auf mcdonalds.com (abgerufen 21.10.2026), übernommen über nutriscan.app/de/calculators/mcdonalds-nutrition-calculator am 15.11.2026"),
     'Burger King': ('ns-burgerking.html', 'Burger King Deutschland, burgerking.de/naehrwerte_allergene (abgerufen 21.10.2026), übernommen über nutriscan.app/de/calculators/burgerking-nutrition-calculator am 15.11.2026'),
     'KFC': ('ns-kfc.html', 'KFC Deutschland, PDF Allergene & Zusatzinformationen (Stand September 2026, abgerufen 21.10.2026), übernommen über nutriscan.app/de/calculators/kfc-nutrition-calculator am 15.11.2026'),
+    # Nur Ketten mit deutscher Karte; US- oder kanadische Werte (Starbucks, Five Guys, Pizza Hut …) passen nicht zu deutschen Restaurants
+    'dean&david': ('ns-deananddavid.html', 'dean&david Nährwertübersicht (Stand September 2026, abgerufen 21.10.2026), übernommen über nutriscan.app/de/calculators/deananddavid-nutrition-calculator am 15.11.2026'),
+    'Hans im Glück': ('ns-hansimglueck.html', 'Nährwerttabelle Hans im Glück, menu.hansimglueck-burgergrill.de (ohne Datum, abgerufen 21.10.2026), übernommen über nutriscan.app am 15.11.2026'),
+    'Peter Pane': ('ns-peterpane.html', 'Nährwerte der Peter Pane Speisekarte, peterpane.de/speisekarte (ohne Datum, abgerufen 21.10.2026), übernommen über nutriscan.app am 15.11.2026'),
+    'Coffee Fellows': ('ns-coffeefellows.html', 'Coffee Fellows Nährwertliste (ohne Ausgabedatum, abgerufen 21.10.2026), übernommen über nutriscan.app am 15.11.2026'),
 }
 for kette, (datei, quelle) in quellen.items():
     kopf, zeilen = ns_tabelle(datei)
@@ -78,7 +85,22 @@ for kette, d in listen.items():
     name = re.sub(r'[^a-z]', '', kette.lower())
     json.dump(datei, open(f'{ordner}/elan-unterwegs-{name}.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     alle.append({'name': kette, 'gerichte': d['gerichte']})
-json.dump({'format': 'elan-unterwegs', 'version': 1, 'quelle': "McDonald's, Burger King, KFC (über nutriscan.app nach den Angaben der Ketten, Okt. 2026), Subway (offizielles PDF Nov. 2026). Einzelquellen in den Einzeldateien.", 'stand': '2026-11-15', 'restaurants': alle},
+json.dump({'format': 'elan-unterwegs', 'version': 1, 'quelle': "Subway: offizielles PDF Nov. 2026. Alle anderen über nutriscan.app nach den Angaben der Ketten (Okt. 2026). Einzelquellen: tools/ketten-listen.py", 'stand': STAND, 'restaurants': alle},
           open(f'{ordner}/elan-unterwegs-fastfood.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 for kette, d in listen.items():
     print(kette, len(d['gerichte']), 'Beispiele:', [(g['name'], g['kcal'], g['protein']) for g in d['gerichte'][:3]])
+
+# Fassung fürs Repo (data/unterwegs-ketten.json): eine Zeile je Gericht, damit Aktualisierungen im Diff lesbar bleiben
+zeilen = ['{', ' "format": "elan-unterwegs",', ' "version": 1,',
+          ' "quelle": ' + json.dumps("Subway: offizielles PDF Nov. 2026. Alle anderen über nutriscan.app nach den Angaben der Ketten (Okt. 2026). Einzelquellen: tools/ketten-listen.py", ensure_ascii=False) + ',',
+          f' "stand": "{STAND}",',
+          ' "hinweis": "Werte je Portion. Quellen je Kette: ' + '; '.join(f"{k}: {d['quelle']}" for k, d in listen.items()).replace('"', "'") + '. Rezepturen ändern sich: im Zweifel gilt die Angabe im Restaurant.",',
+          ' "restaurants": [']
+for i, r in enumerate(alle):
+    zeilen.append(f'  {{ "name": {json.dumps(r["name"], ensure_ascii=False)}, "gerichte": [')
+    zeilen += ['   ' + json.dumps(g, ensure_ascii=False) + (',' if j < len(r['gerichte']) - 1 else '') for j, g in enumerate(r['gerichte'])]
+    zeilen.append('  ] }' + (',' if i < len(alle) - 1 else ''))
+zeilen += [' ]', '}']
+open(f'{ordner}/unterwegs-ketten.json', 'w', encoding='utf-8').write('\n'.join(zeilen) + '\n')
+json.load(open(f'{ordner}/unterwegs-ketten.json', encoding='utf-8'))
+print('Repo-Fassung geschrieben:', sum(len(r['gerichte']) for r in alle), 'Gerichte, Stand', STAND)

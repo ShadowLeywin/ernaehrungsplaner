@@ -3,7 +3,7 @@
 // einer Datei (docs/UNTERWEGS-FORMAT.md). Elan liefert keine Werte von Ketten mit: die ändern sich, und
 // ein falscher Nährwert ist schlimmer als keiner.
 
-import { FRUEHSTUECKS_SLOTS, ZIELE_VORSCHLAG, bereinigeGerichte, fuegeZusammen, korbEintraege, korbSumme, leseUnterwegsDatei, mischeKetten, offeneKcal, pruefeGericht, restaurants, setzeGericht, vorschlaege } from '../logik/unterwegs.js';
+import { FRUEHSTUECKS_SLOTS, ZIELE_VORSCHLAG, bereinigeGerichte, fuegeZusammen, korbEintraege, korbSumme, leseUnterwegsDatei, mischeKetten, nullGetraenke, offeneKcal, pruefeGericht, restaurants, setzeGericht, vorschlaege } from '../logik/unterwegs.js';
 import { formatKurz } from '../logik/datum.js';
 import { SLOTS, tagestypFuer } from '../logik/ziele.js';
 import { parseZahl } from '../logik/zutat.js';
@@ -86,7 +86,7 @@ export async function zeigeUnterwegs({ b, datum, slot, beiFertig, korb = new Map
       if (!r.ok) { hinweis(r.fehler); return; }
       await sichere(fuegeZusammen(await ladeGerichte(), r.gerichte));
       const anzahlR = restaurants(r.gerichte).length;
-      hinweis(`${r.gerichte.length} Gerichte von ${anzahlR} ${anzahlR === 1 ? 'Restaurant' : 'Restaurants'} geladen${r.stand ? `, Stand ${formatKurz(r.stand)}` : ''}${r.verworfen ? `; ${r.verworfen} ohne brauchbare Werte übersprungen` : ''}.`);
+      hinweis(`${r.gerichte.length} Gerichte von ${anzahlR} ${anzahlR === 1 ? 'Restaurant' : 'Restaurants'} geladen${r.stand ? `, Stand ${formatKurz(r.stand.slice(0, 10))}` : ''}${r.verworfen ? `; ${r.verworfen} ohne brauchbare Werte übersprungen` : ''}.`);
       neuZeigen();
     },
   });
@@ -153,15 +153,19 @@ export async function zeigeUnterwegs({ b, datum, slot, beiFertig, korb = new Map
   const zeigeVorschlaege = () => {
     // Frühstücksartikel (McMuffin, Pancakes …) nur, wenn für Frühstück oder Morgensnack eingetragen wird
     const treffer = vorschlaege(gerichte, { restaurant: gewaehlt, budget: budgetWert, ziel: zielVorschlag, fruehstueck: FRUEHSTUECKS_SLOTS.includes(slot) });
+    // Getränk ohne Kalorien als Tipp: ändert das Budget nicht, ein Tipp nimmt Vorschlag und Getränk zusammen
+    const getraenke = nullGetraenke(gerichte, gewaehlt);
+    const uebernimm = (ids) => { korb.clear(); for (const id of ids) korb.set(id, 1); modus = 'selbst'; neuZeigen(); };
     vorschlagListe.replaceChildren(...(treffer.length ? treffer.map((v, i) => el('div', { class: 'vorschlag' },
       el('div', { class: 'vorschlag-kopf' },
         el('strong', {}, `${zahl(v.kcal)} kcal`),
         el('span', { class: 'klein' }, [['E', v.protein], ['K', v.kh], ['F', v.fett]].filter(([, w]) => w > 0).map(([k, w]) => `${k} ${gramm(w)} g`).join(' · '))),
       el('ul', { class: 'vorschlag-teile' }, v.gerichte.map((g) => el('li', {}, g.name, el('small', {}, ` ${zahl(g.kcal)} kcal`)))),
-      el('button', {
-        type: 'button', class: 'knopf leise', id: `vorschlag-${i}`,
-        onclick: () => { korb.clear(); for (const id of v.ids) korb.set(id, 1); modus = 'selbst'; neuZeigen(); },
-      }, 'Übernehmen')))
+      el('div', { class: 'vorschlag-aktionen' },
+        el('button', { type: 'button', class: 'knopf leise', id: `vorschlag-${i}`, onclick: () => uebernimm(v.ids) }, 'Übernehmen'),
+        getraenke.map((d) => el('button', {
+          type: 'button', class: 'chip getraenk', 'aria-label': `Übernehmen mit ${d.name}`, onclick: () => uebernimm([...v.ids, d.id]),
+        }, `+ ${d.name}`)))))
       : [el('p', { class: 'leer' }, gerichte.some((g) => g.restaurant === gewaehlt && g.kcal <= budgetWert)
         ? 'Keine Kombination nutzt das Budget zu mindestens 60 %. Leg mehr Gerichte an oder senk das Budget.'
         : `Bei ${gewaehlt} passt nichts in ${zahl(budgetWert)} kcal.`)]));

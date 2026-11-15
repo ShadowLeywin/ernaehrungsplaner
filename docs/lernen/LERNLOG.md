@@ -324,3 +324,11 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Befehle:** `npm test` (202; `test/projekt.test.js` meldete die fehlende Datei in `sw.js` sofort) · `node tools/pruefe-app.cjs` (141 Kriterien).
 - **Entscheidung:** Frühstück am Namen erkennen (McMuffin, Pancake, Rührei, Morning, McGriddle, Breakfast, King Toasty) und an der Mahlzeit statt an der Uhrzeit: Öffnungszeiten fürs Frühstück sind nicht belegt [vermutet bis 10:30], die Mahlzeit ist eindeutig und testbar. Erster Entwurf mit „egg“ traf „Veggie“; deshalb nur eindeutige Wörter.
 - **Fachbegriffe:** Daten-Stand (Versionsdatum einer mitgelieferten Liste), Einmischen (Merge mit Vorrang der neueren Liste für gleiche Schlüssel).
+
+## Session 14, Runde 13: Mehr Ketten, Getränk-Tipp, Aktualisierung (15.11.2026)
+
+- **Was und warum:** Léon: „Setze alles um.“ Vier weitere Ketten mit deutscher Karte (dean&david, Hans im Glück, Peter Pane, Coffee Fellows), zusammen 1.026 Gerichte. Getränk ohne Kalorien als Chip an jedem Vorschlag (`nullGetraenke`). Vierteljährliche geplante Aufgabe, die die Listen neu baut und einen PR anlegt.
+- **Entscheidung:** Sieben weitere Ketten bei nutriscan nutzen nur US- oder kanadische Karten. Sie fehlen bewusst: andere Rezepturen und Portionen, lieber kein Wert als ein falscher.
+- **Fehler:** Die Obergrenze von 1.000 Gerichten schnitt 26 ab (Elans Leser meldete „verworfen 26“); jetzt 3.000. Extras wie „Whey Protein“, „Collagen Matcha“, „Americano (Medium)“ landeten in Vorschlägen; Liste der Ausschlusswörter erweitert, Größen in Klammern gelten als Getränk. Geräte mit Stand „2026-11-15“ hätten die neuen Ketten nicht bekommen: `stand` darf jetzt eine Uhrzeit haben.
+- **Fehler:** Knöpfe auf der Vorschlagskarte waren unsichtbar (gleiche Farbe wie die Karte), die Theme-Regel gewann bei gleicher Spezifität, weil sie später steht. Lösung: `:root[data-thema]` davor.
+- **Befehle:** `python3 -I tools/ketten-listen.py <ordner> 2026-11-15T16:00` (Liste bauen) · `npm test` (203) · `node tools/pruefe-app.cjs` (141).
