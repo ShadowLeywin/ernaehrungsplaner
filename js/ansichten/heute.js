@@ -84,15 +84,27 @@ let fabBeobachtet = false;
 function beobachteFab() {
   if (fabBeobachtet) return null;
   fabBeobachtet = true;
+  // Richtung mit Puffer: verschwindet nach 12 px nach unten, kommt erst nach 48 px nach oben zurück.
+  // So lassen kleine Gegenbewegungen (Finger zittert, Wischen federt aus) den Knopf in Ruhe.
+  // Oben und am Ende ist er immer da; am Ende hält der Abstand unter der Seite ihm Platz frei.
   let zuletzt = window.scrollY;
-  window.addEventListener('scroll', () => {
+  let strecke = 0;
+  let geplant = false;
+  const pruefe = () => {
+    geplant = false;
     const fab = document.querySelector('.fab');
-    const y = window.scrollY;
-    if (!fab || Math.abs(y - zuletzt) < 6) return;
-    const amEnde = y + window.innerHeight >= document.documentElement.scrollHeight - 40;
-    fab.classList.toggle('weg', y > zuletzt && y > 120 && !amEnde);
+    const y = Math.max(0, window.scrollY);
+    const schritt = y - zuletzt;
     zuletzt = y;
-  }, { passive: true });
+    if (!fab || schritt === 0) return;
+    strecke = Math.sign(schritt) === Math.sign(strecke) ? strecke + schritt : schritt;
+    const amEnde = y + window.innerHeight >= document.documentElement.scrollHeight - 24;
+    if (y < 120 || amEnde) fab.classList.remove('weg');
+    else if (strecke > 12) fab.classList.add('weg');
+    else if (strecke < -48) fab.classList.remove('weg');
+  };
+  // Einmal je Bild statt bei jedem Scroll-Ereignis
+  window.addEventListener('scroll', () => { if (!geplant) { geplant = true; requestAnimationFrame(pruefe); } }, { passive: true });
   return null;
 }
 

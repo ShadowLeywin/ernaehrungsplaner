@@ -276,3 +276,10 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Entscheidung:** „Energie Ø“ im Rückblick heißt jetzt „Kalorien Ø“, damit es nicht mit der gefühlten Energie aus dem Check-in verwechselt wird.
 - **Fehler:** Test las den Schalter, bevor die Seite neu gezeichnet war. Lösung: erst speichern, dann Hinweis zeigen; im Test auf den Schalter warten. Zweiter Fehler: Kachel-Zählung nahm „2 Körperwerte“ fest an; jetzt gezählt.
 - **Fachbegriffe:** lokale Benachrichtigung (plant das Handy selbst, ohne Server), HRV (Schwankung der Abstände zwischen Herzschlägen, in ms).
+
+## Session 14, Runde 7: Plus-Knopf stand über dem Inhalt (15.11.2026)
+
+- **Was und warum:** Léon (mit Bildschirmfoto): Der Plus-Knopf „steht oft schlecht davor“. Ursache: Der Seitenübergang lief mit `animation-fill-mode: both` und ließ `transform` an der Seite stehen. Ein Vorfahr mit `transform` wird zum Bezug für `position: fixed`; der Knopf hing deshalb an der Seite statt am Bildschirm und lag am Seitenende über dem Check-in.
+- **Befehle:** Messskript mit Playwright (`getBoundingClientRect` von Knopf und Leiste) · Gegenprobe mit `git stash` (alter Stand: Knopf 1.712 px unter dem Bild) · `node tools/pruefe-app.cjs` (139 Kriterien).
+- **Lösung:** `backwards` statt `both`, der Knopf blendet erst nach dem Übergang ein. Dazu ein Puffer: Er verschwindet nach 12 px nach unten und kommt erst nach 48 px nach oben zurück, geprüft einmal je Bild (`requestAnimationFrame`).
+- **Fachbegriffe:** Containing Block (Bezugsrahmen für die Lage eines Elements), Hysterese (Puffer, damit kleine Gegenbewegungen nichts umschalten).
