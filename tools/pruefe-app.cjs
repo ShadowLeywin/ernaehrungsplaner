@@ -916,7 +916,13 @@ async function healthLauf(browser) {
   // Unterwegs-Rechner: Gerichte anlegen, Bestellung zusammentippen, eintragen, Rückgängig; Liste aus Datei laden
   await seite.getByRole('button', { name: 'Zu Abendessen hinzufügen' }).click();
   await seite.locator('#unterwegs-oeffnen').click();
-  const leerText = await seite.locator('dialog .leer').innerText();
+  // Mitgelieferte Ketten sind ohne Datei da; Frühstück (McMuffin) wird fürs Abendessen nicht vorgeschlagen
+  await seite.getByRole('button', { name: "McDonald's" }).click();
+  const kettenAnfang = await seite.locator('.unterwegs-restaurants .chip').allInnerTexts();
+  await seite.locator('#f-unterwegs-budget').fill('600');
+  await seite.locator('.vorschlag').first().waitFor();
+  await seite.waitForTimeout(400);
+  const mcdVorschlaege = (await seite.locator('#vorschlaege').innerText()).replace(/\s+/g, ' ');
   const gerichtAnlegen = async (restaurant, name, kcal, protein) => {
     await seite.locator('#gericht-neu').click();
     await seite.locator('#f-schnell-restaurant').fill(restaurant);
@@ -974,10 +980,10 @@ async function healthLauf(browser) {
   await seite.locator('dialog').waitFor({ state: 'detached' });
   pruefe('Unterwegs: Vorschläge fürs Budget übernehmen, Bestellung eintragen, Liste aus Datei laden',
     /650 kcal E 33 g/.test(ersterVorschlag) && /Testburger/.test(ersterVorschlag) && /Salat/.test(ersterVorschlag) && /^650 kcal · 2 Gerichte · E 33 g/.test(uebernommen) &&
-    /Leg einmal an/.test(leerText) && /1\.330 kcal · 3 Gerichte · E 54 g$/.test(korbText) && nochDa === '2'
+    kettenAnfang.join() === "Burger King,KFC,McDonald's,Subway" && /kcal/.test(mcdVorschlaege) && !/McMuffin|Pancake/.test(mcdVorschlaege) && /1\.330 kcal · 3 Gerichte · E 54 g$/.test(korbText) && nochDa === '2'
       && /2× Testburger/.test(abend) && /Testgrill/.test(abend) && /Pommes M/.test(abend) && !/Wrap/.test(abend)
-      && /2 Gerichte von 1 Restaurant geladen, Stand 01\.11\.2026; 1 ohne brauchbare Werte/.test(geladen) && chips.join() === 'Dateigrill,Testgrill,Wrapladen',
-    `Vorschlag „${ersterVorschlag}“, übernommen „${uebernommen}“; Korb „${korbText}“ (Burger ${nochDa}); Abendessen „${abend.slice(0, 120)}“; Datei: „${geladen}“; Restaurants ${chips.join(', ')}`);
+      && /2 Gerichte von 1 Restaurant geladen, Stand 01\.11\.2026; 1 ohne brauchbare Werte/.test(geladen) && chips.join() === "Burger King,Dateigrill,KFC,McDonald's,Subway,Testgrill,Wrapladen",
+    `Ketten ${kettenAnfang.join(', ')}; McDonald's 600 kcal: „${mcdVorschlaege.slice(0, 90)}…“; Vorschlag „${ersterVorschlag}“, übernommen „${uebernommen}“; Korb „${korbText}“ (Burger ${nochDa}); Abendessen „${abend.slice(0, 120)}“; Datei: „${geladen}“; Restaurants ${chips.join(', ')}`);
 
   // Körpermaße: Kacheln wie beim Maßband, Eintragen im Blatt, eigenes Maß mit Namen
   await seite.goto(`${URL_APP}#/fortschritt`);

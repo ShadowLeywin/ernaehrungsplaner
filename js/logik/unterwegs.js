@@ -115,10 +115,11 @@ const wert = (g, w) => (typeof g[w] === 'number' ? g[w] : 0);
  * eine schlechtere Obermenge einer besseren sind.
  * Durchprobieren findet sicher das Beste; nach kcal sortiert bricht jede Schleife ab, sobald das Budget gesprengt ist.
  */
-export function vorschlaege(gerichte, { restaurant, budget, ziel = 'eiweiss', maxTeile = 3, anzahl = 5, untergrenze = 0.6 }) {
+export function vorschlaege(gerichte, { restaurant, budget, ziel = 'eiweiss', maxTeile = 3, anzahl = 5, untergrenze = 0.6, fruehstueck = true }) {
   if (!(budget > 0)) return [];
   // Nach kcal aufsteigend: Sobald eine Summe das Budget sprengt, sind alle weiteren in der Schleife zu groß (früher Abbruch)
-  const auswahl = gerichte.filter((g) => g.restaurant === restaurant && g.kcal > 0 && g.kcal <= budget && !istGetraenkOderSauce(g.name)).sort((a, b) => a.kcal - b.kcal);
+  const auswahl = gerichte.filter((g) => g.restaurant === restaurant && g.kcal > 0 && g.kcal <= budget && !istGetraenkOderSauce(g.name)
+    && (fruehstueck || !istFruehstueck(g.name))).sort((a, b) => a.kcal - b.kcal);
   const n = auswahl.length;
   const kcal = auswahl.map((g) => g.kcal);
   const werte = auswahl.map((g) => WERTE.map((w) => wert(g, w))); // [kcal, protein, kh, fett]
@@ -179,3 +180,21 @@ export function offeneKcal({ zielKcal, slots, slot, eintraege }) {
   const anteil = slots.find((s) => s.id === slot)?.anteil ?? 0;
   return { mahlzeit: runde(zielKcal * anteil - kcal(eintraege.filter((e) => e.slot === slot))), tag: runde(zielKcal - kcal(eintraege)) };
 }
+
+/* ---------- Mitgelieferte Ketten-Listen ---------- */
+
+/**
+ * Mitgelieferte Liste (data/unterwegs-ketten.json) in die eigene einmischen, wenn sie neu ist oder einen neueren
+ * Stand hat. Gleiche Gerichte (Restaurant + Name) übernimmt die Liste mit neuen Werten; eigene bleiben unberührt.
+ * Ergebnis { gerichte, stand, geaendert }. Wer ein Ketten-Gericht löscht, bekommt es erst mit dem nächsten Stand zurück.
+ */
+export function mischeKetten(eigene, paket, gespeicherterStand) {
+  const datei = leseUnterwegsDatei(paket);
+  if (!datei.ok || !datei.stand || (gespeicherterStand && gespeicherterStand >= datei.stand)) return { gerichte: eigene, stand: gespeicherterStand ?? null, geaendert: false };
+  return { gerichte: fuegeZusammen(eigene, datei.gerichte), stand: datei.stand, geaendert: true };
+}
+
+// Frühstück gibt es meist nur vormittags: solche Artikel nur für Frühstück und Morgensnack vorschlagen
+const FRUEHSTUECK = /mcmuffin|pancake|rührei|morning|mcgriddle|breakfast|frühstück|king toasty/i;
+export const istFruehstueck = (name) => FRUEHSTUECK.test(name);
+export const FRUEHSTUECKS_SLOTS = ['fruehstueck', 'morgensnack'];

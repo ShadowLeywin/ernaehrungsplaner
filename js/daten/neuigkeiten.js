@@ -5,6 +5,15 @@ export const NEUIGKEITEN = [
   {
     version: '1.0.0',
     datum: '2026-11-15',
+    titel: 'Fast-Food-Ketten dabei',
+    punkte: [
+      'Unterwegs kennt jetzt McDonald\'s, Burger King, KFC und Subway: 485 Gerichte mit Kalorien und Makros, ohne Datei laden. Quellen und Stand stehen in der Liste; im Zweifel gilt die Angabe im Restaurant.',
+      'Frühstücksartikel wie McMuffin oder Pancakes schlägt Elan nur fürs Frühstück und den Morgensnack vor.',
+    ],
+  },
+  {
+    version: '1.0.0',
+    datum: '2026-11-15',
     titel: 'Unterwegs-Rechner',
     punkte: [
       'Unterwegs-Vorschläge: Sag, wie viel du offen hast (Elan schlägt vor, was für die Mahlzeit oder den Tag noch frei ist), wähl „Viel Eiweiß“, „Mager“ (Eiweiß minus Fett) oder „Budget voll“, und Elan zeigt passende Kombinationen aus bis zu drei Gerichten, ohne Getränke und Saucen. „Übernehmen“ legt sie in die Bestellung.',
@@ -158,7 +167,7 @@ export const FUNKTIONEN = [
   { titel: 'Rezepte', text: 'Zutaten, Portionen und Schritte, je Schritt mit „Prinzip dahinter“. Meal-Prep mit Gewicht nach dem Kochen und Haltbarkeit. Import aus Text.' },
   { titel: 'Zutaten', text: '184 Lebensmittel sind dabei, eigene kommen dazu. Suche bei Open Food Facts nur auf Knopfdruck. Die Mag-Liste merkt sich, was du (nicht) magst.' },
   { titel: 'Fortschritt', text: 'Rückblick der Woche, Gewicht mit 7-Tage-Schnitt gegen dein Wochenziel, Ruhepuls und HRV, alle Körpermaße als Kacheln, Verläufe, Laborwerte und Symptome. Eingetragen wird auf „Heute“.' },
-  { titel: 'Unterwegs', text: 'Im Restaurant oder Imbiss: Vorschläge, was in deine offenen Kalorien passt, sortiert nach Eiweiß, Fett oder Budget. Oder die Bestellung selbst zusammentippen und auf einmal eintragen. Gerichte selbst anlegen oder als Liste laden.' },
+  { titel: 'Unterwegs', text: 'Im Restaurant oder Imbiss: Vorschläge, was in deine offenen Kalorien passt, sortiert nach Eiweiß, Fett oder Budget. Oder die Bestellung selbst zusammentippen und auf einmal eintragen. McDonald\'s, Burger King, KFC und Subway sind dabei; weitere Gerichte selbst anlegen oder als Liste laden.' },
   { titel: 'Check-in', text: 'Energie, Stimmung und Stress je Tag mit einem Tipp, im Rückblick als Wochenschnitt. Die App deutet die Werte nicht.' },
   { titel: 'Erinnerungen (Android)', text: 'Wasser, Supplements und Check-in zu festen Uhrzeiten, geplant auf dem Handy, ohne Server.' },
   { titel: 'Health Connect (Android)', text: 'Schritte, Gewicht, Schlaf, Ruhepuls, Körperfett und HRV übernehmen; ein Krafttraining setzt den Tagestyp. Nur lesen, nur auf dein Ja; eigene Eingaben gehen vor.' },

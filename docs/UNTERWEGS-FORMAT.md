@@ -3,8 +3,9 @@
 Mit dieser Datei lädt man Gerichte von Restaurants und Imbissen in den Unterwegs-Rechner
 (Eintragen → „Unterwegs“ → „Liste aus Datei laden“). Prüfung und Einlesen: `leseUnterwegsDatei` in `js/logik/unterwegs.js`.
 
-Elan liefert keine Werte von Ketten mit. Rezepturen ändern sich, und ein falscher Nährwert ist schlimmer als keiner.
-Wer eine Liste baut, nimmt die Werte aus der offiziellen Nährwerttabelle des Restaurants und trägt Quelle und Datum ein.
+Seit 15.11.2026 liefert Elan eine Liste mit (`data/unterwegs-ketten.json`: McDonald's, Burger King, KFC, Subway; gebaut mit `tools/ketten-listen.py`).
+Sie wird beim ersten Öffnen von „Unterwegs“ und bei jedem neueren `stand` automatisch eingemischt. Eigene Listen für andere Restaurants
+nehmen die Werte aus der offiziellen Nährwerttabelle des Restaurants und tragen Quelle und Datum ein.
 
 ## Aufbau
 

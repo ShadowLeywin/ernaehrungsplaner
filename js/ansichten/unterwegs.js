@@ -3,7 +3,7 @@
 // einer Datei (docs/UNTERWEGS-FORMAT.md). Elan liefert keine Werte von Ketten mit: die ändern sich, und
 // ein falscher Nährwert ist schlimmer als keiner.
 
-import { ZIELE_VORSCHLAG, bereinigeGerichte, fuegeZusammen, korbEintraege, korbSumme, leseUnterwegsDatei, offeneKcal, pruefeGericht, restaurants, setzeGericht, vorschlaege } from '../logik/unterwegs.js';
+import { FRUEHSTUECKS_SLOTS, ZIELE_VORSCHLAG, bereinigeGerichte, fuegeZusammen, korbEintraege, korbSumme, leseUnterwegsDatei, mischeKetten, offeneKcal, pruefeGericht, restaurants, setzeGericht, vorschlaege } from '../logik/unterwegs.js';
 import { formatKurz } from '../logik/datum.js';
 import { SLOTS, tagestypFuer } from '../logik/ziele.js';
 import { parseZahl } from '../logik/zutat.js';
@@ -24,6 +24,24 @@ async function ladeOffen(datum, slot) {
 }
 
 const ladeGerichte = async () => bereinigeGerichte(await speicher.einstellung('unterwegs'));
+
+/**
+ * Mitgelieferte Ketten (data/unterwegs-ketten.json, liegt im App-Cache, kein Netz nötig) beim ersten Öffnen und bei
+ * jedem neueren Stand in die eigene Liste einmischen. Klappt das Laden nicht, geht es mit der eigenen Liste weiter.
+ */
+async function ladeMitKetten() {
+  const [eigene, stand] = await Promise.all([ladeGerichte(), speicher.einstellung('unterwegsStand')]);
+  try {
+    const antwort = await fetch('./data/unterwegs-ketten.json');
+    if (!antwort.ok) return eigene;
+    const r = mischeKetten(eigene, await antwort.json(), stand);
+    if (!r.geaendert) return eigene;
+    await Promise.all([sichere(r.gerichte), speicher.setzeEinstellung('unterwegsStand', r.stand)]);
+    return r.gerichte;
+  } catch {
+    return eigene;
+  }
+}
 const sichere = (gerichte) => speicher.setzeEinstellung('unterwegs', gerichte);
 const kurzWerte = (g) => [`${zahl(g.kcal)} kcal`, typeof g.protein === 'number' ? `E ${gramm(g.protein)} g` : null].filter(Boolean).join(' · ');
 
@@ -32,7 +50,7 @@ const kurzWerte = (g) => [`${zahl(g.kcal)} kcal`, typeof g.protein === 'number' 
  * Restaurants und das Anlegen eines Gerichts, nicht aber das Schließen des Blatts.
  */
 export async function zeigeUnterwegs({ b, datum, slot, beiFertig, korb = new Map(), budget = null }) {
-  const [gerichte, offen] = await Promise.all([ladeGerichte(), ladeOffen(datum, slot)]);
+  const [gerichte, offen] = await Promise.all([ladeMitKetten(), ladeOffen(datum, slot)]);
   // Budget: was für diese Mahlzeit offen ist; ist sie schon voll, was für den Tag offen ist
   let budgetWert = budget ?? (offen.mahlzeit || offen.tag || 600);
   const namen = restaurants(gerichte);
@@ -133,7 +151,8 @@ export async function zeigeUnterwegs({ b, datum, slot, beiFertig, korb = new Map
   /* Vorschläge: Budget eingeben, Sortierung wählen, passende Kombinationen sehen und übernehmen */
   const vorschlagListe = el('div', { class: 'stapel vorschlag-liste', 'aria-live': 'polite', id: 'vorschlaege' });
   const zeigeVorschlaege = () => {
-    const treffer = vorschlaege(gerichte, { restaurant: gewaehlt, budget: budgetWert, ziel: zielVorschlag });
+    // Frühstücksartikel (McMuffin, Pancakes …) nur, wenn für Frühstück oder Morgensnack eingetragen wird
+    const treffer = vorschlaege(gerichte, { restaurant: gewaehlt, budget: budgetWert, ziel: zielVorschlag, fruehstueck: FRUEHSTUECKS_SLOTS.includes(slot) });
     vorschlagListe.replaceChildren(...(treffer.length ? treffer.map((v, i) => el('div', { class: 'vorschlag' },
       el('div', { class: 'vorschlag-kopf' },
         el('strong', {}, `${zahl(v.kcal)} kcal`),
@@ -170,7 +189,7 @@ export async function zeigeUnterwegs({ b, datum, slot, beiFertig, korb = new Map
       onclick: (e) => { zielVorschlag = z.id; for (const k of e.currentTarget.parentElement.children) k.setAttribute('aria-pressed', String(k === e.currentTarget)); zeigeVorschlaege(); },
     }, z.name))),
     vorschlagListe,
-    el('p', { class: 'klein' }, 'Kombinationen aus bis zu drei Gerichten, die dein Budget zu 60 bis 100 % nutzen, ohne Getränke und Saucen (die nimmst du unter „Selbst wählen“ dazu). Elan sortiert nur nach deiner Wahl, ohne zu bewerten.'));
+    el('p', { class: 'klein' }, 'Kombinationen aus bis zu drei Gerichten, die dein Budget zu 60 bis 100 % nutzen, ohne Getränke und Saucen (die nimmst du unter „Selbst wählen“ dazu); Frühstück nur morgens. Werte der Ketten: Stand laut Liste, im Zweifel gilt die Angabe im Restaurant. Elan sortiert nur nach deiner Wahl, ohne zu bewerten.'));
 
   const modusWahl = el('div', { class: 'wahl', role: 'group', 'aria-label': 'Ansicht' }, [['vorschlag', 'Vorschläge'], ['selbst', 'Selbst wählen']].map(([id, name]) => el('button', {
     type: 'button', class: 'wahl-knopf', 'aria-pressed': String(id === modus), onclick: () => { modus = id; neuZeigen(); },
