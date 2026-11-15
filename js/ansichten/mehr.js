@@ -344,17 +344,26 @@ function backupBereich(letztesBackup, daten) {
   };
 
   const dateiWahl = el('input', { type: 'file', accept: 'application/json,.json', class: 'unsichtbar', id: 'f-backup-datei', onchange: einspielen });
-  return el('section', { class: 'bereich' },
-    el('h2', {}, 'Backup'),
-    el('p', {}, istApp()
-      ? 'Deine Daten liegen nur in dieser App. Deinstallierst du sie oder geht das Handy verloren, sind sie weg. Ein Backup ist eine Datei, die du selbst aufbewahrst.'
-      : 'Deine Daten liegen nur in diesem Browser. Löscht der Browser seinen Speicher, sind sie weg. Ein Backup ist eine Datei, die du selbst aufbewahrst.'),
-    el('p', { class: 'klein' }, `Auf diesem Gerät: ${zaehle(anzahl)}.`),
-    el('p', { class: letztesBackup ? 'klein' : 'merkzettel' }, letztesBackup ? `Letztes Backup: ${formatKurz(letztesBackup)}.` : 'Du hast noch kein Backup gespeichert.'),
-    el('div', { class: 'knopfreihe' },
-      el('label', { class: 'knopf leise', for: 'f-backup-datei' }, 'Backup einspielen'),
-      dateiWahl,
-      el('button', { type: 'button', class: 'knopf', onclick: sichern }, 'Backup speichern')));
+  // Zeilen statt Fließtext: Stand oben, die Erklärung klein darunter, Aktionen am Ende
+  const wert = (titel, text) => el('div', { class: 'ezeile' }, el('span', { class: 'ezeile-text' }, titel), el('span', { class: 'ezeile-wert klein' }, text));
+  return [
+    gruppe({
+      titel: 'Stand',
+      fuss: istApp()
+        ? 'Deine Daten liegen nur in dieser App. Deinstallierst du sie oder geht das Handy verloren, sind sie weg. Ein Backup ist eine Datei, die du selbst aufbewahrst.'
+        : 'Deine Daten liegen nur in diesem Browser. Löscht der Browser seinen Speicher, sind sie weg. Ein Backup ist eine Datei, die du selbst aufbewahrst.',
+    },
+    wert('Letztes Backup', letztesBackup ? formatKurz(letztesBackup) : 'noch keins'),
+    wert('Einträge', zahl(anzahl.eintraege)),
+    wert('Rezepte', zahl(anzahl.rezepte)),
+    wert('Körperwerte', zahl(anzahl.messungen))),
+    !letztesBackup ? el('p', { class: 'merkzettel' }, 'Du hast noch kein Backup gespeichert.') : null,
+    el('div', { class: 'einstell-knoepfe' },
+      el('button', { type: 'button', class: 'knopf', onclick: sichern }, 'Backup speichern'),
+      el('label', { class: 'textlink', for: 'f-backup-datei' }, 'Backup einspielen'),
+      dateiWahl),
+    el('p', { class: 'klein backup-alles' }, `Im Backup steckt alles: ${zaehle(anzahl)}.`),
+  ];
 }
 
 /* ---------- Coach-Export ---------- */
@@ -393,12 +402,12 @@ function coachBereich() {
       if (ausgabe.childElementCount) erstelle();
     },
   }, name);
-  return el('section', { class: 'bereich' },
-    el('h2', {}, 'Coach-Export'),
-    el('p', {}, 'Ein Wochenbericht als Text: Ernährung, Gewicht, Alltag, Supplements und Symptome. Zum Einfügen in einen Chat mit deinem Coach oder einer KI.'),
-    el('p', { class: 'klein' }, 'Der Bericht enthält Gesundheitsdaten. Die App sendet ihn nirgendwohin; du entscheidest, wohin du ihn kopierst.'),
+  return el('div', { class: 'einstellungen' },
     el('div', { class: 'wahl', role: 'group', 'aria-label': 'Woche für den Bericht' }, wahl('diese', 'Diese Woche'), wahl('letzte', 'Letzte Woche')),
-    el('div', { class: 'knopfreihe' }, el('button', { type: 'button', class: 'knopf leise', onclick: erstelle }, 'Bericht erstellen')),
+    el('div', { class: 'egruppe-fuss coach-erklaerung' },
+      el('p', {}, 'Ein Wochenbericht als Text: Ernährung, Gewicht, Alltag, Supplements und Symptome. Zum Einfügen in einen Chat mit deinem Coach oder einer KI.'),
+      el('p', {}, 'Der Bericht enthält Gesundheitsdaten. Die App sendet ihn nirgendwohin; du entscheidest, wohin du ihn kopierst.')),
+    el('div', { class: 'einstell-knoepfe' }, el('button', { type: 'button', class: 'knopf', onclick: erstelle }, 'Bericht erstellen')),
     ausgabe);
 }
 
@@ -411,7 +420,7 @@ function coachBereich() {
  * Elan liest dort nur Schritte, Gewicht und Schlaf, nur nach deinem Ja, und schreibt nichts zurück.
  */
 async function healthConnectBereich() {
-  const erklaerung = 'Elan liest nur Schritte, Gewicht und Schlaf der letzten 30 Tage, nichts sonst, und schreibt nichts zurück. Eigene Eingaben in Elan gehen immer vor. Die Daten bleiben auf dem Handy.';
+  const erklaerung = 'Elan liest nur Schritte, Gewicht, Schlaf, Ruhepuls, Körperfett und Trainings (für den Tagestyp) der letzten 30 Tage, nichts sonst, und schreibt nichts zurück. Eigene Eingaben in Elan gehen immer vor. Die Daten bleiben auf dem Handy.';
   if (!istApp()) {
     return gruppe({ fuss: [el('p', {}, 'Health Connect gibt es nur in der Android-App.'), el('p', {}, erklaerung)] },
       el('div', { class: 'ezeile' }, el('span', { class: 'ezeile-text' }, 'Im Browser nicht verfügbar')));
@@ -472,18 +481,17 @@ function darstellungBereich() {
 
 function speicherBereich(status) {
   if (!status.bekannt) return null;
-  const belegt = status.belegt === null ? '' : ` Belegt sind ${zahl(status.belegt / 1024 / 1024, 1)} MB.`;
   const schuetzen = async () => {
     const ok = await speicher.sichereSpeicher();
     hinweis(ok ? 'Der Speicher ist jetzt geschützt.' : 'Der Browser hat abgelehnt. Installiere die App auf dem Startbildschirm und versuche es erneut.');
     neuZeichnen();
   };
-  return el('section', { class: 'bereich' },
-    el('h2', {}, 'Speicher'),
-    status.dauerhaft
-      ? el('p', {}, `Der Browser räumt die Daten dieser App nicht von selbst auf.${belegt}`)
-      : el('p', {}, `Bei knappem Speicherplatz darf der Browser die Daten dieser App löschen.${belegt}`),
-    status.dauerhaft ? null : el('div', { class: 'knopfreihe' }, el('button', { type: 'button', class: 'knopf leise', onclick: schuetzen }, 'Speicher schützen')));
+  return [
+    gruppe({ titel: 'Speicher', fuss: status.dauerhaft ? 'Der Browser räumt die Daten dieser App nicht von selbst auf.' : 'Bei knappem Speicherplatz darf der Browser die Daten dieser App löschen.' },
+      el('div', { class: 'ezeile' }, el('span', { class: 'ezeile-text' }, 'Geschützt'), el('span', { class: 'ezeile-wert klein' }, status.dauerhaft ? 'ja' : 'nein')),
+      status.belegt !== null ? el('div', { class: 'ezeile' }, el('span', { class: 'ezeile-text' }, 'Belegt'), el('span', { class: 'ezeile-wert klein' }, `${zahl(status.belegt / 1024 / 1024, 1)} MB`)) : null),
+    status.dauerhaft ? null : el('div', { class: 'einstell-knoepfe' }, el('button', { type: 'button', class: 'knopf leise', onclick: schuetzen }, 'Speicher schützen')),
+  ];
 }
 
 function ueberBereich() {

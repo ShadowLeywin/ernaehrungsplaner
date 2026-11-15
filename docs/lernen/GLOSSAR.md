@@ -77,3 +77,4 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | Health Connect | Die Sammelstelle von Android für Gesundheitsdaten aus Apps und Geräten (Schrittzähler, Waage, Uhr). | `js/abgleich.js`, `docs/ANDROID.md` |
 | Manifest-Zusammenführung | Android führt die Manifeste aller Bibliotheken zu einem zusammen; mit `tools:node="remove"` streicht die App Einträge daraus. | `android/app/src/main/AndroidManifest.xml` |
 | MPL-2.0 | Lizenz, bei der nur Änderungen an den Dateien der Bibliothek offen bleiben müssen; die eigene App darf eine andere Lizenz haben. | Plugin `@capgo/capacitor-health` |
+| Least Privilege | Grundsatz: eine App bekommt nur die Rechte, die sie wirklich braucht. | Manifest-Einträge mit `tools:node="remove"` |

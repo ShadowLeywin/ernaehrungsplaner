@@ -858,6 +858,13 @@ async function healthLauf(browser) {
   await seite.reload({ waitUntil: 'networkidle' });
   const taille = await seite.locator('#mass-taille').innerText();
   const eigen = await seite.locator('#mass-eigen1').innerText();
+  await seite.getByRole('button', { name: 'Maße wählen' }).click();
+  await seite.locator('#f-zeige-hals').uncheck();
+  await seite.locator('dialog').getByRole('button', { name: 'Schließen' }).click();
+  await seite.locator('dialog').waitFor({ state: 'detached' });
+  await seite.locator('#mass-hals').waitFor({ state: 'detached' });
+  const nachAuswahl = await seite.locator('section[aria-label="Körpermaße"] .mass-kachel').count();
+  pruefe('Fortschritt: Maße wählbar, ausgeblendete Kachel verschwindet', nachAuswahl === kacheln - 2 - 1, `${kacheln} Kacheln (davon 2 Körperwerte), nach „Hals aus“: ${nachAuswahl}`);
   pruefe('Fortschritt: alle Körpermaße als Kacheln, Wert und eigener Name bleiben', kacheln >= 19 && taille.includes('84,5') && eigen.startsWith('Unterbauch') && eigen.includes('88'),
     `${kacheln} Kacheln; ${taille.replace(/\n/g, ' ')}; ${eigen.replace(/\n/g, ' ')}`);
   await bild(seite, '17-koerpermasse');
@@ -1243,6 +1250,9 @@ async function appLauf(browser) {
           if (methode === 'queryAggregated') return { samples: [{ startDate: heute(0), endDate: heute(23), value: 6543, unit: 'count' }] };
           if (methode === 'readSamples' && optionen.dataType === 'weight') return { samples: [{ startDate: heute(7), endDate: heute(7), value: 79.9, unit: 'kilogram' }] };
           if (methode === 'readSamples' && optionen.dataType === 'sleep') return { samples: [{ startDate: gestern(23), endDate: heute(6, 30), value: 450, unit: 'minute', sleepState: 'light' }] };
+          if (methode === 'readSamples' && optionen.dataType === 'restingHeartRate') return { samples: [{ startDate: heute(6), endDate: heute(6), value: 61, unit: 'bpm' }] };
+          if (methode === 'readSamples' && optionen.dataType === 'bodyFat') return { samples: [{ startDate: heute(7), endDate: heute(7), value: 17.8, unit: 'percent' }] };
+          if (methode === 'queryWorkouts') return { workouts: [{ workoutType: 'strengthTraining', duration: 3600, startDate: heute(10), endDate: heute(11) }] };
         }
         return {};
       },
@@ -1337,8 +1347,15 @@ async function appLauf(browser) {
   await seite.goto(`${URL_APP}#/heute`);
   await seite.locator('#f-schritte').waitFor();
   const eigenBleibt = await seite.locator('#f-schritte').inputValue();
-  pruefe('App: Health Connect liest nur Schritte, Gewicht, Schlaf; eigene Eingabe geht vor',
-    angefragt.join() === 'steps+weight+sleep' && hcWerte === '79,9|7,5|6543' && markiert === 3 && eigenBleibt === '7000',
+  const gymGewaehlt = await seite.locator('[aria-label=Tagestyp] .wahl-knopf[aria-pressed=true]').innerText();
+  const quelleHinweis = await seite.locator('.tagestyp-quelle').count();
+  await seite.goto(`${URL_APP}#/fortschritt`);
+  await seite.locator('#mass-ruhepuls').waitFor();
+  const koerperwerte = `${await seite.locator('#mass-ruhepuls .mass-wert').innerText()}|${await seite.locator('#mass-koerperfett .mass-wert').innerText()}`;
+  pruefe('App: Ruhepuls, Körperfett und Tagestyp aus dem Training übernommen', koerperwerte === '61 bpm|17,8 %' && gymGewaehlt === 'Gym' && quelleHinweis === 1,
+    `${koerperwerte}; Tagestyp ${gymGewaehlt} mit Hinweis auf Health Connect: ${quelleHinweis}`);
+  pruefe('App: Health Connect liest nur die sechs freigegebenen Arten; eigene Eingabe geht vor',
+    angefragt.join() === 'steps+weight+sleep+restingHeartRate+bodyFat+workouts' && hcWerte === '79,9|7,5|6543' && markiert === 3 && eigenBleibt === '7000',
     `angefragt ${angefragt.join()}; „${hcHinweis}“; übernommen ${hcWerte} (${markiert} markiert); nach eigener Eingabe und erneutem Abgleich: ${eigenBleibt} Schritte`);
 
   pruefe('App: Vibration beim Tippen, abschaltbar', tipp.join() === 'impact:LIGHT' && erfolg.join() === 'impact:LIGHT,notification:SUCCESS' && ohne === 0, `Wasser: ${tipp.join() || 'kein Aufruf'}; nach Eintragen: ${erfolg.join()}; aus: ${ohne} Aufrufe`);

@@ -252,3 +252,11 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Entscheidung:** Die Datenschutzseite wird in der App aus `privacypolicy.html` gelesen (`fetch` und `DOMParser`). Eine Quelle für Health Connect und die App. Verworfen: Text doppelt pflegen.
 - **Fehler:** Der Prüfpunkt für das zweite Maß fiel zweimal aus, isoliert lief er dreimal sauber. Vermutete Ursache: ein noch hinausgleitendes Blatt. Lösung: Ein neues Blatt schließt ein gleitendes sofort, dazu eine Diagnose im Test. Danach zweimal grün; die Ursache ist nicht sicher belegt.
 - **Testfalle:** `innerText` liefert Text in Großbuchstaben, wenn CSS `text-transform: uppercase` setzt.
+
+## Session 14, Runde 4: Restliche Vorschläge (15.11.2026)
+
+- **Was und warum:** Léon: „Setze deine anderen Vorschläge auch um.“ Umgesetzt: Health Connect liest zusätzlich Ruhepuls, Körperfett und Trainings (für den Tagestyp), Maße wählbar, Verlauf je Maß im Blatt, Unterseiten im Kartenstil, Backup und Coach als Listen. Nicht umgesetzt: „Mehr“ durch Zusammenlegen kürzen. Seit jede Zeile ihren Stand zeigt, wären zusammengelegte Seiten nur länger.
+- **Befehle:** `node tools/pruefe-app.cjs` (135 Kriterien) · `aapt2 dump permissions` (6 Leserechte im APK).
+- **Entscheidung:** Krafttraining = Gym, Calisthenics = Calisthenics, Laufen oder Rad setzen nichts. Lieber kein Treffer als ein falscher Tagestyp. Eigene Wahl wird als `tagestypQuelle: 'eigen'` markiert, auch wenn man „wie im Plan“ wählt.
+- **Fehler:** Die Prüfung zählte erst alle Kacheln, auch die neuen Körperwerte. Lösung: nur im Abschnitt „Körpermaße“ zählen.
+- **Fachbegriffe:** Herkunft eines Werts (`quelle`), Least Privilege (nur so viele Rechte wie nötig).

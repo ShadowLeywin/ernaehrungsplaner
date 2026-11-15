@@ -5,6 +5,18 @@ export const NEUIGKEITEN = [
   {
     version: '1.0.0',
     datum: '2026-11-15',
+    titel: 'Ruhepuls, Körperfett, Trainings',
+    punkte: [
+      'Health Connect liefert jetzt auch Ruhepuls und Körperfett; beide stehen unter „Fortschritt“ und lassen sich auch von Hand eintragen.',
+      'Ein Krafttraining in Health Connect setzt den Tag auf „Gym“, Calisthenics auf „Calisthenics“. Deine eigene Wahl geht immer vor.',
+      'Maße wählen: Kacheln für Maße, die du nicht misst, ausblenden.',
+      'Tippst du ein Maß an, siehst du seinen Verlauf als Linie direkt im Blatt.',
+      'Alle Einstellungsseiten im Kartenstil des Menüs; Backup und Coach-Export als übersichtliche Listen.',
+    ],
+  },
+  {
+    version: '1.0.0',
+    datum: '2026-11-15',
     titel: '„Mehr“ aufgeräumt',
     punkte: [
       'Jede Zeile in „Mehr“ zeigt jetzt den aktuellen Stand, z. B. „Blatt · Dunkel · Vibration an“ oder „Gesichert vor 3 Tagen“.',
@@ -110,7 +122,7 @@ export const FUNKTIONEN = [
   { titel: 'Rezepte', text: 'Zutaten, Portionen und Schritte, je Schritt mit „Prinzip dahinter“. Meal-Prep mit Gewicht nach dem Kochen und Haltbarkeit. Import aus Text.' },
   { titel: 'Zutaten', text: '184 Lebensmittel sind dabei, eigene kommen dazu. Suche bei Open Food Facts nur auf Knopfdruck. Die Mag-Liste merkt sich, was du (nicht) magst.' },
   { titel: 'Fortschritt', text: 'Gewicht mit 7-Tage-Schnitt gegen dein Wochenziel, alle Körpermaße als Kacheln, Verläufe, Laborwerte und Symptome. Eingetragen wird auf „Heute“.' },
-  { titel: 'Health Connect (Android)', text: 'Schritte, Gewicht und Schlaf vom Handy übernehmen. Nur lesen, nur auf dein Ja; eigene Eingaben gehen vor.' },
+  { titel: 'Health Connect (Android)', text: 'Schritte, Gewicht, Schlaf, Ruhepuls und Körperfett übernehmen; ein Krafttraining setzt den Tagestyp. Nur lesen, nur auf dein Ja; eigene Eingaben gehen vor.' },
   { titel: 'Backup und Coach-Export', text: 'Alle Daten als Datei sichern und wieder einspielen. Der Wochenbericht ist Text zum Einfügen in einen Chat.' },
   { titel: 'Widget (Android)', text: 'Auf dem Startbildschirm: kcal übrig und Wasser von heute. Antippen öffnet Elan.' },
   { titel: 'Darstellung', text: 'Blatt (schlicht und grün) oder Zitrus (das erste Design), jeweils hell, dunkel oder wie das Handy.' },

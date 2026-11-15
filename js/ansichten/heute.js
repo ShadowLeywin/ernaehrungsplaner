@@ -48,7 +48,7 @@ export async function zeigeHeute(wurzel, [parameter]) {
   }) : () => {};
   haenge(wurzel,
     kopf(datum, heute),
-    tagestypWahl(datum, typ, lautPlan),
+    tagestypWahl(datum, typ, lautPlan, tag),
     geplantHinweis(plan.filter((p) => !p.uebernommen), datum),
     uebersicht(ist, ziel, slots, kcalJeSlot),
     kacheln({ ist, ziel, datum, ringe, widget, wasser: wasserHeute.filter((m) => m.art === 'wasser'), wasserZielMl: gesundheit.wasserZielMl, wasserMl: wasserMengen[0] }),
@@ -108,15 +108,19 @@ function kopf(datum, heute) {
       el('a', { class: 'rund', href: `#/heute/${verschiebe(datum, 1)}`, 'aria-label': 'Einen Tag weiter' }, icon('vor'))));
 }
 
-function tagestypWahl(datum, typ, lautPlan) {
+function tagestypWahl(datum, typ, lautPlan, tag) {
   const waehle = async (id) => {
     await speicher.setzeTagestyp(datum, id === lautPlan ? null : id);
     neuZeichnen();
   };
-  return el('div', { class: 'wahl', role: 'group', 'aria-label': 'Tagestyp' },
+  const wahl = el('div', { class: 'wahl', role: 'group', 'aria-label': 'Tagestyp' },
     TAGESTYPEN.map((t) => el('button', {
       type: 'button', class: 'wahl-knopf', 'aria-pressed': String(t.id === typ), onclick: () => waehle(t.id),
     }, t.name)));
+  // Woher der Typ kommt, wenn nicht von dir: ein Training in Health Connect
+  return tag?.tagestypQuelle === 'healthconnect'
+    ? [wahl, el('p', { class: 'klein tagestyp-quelle' }, 'Aus deinem Training in Health Connect. Antippen ändert es.')]
+    : wahl;
 }
 
 /** Steht für diesen Tag etwas im Wochenplan, das noch nicht im Tagebuch ist? Dann ein Tipp zum Übernehmen. */

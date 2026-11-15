@@ -25,7 +25,7 @@ Regeln und Wissen für jede Claude-Session in diesem Repo. Erst lesen, dann arbe
 | Schrift | selbst gehostet (`schrift/`), keine Abrufe bei Schriftdiensten. Keine Apple-Schrift (SF Pro): Lizenz nur für Apple-Plattformen |
 | Zielwerte | neutrale Startwerte im Code, alles in der App einstellbar |
 | Netz | nur auf ausdrücklichen Knopfdruck (Open Food Facts). Der Import ruft keine fremden Seiten ab |
-| Health Connect | nur lesen: Schritte, Gewicht, Schlaf; nur nach Ja; eigene Eingaben gehen vor (`quelle: 'healthconnect'`). Weitere Berechtigungen nur mit Léons Ja |
+| Health Connect | nur lesen: Schritte, Gewicht, Schlaf, Ruhepuls, Körperfett, Trainings (nur für den Tagestyp; Léons Ja vom 15.11.2026); nur nach Ja im Gerät; eigene Eingaben gehen vor (`quelle: 'healthconnect'`, `tagestypQuelle`). Weitere Berechtigungen nur mit Léons Ja |
 | Struktur | Eintragen auf „Heute“ (Essen, Tageswerte, Wasser, Supplements); Entwicklung unter „Fortschritt“; Einstellungen unter „Mehr“ |
 | Name | „Elan“ steht nur in `js/logik/schema.js`, `manifest.webmanifest`, `index.html` |
 | Version | bleibt 1.0.0, bis Léon zufrieden ist. Jede sichtbare Änderung bekommt trotzdem einen Eintrag in `js/daten/neuigkeiten.js` (Was ist neu) |
