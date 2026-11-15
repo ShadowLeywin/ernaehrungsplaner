@@ -4,6 +4,17 @@
 export const NEUIGKEITEN = [
   {
     version: '1.0.0',
+    datum: '2026-11-15',
+    titel: 'Einstellungen wie auf dem iPhone',
+    punkte: [
+      'Alle Einstellungen als ruhige Listen: Wert rechts, Schalter für An und Aus, Häkchen für die Auswahl, Erklärung klein darunter.',
+      'Keine abgeschnittenen Auswahlfelder mehr („Keine Ang…“).',
+      'Woche als eine Liste mit Kalenderkachel („Do 12“) statt sieben Einzelkarten.',
+      'Der Plus-Knopf auf „Heute“ weicht beim Herunterrollen aus und verdeckt keine Mahlzeit mehr.',
+    ],
+  },
+  {
+    version: '1.0.0',
     datum: '2026-11-14',
     titel: 'Neues Design: Blatt',
     punkte: [

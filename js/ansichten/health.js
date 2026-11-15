@@ -9,7 +9,7 @@ import { APP_NAME } from '../logik/schema.js';
 import { tippGefuehl } from '../plattform.js';
 import { neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
-import { el, feld, haenge, hinweis, icon, mitBild, svg, zahl } from '../ui.js';
+import { el, feld, haenge, hinweis, icon, mitBild, svg, zahl, zeileFeld } from '../ui.js';
 import { zeigeLabor, zeigeSymptome } from './befunde.js';
 
 const MASSE = ARTEN.filter((a) => a.gruppe === 'mass');
@@ -279,7 +279,7 @@ function verlaufBereich(datum, messungen) {
 function zielBereich(ziele) {
   const eingabe = Object.fromEntries(Object.entries(ziele).map(([id, wert]) => [id, alsText(wert)]));
   const bereich = el('details', { class: 'bereich aufklappen', open: aufgeklappt.has('ziele') ? true : null, ontoggle: (e) => { if (e.target.open) aufgeklappt.add('ziele'); else aufgeklappt.delete('ziele'); } });
-  const zeile = (id, beschriftung, einheit, fehler) => feld({
+  const zeile = (id, beschriftung, einheit, fehler) => zeileFeld({
     name: `ziel-${id}`, beschriftung, einheit, inputmode: 'decimal', value: eingabe[id], fehler: fehler[id], oninput: (e) => { eingabe[id] = e.target.value; },
   });
   const zeichne = (fehler = {}) => {
@@ -296,13 +296,13 @@ function zielBereich(ziele) {
           neuZeichnen();
         },
       },
-      el('p', { class: 'klein' }, 'Wochenziel Gewicht: plus zum Zunehmen, minus zum Abnehmen, 0 zum Halten. Die Startwerte sind Platzhalter, keine Empfehlung.'),
-      el('div', { class: 'raster' },
+      el('div', { class: 'eliste' },
         zeile('wochenzielKg', 'Gewicht je Woche', 'kg', fehler),
         zeile('wasserZielMl', 'Wasser am Tag', 'ml', fehler),
         zeile('schlafZielH', 'Schlaf', 'h', fehler),
         zeile('schritteZiel', 'Schritte am Tag', '', fehler)),
-      el('div', { class: 'knopfreihe' }, el('button', { type: 'submit', class: 'knopf' }, 'Ziele speichern'))));
+      el('p', { class: 'klein' }, 'Gewicht je Woche: plus zum Zunehmen, minus zum Abnehmen, 0 zum Halten. Die Startwerte sind Platzhalter, keine Empfehlung.'),
+      el('div', { class: 'einstell-knoepfe' }, el('button', { type: 'submit', class: 'knopf' }, 'Ziele speichern'))));
   };
   zeichne();
   return bereich;

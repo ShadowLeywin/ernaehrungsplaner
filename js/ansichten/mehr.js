@@ -13,7 +13,7 @@ import { gibDatei, istApp, setzeVibration, teileText, tippGefuehl, vibrationAn }
 import { neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { FUNKTIONEN, NEUIGKEITEN } from '../daten/neuigkeiten.js';
-import { bestaetige, el, feld, haenge, hinweis, icon, svg, zahl } from '../ui.js';
+import { bestaetige, el, gruppe, haenge, hinweis, icon, svg, zahl, zeileFeld, zeileSchalter, zeileWahl, zeilenAuswahl } from '../ui.js';
 
 let gewaehlterTyp = 'gym';
 
@@ -96,29 +96,24 @@ function zeigeMenue(wurzel) {
 
 /* ---------- Ringe auf „Heute“ ---------- */
 
-/** Welche Kacheln „Heute“ zeigt. Speichert sofort; Häkchen ändern sich an Ort und Stelle. */
+/** Welche Kacheln „Heute“ zeigt. Schalter speichern sofort und ändern sich an Ort und Stelle. */
 function ringeBereich(gewaehlt) {
   const an = new Set(gewaehlt);
-  return el('section', { class: 'bereich' },
-    el('h2', {}, 'Ringe auf „Heute“'),
-    el('p', { class: 'klein' }, 'Blende aus, was du nicht verfolgen willst. Die Werte zählen trotzdem weiter.'),
-    el('ul', { class: 'zeilen' }, RINGE.map((r) => el('li', { class: 'haken' },
-      el('label', {},
-        el('input', {
-          type: 'checkbox', id: `ring-${r.id}`, checked: an.has(r.id) ? true : null,
-          onchange: async (e) => {
-            if (e.target.checked) an.add(r.id); else an.delete(r.id);
-            await speicher.setzeEinstellung('ringe', RINGE.map((x) => x.id).filter((id) => an.has(id)));
-            tippGefuehl();
-          },
-        }),
-        el('span', { class: 'zeile-name' }, r.name))))));
+  return gruppe({ titel: 'Ringe auf „Heute“', fuss: 'Ausgeblendete Werte zählen trotzdem weiter.' },
+    RINGE.map((r) => zeileSchalter({
+      id: `ring-${r.id}`, beschriftung: r.name, an: an.has(r.id),
+      onchange: async (e) => {
+        if (e.target.checked) an.add(r.id); else an.delete(r.id);
+        await speicher.setzeEinstellung('ringe', RINGE.map((x) => x.id).filter((id) => an.has(id)));
+        tippGefuehl();
+      },
+    })));
 }
 
 /* ---------- Ziele ---------- */
 
 function zielBereich(ziele) {
-  const bereich = el('section', { class: 'bereich' });
+  const bereich = el('div', { class: 'einstellungen' });
   // Eingaben als Text halten, damit halb getippte Zahlen ("12,") nicht verloren gehen
   const eingabe = Object.fromEntries(TAGESTYPEN.map((t) => [t.id,
     Object.fromEntries(ZIEL_FELDER.map((f) => [f.id, String(ziele[t.id][f.id]).replace('.', ',')]))]));
@@ -143,7 +138,7 @@ function zielBereich(ziele) {
     if (pruefung) {
       const diff = Math.round(pruefung.abweichung);
       bilanz = Math.abs(diff) <= 50
-        ? el('p', { class: 'klein' }, `Eiweiß, Kohlenhydrate und Fett ergeben ${zahl(pruefung.ausMakros)} kcal. Das passt zum Energieziel.`)
+        ? el('p', {}, `Eiweiß, Kohlenhydrate und Fett ergeben ${zahl(pruefung.ausMakros)} kcal. Das passt zum Energieziel.`)
         : el('p', { class: 'merkzettel' }, `Eiweiß, Kohlenhydrate und Fett ergeben ${zahl(pruefung.ausMakros)} kcal. Das sind ${zahl(Math.abs(diff))} kcal ${diff > 0 ? 'mehr' : 'weniger'} als dein Energieziel.`);
     }
 
@@ -159,26 +154,25 @@ function zielBereich(ziele) {
       hinweis('Ziele gespeichert.');
     };
 
+    const name = TAGESTYPEN.find((t) => t.id === typ).name;
     bereich.replaceChildren(
-      el('h2', {}, 'Ziele je Tagestyp'),
-      el('p', { class: 'klein' }, 'Der Tagestyp bestimmt, welches Ziel im Tagebuch gilt.'),
       el('div', { class: 'wahl', role: 'group', 'aria-label': 'Tagestyp' }, TAGESTYPEN.map((t) => el('button', {
         type: 'button', class: 'wahl-knopf', 'aria-pressed': String(t.id === typ), onclick: () => { gewaehlterTyp = t.id; zeichne(); },
       }, t.name))),
-      el('form', { class: 'stapel', novalidate: true, onsubmit: speichern },
-        el('div', { class: 'raster' }, ZIEL_FELDER.map((f) => feld({
-          name: `ziel-${f.id}`, beschriftung: f.name, einheit: f.einheit, inputmode: 'decimal', value: eingabe[typ][f.id],
-          fehler: zeigeFehler ? fehler[f.id] : null,
-          oninput: (e) => { eingabe[typ][f.id] = e.target.value; },
-          onchange: () => zeichne(zeigeFehler),
-        }))),
-        bilanz,
-        el('div', { class: 'knopfreihe' },
-          el('button', { type: 'button', class: 'knopf leise', onclick: () => {
+      el('form', { novalidate: true, onsubmit: speichern },
+        gruppe({ titel: `Ziel an ${name}-Tagen`, fuss: [el('p', {}, 'Der Tagestyp bestimmt, welches Ziel im Tagebuch gilt.'), bilanz] },
+          ZIEL_FELDER.map((f) => zeileFeld({
+            name: `ziel-${f.id}`, beschriftung: f.name, einheit: f.einheit, inputmode: 'decimal', value: eingabe[typ][f.id],
+            fehler: zeigeFehler ? fehler[f.id] : null,
+            oninput: (e) => { eingabe[typ][f.id] = e.target.value; },
+            onchange: () => zeichne(zeigeFehler),
+          }))),
+        el('div', { class: 'einstell-knoepfe' },
+          el('button', { type: 'submit', class: 'knopf' }, 'Ziele speichern'),
+          el('button', { type: 'button', class: 'textlink', onclick: () => {
             for (const f of ZIEL_FELDER) eingabe[typ][f.id] = String(STANDARD_ZIELE[typ][f.id]);
             zeichne();
-          } }, 'Startwerte einsetzen'),
-          el('button', { type: 'submit', class: 'knopf' }, 'Ziele speichern'))));
+          } }, 'Startwerte einsetzen'))));
   };
   zeichne();
   return bereich;
@@ -188,16 +182,15 @@ function zielBereich(ziele) {
 
 function wochenBereich(woche) {
   const aktuell = [...woche];
-  return el('section', { class: 'bereich' },
-    el('h2', {}, 'Wochenplan'),
-    el('p', { class: 'klein' }, 'Welcher Tagestyp gilt an welchem Wochentag? Im Tagebuch kannst du einzelne Tage abweichend setzen.'),
-    el('div', { class: 'wochenplan' }, WOCHENTAGE.map((tag, i) => el('div', { class: 'feld quer' },
-      el('label', { for: `f-woche-${i}` }, tag),
-      el('select', { id: `f-woche-${i}`, onchange: async (e) => {
+  return gruppe({ fuss: 'Welcher Tagestyp gilt an welchem Wochentag? Im Tagebuch kannst du einzelne Tage abweichend setzen.' },
+    WOCHENTAGE.map((tag, i) => zeileWahl({
+      id: `f-woche-${i}`, beschriftung: tag, optionen: TAGESTYPEN, wert: aktuell[i],
+      onchange: async (e) => {
         aktuell[i] = e.target.value;
         await speicher.setzeEinstellung('woche', aktuell);
         hinweis(`${tag}: ${TAGESTYPEN.find((t) => t.id === aktuell[i]).name}.`);
-      } }, TAGESTYPEN.map((t) => el('option', { value: t.id, selected: t.id === aktuell[i] }, t.name)))))));
+      },
+    })));
 }
 
 /* ---------- Anteile der Mahlzeiten ---------- */
@@ -210,8 +203,8 @@ function anteileBereich(anteile) {
     stand.textContent = p.ok ? 'Zusammen 100 %.' : p.fehler;
     stand.className = p.ok ? 'klein' : 'fehlertext';
   };
-  const felder = el('div', { class: 'raster' });
-  const zeichneFelder = () => felder.replaceChildren(...SLOTS.map((s) => feld({
+  const felder = el('div', { class: 'eliste' });
+  const zeichneFelder = () => felder.replaceChildren(...SLOTS.map((s) => zeileFeld({
     name: `anteil-${s.id}`, beschriftung: s.name, einheit: '%', inputmode: 'decimal', value: eingabe[s.id],
     oninput: (e) => { eingabe[s.id] = e.target.value; zeigeStand(); },
   })));
@@ -224,42 +217,41 @@ function anteileBereich(anteile) {
   };
   zeichneFelder();
   zeigeStand();
-  return el('section', { class: 'bereich' },
-    el('h2', {}, 'Anteile der Mahlzeiten'),
-    el('p', { class: 'klein' }, 'Wie viel vom Tagesziel soll auf welche Mahlzeit entfallen? Das bestimmt die Segmente der Tagesscheibe. Eine Mahlzeit mit 0 % bekommt kein Segment.'),
-    el('form', { class: 'stapel', novalidate: true, onsubmit: speichern },
+  return el('form', { novalidate: true, onsubmit: speichern },
+    el('section', { class: 'egruppe', 'aria-label': 'Anteile' },
       felder,
-      stand,
-      el('div', { class: 'knopfreihe' },
-        el('button', { type: 'button', class: 'knopf leise', onclick: () => {
-          for (const s of SLOTS) eingabe[s.id] = String(STANDARD_ANTEILE[s.id]);
-          zeichneFelder();
-          zeigeStand();
-        } }, 'Startwerte einsetzen'),
-        el('button', { type: 'submit', class: 'knopf' }, 'Anteile speichern'))));
+      el('div', { class: 'egruppe-fuss' }, stand,
+        el('p', {}, 'Bestimmt die Segmente der Tagesscheibe. Eine Mahlzeit mit 0 % bekommt kein Segment.'))),
+    el('div', { class: 'einstell-knoepfe' },
+      el('button', { type: 'submit', class: 'knopf' }, 'Anteile speichern'),
+      el('button', { type: 'button', class: 'textlink', onclick: () => {
+        for (const s of SLOTS) eingabe[s.id] = String(STANDARD_ANTEILE[s.id]);
+        zeichneFelder();
+        zeigeStand();
+      } }, 'Startwerte einsetzen')));
 }
 
 /* ---------- Referenzgruppe ---------- */
 
-function referenzBereich({ daten, gruppe }) {
+function referenzBereich({ daten, gruppe: referenzgruppe }) {
   if (!daten) return null;
-  const wahl = { geschlecht: gruppe?.geschlecht ?? '', alter: gruppe?.alter ?? '' };
+  const wahl = { geschlecht: referenzgruppe?.geschlecht ?? '', alter: referenzgruppe?.alter ?? '' };
   const speichern = async () => {
     await speicher.setzeEinstellung('referenzgruppe', wahl.geschlecht && wahl.alter ? { ...wahl } : null);
     hinweis(wahl.geschlecht && wahl.alter ? 'Referenzgruppe gespeichert.' : 'Ohne Referenzgruppe gibt es keinen Vergleich.');
   };
-  const auswahl = (id, beschriftung, optionen, schluessel) => el('div', { class: 'feld' },
-    el('label', { for: id }, beschriftung),
-    el('select', { id, onchange: (e) => { wahl[schluessel] = e.target.value; speichern(); } },
-      el('option', { value: '' }, 'Keine Angabe'),
-      optionen.map((o) => el('option', { value: o.id, selected: o.id === wahl[schluessel] }, o.name))));
-  return el('section', { class: 'bereich' },
-    el('h2', {}, 'Referenzwerte'),
-    el('p', { class: 'klein' }, `Für Vitamine und Mineralstoffe vergleicht die App mit den Referenzwerten der DGE (Stand ${daten.stand}, abgerufen am ${formatKurz(daten.abgerufen)}). Sie hängen von Geschlecht und Alter ab. Die Angabe bleibt auf dem Gerät.`),
-    el('div', { class: 'raster' },
-      auswahl('f-ref-geschlecht', 'Geschlecht', GESCHLECHTER, 'geschlecht'),
-      auswahl('f-ref-alter', 'Alter', daten.altersgruppen, 'alter')),
-    el('p', { class: 'klein' }, 'Für Schwangere und Stillende gelten andere Werte; die zeigt die App nicht.'));
+  const auswahl = (id, beschriftung, optionen, schluessel) => zeileWahl({
+    id, beschriftung, optionen, wert: wahl[schluessel], leer: 'Keine Angabe',
+    onchange: (e) => { wahl[schluessel] = e.target.value; speichern(); },
+  });
+  return gruppe({
+    fuss: [
+      el('p', {}, `Für Vitamine und Mineralstoffe vergleicht die App mit den Referenzwerten der DGE (Stand ${daten.stand}, abgerufen am ${formatKurz(daten.abgerufen)}). Sie hängen von Geschlecht und Alter ab. Die Angabe bleibt auf dem Gerät.`),
+      el('p', {}, 'Für Schwangere und Stillende gelten andere Werte; die zeigt die App nicht.'),
+    ],
+  },
+  auswahl('f-ref-geschlecht', 'Geschlecht', GESCHLECHTER, 'geschlecht'),
+  auswahl('f-ref-alter', 'Alter', daten.altersgruppen, 'alter'));
 }
 
 /* ---------- Backup ---------- */
@@ -366,18 +358,22 @@ function coachBereich() {
 /* ---------- Darstellung, Speicher, Über ---------- */
 
 function darstellungBereich() {
-  const wahl = (titel, liste, aktuell, setze) => el('div', { class: 'stapel' },
-    el('h3', { class: 'zwischentitel' }, titel),
-    el('div', { class: 'wahl', role: 'group', 'aria-label': titel }, liste.map((m) => el('button', {
-      type: 'button', class: 'wahl-knopf', 'aria-pressed': String(m.id === aktuell),
-      onclick: () => { setze(m.id); neuZeichnen(); },
-    }, m.name))));
-  return el('section', { class: 'bereich' },
-    el('h2', {}, 'Darstellung'),
-    wahl('Design', THEMEN, leseThema(), setzeThema),
-    el('p', { class: 'klein' }, 'Blatt: schlicht wie auf dem iPhone, in Grün. Zitrus: das erste Design mit eigener Schrift.'),
-    wahl('Hell oder dunkel', MODI, leseDarstellung(), setzeDarstellung),
-    wahl('Vibration beim Tippen', [{ id: 'an', name: 'An' }, { id: 'aus', name: 'Aus' }], vibrationAn() ? 'an' : 'aus', (id) => { setzeVibration(id === 'an'); if (id === 'an') tippGefuehl(); }));
+  // Kleine Farbprobe je Design: Grund, Fläche, Akzent
+  const probe = (...farben) => el('span', { class: 'vorschau-farben', 'aria-hidden': 'true' }, farben.map((f) => el('span', { style: `background:${f}` })));
+  const design = [
+    { id: 'blatt', name: 'Blatt', text: 'Schlicht wie auf dem iPhone, in Grün', vorschau: probe('#0b100c', '#172019', '#b5e13a') },
+    { id: 'zitrus', name: 'Zitrus', text: 'Das erste Design, mit eigener Schrift', vorschau: probe('#f5f9ec', '#ffffff', '#1c7445') },
+  ];
+  const neu = (setze) => (id) => { setze(id); neuZeichnen(); };
+  return [
+    gruppe({ titel: 'Design' }, zeilenAuswahl({ name: 'design', optionen: design, wert: leseThema(), onchange: neu(setzeThema) })),
+    gruppe({ titel: 'Hell oder dunkel', fuss: '„Wie das Handy“ folgt der Einstellung des Systems.' },
+      zeilenAuswahl({ name: 'modus', optionen: MODI, wert: leseDarstellung(), onchange: neu(setzeDarstellung) })),
+    gruppe({ titel: 'Bedienung' }, zeileSchalter({
+      id: 'f-vibration', beschriftung: 'Vibration beim Tippen', text: 'Beim Eintragen, bei Wasser und Häkchen', an: vibrationAn(),
+      onchange: (e) => { setzeVibration(e.target.checked); if (e.target.checked) tippGefuehl(); },
+    })),
+  ];
 }
 
 function speicherBereich(status) {

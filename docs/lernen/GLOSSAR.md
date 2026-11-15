@@ -73,3 +73,4 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | inert | Ein Element mit `inert` reagiert auf keine Tipps und keinen Fokus; ein modales Blatt macht den Rest der Seite inert. | `zu()` in `blatt()` in `js/ui.js` |
 | RemoteViews | Die einfachen Bausteine, aus denen Android ein Widget zeichnet; das Widget läuft nicht in der App selbst. | `ElanWidget.java` |
 | SharedPreferences | Kleiner privater Schlüssel-Wert-Speicher einer Android-App. | `WidgetPlugin.java` |
+| Verschattung (Shadowing) | Ein innerer Name (z. B. ein Parameter) verdeckt einen gleichnamigen äußeren, etwa einen Import. | `referenzBereich` in `js/ansichten/mehr.js` |

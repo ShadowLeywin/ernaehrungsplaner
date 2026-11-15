@@ -49,9 +49,10 @@ export async function zeigeHeute(wurzel, [parameter]) {
     geplantHinweis(plan.filter((p) => !p.uebernommen), datum),
     uebersicht(ist, ziel, slots, kcalJeSlot),
     kacheln({ ist, ziel, datum, ringe, widget, wasser: wasserHeute.filter((m) => m.art === 'wasser'), wasserZielMl: gesundheit.wasserZielMl }),
-    eintraege.length === 0 && !plan.some((p) => !p.uebernommen) ? el('p', { class: 'leer' }, 'Noch nichts eingetragen. Tippe bei einer Mahlzeit auf das Plus.') : null,
     el('section', { class: 'karte mahlzeiten', 'aria-label': 'Mahlzeiten' },
       el('h2', { class: 'kartentitel' }, 'Mahlzeiten'),
+      // Leer-Hinweis in der Karte, wo man gleich tippt, statt als loser Satz dazwischen
+      eintraege.length === 0 && !plan.some((p) => !p.uebernommen) ? el('p', { class: 'leer' }, 'Noch nichts eingetragen. Tippe bei einer Mahlzeit auf das Plus.') : null,
       el('div', { class: 'slots' }, slots.map((slot) => slotBereich({
         slot, datum, eintraege: imSlot(eintraege, slot), vortag: imSlot(vortag, slot), kcal: kcalJeSlot[slot.id], zielKcal: ziel.kcal * slot.anteil,
       })))),
@@ -60,11 +61,32 @@ export async function zeigeHeute(wurzel, [parameter]) {
       el('button', { type: 'button', class: 'knopf leise', onclick: () => oeffneTagKopieren(datum, heute, eintraege) }, 'Diesen Tag kopieren')) : null,
     backupErinnerung(backupFaellig(letztesBackup, heute, anzahlEintraege)),
     // Schnell eintragen: der Slot passt zur Uhrzeit und lässt sich im Blatt noch ändern
+    beobachteFab(),
     el('button', {
       type: 'button', class: 'fab', 'aria-label': 'Essen erfassen',
       onclick: () => oeffneZutatWahl({ datum, slot: slotFuerUhrzeit(new Date().getHours()), beiFertig: neuZeichnen }),
     }, icon('plus', 28)),
   );
+}
+
+/**
+ * Der Plus-Knopf weicht beim Herunterrollen aus und kommt beim Hochrollen oder am Seitenende zurück.
+ * So verdeckt er beim Lesen nicht die Plus-Knöpfe der Mahlzeiten. Ein einziger Zuhörer für alle Seiten.
+ */
+let fabBeobachtet = false;
+function beobachteFab() {
+  if (fabBeobachtet) return null;
+  fabBeobachtet = true;
+  let zuletzt = window.scrollY;
+  window.addEventListener('scroll', () => {
+    const fab = document.querySelector('.fab');
+    const y = window.scrollY;
+    if (!fab || Math.abs(y - zuletzt) < 6) return;
+    const amEnde = y + window.innerHeight >= document.documentElement.scrollHeight - 40;
+    fab.classList.toggle('weg', y > zuletzt && y > 120 && !amEnde);
+    zuletzt = y;
+  }, { passive: true });
+  return null;
 }
 
 function kopf(datum, heute) {

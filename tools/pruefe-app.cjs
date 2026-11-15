@@ -186,7 +186,7 @@ async function hauptlauf(browser) {
   pruefe('Mehr ist ein Menü mit Gruppen und Unterseiten', menue.length === 4 && seite.url().endsWith('#/mehr/ziele'), `Gruppen: ${menue.join(', ')}; Ziele unter ${seite.url().split('#')[1]}`);
   await seite.locator('#f-ziel-kcal').fill('3000');
   await seite.locator('#f-ziel-kcal').blur();
-  const warnung = await seite.locator('.bereich').first().locator('.merkzettel').innerText().catch(() => '');
+  const warnung = await seite.locator('.unterseite .merkzettel').first().innerText().catch(() => '');
   await seite.getByRole('button', { name: 'Ziele speichern' }).click();
   await seite.locator('.hinweis', { hasText: 'Ziele gespeichert' }).waitFor();
   pruefe('Ziel ändern, Hinweis bei unpassenden Makros', warnung.includes('weniger'), warnung);
@@ -417,8 +417,12 @@ async function dunkelLauf(browser) {
 
   // Das erste Design bleibt wählbar und wirkt sofort
   await seite.goto(`${URL_APP}#/mehr/darstellung`);
-  await seite.getByRole('group', { name: 'Design' }).getByRole('button', { name: 'Zitrus' }).click();
-  await seite.getByRole('group', { name: 'Hell oder dunkel' }).getByRole('button', { name: 'Hell' }).click();
+  // Wie ein Mensch: die Zeile antippen; der versteckte Radioknopf dahinter wird gewählt
+  await seite.locator('label.auswahl', { hasText: 'Zitrus' }).click();
+  await seite.locator('label.auswahl', { hasText: /^Hell/ }).click();
+  await seite.getByRole('radio', { name: /^Hell/ }).waitFor({ state: 'attached' });
+  const gewaehlt = await seite.evaluate(() => [...document.querySelectorAll('input[type=radio]:checked')].map((r) => r.value).join(','));
+  pruefe('Darstellung: Häkchen-Liste wählt Design und Modus', gewaehlt === 'zitrus,hell', gewaehlt);
   const zitrus = await seite.evaluate(() => `${document.documentElement.dataset.thema}/${document.documentElement.dataset.modus}/${getComputedStyle(document.body).fontFamily.split(',')[0]}/${localStorage.getItem('elan.thema')}`);
   pruefe('Darstellung: Zitrus hell wählbar, mit eigener Schrift, bleibt gespeichert', zitrus.startsWith('zitrus/hell/') && zitrus.includes('Bricolage') && zitrus.endsWith('/zitrus'), zitrus);
   await kontext.close();
@@ -1253,7 +1257,7 @@ async function appLauf(browser) {
   await trageEin(seite, 'Frühstück', 'apfel', 100);
   const erfolg = await seite.evaluate(() => window.__aufrufe.filter((a) => a.plugin === 'Haptics').map((a) => `${a.methode}:${a.optionen.style ?? a.optionen.type}`));
   await seite.goto(`${URL_APP}#/mehr/darstellung`);
-  await seite.getByRole('group', { name: 'Vibration beim Tippen' }).getByRole('button', { name: 'Aus' }).click();
+  await seite.getByRole('switch', { name: /Vibration beim Tippen/ }).uncheck();
   await seite.goto(`${URL_APP}#/heute`);
   await seite.evaluate(() => { window.__aufrufe = []; });
   await seite.locator('.kachel.makro-wasser').click();
@@ -1281,7 +1285,7 @@ async function willkommenLauf(browser) {
   await seite.goto(`${URL_APP}#/mehr/ziele`);
   await seite.locator('#f-ziel-kcal').waitFor();
   const ziele = `${await seite.locator('#f-ziel-kcal').inputValue()} kcal, Eiweiß ${await seite.locator('#f-ziel-protein').inputValue()} g, KH ${await seite.locator('#f-ziel-kh').inputValue()} g, Fett ${await seite.locator('#f-ziel-fett').inputValue()} g`;
-  const passt = (await seite.locator('.bereich').first().innerText()).includes('passt zum Energieziel');
+  const passt = (await seite.locator('.unterseite').innerText()).includes('passt zum Energieziel');
   await seite.goto(`${URL_APP}#/mehr/referenz`);
   const gruppe = `${await seite.locator('#f-ref-geschlecht').inputValue()}/${await seite.locator('#f-ref-alter').inputValue()}`;
   await seite.goto(URL_APP, { waitUntil: 'networkidle' });

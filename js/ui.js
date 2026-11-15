@@ -82,6 +82,7 @@ const PFADE = {
   plus: 'M12 5v14M5 12h14',
   zurueck: 'M15 5l-7 7 7 7',
   vor: 'M9 5l7 7-7 7',
+  haken: 'M5 12.5l4.5 4.5L19 7.5',
   zu: 'M6 6l12 12M18 6L6 18',
   suche: 'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM20 20l-4-4',
   // Tagesscheibe: Kreis mit drei Schnitten
@@ -170,6 +171,57 @@ export function bestaetige({ titel, text, ja, nein = 'Abbrechen', gefaehrlich = 
 }
 
 /** Beschriftetes Eingabefeld mit Platz für eine Fehlermeldung */
+/* ---------- Einstellungen im Stil von iOS: Gruppen aus Zeilen ---------- */
+
+/**
+ * Gruppe: kleiner Titel über der Karte, Zeilen darin, Erklärung klein darunter.
+ * So stehen Einstellungen ruhig untereinander statt als Formular mit Kästen.
+ */
+export function gruppe({ titel, fuss, klasse = '' } = {}, ...zeilen) {
+  return el('section', { class: `egruppe ${klasse}`.trim(), 'aria-label': titel ?? null },
+    titel ? el('h2', { class: 'egruppe-titel' }, titel) : null,
+    el('div', { class: 'eliste' }, zeilen),
+    fuss ? el('div', { class: 'egruppe-fuss' }, fuss) : null);
+}
+
+/** Zeile mit Eingabe rechts („Energie … 2.700 kcal“). Gleiche id und Fehlermeldung wie feld(). */
+export function zeileFeld({ name, beschriftung, einheit, fehler, ...attribute }) {
+  const id = `f-${name}`;
+  return el('div', { class: fehler ? 'ezeile hat-fehler' : 'ezeile' },
+    el('label', { for: id, class: 'ezeile-text' }, beschriftung),
+    el('span', { class: 'ezeile-wert' },
+      el('input', { id, name, autocomplete: 'off', 'aria-invalid': fehler ? 'true' : null, 'aria-describedby': fehler ? `${id}-fehler` : null, ...attribute }),
+      einheit ? el('span', { class: 'einheit' }, einheit) : null),
+    fehler ? el('p', { class: 'fehlertext', id: `${id}-fehler` }, fehler) : null);
+}
+
+/** Zeile mit Auswahl rechts. Das native Auswahlmenü bleibt (Barrierefreiheit, Handy-Bedienung), nur schlicht gezeichnet. */
+export function zeileWahl({ id, beschriftung, optionen, wert, leer, onchange }) {
+  return el('div', { class: 'ezeile' },
+    el('label', { for: id, class: 'ezeile-text' }, beschriftung),
+    el('span', { class: 'ezeile-wert wahlfeld' },
+      el('select', { id, onchange },
+        leer ? el('option', { value: '' }, leer) : null,
+        optionen.map((o) => el('option', { value: o.id, selected: o.id === wert }, o.name))),
+      icon('vor', 16)));
+}
+
+/** Zeile mit Schalter für An/Aus. Ein Kontrollkästchen mit role="switch": Screenreader sagen „Schalter, an“. */
+export function zeileSchalter({ id, beschriftung, text, an, onchange }) {
+  return el('label', { class: 'ezeile schalter-zeile', for: id },
+    el('span', { class: 'ezeile-text' }, beschriftung, text ? el('small', {}, text) : null),
+    el('input', { type: 'checkbox', role: 'switch', class: 'schalter', id, checked: an ? true : null, onchange }));
+}
+
+/** Auswahl aus wenigen Möglichkeiten als Liste mit Häkchen (wie bei iOS), technisch Radioknöpfe. */
+export function zeilenAuswahl({ name, optionen, wert, onchange }) {
+  return optionen.map((o) => el('label', { class: 'ezeile auswahl' },
+    el('input', { type: 'radio', class: 'unsichtbar', name, value: o.id, checked: o.id === wert ? true : null, onchange: () => onchange(o.id) }),
+    o.vorschau ?? null,
+    el('span', { class: 'ezeile-text' }, o.name, o.text ? el('small', {}, o.text) : null),
+    el('span', { class: 'auswahl-haken', 'aria-hidden': 'true' }, icon('haken', 20))));
+}
+
 export function feld({ name, beschriftung, einheit, fehler, ...attribute }) {
   const id = `f-${name}`;
   return el('div', { class: fehler ? 'feld hat-fehler' : 'feld' },

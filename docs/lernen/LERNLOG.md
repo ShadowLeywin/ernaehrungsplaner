@@ -226,3 +226,11 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Testfehler:** Ein Test hing an der Uhrzeit (Berlin, nach 21 Uhr landete die Portion im Abendsnack). Ein Filter mit `\b` griff nicht, weil `textContent` die Wörter ohne Leerzeichen verbindet.
 - **Entscheidung:** CSS-Animation statt View Transitions API. Sie läuft überall und sperrt keine Eingaben; geprüft am 14.11.2026.
 - **Fachbegriffe:** modal, inert, AppWidgetProvider, RemoteViews, SharedPreferences.
+
+## Session 14, Runde 1: Einstellungen im iOS-Stil, Heute und Woche (15.11.2026)
+
+- **Was und warum:** Léons Bilder zeigten: Der Plus-Knopf verdeckt die Plus-Knöpfe der Mahlzeiten, die Woche wirkt unruhig, die Einstellungen sind uneinheitlich. Neue Bausteine in `js/ui.js`: `gruppe`, `zeileFeld`, `zeileWahl`, `zeileSchalter`, `zeilenAuswahl`. Alle Einstellungen nutzen sie jetzt.
+- **Befehle:** `node tools/pruefe-app.cjs` (130 Kriterien) · eigene Bild-Skripte für einen Vorher-nachher-Vergleich.
+- **Entscheidung:** Native `select` und Radioknöpfe bleiben und werden nur schlicht gezeichnet. So bleiben Bedienung am Handy und Screenreader erhalten. Verworfen: eigene Aufklapp-Menüs, die mehr Code und schlechtere Zugänglichkeit bringen.
+- **Fehler:** Der Parameter `gruppe` (Referenzgruppe) verdeckte den neuen Baustein `gruppe`, Folge: „gruppe is not a function“. Die neue Fehlerseite zeigte es sofort an. Lösung: Parameter umbenannt.
+- **Fachbegriffe:** Schalter (`role="switch"`), Verschattung (shadowing) eines Namens.
