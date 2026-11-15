@@ -5,7 +5,7 @@ Regeln und Wissen für jede Claude-Session in diesem Repo. Erst lesen, dann arbe
 ## Projekt
 
 - **Was:** Android-App (APK mit Capacitor) und dieselbe App als Progressive Web App, komplett deutsch, offline-first.
-- **Umfang:** nur Ernährung und Health-Daten. Kein Trainingslog; der Tagestyp (Gym, Calisthenics, Rest) bestimmt nur die Ziele.
+- **Umfang:** die Gesundheits-App für alles außer Training (Léon, 15.11.2026: „all in all Health-App“): Ernährung, Körperwerte, Schlaf, Wasser, Supplements, Labor, Symptome, Fortschritt. Kein Trainingslog; Training führt Léon in seiner Fitness-App, Elan liest Trainings nur über Health Connect für den Tagestyp.
 - **Nutzer:** Léon baut privat. Später nutzen Freunde die App, jeder mit eigenen lokalen Daten.
 - **Stand:** Version 1.0.0 als APK und PWA, alle neun Module, Referenzwerte der DGE, Schema-Version 7. Offen: Tests am echten Gerät, automatischer APK-Bau auf GitHub, automatischer Abruf von Angeboten. Léons Aufgaben: `docs/AUFGABEN-LEON.md`. Plan: `docs/PHASENPLAN.md`.
 

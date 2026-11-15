@@ -801,6 +801,8 @@ async function healthLauf(browser) {
   const pilleNachher = await seite.locator('.gewicht-karte .trend-pille').innerText();
   pruefe('Fortschritt: Gewichts-Karte mit großem Schnitt, Pfeil und Stand zum Ziel', karteVorher === '80,3 kg|↑ +0,3 kg|über Plan' && pilleNachher === 'im Ziel', `vorher ${karteVorher}, mit Ziel +0,25: ${pilleNachher}`);
   await bild(seite, '16-fortschritt');
+  const rueckblick = (await seite.locator('.rueckblick').innerText()).replace(/\s+/g, ' ');
+  pruefe('Fortschritt: Rückblick der letzten 7 Tage mit Schlaf und Schritten vom Tag', /Schlaf Ø 7,5 h/i.test(rueckblick) && /Schritte Ø 9\.000/i.test(rueckblick) && rueckblick.includes('keine Vorwoche'), rueckblick.slice(0, 160));
 
   // Wasser mit eigenen Knöpfen; Getipptes im Gewichtsfeld bleibt erhalten
   await seite.goto(`${URL_APP}#/heute`);
