@@ -2,7 +2,7 @@
 // Eigene Eingaben bleiben unangetastet; gespeichert wird nur, was neu ist oder sich geändert hat.
 
 import { isoDatum, verschiebe, ausIso } from './logik/datum.js';
-import { darfTagestypSetzen, gewichtJeTag, koerperfettJeTag, ruhepulsJeTag, schlafJeNacht, schritteJeTag, tagestypJeTag, zuUebernehmen } from './logik/healthconnect.js';
+import { darfTagestypSetzen, gewichtJeTag, hrvJeTag, koerperfettJeTag, ruhepulsJeTag, schlafJeNacht, schritteJeTag, tagestypJeTag, zuUebernehmen } from './logik/healthconnect.js';
 import { hcLesen, istApp } from './plattform.js';
 import * as speicher from './speicher.js';
 
@@ -27,7 +27,7 @@ export async function gleicheAb(tage = 30) {
   const start = ausIso(von);
   start.setHours(0, 0, 0, 0); // ab Mitternacht des ersten Tages
   const roh = await hcLesen(start.toISOString(), new Date().toISOString());
-  const gelesen = [...schritteJeTag(roh.steps), ...gewichtJeTag(roh.weight), ...schlafJeNacht(roh.sleep), ...ruhepulsJeTag(roh.restingHeartRate), ...koerperfettJeTag(roh.bodyFat)]
+  const gelesen = [...schritteJeTag(roh.steps), ...gewichtJeTag(roh.weight), ...schlafJeNacht(roh.sleep), ...ruhepulsJeTag(roh.restingHeartRate), ...koerperfettJeTag(roh.bodyFat), ...hrvJeTag(roh.heartRateVariability)]
     .filter((m) => m.datum >= von && m.datum <= heute);
   const vorhanden = await speicher.messungenZwischen(von, heute);
   const neu = zuUebernehmen(vorhanden, gelesen);

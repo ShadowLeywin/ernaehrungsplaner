@@ -35,7 +35,11 @@ Was nur du erledigen kannst, weil es ein echtes Handy oder dein GitHub-Konto bra
 | A16 | Bei einer Mahlzeit auf das Plus: Steht oben „Zuletzt eingetragen“ mit „+ 80 g“? Antippen | Eintrag ist sofort da, unten „Rückgängig“ |
 | A17 | Startbildschirm lange drücken → Widgets → Elan → „Elan · heute“ hinzufügen. Danach Wasser eintragen | Widget zeigt kcal übrig und das neue Wasser |
 | A18 | Zwei Minuten frei herumtippen | Notiere, was hakt, zu klein ist oder unklar heißt |
-| A19 | Mehr → Health Connect → „Mit Health Connect verbinden“, alle sechs Arten erlauben | Heute zeigt die Werte mit „aus Health Connect“. Falls kein Erlaubnis-Fenster kommt: Bildschirmfoto an Claude |
+| A19a | Samsung Health → Einstellungen → Health Connect → Synchronisieren einschalten (sonst kommen Ring-Daten nicht in Health Connect an) | Health Connect → Daten und Zugriff zeigt Schritte, Schlaf, Herzfrequenz von Samsung Health |
+| A19 | Mehr → Health Connect → „Mit Health Connect verbinden“, alle sieben Arten erlauben (auch HRV) | Heute zeigt die Werte mit „aus Health Connect“. Falls kein Erlaubnis-Fenster kommt: Bildschirmfoto an Claude |
+| A20 | Mehr → Erinnerungen → „Ans Trinken erinnern“ an, eine Uhrzeit auf in 30 Minuten stellen | Android fragt einmal nach Benachrichtigungen; zur Uhrzeit (auf ein paar Minuten genau) kommt „Wasser“ mit dem Blatt-Symbol |
+| A21 | Heute → „Wie geht es dir heute?“: je Frage eine Zahl tippen, dann Fortschritt öffnen | Zahlen bleiben gewählt; „Letzte 7 Tage“ zeigt Energie, Stimmung, Stress |
+| A22 | Fortschritt → Körperwerte: Steht bei HRV ein Wert? | Wenn „noch kein Wert“: Samsung Health gibt HRV nicht an Health Connect weiter; kurz melden |
 
 ## B. Automatischer Bau einrichten (5 Minuten, am Rechner oder Handy)
 

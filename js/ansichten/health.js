@@ -5,11 +5,11 @@
 
 import { formatKurz, isoDatum, verschiebe } from '../logik/datum.js';
 import {
-  ARTEN, WAEHLBARE_MASSE, artVon, bereinigeMasseAuswahl, gewichtsTrend, linienPunkte, pruefeGesundheit, pruefeMesswert, pruefeWasserMengen, sichtbareMasse, standUndAenderung,
+  ARTEN, WAEHLBARE_MASSE, artVon, bereinigeMasseAuswahl, gewichtsTrend, linienPunkte, messungId, pruefeGesundheit, pruefeMesswert, pruefeWasserMengen, sichtbareMasse, standUndAenderung,
   tagesSumme, tagesWert, trendRichtung, verlauf, verlaufJeTag,
 } from '../logik/gesundheit.js';
 import { QUELLE_HC } from '../logik/healthconnect.js';
-import { aenderung, ruhepulsTrend, wochenRueckblick } from '../logik/rueckblick.js';
+import { aenderung, wertTrend, wochenRueckblick } from '../logik/rueckblick.js';
 import { APP_NAME } from '../logik/schema.js';
 import { tippGefuehl } from '../plattform.js';
 import { neuZeichnen } from '../router.js';
@@ -184,6 +184,45 @@ export function supplementKarte(datum, supplements, tag) {
     }, nameFeld, dosisFeld, el('button', { type: 'submit', class: 'knopf leise' }, 'Dazu')));
 }
 
+/* ---------- Für „Heute“: Check-in ---------- */
+
+// Die Enden der Skala in Worten, damit 1 und 5 nicht geraten werden müssen
+const CHECKIN = [
+  { id: 'energie', leise: 'müde', laut: 'voller Energie' },
+  { id: 'stimmung', leise: 'schlecht', laut: 'sehr gut' },
+  { id: 'stress', leise: 'entspannt', laut: 'sehr gestresst' },
+];
+
+/**
+ * Drei Fragen mit je fünf Stufen, ein Tipp je Frage. Speichert sofort und ändert nur die Knöpfe
+ * (kein Neuzeichnen der Seite). Nochmal auf die gewählte Stufe tippen nimmt den Wert zurück.
+ * Die App deutet die Werte nicht; „Fortschritt“ zeigt nur den Schnitt der Woche.
+ */
+export function checkinKarte(datum, messungen) {
+  const reihe = ({ id, leise, laut }) => {
+    const art = artVon(id);
+    let gewaehlt = tagesWert(messungen, id, datum);
+    const knoepfe = [1, 2, 3, 4, 5].map((stufe) => el('button', {
+      type: 'button', class: 'wahl-knopf', 'aria-pressed': String(gewaehlt === stufe), 'aria-label': `${art.name} ${stufe} von 5`,
+      onclick: async () => {
+        const neu = gewaehlt === stufe ? null : stufe;
+        if (neu === null) await speicher.loescheMessung(messungId(id, datum));
+        else await speicher.speichereMessung({ art: id, datum, wert: neu });
+        gewaehlt = neu;
+        if (neu !== null) tippGefuehl();
+        knoepfe.forEach((k, i) => k.setAttribute('aria-pressed', String(i + 1 === neu)));
+      },
+    }, String(stufe)));
+    return el('div', { class: 'checkin-reihe' },
+      el('h3', { class: 'checkin-frage', id: `checkin-${id}` }, art.name),
+      el('div', { class: 'wahl checkin-wahl', role: 'group', 'aria-labelledby': `checkin-${id}` }, knoepfe),
+      el('div', { class: 'checkin-pole klein', 'aria-hidden': 'true' }, el('span', {}, leise), el('span', {}, laut)));
+  };
+  return el('section', { class: 'karte checkin', 'aria-label': 'Check-in' },
+    el('h2', { class: 'kartentitel' }, 'Wie geht es dir heute?'),
+    CHECKIN.map(reihe));
+}
+
 /* ---------- Seite „Fortschritt“ ---------- */
 
 export async function zeigeFortschritt(wurzel, [parameter]) {
@@ -229,12 +268,16 @@ function rueckblickKarte({ von, jetzt, davor }) {
       el('h2', { class: 'kartentitel' }, 'Letzte 7 Tage'),
       el('span', { class: 'klein' }, `seit ${formatKurz(von).slice(0, 6)}`)),
     el('div', { class: 'rueckblick-raster' },
-      kennzahl('Energie Ø', jetzt.kcal, davor.kcal, 0, 'kcal'),
+      kennzahl('Kalorien Ø', jetzt.kcal, davor.kcal, 0, 'kcal'),
       kennzahl('Eiweiß Ø', jetzt.protein, davor.protein, 0, 'g'),
       kennzahl('Schlaf Ø', jetzt.schlaf, davor.schlaf, 1, 'h'),
       kennzahl('Schritte Ø', jetzt.schritte, davor.schritte, 0, ''),
       kennzahl('Wasser Ø', jetzt.wasser, davor.wasser, 0, 'ml'),
-      hatTrainings ? kennzahl('Trainings', jetzt.trainings, davor.trainings, 0, '') : null),
+      hatTrainings ? kennzahl('Trainings', jetzt.trainings, davor.trainings, 0, '') : null,
+      // Nur zeigen, was es gibt: wer nie eincheckt oder keine HRV misst, sieht keine leeren Kacheln
+      ...[['hrv', 'HRV Ø', 0, 'ms'], ['energie', 'Energie Ø', 1, 'von 5'], ['stimmung', 'Stimmung Ø', 1, 'von 5'], ['stress', 'Stress Ø', 1, 'von 5']]
+        .filter(([id]) => jetzt[id] !== null || davor[id] !== null)
+        .map(([id, titel, stellen, einheit]) => kennzahl(titel, jetzt[id], davor[id], stellen, einheit))),
     el('p', { class: 'klein' }, jetzt.tageMitEssen
       ? `Schnitte über die Tage mit Werten; gegessen an ${jetzt.tageMitEssen} von 7 Tagen.`
       : 'Noch kein Essen eingetragen in den letzten 7 Tagen.'));
@@ -303,18 +346,18 @@ function messKachel(art, name, messungen, datum, namen, zusatz = null) {
     : stand?.aenderung ? el('span', { class: 'mass-aenderung' }, `${mitVorzeichen(stand.aenderung, art.stellen)} seit ${formatKurz(stand.datum).slice(0, 6)}`) : null);
 }
 
-/** Ruhepuls: Schnitt der letzten 7 Tage und Änderung zur Vorwoche, wie beim Gewicht (ein Einzelwert schwankt stark). */
-function ruhepulsZusatz(messungen, datum) {
-  const trend = ruhepulsTrend(messungen, datum);
+/** Ruhepuls und HRV: Schnitt der letzten 7 Tage und Änderung zur Vorwoche, wie beim Gewicht (ein Einzelwert schwankt stark). */
+function trendZusatz(messungen, artId, datum) {
+  const trend = wertTrend(messungen, artId, datum);
   if (!trend) return null;
   return `Ø 7 Tage ${zahl(trend.schnitt)}${trend.aenderung === null ? '' : ` · ${mitVorzeichen(trend.aenderung, 0)}`}`;
 }
 
-/** Ruhepuls und Körperfett: meist aus Health Connect, auch von Hand. */
+/** Ruhepuls, Körperfett und HRV: meist aus Health Connect, auch von Hand. */
 function koerperwerteBereich(datum, messungen) {
   return el('section', { class: 'egruppe masse', 'aria-label': 'Körperwerte' },
     el('h2', { class: 'egruppe-titel' }, 'Körperwerte'),
-    el('div', { class: 'mass-kacheln' }, ARTEN.filter((a) => a.gruppe === 'koerper').map((art) => messKachel(art, art.name, messungen, datum, {}, art.id === 'ruhepuls' ? ruhepulsZusatz(messungen, datum) : null))));
+    el('div', { class: 'mass-kacheln' }, ARTEN.filter((a) => a.gruppe === 'koerper').map((art) => messKachel(art, art.name, messungen, datum, {}, ['ruhepuls', 'hrv'].includes(art.id) ? trendZusatz(messungen, art.id, datum) : null))));
 }
 
 function masseBereich(datum, messungen, namen, auswahl) {

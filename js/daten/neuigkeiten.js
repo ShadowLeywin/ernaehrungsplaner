@@ -5,6 +5,17 @@ export const NEUIGKEITEN = [
   {
     version: '1.0.0',
     datum: '2026-11-15',
+    titel: 'Check-in, HRV, Erinnerungen',
+    punkte: [
+      'Check-in auf „Heute“: Energie, Stimmung und Stress mit je einem Tipp von 1 bis 5. Nochmal tippen nimmt den Wert zurück.',
+      'Fortschritt: Der Rückblick zeigt den Wochenschnitt von Energie, Stimmung, Stress und HRV, sobald es Werte gibt. „Energie“ aus dem Essen heißt dort jetzt „Kalorien“.',
+      'HRV (Herzfrequenzvariabilität) aus Health Connect, z. B. vom Galaxy Ring, als Kachel unter „Körperwerte“ mit 7-Tage-Schnitt.',
+      'Erinnerungen (Android): ans Trinken bis zu sechsmal am Tag, an Supplements und abends an den Check-in. Unter Mehr → Erinnerungen.',
+    ],
+  },
+  {
+    version: '1.0.0',
+    datum: '2026-11-15',
     titel: 'Ruhepuls, Körperfett, Trainings',
     punkte: [
       'Fortschritt: Rückblick der letzten 7 Tage (Energie, Eiweiß, Schlaf, Schritte, Wasser, Trainings) mit Änderung zur Woche davor.',
@@ -123,8 +134,10 @@ export const FUNKTIONEN = [
   { titel: 'Woche und Einkauf', text: 'Mahlzeiten vormerken, mit einem Tipp ins Tagebuch übernehmen. Die Einkaufsliste rechnet Rezepte in Zutaten um und zeigt Angebote.' },
   { titel: 'Rezepte', text: 'Zutaten, Portionen und Schritte, je Schritt mit „Prinzip dahinter“. Meal-Prep mit Gewicht nach dem Kochen und Haltbarkeit. Import aus Text.' },
   { titel: 'Zutaten', text: '184 Lebensmittel sind dabei, eigene kommen dazu. Suche bei Open Food Facts nur auf Knopfdruck. Die Mag-Liste merkt sich, was du (nicht) magst.' },
-  { titel: 'Fortschritt', text: 'Gewicht mit 7-Tage-Schnitt gegen dein Wochenziel, alle Körpermaße als Kacheln, Verläufe, Laborwerte und Symptome. Eingetragen wird auf „Heute“.' },
-  { titel: 'Health Connect (Android)', text: 'Schritte, Gewicht, Schlaf, Ruhepuls und Körperfett übernehmen; ein Krafttraining setzt den Tagestyp. Nur lesen, nur auf dein Ja; eigene Eingaben gehen vor.' },
+  { titel: 'Fortschritt', text: 'Rückblick der Woche, Gewicht mit 7-Tage-Schnitt gegen dein Wochenziel, Ruhepuls und HRV, alle Körpermaße als Kacheln, Verläufe, Laborwerte und Symptome. Eingetragen wird auf „Heute“.' },
+  { titel: 'Check-in', text: 'Energie, Stimmung und Stress je Tag mit einem Tipp, im Rückblick als Wochenschnitt. Die App deutet die Werte nicht.' },
+  { titel: 'Erinnerungen (Android)', text: 'Wasser, Supplements und Check-in zu festen Uhrzeiten, geplant auf dem Handy, ohne Server.' },
+  { titel: 'Health Connect (Android)', text: 'Schritte, Gewicht, Schlaf, Ruhepuls, Körperfett und HRV übernehmen; ein Krafttraining setzt den Tagestyp. Nur lesen, nur auf dein Ja; eigene Eingaben gehen vor.' },
   { titel: 'Backup und Coach-Export', text: 'Alle Daten als Datei sichern und wieder einspielen. Der Wochenbericht ist Text zum Einfügen in einen Chat.' },
   { titel: 'Widget (Android)', text: 'Auf dem Startbildschirm: kcal übrig und Wasser von heute. Antippen öffnet Elan.' },
   { titel: 'Darstellung', text: 'Blatt (schlicht und grün) oder Zitrus (das erste Design), jeweils hell, dunkel oder wie das Handy.' },

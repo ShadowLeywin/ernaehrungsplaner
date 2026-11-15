@@ -10,7 +10,8 @@ import { anteileText, anzahlText, backupText, dabeiSeit, darstellungText, kennza
 import { wochenTage } from '../logik/woche.js';
 import { RINGE, SLOTS, STANDARD_ANTEILE, STANDARD_ZIELE, TAGESTYPEN, ZIEL_FELDER, bereinigeAnteile, bereinigeRinge, makroAbweichung, pruefeAnteile } from '../logik/ziele.js';
 import { parseZahl } from '../logik/zutat.js';
-import { gibDatei, hcEinstellungen, hcErlaubt, hcVerbinden, hcVerfuegbar, istApp, setzeVibration, teileText, tippGefuehl, vibrationAn } from '../plattform.js';
+import { erinnerungErlaubnis, gibDatei, hcEinstellungen, hcErlaubt, hcVerbinden, hcVerfuegbar, istApp, planeBenachrichtigungen, setzeVibration, teileText, tippGefuehl, vibrationAn } from '../plattform.js';
+import { ALLE_IDS, bereinigeErinnerungen, erinnerungenText, planeErinnerungen } from '../logik/erinnerungen.js';
 import { automatischAn, gleicheAb, setzeAutomatisch, zuletztAbgeglichen } from '../abgleich.js';
 import { bereinigeWasserMengen } from '../logik/gesundheit.js';
 import { HC_ARTEN } from '../logik/healthconnect.js';
@@ -44,6 +45,7 @@ const MENUE = [
     { id: 'coach', titel: 'Coach-Export', stand: () => 'Wochenbericht als Text' },
   ] },
   { gruppe: 'App', eintraege: [
+    { id: 'erinnerungen', titel: 'Erinnerungen', stand: (w) => (istApp() ? erinnerungenText(w.erinnerungen) : 'Nur in der Android-App') },
     { id: 'darstellung', titel: 'Darstellung', stand: () => darstellungText({ thema: leseThema(), modus: leseDarstellung(), vibration: vibrationAn() }) },
     { id: 'neu', titel: 'Was ist neu', stand: () => NEUIGKEITEN[0]?.titel ?? '' },
     { id: 'ueber', titel: 'Über Elan', stand: () => `Version ${APP_VERSION}` },
@@ -70,6 +72,7 @@ export async function zeigeMehr(wurzel, [unterseite]) {
     darstellung: async () => darstellungBereich(),
     koerper: async () => koerperZielBereich(await speicher.ladeGesundheit(), bereinigeWasserMengen(await speicher.einstellung('wasserMengen'))),
     healthconnect: async () => healthConnectBereich(),
+    erinnerungen: async () => erinnerungenBereich(),
     ueber: async () => ueberBereich(),
     neu: async () => neuBereich(),
     datenschutz: async () => datenschutzBereich(),
@@ -85,15 +88,15 @@ export async function zeigeMehr(wurzel, [unterseite]) {
 /** Alle Werte für die Zusammenfassungen in einem Zug laden; Fehler in einer Quelle lassen die Zeile nur leer. */
 async function ladeStand() {
   const heute = isoDatum();
-  const [eintraege, rezepte, ziele, woche, anteile, referenz, gesundheit, wasserMengen, vorlieben, angebote, letztesBackup, hc] = await Promise.all([
+  const [eintraege, rezepte, ziele, woche, anteile, referenz, gesundheit, wasserMengen, vorlieben, angebote, letztesBackup, hc, erinnerungen] = await Promise.all([
     speicher.alleEintraege(), speicher.alleRezepte(), speicher.ladeZiele(), speicher.ladeWoche(),
     speicher.einstellung('slotAnteile').then(bereinigeAnteile), speicher.ladeReferenz(), speicher.ladeGesundheit(),
     speicher.einstellung('wasserMengen').then(bereinigeWasserMengen), speicher.alleVorlieben(), speicher.alleAngebote(),
-    speicher.einstellung('letztesBackup'), healthConnectStand(),
+    speicher.einstellung('letztesBackup'), healthConnectStand(), speicher.einstellung('erinnerungen'),
   ]);
   return {
     heute, eintraege, rezepte, ziele, woche, anteile, referenz, gesundheit, wasserMengen, letztesBackup,
-    vorlieben: vorlieben.size, angebote: angebote.length, healthConnect: hc,
+    vorlieben: vorlieben.size, angebote: angebote.length, healthConnect: hc, erinnerungen,
   };
 }
 
@@ -420,7 +423,7 @@ function coachBereich() {
  * Elan liest dort nur Schritte, Gewicht und Schlaf, nur nach deinem Ja, und schreibt nichts zurück.
  */
 async function healthConnectBereich() {
-  const erklaerung = 'Elan liest nur Schritte, Gewicht, Schlaf, Ruhepuls, Körperfett und Trainings (für den Tagestyp) der letzten 30 Tage, nichts sonst, und schreibt nichts zurück. Eigene Eingaben in Elan gehen immer vor. Die Daten bleiben auf dem Handy.';
+  const erklaerung = 'Elan liest nur Schritte, Gewicht, Schlaf, Ruhepuls, Körperfett, HRV und Trainings (für den Tagestyp) der letzten 30 Tage, nichts sonst, und schreibt nichts zurück. Eigene Eingaben in Elan gehen immer vor. Die Daten bleiben auf dem Handy.';
   if (!istApp()) {
     return gruppe({ fuss: [el('p', {}, 'Health Connect gibt es nur in der Android-App.'), el('p', {}, erklaerung)] },
       el('div', { class: 'ezeile' }, el('span', { class: 'ezeile-text' }, 'Im Browser nicht verfügbar')));
@@ -457,6 +460,76 @@ async function healthConnectBereich() {
       erlaubt.length ? el('button', { type: 'button', class: 'textlink', onclick: verbinden }, 'Erlaubnis ändern') : null,
       el('button', { type: 'button', class: 'textlink', onclick: hcEinstellungen }, 'Health Connect öffnen'),
       el('a', { class: 'textlink', href: '#/mehr/datenschutz' }, 'Datenschutz')),
+  ];
+}
+
+/**
+ * Erinnerungen für Wasser, Supplements und den Check-in am Abend. Jede Änderung speichert sofort und plant
+ * alle Benachrichtigungen neu (einfacher und sicherer als einzelne nachzuziehen). Android erinnert auf ein paar
+ * Minuten genau; das reicht und spart die Sonderfreigabe für exakte Wecker.
+ */
+async function erinnerungenBereich() {
+  const fuss = 'Android erinnert dich zur eingestellten Uhrzeit, auf ein paar Minuten genau. Die Erinnerung weiß nicht, ob du schon getrunken hast; sie fragt nur nach.';
+  if (!istApp()) {
+    return gruppe({ fuss: 'Erinnerungen plant Android auf dem Handy. Im Browser gibt es sie nicht.' },
+      el('div', { class: 'ezeile' }, el('span', { class: 'ezeile-text' }, 'Nur in der Android-App')));
+  }
+  const [gespeichert, erlaubnis] = await Promise.all([speicher.einstellung('erinnerungen'), erinnerungErlaubnis()]);
+  let e = bereinigeErinnerungen(gespeichert);
+  const sichere = async (neu, zeichne = false) => {
+    e = bereinigeErinnerungen(neu);
+    const ergebnis = await planeBenachrichtigungen(planeErinnerungen(e), ALLE_IDS);
+    if (ergebnis === 'verweigert') {
+      // Ohne Erlaubnis nichts als „an“ speichern, sonst zeigt die App Erinnerungen, die nie kommen
+      e = bereinigeErinnerungen({ ...e, wasser: { ...e.wasser, an: false }, supplements: { ...e.supplements, an: false }, checkin: { ...e.checkin, an: false } });
+      zeichne = true;
+    }
+    await speicher.setzeEinstellung('erinnerungen', e);
+    if (ergebnis === 'verweigert') hinweis('Benachrichtigungen sind für Elan aus. Erlauben in den Android-Einstellungen: Apps → Elan → Benachrichtigungen.');
+    if (zeichne) neuZeichnen(); else if (ergebnis === 'ok') tippGefuehl();
+  };
+  // Auswahl in halben Stunden statt Uhrzeitfeld: zeigt immer 24 Stunden (das Zeitfeld folgt sonst der Systemsprache
+  // und schneidet „AM/PM“ ab) und ist mit einem Tipp gewählt. Eine krumme Zeit aus einem Backup bleibt wählbar.
+  const zeiten = Array.from({ length: 38 }, (_, i) => `${String(5 + Math.floor(i / 2)).padStart(2, '0')}:${i % 2 ? '30' : '00'}`);
+  const zeileZeit = ({ id, beschriftung, wert, onchange, entfernen = null }) => el('div', { class: 'ezeile' },
+    el('label', { for: id, class: 'ezeile-text' }, beschriftung),
+    el('span', { class: 'ezeile-wert wahlfeld zeitwahl' },
+      el('select', { id, onchange }, [...new Set([...zeiten, wert])].sort().map((z) => el('option', { value: z, selected: z === wert ? true : null }, z))),
+      icon('vor', 16)),
+    entfernen);
+  const schalter = (id, beschriftung, text) => zeileSchalter({
+    id: `f-erinnerung-${id}`, beschriftung, text, an: e[id].an,
+    onchange: (ev) => sichere({ ...e, [id]: { ...e[id], an: ev.target.checked } }, true),
+  });
+  const naechsteZeit = () => {
+    const letzte = e.wasser.zeiten.at(-1) ?? '08:00';
+    const stunde = Math.min(22, Number(letzte.slice(0, 2)) + 2);
+    const vorschlag = `${String(stunde).padStart(2, '0')}:00`;
+    return e.wasser.zeiten.includes(vorschlag) ? '07:00' : vorschlag;
+  };
+  return [
+    erlaubnis === 'denied' ? gruppe({ fuss: 'Elan darf gerade keine Benachrichtigungen zeigen. Erlauben in den Android-Einstellungen: Apps → Elan → Benachrichtigungen.' },
+      el('div', { class: 'ezeile' }, el('span', { class: 'ezeile-text' }, 'Benachrichtigungen aus'))) : null,
+    gruppe({ titel: 'Wasser', fuss: e.wasser.an ? 'Bis zu sechs Uhrzeiten am Tag.' : null },
+      schalter('wasser', 'Ans Trinken erinnern', 'Mehrmals am Tag'),
+      e.wasser.an ? e.wasser.zeiten.map((zeit, i) => zeileZeit({
+        id: `f-wasser-zeit-${i}`, beschriftung: `Erinnerung ${i + 1}`, wert: zeit,
+        onchange: (ev) => sichere({ ...e, wasser: { ...e.wasser, zeiten: e.wasser.zeiten.map((z, j) => (j === i ? ev.target.value : z)) } }, true),
+        entfernen: e.wasser.zeiten.length > 1 ? el('button', {
+          type: 'button', class: 'rund', 'aria-label': `Erinnerung ${i + 1} entfernen`,
+          onclick: () => sichere({ ...e, wasser: { ...e.wasser, zeiten: e.wasser.zeiten.filter((_, j) => j !== i) } }, true),
+        }, icon('zu', 18)) : null,
+      })) : null,
+      e.wasser.an && e.wasser.zeiten.length < 6 ? el('button', {
+        type: 'button', class: 'ezeile ezeile-knopf', id: 'wasser-zeit-dazu',
+        onclick: () => sichere({ ...e, wasser: { ...e.wasser, zeiten: [...e.wasser.zeiten, naechsteZeit()] } }, true),
+      }, el('span', { class: 'ezeile-text' }, 'Uhrzeit dazu'), icon('plus', 18)) : null),
+    gruppe({ titel: 'Supplements' },
+      schalter('supplements', 'An Supplements erinnern', 'Einmal am Tag'),
+      e.supplements.an ? zeileZeit({ id: 'f-supplements-zeit', beschriftung: 'Uhrzeit', wert: e.supplements.zeit, onchange: (ev) => sichere({ ...e, supplements: { ...e.supplements, zeit: ev.target.value } }) }) : null),
+    gruppe({ titel: 'Check-in', fuss },
+      schalter('checkin', 'Abends nachfragen', 'Energie, Stimmung, Stress'),
+      e.checkin.an ? zeileZeit({ id: 'f-checkin-zeit', beschriftung: 'Uhrzeit', wert: e.checkin.zeit, onchange: (ev) => sichere({ ...e, checkin: { ...e.checkin, zeit: ev.target.value } }) }) : null),
   ];
 }
 

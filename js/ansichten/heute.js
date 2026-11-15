@@ -15,7 +15,7 @@ import { gehe, neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { blatt, el, gramm, haenge, hinweis, icon, svg, zahl } from '../ui.js';
 import { oeffneEintrag, oeffneZutatWahl } from './eintrag.js';
-import { supplementKarte, tageswerteKarte } from './health.js';
+import { checkinKarte, supplementKarte, tageswerteKarte } from './health.js';
 
 const nameVon = (id) => NAEHRSTOFFE.find((n) => n.id === id).name;
 const eintraegeText = (n) => `${n} ${n === 1 ? 'Eintrag' : 'Einträge'}`;
@@ -62,6 +62,7 @@ export async function zeigeHeute(wurzel, [parameter]) {
     // Alles, was man am Tag einträgt, an einem Ort: erst Essen, dann Körperwerte und Supplements
     tageswerteKarte({ datum, messungen: wasserHeute, ziele: gesundheit, mengen: wasserMengen }),
     supplementKarte(datum, supplements, tag),
+    checkinKarte(datum, wasserHeute),
     alleNaehrwerte(eintraege, wochenEintraege, woche, referenz),
     eintraege.length ? el('div', { class: 'knopfreihe' },
       el('button', { type: 'button', class: 'knopf leise', onclick: () => oeffneTagKopieren(datum, heute, eintraege) }, 'Diesen Tag kopieren')) : null,

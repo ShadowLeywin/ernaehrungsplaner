@@ -13,6 +13,11 @@ export const ARTEN = [
   // Körperwerte (meist aus Health Connect, auch von Hand)
   { id: 'ruhepuls', name: 'Ruhepuls', einheit: 'bpm', min: 25, max: 150, stellen: 0, proTag: 'einmal', gruppe: 'koerper' },
   { id: 'koerperfett', name: 'Körperfett', einheit: '%', min: 2, max: 70, stellen: 1, proTag: 'einmal', gruppe: 'koerper' },
+  { id: 'hrv', name: 'HRV', einheit: 'ms', min: 5, max: 300, stellen: 0, proTag: 'einmal', gruppe: 'koerper' },
+  // Täglicher Check-in: eigenes Empfinden auf einer Skala von 1 bis 5. Die App vergleicht nur, sie deutet nichts.
+  { id: 'energie', name: 'Energie', einheit: '', min: 1, max: 5, stellen: 0, proTag: 'einmal', gruppe: 'checkin' },
+  { id: 'stimmung', name: 'Stimmung', einheit: '', min: 1, max: 5, stellen: 0, proTag: 'einmal', gruppe: 'checkin' },
+  { id: 'stress', name: 'Stress', einheit: '', min: 1, max: 5, stellen: 0, proTag: 'einmal', gruppe: 'checkin' },
   // Körpermaße. Reihenfolge = Reihenfolge der Kacheln: Paare links/rechts stehen nebeneinander.
   { id: 'mass:hals', name: 'Hals', einheit: 'cm', min: 20, max: 80, stellen: 1, proTag: 'einmal', gruppe: 'mass' },
   { id: 'mass:schultern', name: 'Schultern', einheit: 'cm', min: 60, max: 220, stellen: 1, proTag: 'einmal', gruppe: 'mass' },

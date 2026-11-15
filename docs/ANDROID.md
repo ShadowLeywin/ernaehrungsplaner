@@ -16,7 +16,8 @@ Die Android-App ist dieselbe Web-App, verpackt mit Capacitor. Alle Dateien liege
 | Cloud-Sicherung | – | **ausgeschaltet**, Gesundheitsdaten gehen nicht in die Google-Cloud |
 | Vibration | `navigator.vibrate`, falls vorhanden | Plugin Haptics |
 | Widget | – | Widget „Elan · heute“ (kcal übrig, Wasser), siehe unten |
-| Health Connect | – | Schritte, Gewicht, Schlaf lesen (Plugin `@capgo/capacitor-health` 8.11.13), siehe unten |
+| Health Connect | – | Schritte, Gewicht, Schlaf, Ruhepuls, Körperfett, HRV, Trainings lesen (Plugin `@capgo/capacitor-health` 8.11.13), siehe unten |
+| Erinnerungen | – (Seite sagt „Nur in der Android-App“) | Plugin `@capacitor/local-notifications` 8.3.1 (MIT), täglich zu festen Uhrzeiten, siehe unten |
 
 Alle Unterschiede stehen in `js/plattform.js`. Der Browser-Test `tools/pruefe-app.cjs` prüft die App-Zweige mit einer nachgebildeten Capacitor-Brücke („App-Lauf“).
 
@@ -82,7 +83,7 @@ Der `versionCode` enthält die Zahl der Commits (Baunummer). Der angezeigte Name
 ## Health Connect
 
 - Plugin `@capgo/capacitor-health` 8.11.13 (MPL-2.0, unverändert genutzt). Es verlangt Android 8 (API 26); deshalb `minSdkVersion = 26`.
-- Das Plugin meldet viele Berechtigungen an. Das App-Manifest entfernt alle außer `READ_STEPS`, `READ_WEIGHT`, `READ_SLEEP`, `READ_RESTING_HEART_RATE`, `READ_BODY_FAT`, `READ_EXERCISE` (`tools:node="remove"`). Nach jedem Plugin-Update mit `aapt2 dump permissions` prüfen.
+- Das Plugin meldet viele Berechtigungen an. Das App-Manifest entfernt alle außer `READ_STEPS`, `READ_WEIGHT`, `READ_SLEEP`, `READ_RESTING_HEART_RATE`, `READ_BODY_FAT`, `READ_HEART_RATE_VARIABILITY`, `READ_EXERCISE` (`tools:node="remove"`). Nach jedem Plugin-Update mit `aapt2 dump permissions` prüfen.
 - Datenschutzseite: `privacypolicy.html` im Wurzelverzeichnis; das Plugin zeigt sie, wenn man in Health Connect auf „Datenschutzerklärung“ tippt.
 - Umrechnung: `js/logik/healthconnect.js` (getestet), Abgleich: `js/abgleich.js`, Aufrufe: `js/plattform.js`.
 - Beim Bau meldet der Lint-Schritt „Module was compiled with an incompatible version of Kotlin“. Das kommt aus `lintVitalAnalyzeRelease` (älteres Kotlin im Lint), nicht aus dem Kompilieren; der Bau ist grün.
@@ -100,3 +101,9 @@ Der `versionCode` enthält die Zahl der Commits (Baunummer). Der angezeigte Name
 
 - Android-Dokumentation „Create a simple widget“ (developer.android.com/guide/topics/appwidgets): Receiver mit `exported="false"`, abgerufen 14.11.2026.
 - Capacitor 8.6.2, Pakete `@capacitor/android`, `@capacitor/cli`, Typen der Konfiguration in `node_modules/@capacitor/cli/dist/declarations.d.ts`, gelesen 14.11.2026.
+
+## Erinnerungen
+
+- Plugin `@capacitor/local-notifications` 8.3.1 (MIT). Elan plant je Erinnerung eine tägliche Benachrichtigung (`schedule.on` mit Stunde und Minute) mit festen Kennungen 1001–1006 (Wasser), 1101 (Supplements), 1201 (Check-in). Bei jeder Änderung werden alle gelöscht und neu gesetzt.
+- `isExactNotification: false`: Android darf ein paar Minuten verschieben. Dafür entfernt das Manifest `SCHEDULE_EXACT_ALARM`, und Android fragt nicht nach „Wecker und Erinnerungen“. Es bleiben `POST_NOTIFICATIONS` (Frage beim ersten Einschalten, ab Android 13), `RECEIVE_BOOT_COMPLETED` (nach Neustart neu planen) und `WAKE_LOCK`.
+- Symbol: `res/drawable/ic_stat_elan.xml` (weißes Blatt), eingetragen in `capacitor.config.json` unter `plugins.LocalNotifications`.

@@ -25,8 +25,9 @@ Regeln und Wissen für jede Claude-Session in diesem Repo. Erst lesen, dann arbe
 | Schrift | selbst gehostet (`schrift/`), keine Abrufe bei Schriftdiensten. Keine Apple-Schrift (SF Pro): Lizenz nur für Apple-Plattformen |
 | Zielwerte | neutrale Startwerte im Code, alles in der App einstellbar |
 | Netz | nur auf ausdrücklichen Knopfdruck (Open Food Facts). Der Import ruft keine fremden Seiten ab |
-| Health Connect | nur lesen: Schritte, Gewicht, Schlaf, Ruhepuls, Körperfett, Trainings (nur für den Tagestyp; Léons Ja vom 15.11.2026); nur nach Ja im Gerät; eigene Eingaben gehen vor (`quelle: 'healthconnect'`, `tagestypQuelle`). Weitere Berechtigungen nur mit Léons Ja |
-| Struktur | Eintragen auf „Heute“ (Essen, Tageswerte, Wasser, Supplements); Entwicklung unter „Fortschritt“; Einstellungen unter „Mehr“ |
+| Health Connect | nur lesen: Schritte, Gewicht, Schlaf, Ruhepuls, Körperfett, HRV, Trainings (nur für den Tagestyp; Léons Ja vom 15.11.2026); nur nach Ja im Gerät; eigene Eingaben gehen vor (`quelle: 'healthconnect'`, `tagestypQuelle`). Weitere Berechtigungen nur mit Léons Ja |
+| Benachrichtigungen | nur lokale Erinnerungen (Wasser, Supplements, Check-in), erst nach Ja im Gerät, ohne exakte Wecker (`SCHEDULE_EXACT_ALARM` entfernt); Léons Ja vom 15.11.2026 |
+| Struktur | Eintragen auf „Heute“ (Essen, Tageswerte, Wasser, Supplements, Check-in); Entwicklung unter „Fortschritt“; Einstellungen unter „Mehr“ |
 | Name | „Elan“ steht nur in `js/logik/schema.js`, `manifest.webmanifest`, `index.html` |
 | Version | bleibt 1.0.0, bis Léon zufrieden ist. Jede sichtbare Änderung bekommt trotzdem einen Eintrag in `js/daten/neuigkeiten.js` (Was ist neu) |
 | Design | Standard „Blatt“: schlicht im Stil von iOS, Elans Grün, viele Farbtöne je Nährwert und Mahlzeit, Leiste ohne Glas, Schrift Inter; „Zitrus“ (Fruchtfarben, Bricolage) bleibt wählbar. Thema über `data-thema`, Modus über `data-modus` (`js/darstellung.js`). Karten, Einstellungen als gruppiertes Menü, Eintragen mit möglichst wenigen Tipps |

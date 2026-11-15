@@ -267,3 +267,12 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Befehle:** `npm test` (182, neu `test/rueckblick.test.js`) · `node tools/pruefe-app.cjs` (136 Kriterien).
 - **Entscheidung:** Gleitende 7 Tage statt Kalenderwoche, weil am Montag eine Kalenderwoche fast leer wäre. Schnitte nur über Tage mit Werten. Trainings zählen nur aus Health Connect, nicht aus dem Plan.
 - **Testfalle (zum dritten Mal):** CSS `text-transform: uppercase` verändert `innerText`. Merksatz: Text in Tests ohne Rücksicht auf Großschreibung vergleichen.
+
+## Session 14, Runde 6: HRV, Check-in, Erinnerungen (15.11.2026)
+
+- **Was und warum:** Léon: „setze deine oberen Vorschläge auch um.“ HRV aus Health Connect (Tagesschnitt), Check-in auf „Heute“ (Energie, Stimmung, Stress 1–5), Erinnerungen für Wasser, Supplements und Check-in als lokale Benachrichtigungen.
+- **Befehle:** `npm install @capacitor/local-notifications@8.3.1 --save-exact` (Plugin, MIT) · `npm test` (187) · `node tools/pruefe-app.cjs` (138 Kriterien).
+- **Entscheidung:** Erinnerungen ungenau (`isExactNotification: false`), dafür kein Recht `SCHEDULE_EXACT_ALARM` und keine Sonderfrage. Uhrzeit als Auswahl in halben Stunden statt `<input type="time">`: Das Zeitfeld folgte der Systemsprache, zeigte „AM/PM“ und schnitt die Zeit ab.
+- **Entscheidung:** „Energie Ø“ im Rückblick heißt jetzt „Kalorien Ø“, damit es nicht mit der gefühlten Energie aus dem Check-in verwechselt wird.
+- **Fehler:** Test las den Schalter, bevor die Seite neu gezeichnet war. Lösung: erst speichern, dann Hinweis zeigen; im Test auf den Schalter warten. Zweiter Fehler: Kachel-Zählung nahm „2 Körperwerte“ fest an; jetzt gezählt.
+- **Fachbegriffe:** lokale Benachrichtigung (plant das Handy selbst, ohne Server), HRV (Schwankung der Abstände zwischen Herzschlägen, in ms).
