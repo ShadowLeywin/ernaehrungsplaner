@@ -85,13 +85,13 @@ async function hauptlauf(browser) {
 
   await eintrag.click();
   await seite.locator('#f-gramm').fill('100');
-  await seite.getByRole('button', { name: 'Speichern' }).click();
+  await seite.locator('dialog').getByRole('button', { name: 'Speichern', exact: true }).click();
   await seite.locator('dialog').waitFor({ state: 'detached' });
   pruefe('Eintrag ändern', (await eintrag.locator('.eintrag-menge').innerText()) === '100 g', await eintrag.locator('.eintrag-menge').innerText());
 
   await eintrag.click();
   await seite.locator('#f-gramm').fill('abc');
-  await seite.getByRole('button', { name: 'Speichern' }).click();
+  await seite.locator('dialog').getByRole('button', { name: 'Speichern', exact: true }).click();
   pruefe('Ungültige Menge wird abgelehnt', (await seite.locator('#f-gramm-fehler').innerText()).length > 0, await seite.locator('#f-gramm-fehler').innerText());
   await seite.getByRole('button', { name: 'Löschen' }).click();
   await seite.locator('dialog').waitFor({ state: 'detached' });
@@ -741,15 +741,17 @@ async function vorkochLauf(browser) {
 
 async function healthLauf(browser) {
   // Alle Werte in diesem Lauf sind erfunden.
+  // Aufbau seit Session 14: Eintragen auf „Heute“ (Tageswerte, Wasser, Supplements), Entwicklung unter „Fortschritt“.
   const { kontext, seite, fehler } = await neueSeite(browser);
-  await seite.goto(`${URL_APP}#/health`, { waitUntil: 'networkidle' });
-  await seite.locator('#f-gewicht').waitFor();
+  await seite.goto(`${URL_APP}#/fortschritt`, { waitUntil: 'networkidle' });
   const leer = await seite.locator('#gewicht-trend').innerText();
-  pruefe('Health: ohne Daten ehrliche Auskunft statt Trend', leer.includes('je 3 Werte'), leer);
+  pruefe('Fortschritt: ohne Daten ehrliche Auskunft statt Trend', leer.includes('je 3 Werte'), leer);
 
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.locator('#f-gewicht').waitFor();
   await seite.locator('#f-gewicht').fill('500');
   await seite.getByRole('button', { name: 'Tageswerte speichern' }).click();
-  const grenze = await seite.locator('.fehlertext').first().innerText();
+  const grenze = await seite.locator('.tageswerte .fehlertext').first().innerText();
   await seite.locator('#f-gewicht').fill('80,4');
   await seite.locator('#f-schlaf').fill('7,5');
   await seite.locator('#f-schritte').fill('9000');
@@ -757,7 +759,7 @@ async function healthLauf(browser) {
   await seite.locator('.hinweis', { hasText: 'Tageswerte gespeichert' }).waitFor();
   await seite.reload({ waitUntil: 'networkidle' });
   await seite.locator('#f-gewicht').waitFor();
-  pruefe('Health: Gewicht, Schlaf und Schritte speichern, Grenzen werden geprüft', (await seite.locator('#f-gewicht').inputValue()) === '80,4' && (await seite.locator('#f-schritte').inputValue()) === '9000' && grenze.includes('20 bis 400'),
+  pruefe('Heute: Gewicht, Schlaf und Schritte speichern, Grenzen werden geprüft', (await seite.locator('#f-gewicht').inputValue()) === '80,4' && (await seite.locator('#f-schritte').inputValue()) === '9000' && grenze.includes('20 bis 400'),
     `„${grenze}“ bei 500 kg; gespeichert: ${await seite.locator('#f-gewicht').inputValue()} kg, ${await seite.locator('#f-schlaf').inputValue()} h, ${await seite.locator('#f-schritte').inputValue()} Schritte`);
 
   // Zwei Wochen erfundene Gewichte direkt in die Datenbank: Vorwoche 80,0, diese Woche 80,3
@@ -772,65 +774,86 @@ async function healthLauf(browser) {
       t.onerror = () => nein(t.error);
     };
   }));
-  await seite.reload({ waitUntil: 'networkidle' });
-  await seite.locator('.verlauf').waitFor();
+  await seite.goto(`${URL_APP}#/fortschritt`);
+  await seite.locator('.gewicht-karte .verlauf').waitFor();
   const halten = await seite.locator('#gewicht-trend').innerText();
   const karteVorher = await seite.locator('.gewicht-karte').evaluate((k) => `${k.querySelector('.gewicht-zahl').textContent}|${k.querySelector('.gewicht-aenderung')?.textContent}|${k.querySelector('.trend-pille')?.textContent}`);
-  await seite.locator('details.bereich summary', { hasText: 'Ziele für Health' }).click();
+  await seite.goto(`${URL_APP}#/mehr/koerper`);
   await seite.locator('#f-ziel-wochenzielKg').fill('0,25');
+  await seite.locator('#f-wasser-menge-0').fill('330');
   await seite.getByRole('button', { name: 'Ziele speichern' }).click();
   await seite.locator('.hinweis', { hasText: 'Ziele gespeichert' }).waitFor();
-  await seite.waitForFunction((alt) => document.getElementById('gewicht-trend').textContent !== alt, halten);
+  await seite.goto(`${URL_APP}#/fortschritt`);
+  await seite.locator('.gewicht-karte .trend-pille').waitFor();
   const zunehmen = await seite.locator('#gewicht-trend').innerText();
-  pruefe('Health: 7-Tage-Schnitt gegen das Wochenziel', halten.includes('80,3 kg') && halten.includes('+0,3 kg zur Vorwoche') && halten.includes('mehr als geplant') && zunehmen.includes('im Ziel'),
+  pruefe('Fortschritt: 7-Tage-Schnitt gegen das Wochenziel', halten.includes('80,3 kg') && halten.includes('+0,3 kg zur Vorwoche') && halten.includes('mehr als geplant') && zunehmen.includes('im Ziel'),
     `Ziel ±0: „${halten}“ | Ziel +0,25: „…${zunehmen.slice(-45)}“`);
   const pilleNachher = await seite.locator('.gewicht-karte .trend-pille').innerText();
-  pruefe('Health: Gewichts-Karte mit großem Schnitt, Pfeil und Stand zum Ziel', karteVorher === '80,3 kg|↑ +0,3 kg|über Plan' && pilleNachher === 'im Ziel', `vorher ${karteVorher}, mit Ziel +0,25: ${pilleNachher}`);
-  await bild(seite, '16-health');
+  pruefe('Fortschritt: Gewichts-Karte mit großem Schnitt, Pfeil und Stand zum Ziel', karteVorher === '80,3 kg|↑ +0,3 kg|über Plan' && pilleNachher === 'im Ziel', `vorher ${karteVorher}, mit Ziel +0,25: ${pilleNachher}`);
+  await bild(seite, '16-fortschritt');
 
+  // Wasser mit eigenen Knöpfen; Getipptes im Gewichtsfeld bleibt erhalten
+  await seite.goto(`${URL_APP}#/heute`);
   await seite.locator('#f-gewicht').fill('81');
-  await seite.getByRole('button', { name: '+ 250 ml' }).click();
+  const knoepfe = await seite.locator('.wasser-knoepfe .chip').allInnerTexts();
+  const ring = await seite.locator('.kachel.makro-wasser .kachel-plus').innerText();
+  await seite.getByRole('button', { name: '+ 330 ml' }).click();
+  await seite.locator('#wasser-stand', { hasText: '330 von' }).waitFor();
   await seite.getByRole('button', { name: '+ 500 ml' }).click();
-  await seite.locator('#wasser-stand', { hasText: '750 von' }).waitFor();
+  await seite.locator('#wasser-stand', { hasText: '830 von' }).waitFor();
   const getippt = await seite.locator('#f-gewicht').inputValue();
   await seite.getByRole('button', { name: 'Letzten Schluck zurücknehmen' }).click();
-  await seite.locator('#wasser-stand', { hasText: '250 von' }).waitFor();
-  pruefe('Health: Wasser zählen, ohne getippte Werte zu verlieren', getippt === '81', `Gewichtsfeld behält „${getippt}“; ${await seite.locator('#wasser-stand').innerText()}`);
+  await seite.locator('#wasser-stand', { hasText: '330 von' }).waitFor();
+  pruefe('Heute: eigene Wasser-Knöpfe, Ring nimmt die erste Menge, Getipptes bleibt', getippt === '81' && knoepfe.join() === '+ 330 ml,+ 500 ml,+ 750 ml' && ring === '+330',
+    `Knöpfe ${knoepfe.join(' / ')}, Ring ${ring}; Gewichtsfeld behält „${getippt}“; ${await seite.locator('#wasser-stand').innerText()}`);
 
   await seite.locator('#f-supplement-name').fill('Testpulver');
   await seite.locator('#f-supplement-dosis').fill('5 g');
   await seite.locator('.zusatz').getByRole('button', { name: 'Dazu' }).click();
   await seite.locator('.haken', { hasText: 'Testpulver' }).waitFor();
   const blieb = await seite.locator('#f-gewicht').inputValue();
-  await seite.locator('.haken input').check();
+  await seite.locator('.supplemente .haken input').check();
   await seite.locator('#supplement-stand', { hasText: '1 von 1' }).waitFor();
   await seite.reload({ waitUntil: 'networkidle' });
-  await seite.locator('.haken').waitFor();
-  const amTag = await seite.locator('.haken.erledigt').count();
+  await seite.locator('.supplemente .haken').waitFor();
+  const amTag = await seite.locator('.supplemente .haken.erledigt').count();
   await seite.getByRole('link', { name: 'Einen Tag zurück' }).click();
-  await seite.locator('.tagestitel p', { hasText: 'Gestern' }).waitFor();
-  await seite.locator('.haken').waitFor();
-  pruefe('Health: Supplement anlegen und je Tag abhaken', amTag === 1 && (await seite.locator('.haken.erledigt').count()) === 0 && blieb === '81', 'heute abgehakt, gestern offen; Entwurf im Gewichtsfeld überlebt das Neuzeichnen');
+  await seite.locator('h1', { hasText: 'Gestern' }).waitFor();
+  await seite.locator('.supplemente .haken').waitFor();
+  pruefe('Heute: Supplement anlegen und je Tag abhaken', amTag === 1 && (await seite.locator('.supplemente .haken.erledigt').count()) === 0 && blieb === '81', 'heute abgehakt, gestern offen; Entwurf im Gewichtsfeld überlebt das Neuzeichnen');
 
-  await seite.getByRole('link', { name: 'Zu heute' }).click();
-  await seite.locator('.tagestitel p', { hasText: 'Heute' }).waitFor();
-  await seite.locator('details.bereich summary', { hasText: 'Körpermaße' }).click();
-  await seite.locator('#f-mass-taille').fill('84,5');
-  await seite.getByRole('button', { name: 'Maße speichern' }).click();
-  await seite.locator('.hinweis', { hasText: 'Maße gespeichert' }).waitFor();
+  // Körpermaße: Kacheln wie beim Maßband, Eintragen im Blatt, eigenes Maß mit Namen
+  await seite.goto(`${URL_APP}#/fortschritt`);
+  await seite.locator('.mass-kachel').first().waitFor();
+  const kacheln = await seite.locator('.mass-kachel').count();
+  await seite.locator('#mass-taille').click();
+  await seite.locator('#f-mass-wert').fill('84,5');
+  await seite.locator('dialog').getByRole('button', { name: 'Speichern' }).click();
+  await seite.locator('.hinweis', { hasText: 'Taille: 84,5 cm gespeichert' }).waitFor();
+  await seite.locator('#mass-eigen1').click();
+  await seite.locator('#f-mass-name').fill('Unterbauch');
+  await seite.locator('#f-mass-wert').fill('88');
+  await seite.locator('dialog').getByRole('button', { name: 'Speichern' }).click();
+  await seite.locator('.hinweis', { hasText: 'Unterbauch: 88 cm gespeichert' }).waitFor();
   await seite.reload({ waitUntil: 'networkidle' });
-  await seite.locator('details.bereich summary', { hasText: 'Körpermaße' }).click();
-  pruefe('Health: Körpermaße speichern', (await seite.locator('#f-mass-taille').inputValue()) === '84,5', `Taille ${await seite.locator('#f-mass-taille').inputValue()} cm`);
+  const taille = await seite.locator('#mass-taille').innerText();
+  const eigen = await seite.locator('#mass-eigen1').innerText();
+  pruefe('Fortschritt: alle Körpermaße als Kacheln, Wert und eigener Name bleiben', kacheln >= 19 && taille.includes('84,5') && eigen.startsWith('Unterbauch') && eigen.includes('88'),
+    `${kacheln} Kacheln; ${taille.replace(/\n/g, ' ')}; ${eigen.replace(/\n/g, ' ')}`);
+  await bild(seite, '17-koerpermasse');
 
   const unsinn = [];
-  await seite.locator('details.bereich summary', { hasText: 'Ziele für Health' }).click();
-  const b = await seite.evaluate(() => ({ inhalt: document.documentElement.scrollWidth, fenster: window.innerWidth }));
-  if (b.inhalt > b.fenster) unsinn.push('zu breit');
-  if (/\b(null|undefined|NaN)\b/.test(await seite.locator('body').innerText())) unsinn.push('null/undefined/NaN im Text');
-  const klein = await seite.evaluate(() => [...document.querySelectorAll('button, a, select, summary, input:not([type=checkbox])')].filter((e) => e.offsetParent).map((e) => ({ t: (e.getAttribute('aria-label') || e.textContent).trim().slice(0, 18), h: Math.round(e.getBoundingClientRect().height) })).filter((e) => e.h < 40));
-  if (klein.length) unsinn.push(`Tippflächen unter 40 px: ${JSON.stringify(klein)}`);
+  for (const route of ['heute', 'fortschritt', 'mehr/koerper']) {
+    await seite.goto(`${URL_APP}#/${route}`);
+    await seite.locator('h1').first().waitFor();
+    const b = await seite.evaluate(() => ({ inhalt: document.documentElement.scrollWidth, fenster: window.innerWidth }));
+    if (b.inhalt > b.fenster) unsinn.push(`${route} zu breit`);
+    if (/\b(null|undefined|NaN)\b/.test(await seite.locator('body').innerText())) unsinn.push(`${route}: null/undefined/NaN im Text`);
+    const klein = await seite.evaluate(() => [...document.querySelectorAll('button, a, select, summary, input:not([type=checkbox])')].filter((e) => e.offsetParent).map((e) => ({ t: (e.getAttribute('aria-label') || e.textContent).trim().slice(0, 18), h: Math.round(e.getBoundingClientRect().height) })).filter((e) => e.h < 40));
+    if (klein.length) unsinn.push(`${route}: Tippflächen unter 40 px: ${JSON.stringify(klein)}`);
+  }
   const leiste = await seite.locator('.navigation a').allInnerTexts();
-  pruefe('Health: Breite, Text, Tippflächen; Leiste mit fünf Einträgen', unsinn.length === 0 && leiste.length === 5, unsinn.join(' | ') || `${b.inhalt}/${b.fenster} px; Leiste: ${leiste.map((t) => t.trim()).join(', ')}`);
+  pruefe('Heute, Fortschritt, Ziele: Breite, Text, Tippflächen; Leiste mit fünf Einträgen', unsinn.length === 0 && leiste.length === 5 && leiste.map((t) => t.trim()).includes('Fortschritt'), unsinn.join(' | ') || `Leiste: ${leiste.map((t) => t.trim()).join(', ')}`);
   pruefe('Health-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
   await kontext.close();
 }
@@ -838,7 +861,9 @@ async function healthLauf(browser) {
 async function befundLauf(browser) {
   // Alle Werte in diesem Lauf sind erfunden.
   const { kontext, seite, fehler } = await neueSeite(browser);
-  await seite.goto(`${URL_APP}#/health`, { waitUntil: 'networkidle' });
+  await seite.goto(`${URL_APP}#/health`, { waitUntil: 'networkidle' }); // alte Adresse: muss zu Fortschritt weiterleiten
+  await seite.locator('h1', { hasText: 'Fortschritt' }).waitFor();
+  pruefe('Alte Adresse #/health führt zu Fortschritt', seite.url().endsWith('#/fortschritt'), seite.url().split('#')[1]);
   await seite.getByRole('link', { name: 'Laborwerte' }).click();
   await seite.locator('h1', { hasText: 'Laborwerte' }).waitFor();
   const leer = await seite.locator('.leer').innerText();
@@ -884,7 +909,7 @@ async function befundLauf(browser) {
   await seite.locator('.slot').first().waitFor();
   await trageEin(seite, 'Frühstück', 'apfel', 150);
   await trageEin(seite, 'Mittagessen', 'reis', 200);
-  await seite.goto(`${URL_APP}#/health/symptome`);
+  await seite.goto(`${URL_APP}#/fortschritt/symptome`);
   await seite.locator('h1', { hasText: 'Symptome' }).waitFor();
   const trage = async (art, staerke, haken) => {
     await seite.getByRole('button', { name: 'Symptom eintragen' }).click();
@@ -911,7 +936,7 @@ async function befundLauf(browser) {
 
   const unsinn = [];
   const mass = [];
-  for (const [route, warteAuf] of [['health/labor', '.laborgruppe'], ['health/symptome', '#vor-symptomen']]) {
+  for (const [route, warteAuf] of [['fortschritt/labor', '.laborgruppe'], ['fortschritt/symptome', '#vor-symptomen']]) {
     await seite.goto(`${URL_APP}#/${route}`);
     await seite.locator(warteAuf).first().waitFor();
     const b = await seite.evaluate(() => ({ inhalt: document.documentElement.scrollWidth, fenster: window.innerWidth }));
@@ -1137,8 +1162,7 @@ async function feinschliffLauf(browser) {
     messung('mass:taille', 60, 86), messung('mass:taille', 0, 84.5),
     messung('schritte', 0, 9000),
   ]);
-  await seite.goto(`${URL_APP}#/health`);
-  await seite.locator('#verlaeufe summary').click();
+  await seite.goto(`${URL_APP}#/fortschritt`);
   await seite.locator('#verlaeufe .verlauf').first().waitFor();
   const linien = await seite.locator('#verlaeufe figcaption').allInnerTexts();
   pruefe('Verläufe für Wasser, Schlaf und Maße; ein einzelner Wert ergibt keine Linie', linien.length === 3 && linien.some((t) => t.startsWith('Wasser') && t.includes('von 1.250 bis 2.000 ml')) && linien.some((t) => t.startsWith('Taille') && t.includes('180 Tagen')) && !linien.some((t) => t.startsWith('Schritte')),
@@ -1162,7 +1186,7 @@ async function feinschliffLauf(browser) {
 
   const unsinn = [];
   await schreibe([{ store: 'einstellungen', vorTagen: 20, feld: 'wert', satz: { schluessel: 'letztesBackup' } }]);
-  for (const [route, warteAuf, oeffne] of [['heute', '.backup-erinnerung', null], ['health', '#verlaeufe', '#verlaeufe summary'], ['rezepte/test-kopie/bearbeiten', '#f-schritt-1', null]]) {
+  for (const [route, warteAuf, oeffne] of [['heute', '.backup-erinnerung', null], ['fortschritt', '#verlaeufe', null], ['rezepte/test-kopie/bearbeiten', '#f-schritt-1', null]]) {
     await seite.goto(`${URL_APP}#/${route}`);
     await seite.locator(warteAuf).first().waitFor();
     if (oeffne && !(await seite.locator('#verlaeufe').getAttribute('open'))) await seite.locator(oeffne).click();
@@ -1189,6 +1213,17 @@ async function appLauf(browser) {
         window.__aufrufe.push({ plugin, methode, optionen });
         if (plugin === 'Filesystem' && methode === 'writeFile') return { uri: `file:///data/cache/${optionen.path}` };
         if (plugin === 'CapacitorHttp') return { status: 200, data: offAntwort, headers: {} };
+        // Health Connect mit erfundenen Werten: heute 6.543 Schritte, 79,9 kg, letzte Nacht 7,5 h Schlaf
+        if (plugin === 'Health') {
+          const heute = (stunde, minute = 0) => { const d = new Date(); d.setHours(stunde, minute, 0, 0); return d.toISOString(); };
+          const gestern = (stunde) => { const d = new Date(); d.setDate(d.getDate() - 1); d.setHours(stunde, 0, 0, 0); return d.toISOString(); };
+          if (methode === 'isAvailable') return { available: true, platform: 'android' };
+          if (methode === 'checkAuthorization') return { readAuthorized: window.__hcErlaubt ?? [] };
+          if (methode === 'requestAuthorization') { window.__hcErlaubt = optionen.read; return { readAuthorized: optionen.read }; }
+          if (methode === 'queryAggregated') return { samples: [{ startDate: heute(0), endDate: heute(23), value: 6543, unit: 'count' }] };
+          if (methode === 'readSamples' && optionen.dataType === 'weight') return { samples: [{ startDate: heute(7), endDate: heute(7), value: 79.9, unit: 'kilogram' }] };
+          if (methode === 'readSamples' && optionen.dataType === 'sleep') return { samples: [{ startDate: gestern(23), endDate: heute(6, 30), value: 450, unit: 'minute', sleepState: 'light' }] };
+        }
         return {};
       },
     };
@@ -1263,6 +1298,29 @@ async function appLauf(browser) {
   await seite.locator('.kachel.makro-wasser').click();
   await seite.locator('.kachel.makro-wasser .kachel-wert', { hasText: '500 ml' }).waitFor();
   const ohne = await seite.evaluate(() => window.__aufrufe.filter((a) => a.plugin === 'Haptics').length);
+  // Health Connect: verbinden, abgleichen; eigene Eingaben bleiben
+  await seite.goto(`${URL_APP}#/mehr/healthconnect`);
+  await seite.getByRole('button', { name: 'Mit Health Connect verbinden' }).click();
+  await seite.locator('.hinweis', { hasText: 'übernommen' }).waitFor();
+  const hcHinweis = await seite.locator('.hinweis').innerText();
+  const angefragt = await seite.evaluate(() => window.__aufrufe.filter((a) => a.plugin === 'Health' && a.methode === 'requestAuthorization').map((a) => a.optionen.read.join('+')));
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.locator('#f-schritte').waitFor();
+  const hcWerte = `${await seite.locator('#f-gewicht').inputValue()}|${await seite.locator('#f-schlaf').inputValue()}|${await seite.locator('#f-schritte').inputValue()}`;
+  const markiert = await seite.locator('.tageswerte label', { hasText: 'aus Health Connect' }).count();
+  await seite.locator('#f-schritte').fill('7000');
+  await seite.getByRole('button', { name: 'Tageswerte speichern' }).click();
+  await seite.locator('.hinweis', { hasText: 'Tageswerte gespeichert' }).waitFor();
+  await seite.goto(`${URL_APP}#/mehr/healthconnect`);
+  await seite.getByRole('button', { name: 'Jetzt abgleichen' }).click();
+  await seite.locator('.hinweis', { hasText: /übernommen|schon da/ }).waitFor();
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.locator('#f-schritte').waitFor();
+  const eigenBleibt = await seite.locator('#f-schritte').inputValue();
+  pruefe('App: Health Connect liest nur Schritte, Gewicht, Schlaf; eigene Eingabe geht vor',
+    angefragt.join() === 'steps+weight+sleep' && hcWerte === '79,9|7,5|6543' && markiert === 3 && eigenBleibt === '7000',
+    `angefragt ${angefragt.join()}; „${hcHinweis}“; übernommen ${hcWerte} (${markiert} markiert); nach eigener Eingabe und erneutem Abgleich: ${eigenBleibt} Schritte`);
+
   pruefe('App: Vibration beim Tippen, abschaltbar', tipp.join() === 'impact:LIGHT' && erfolg.join() === 'impact:LIGHT,notification:SUCCESS' && ohne === 0, `Wasser: ${tipp.join() || 'kein Aufruf'}; nach Eintragen: ${erfolg.join()}; aus: ${ohne} Aufrufe`);
   pruefe('App-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
   await kontext.close();

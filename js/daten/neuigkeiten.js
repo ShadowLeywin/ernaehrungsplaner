@@ -5,6 +5,19 @@ export const NEUIGKEITEN = [
   {
     version: '1.0.0',
     datum: '2026-11-15',
+    titel: 'Fortschritt, alle Körpermaße, Health Connect',
+    punkte: [
+      'Alles Eintragen an einem Ort: Gewicht, Schlaf, Schritte, Wasser und Supplements stehen jetzt auf „Heute“.',
+      'Neuer Tab „Fortschritt“ statt „Health“: Gewichtstrend, Körpermaße, Verläufe, Laborwerte und Symptome.',
+      'Alle Körpermaße wie beim Maßband: Hals, Schultern, Brust, Taille, Bauch, Hüfte, Gesäß, dazu Oberarm, Unterarm, Handgelenk, Oberschenkel und Wade je links und rechts, plus zwei eigene Maße mit eigenem Namen.',
+      'Wasser-Knöpfe frei wählbar (Mehr → Ziele für Körper und Wasser); der Wasser-Ring nimmt die erste Menge.',
+      'Android: Schritte, Gewicht und Schlaf aus Health Connect übernehmen (Mehr → Health Connect). Nur lesen, eigene Eingaben gehen vor.',
+      '„Letzten Schluck zurücknehmen“ trifft jetzt sicher den zuletzt eingetragenen Schluck.',
+    ],
+  },
+  {
+    version: '1.0.0',
+    datum: '2026-11-15',
     titel: 'Einstellungen wie auf dem iPhone',
     punkte: [
       'Alle Einstellungen als ruhige Listen: Wert rechts, Schalter für An und Aus, Häkchen für die Auswahl, Erklärung klein darunter.',
@@ -84,7 +97,8 @@ export const FUNKTIONEN = [
   { titel: 'Woche und Einkauf', text: 'Mahlzeiten vormerken, mit einem Tipp ins Tagebuch übernehmen. Die Einkaufsliste rechnet Rezepte in Zutaten um und zeigt Angebote.' },
   { titel: 'Rezepte', text: 'Zutaten, Portionen und Schritte, je Schritt mit „Prinzip dahinter“. Meal-Prep mit Gewicht nach dem Kochen und Haltbarkeit. Import aus Text.' },
   { titel: 'Zutaten', text: '184 Lebensmittel sind dabei, eigene kommen dazu. Suche bei Open Food Facts nur auf Knopfdruck. Die Mag-Liste merkt sich, was du (nicht) magst.' },
-  { titel: 'Health', text: 'Gewicht mit 7-Tage-Schnitt gegen dein Wochenziel, Wasser, Schlaf, Schritte, Supplements, Maße, Laborwerte und Symptome.' },
+  { titel: 'Fortschritt', text: 'Gewicht mit 7-Tage-Schnitt gegen dein Wochenziel, alle Körpermaße als Kacheln, Verläufe, Laborwerte und Symptome. Eingetragen wird auf „Heute“.' },
+  { titel: 'Health Connect (Android)', text: 'Schritte, Gewicht und Schlaf vom Handy übernehmen. Nur lesen, nur auf dein Ja; eigene Eingaben gehen vor.' },
   { titel: 'Backup und Coach-Export', text: 'Alle Daten als Datei sichern und wieder einspielen. Der Wochenbericht ist Text zum Einfügen in einen Chat.' },
   { titel: 'Widget (Android)', text: 'Auf dem Startbildschirm: kcal übrig und Wasser von heute. Antippen öffnet Elan.' },
   { titel: 'Darstellung', text: 'Blatt (schlicht und grün) oder Zitrus (das erste Design), jeweils hell, dunkel oder wie das Handy.' },

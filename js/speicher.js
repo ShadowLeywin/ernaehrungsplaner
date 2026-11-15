@@ -165,7 +165,9 @@ async function aendereTag(datum, aendere) {
 /* ---------- Health ---------- */
 
 export const messungenZwischen = (von, bis) => db.imBereich('messungen', 'datum', von, bis);
-export const speichereMessung = ({ art, datum, wert }) => db.speichere('messungen', { id: messungId(art, datum, crypto.randomUUID()), art, datum, wert });
+// quelle (optional): 'healthconnect' bei gelesenen Werten; eigene Eingaben haben keine Quelle und gehen immer vor
+// erstellt: Zeitpunkt der Eingabe; „Letzten Schluck zurücknehmen“ braucht die Reihenfolge, die Kennung ist zufällig
+export const speichereMessung = ({ art, datum, wert, quelle }) => db.speichere('messungen', { id: messungId(art, datum, crypto.randomUUID()), art, datum, wert, erstellt: new Date().toISOString(), ...(quelle ? { quelle } : {}) });
 export const loescheMessung = (id) => db.loesche('messungen', id);
 export const alleSupplements = () => db.alle('supplements');
 export const speichereSupplement = (s) => db.speichere('supplements', { ...s, id: s.id ?? crypto.randomUUID() });

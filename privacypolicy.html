@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Datenschutz – Elan</title>
+  <!-- Diese Seite zeigt Health Connect, wenn man dort auf „Datenschutzerklärung“ tippt (Pflicht für Apps mit Health Connect).
+       Sie liegt in der App selbst und lädt nichts aus dem Netz. -->
+  <style>
+    :root { color-scheme: light dark; --grund: #f3f6ee; --text: #14241a; --leise: #5b6a5e; --akzent: #1c7445; }
+    @media (prefers-color-scheme: dark) { :root { --grund: #0b100c; --text: #eef5e4; --leise: #9dab9f; --akzent: #b5e13a; } }
+    body { margin: 0; padding: 1.25rem 1rem 3rem; background: var(--grund); color: var(--text); font: 1rem/1.5 system-ui, -apple-system, Roboto, sans-serif; }
+    main { max-width: 34rem; margin: 0 auto; }
+    h1 { font-size: 1.75rem; line-height: 1.2; margin: 0 0 1rem; }
+    h2 { font-size: 1.125rem; margin: 1.5rem 0 0.375rem; }
+    p, li { color: var(--text); }
+    .klein { color: var(--leise); font-size: 0.875rem; }
+    a { color: var(--akzent); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Datenschutz bei Elan</h1>
+    <p>Elan ist eine private App ohne Konto, ohne Server und ohne Werbung. Alles, was du einträgst, bleibt auf deinem Gerät.</p>
+
+    <h2>Health Connect</h2>
+    <p>Wenn du es erlaubst, liest Elan aus Health Connect genau drei Arten von Daten:</p>
+    <ul>
+      <li><strong>Schritte</strong> als Summe je Tag,</li>
+      <li><strong>Gewicht</strong>, je Tag die letzte Messung,</li>
+      <li><strong>Schlaf</strong> als Dauer je Nacht.</li>
+    </ul>
+    <p>Elan liest höchstens die letzten 30 Tage, nur wenn du „Abgleichen“ antippst oder den automatischen Abgleich einschaltest. Elan schreibt nichts in Health Connect zurück.</p>
+    <p>Die Werte erscheinen auf „Heute“ und unter „Fortschritt“. Wenn du einen Wert selbst einträgst, hat deiner Vorrang.</p>
+
+    <h2>Wohin die Daten gehen</h2>
+    <p>Nirgendwohin. Elan sendet keine Gesundheitsdaten an einen Server und gibt sie an niemanden weiter. Die Android-Sicherung in die Google-Cloud ist für Elan ausgeschaltet.</p>
+    <p>Daten verlassen das Gerät nur, wenn du selbst ein Backup speicherst oder den Coach-Bericht teilst. Dann entscheidest du, wohin die Datei oder der Text geht.</p>
+
+    <h2>Erlaubnis zurücknehmen</h2>
+    <p>Du kannst die Erlaubnis jederzeit in Health Connect entziehen: Einstellungen → Health Connect → App-Berechtigungen → Elan. Bereits übernommene Werte bleiben in Elan, bis du sie dort löschst.</p>
+
+    <p class="klein">Stand: 15.11.2026</p>
+  </main>
+</body>
+</html>

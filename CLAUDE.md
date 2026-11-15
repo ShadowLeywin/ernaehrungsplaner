@@ -25,6 +25,8 @@ Regeln und Wissen für jede Claude-Session in diesem Repo. Erst lesen, dann arbe
 | Schrift | selbst gehostet (`schrift/`), keine Abrufe bei Schriftdiensten. Keine Apple-Schrift (SF Pro): Lizenz nur für Apple-Plattformen |
 | Zielwerte | neutrale Startwerte im Code, alles in der App einstellbar |
 | Netz | nur auf ausdrücklichen Knopfdruck (Open Food Facts). Der Import ruft keine fremden Seiten ab |
+| Health Connect | nur lesen: Schritte, Gewicht, Schlaf; nur nach Ja; eigene Eingaben gehen vor (`quelle: 'healthconnect'`). Weitere Berechtigungen nur mit Léons Ja |
+| Struktur | Eintragen auf „Heute“ (Essen, Tageswerte, Wasser, Supplements); Entwicklung unter „Fortschritt“; Einstellungen unter „Mehr“ |
 | Name | „Elan“ steht nur in `js/logik/schema.js`, `manifest.webmanifest`, `index.html` |
 | Version | bleibt 1.0.0, bis Léon zufrieden ist. Jede sichtbare Änderung bekommt trotzdem einen Eintrag in `js/daten/neuigkeiten.js` (Was ist neu) |
 | Design | Standard „Blatt“: schlicht im Stil von iOS, Elans Grün, viele Farbtöne je Nährwert und Mahlzeit, Leiste ohne Glas, Schrift Inter; „Zitrus“ (Fruchtfarben, Bricolage) bleibt wählbar. Thema über `data-thema`, Modus über `data-modus` (`js/darstellung.js`). Karten, Einstellungen als gruppiertes Menü, Eintragen mit möglichst wenigen Tipps |
@@ -76,13 +78,15 @@ Léon kann mehrere Runden am Stück freigeben („mach durch bis …“). Dann d
 | `js/speicher.js` | Datenzugriff für die Ansichten |
 | `js/ansichten/` | je Seite eine Datei, baut DOM-Elemente |
 | `js/ui.js` | `el`, `svg`, `haenge`, `blatt`, `hinweis`, `bestaetige`, `feld` |
-| `js/router.js` | Hash-Router (`#/heute`, `#/woche`, `#/rezepte`, `#/health`, `#/mehr/<unterseite>`, `#/willkommen`; `#/zutaten` ohne eigenen Platz in der Leiste) |
+| `js/router.js` | Hash-Router (`#/heute`, `#/woche`, `#/rezepte`, `#/fortschritt`, `#/mehr/<unterseite>`, `#/willkommen`; `#/zutaten` ohne eigenen Platz in der Leiste; `#/health` leitet zu `#/fortschritt`) |
 | `sw.js` | Service Worker, Cache zuerst |
 | `data/zutaten-basis.json` | mitgelieferte Zutaten, nur lesen |
 | `test/` | Unit-Tests und Beispieldaten |
 | `tools/` | Server, Browser-Prüfung, Icon-Erzeugung, APK-Vorbereitung |
 | `android/` | Android-Projekt (Capacitor); `www/` entsteht beim Bau |
-| `js/plattform.js` | Datei geben, Text teilen, JSON holen: im Browser und in der App |
+| `js/plattform.js` | Datei geben, Text teilen, JSON holen, Vibration, Widget, Health Connect: im Browser und in der App |
+| `js/abgleich.js` | Abgleich mit Health Connect (lesen, umrechnen über `js/logik/healthconnect.js`, speichern) |
+| `privacypolicy.html` | Datenschutzseite, Pflicht für Health Connect |
 | `data/referenzwerte.json` | Referenzwerte der DGE mit Quelle und Abrufdatum |
 | `js/daten/neuigkeiten.js` | Patchnotes und Funktionsliste für „Was ist neu“ und „Über Elan“ |
 | `js/ansichten/willkommen.js` | Ersteinrichtung beim ersten Start (Gerät merkt sich `elan.eingerichtet`) |

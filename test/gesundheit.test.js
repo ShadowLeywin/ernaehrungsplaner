@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
-  ARTEN, STANDARD_GESUNDHEIT, bereinigeGesundheit, gewichtsTrend, trendRichtung, gleitenderSchnitt, letzterWert, linienPunkte, messungId,
+  ARTEN, STANDARD_GESUNDHEIT, STANDARD_WASSER_MENGEN, bereinigeWasserMengen, pruefeWasserMengen, sichtbareMasse, standUndAenderung, bereinigeGesundheit, gewichtsTrend, trendRichtung, gleitenderSchnitt, letzterWert, linienPunkte, messungId,
   pruefeGesundheit, pruefeMesswert, tagesSumme, tagesWert, verlauf,
 } from '../js/logik/gesundheit.js';
 import { verschiebe } from '../js/logik/datum.js';
@@ -100,4 +100,41 @@ test('trendRichtung: Pfeil nur bei spürbarer Änderung', () => {
   assert.equal(trendRichtung(-0.049), 'gleich');
   assert.equal(trendRichtung(null), 'gleich');
   assert.equal(trendRichtung(Number.NaN), 'gleich');
+});
+
+test('Körpermaße: alle Stellen wie beim Maßband, Paare links/rechts nebeneinander', () => {
+  const masse = ARTEN.filter((a) => a.gruppe === 'mass' && !a.alt).map((a) => a.id);
+  for (const teil of ['hals', 'schultern', 'brust', 'taille', 'bauch', 'huefte', 'gesaess']) assert.ok(masse.includes(`mass:${teil}`), teil);
+  for (const teil of ['oberarm', 'unterarm', 'handgelenk', 'oberschenkel', 'wade']) {
+    const links = masse.indexOf(`mass:${teil}-links`);
+    assert.ok(links >= 0 && masse[links + 1] === `mass:${teil}-rechts`, teil);
+    assert.equal(links % 2, 0, `${teil} links steht in der linken Spalte`);
+  }
+});
+
+test('sichtbareMasse: alte Arten ohne Seite nur, wenn es Werte gibt', () => {
+  const ohne = sichtbareMasse([]).map((a) => a.id);
+  assert.ok(!ohne.includes('mass:oberarm'));
+  const mit = sichtbareMasse([{ art: 'mass:oberarm', datum: '2026-11-01', wert: 35 }]).map((a) => a.id);
+  assert.ok(mit.includes('mass:oberarm'));
+});
+
+test('standUndAenderung: letzter Wert und Differenz zum vorletzten', () => {
+  const m = [{ art: 'mass:taille', datum: '2026-11-01', wert: 84 }, { art: 'mass:taille', datum: '2026-11-08', wert: 82.5 }, { art: 'mass:taille', datum: '2026-11-20', wert: 80 }];
+  assert.deepEqual(standUndAenderung(m, 'mass:taille', '2026-11-15'), { wert: 82.5, datum: '2026-11-08', aenderung: -1.5 });
+  assert.equal(standUndAenderung(m, 'mass:hals', '2026-11-15'), null);
+  assert.equal(standUndAenderung(m.slice(0, 1), 'mass:taille', '2026-11-15').aenderung, null);
+});
+
+test('Wasser-Mengen: drei eigene Knöpfe, Grenzen und Startwerte', () => {
+  assert.deepEqual(bereinigeWasserMengen(null), STANDARD_WASSER_MENGEN);
+  assert.deepEqual(bereinigeWasserMengen([200, 330, 1000]), [200, 330, 1000]);
+  assert.deepEqual(bereinigeWasserMengen([200, 330]), STANDARD_WASSER_MENGEN, 'genau drei');
+  assert.deepEqual(bereinigeWasserMengen([200, 330, 5000]), STANDARD_WASSER_MENGEN, 'höchstens 2.000');
+  const ok = pruefeWasserMengen(['200', '330', '1000']);
+  assert.equal(ok.ok, true);
+  assert.deepEqual(ok.mengen, [200, 330, 1000]);
+  const falsch = pruefeWasserMengen(['200', '33,5', '']);
+  assert.equal(falsch.ok, false);
+  assert.deepEqual(falsch.fehler.map(Boolean), [false, true, true]);
 });

@@ -234,3 +234,13 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Entscheidung:** Native `select` und Radioknöpfe bleiben und werden nur schlicht gezeichnet. So bleiben Bedienung am Handy und Screenreader erhalten. Verworfen: eigene Aufklapp-Menüs, die mehr Code und schlechtere Zugänglichkeit bringen.
 - **Fehler:** Der Parameter `gruppe` (Referenzgruppe) verdeckte den neuen Baustein `gruppe`, Folge: „gruppe is not a function“. Die neue Fehlerseite zeigte es sofort an. Lösung: Parameter umbenannt.
 - **Fachbegriffe:** Schalter (`role="switch"`), Verschattung (shadowing) eines Namens.
+
+## Session 14, Runde 2: Struktur nach Recherche, alle Körpermaße, Health Connect (15.11.2026)
+
+- **Was und warum:** Léon wollte eigene Wasser-Knöpfe, alle Körpermaße wie in seiner Maßband-App, Health Connect und eine bessere Struktur nach Recherche. Ergebnis der Recherche (MyFitnessPal, Foodnoms): Eintragen gehört auf die Startseite, Fortschritt ist ein eigener Tab. Umgesetzt: Tageswerte, Wasser und Supplements auf „Heute“, Tab „Fortschritt“ mit Gewicht, 19 Maß-Kacheln und Verläufen; Health Connect liest Schritte, Gewicht, Schlaf.
+- **Befehle:** `npm install --save-exact @capgo/capacitor-health@8.11.13` (Version älter als zwei Wochen) · `aapt2 dump permissions` (zeigt, welche Rechte im APK landen).
+- **Entscheidung:** Alle Health-Berechtigungen des Plugins außer drei mit `tools:node="remove"` gestrichen. Verworfen: die Plugin-Vorgabe übernehmen (49 Rechte, auch Schreibrechte).
+- **Fehler 1:** Der Filter für Rechte übersah `VO2_MAX`, weil das Muster keine Ziffern erlaubte. Gefunden erst durch die Prüfung des fertigen APK.
+- **Fehler 2:** „Letzten Schluck zurücknehmen“ löschte nach dem Umbau einen zufälligen Schluck, weil die Liste nach der zufälligen Kennung sortiert war. Lösung: Feld `erstellt` an jeder Messung.
+- **Fehler 3:** Der Bau scheiterte dreimal an einer fehlenden Bibliothek (Maven drosselt). Angehalten, Fehlermeldung gelesen, gezielt einzeln geladen, dann ging es. Die Kotlin-Meldungen danach stammen nur aus dem Lint.
+- **Fachbegriffe:** Health Connect, Berechtigung (Permission), Manifest-Zusammenführung (manifest merger), MPL-2.0.

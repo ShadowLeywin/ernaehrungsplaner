@@ -2,7 +2,7 @@
 
 import './darstellung.js';
 import { zeigeAngebote } from './ansichten/angebote.js';
-import { zeigeHealth } from './ansichten/health.js';
+import { zeigeFortschritt } from './ansichten/health.js';
 import { zeigeHeute } from './ansichten/heute.js';
 import { zeigeMehr } from './ansichten/mehr.js';
 import { zeigeRezepte } from './ansichten/rezepte.js';
@@ -10,7 +10,9 @@ import { istEingerichtet, merkeEingerichtet, zeigeWillkommen } from './ansichten
 import { zeigeWoche } from './ansichten/woche.js';
 import * as speicher from './speicher.js';
 import { zeigeZutaten } from './ansichten/zutaten.js';
-import { route, starte } from './router.js';
+import { neuZeichnen, route, starte } from './router.js';
+import { automatischAn, gleicheAb } from './abgleich.js';
+import { istApp } from './plattform.js';
 import { hinweis } from './ui.js';
 
 // Android "Teilen": Die App wird mit ?titel=…&text=…&url=… geöffnet (siehe share_target im Manifest).
@@ -27,7 +29,12 @@ route('woche', zeigeWoche);
 route('angebote', zeigeAngebote);
 route('rezepte', zeigeRezepte);
 route('zutaten', zeigeZutaten);
-route('health', zeigeHealth);
+route('fortschritt', zeigeFortschritt);
+// Alte Adressen (#/health, #/health/labor …) aus Lesezeichen und älteren Fassungen führen weiter
+route('health', (wurzel, teile) => {
+  history.replaceState(null, '', `${location.pathname}${location.search}#/fortschritt${teile.length ? `/${teile.join('/')}` : ''}`);
+  return zeigeFortschritt(wurzel, teile);
+});
 route('mehr', zeigeMehr);
 route('willkommen', zeigeWillkommen);
 
@@ -38,6 +45,18 @@ if (!istEingerichtet() && startseite) {
   else history.replaceState(null, '', `${location.pathname}${location.search}#/willkommen`);
 }
 starte(document.getElementById('inhalt'), 'heute');
+
+/* ---------- Health Connect: beim Öffnen abgleichen, wenn eingeschaltet ---------- */
+
+// Höchstens alle 15 Minuten; auch wenn die App aus dem Hintergrund zurückkommt. Fehler stören nie den Start.
+let letzterAbgleich = 0;
+const abgleich = async () => {
+  if (!istApp() || !automatischAn() || Date.now() - letzterAbgleich < 15 * 60 * 1000) return;
+  letzterAbgleich = Date.now();
+  try { if (await gleicheAb() > 0) neuZeichnen(); } catch (fehler) { console.warn('Health Connect:', fehler); }
+};
+abgleich();
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') abgleich(); });
 
 /* ---------- Unerwartete Fehler ---------- */
 
