@@ -180,10 +180,20 @@ async function hauptlauf(browser) {
   /* Ziele */
   await seite.getByRole('link', { name: 'Mehr', exact: true }).click();
   await seite.locator('.menuepunkt').first().waitFor();
-  const menue = await seite.locator('.menuegruppe-titel').allInnerTexts();
+  const menue = await seite.locator('.menuekarte-titel').allInnerTexts();
+  const standZiele = await seite.locator('#menue-ziele small').innerText();
+  const standDarstellung = await seite.locator('#menue-darstellung small').innerText();
   await seite.getByRole('link', { name: /Ziele je Tagestyp/ }).click();
   await seite.locator('#f-ziel-kcal').waitFor();
-  pruefe('Mehr ist ein Menü mit Gruppen und Unterseiten', menue.length === 4 && seite.url().endsWith('#/mehr/ziele'), `Gruppen: ${menue.join(', ')}; Ziele unter ${seite.url().split('#')[1]}`);
+  pruefe('Mehr: Karten mit Überblick, jede Zeile zeigt den aktuellen Stand', menue.length === 5 && menue[0].toLowerCase().startsWith('dabei seit') && standZiele === '2.300 bis 2.700 kcal je Tag' && standDarstellung === 'Blatt · Dunkel · Vibration an' && seite.url().endsWith('#/mehr/ziele'),
+    `Karten: ${menue.join(', ')}; Ziele „${standZiele}“, Darstellung „${standDarstellung}“`);
+  await seite.getByRole('link', { name: 'Zurück zu Mehr' }).waitFor();
+  await seite.goto(`${URL_APP}#/mehr/datenschutz`);
+  await seite.locator('.datenschutz h2').first().waitFor();
+  const datenschutz = await seite.locator('.datenschutz').innerText();
+  pruefe('Datenschutz in der App: nennt Health Connect und dass nichts das Gerät verlässt', datenschutz.includes('Health Connect') && datenschutz.includes('Nirgendwohin'), datenschutz.slice(0, 80).replace(/\n/g, ' '));
+  await seite.goto(`${URL_APP}#/mehr/ziele`);
+  await seite.locator('#f-ziel-kcal').waitFor();
   await seite.locator('#f-ziel-kcal').fill('3000');
   await seite.locator('#f-ziel-kcal').blur();
   const warnung = await seite.locator('.unterseite .merkzettel').first().innerText().catch(() => '');
@@ -830,11 +840,21 @@ async function healthLauf(browser) {
   await seite.locator('#f-mass-wert').fill('84,5');
   await seite.locator('dialog').getByRole('button', { name: 'Speichern' }).click();
   await seite.locator('.hinweis', { hasText: 'Taille: 84,5 cm gespeichert' }).waitFor();
+  await seite.locator('dialog').waitFor({ state: 'detached' });
   await seite.locator('#mass-eigen1').click();
   await seite.locator('#f-mass-name').fill('Unterbauch');
   await seite.locator('#f-mass-wert').fill('88');
   await seite.locator('dialog').getByRole('button', { name: 'Speichern' }).click();
-  await seite.locator('.hinweis', { hasText: 'Unterbauch: 88 cm gespeichert' }).waitFor();
+  try {
+    await seite.locator('.hinweis', { hasText: 'Unterbauch: 88 cm gespeichert' }).waitFor({ timeout: 5000 });
+  } catch (fehlerBeimWarten) {
+    const zustand = await seite.evaluate(() => ({
+      dialoge: [...document.querySelectorAll('dialog')].map((d) => `${d.className}|offen=${d.open}|${d.querySelector('.blatt-titel')?.textContent}|fehler=${d.querySelector('.fehlertext')?.textContent}|name=${d.querySelector('#f-mass-name')?.value}|wert=${d.querySelector('#f-mass-wert')?.value}`),
+      hinweis: document.getElementById('hinweis').textContent, adresse: location.hash,
+    }));
+    console.log('DIAGNOSE', JSON.stringify(zustand));
+    throw fehlerBeimWarten;
+  }
   await seite.reload({ waitUntil: 'networkidle' });
   const taille = await seite.locator('#mass-taille').innerText();
   const eigen = await seite.locator('#mass-eigen1').innerText();

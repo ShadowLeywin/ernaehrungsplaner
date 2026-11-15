@@ -5,6 +5,18 @@ export const NEUIGKEITEN = [
   {
     version: '1.0.0',
     datum: '2026-11-15',
+    titel: '„Mehr“ aufgeräumt',
+    punkte: [
+      'Jede Zeile in „Mehr“ zeigt jetzt den aktuellen Stand, z. B. „Blatt · Dunkel · Vibration an“ oder „Gesichert vor 3 Tagen“.',
+      'Oben ein Überblick: seit wann du Elan nutzt, an wie vielen Tagen, wie viele Einträge und Rezepte.',
+      'Ruhige Karten ohne Symbole, Unterseiten mit Zurück-Knopf neben dem Titel.',
+      'Neu: „Rechtliches und Hilfe“ mit der Datenschutzseite in der App und dem Hinweis, dass Elan kein Medizinprodukt ist.',
+      'Referenzwerte heißen jetzt „Über dich“.',
+    ],
+  },
+  {
+    version: '1.0.0',
+    datum: '2026-11-15',
     titel: 'Fortschritt, alle Körpermaße, Health Connect',
     punkte: [
       'Alles Eintragen an einem Ort: Gewicht, Schlaf, Schritte, Wasser und Supplements stehen jetzt auf „Heute“.',

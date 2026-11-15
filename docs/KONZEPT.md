@@ -55,6 +55,7 @@ Elan ist eine Ernährungs- und Health-App als Android-App und PWA aus demselben 
 | Kurze Einrichtung, schnell zum ersten Eintrag | Ratgeber zu Onboarding von Ernährungs-Apps | drei Schritte, überspringbar, Backup einspielen gleich am Anfang |
 | Viele Einstellungen in Gruppen und Unterseiten, Wichtiges zuerst | Android-Designrichtlinien zu Einstellungen | Menü „Mehr“ mit vier Gruppen |
 | Navigationsleiste mit drei bis fünf Zielen | Android-Richtlinien zu Navigation | fünf Ziele: Heute, Woche, Rezepte, Fortschritt, Mehr |
+| Einstellungen: jede Zeile zeigt den aktuellen Stand, ruhige Karten, Überblick oben, „Rechtliches und Hilfe“ unten | Bildschirmfotos von Léons Fitness-App (15.11.2026) | Menü „Mehr“: Aufbau übernommen, Inhalte, Texte und Farben eigen |
 | Eintragen ist die Startseite, Fortschritt ein eigener Bereich | MyFitnessPal (Tagebuch als Startseite, eigener Tab „Progress“), Foodnoms (Eintragen im Mittelpunkt, eigenes Insights-Dashboard) | Tageswerte, Wasser, Supplements auf „Heute“; Gewicht, Maße, Verläufe unter „Fortschritt“ |
 | Dunkles Design mit Ring-Kacheln, Mahlzeiten-Karte, rundem Plus-Knopf | Bildschirmfotos einer Fitness-App von Léon (14.11.2026) | Blatt: Aufbau übernommen, Farben, Schrift und Symbole eigen |
 | Apple-Stil: große Titel, gruppierte Listen, farbige Symbole, Ringe | Léons Wunsch „allgemein der Apple-Style“, dann „schlicht, ohne Glas, das Grüne“ | Blatt, mit Inter statt SF Pro |

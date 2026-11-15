@@ -244,3 +244,11 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Fehler 2:** „Letzten Schluck zurücknehmen“ löschte nach dem Umbau einen zufälligen Schluck, weil die Liste nach der zufälligen Kennung sortiert war. Lösung: Feld `erstellt` an jeder Messung.
 - **Fehler 3:** Der Bau scheiterte dreimal an einer fehlenden Bibliothek (Maven drosselt). Angehalten, Fehlermeldung gelesen, gezielt einzeln geladen, dann ging es. Die Kotlin-Meldungen danach stammen nur aus dem Lint.
 - **Fachbegriffe:** Health Connect, Berechtigung (Permission), Manifest-Zusammenführung (manifest merger), MPL-2.0.
+
+## Session 14, Runde 3: „Mehr“ im Stil von Léons Fitness-App (15.11.2026)
+
+- **Was und warum:** Léon zeigte Bilder seiner Fitness-App und wollte deren saubere Einstellungen. Übernommen: Jede Zeile zeigt den aktuellen Stand statt einer festen Beschreibung, ruhige Karten ohne Symbole, Überblick oben, „Rechtliches und Hilfe“ unten, Zurück als Kasten neben dem Titel. Nicht übernommen: Name, Maskottchen, Rang, Werbung.
+- **Befehle:** `npm test` (175, neu `test/zusammenfassung.test.js`) · `node tools/pruefe-app.cjs` (133 Kriterien).
+- **Entscheidung:** Die Datenschutzseite wird in der App aus `privacypolicy.html` gelesen (`fetch` und `DOMParser`). Eine Quelle für Health Connect und die App. Verworfen: Text doppelt pflegen.
+- **Fehler:** Der Prüfpunkt für das zweite Maß fiel zweimal aus, isoliert lief er dreimal sauber. Vermutete Ursache: ein noch hinausgleitendes Blatt. Lösung: Ein neues Blatt schließt ein gleitendes sofort, dazu eine Diagnose im Test. Danach zweimal grün; die Ursache ist nicht sicher belegt.
+- **Testfalle:** `innerText` liefert Text in Großbuchstaben, wenn CSS `text-transform: uppercase` setzt.
