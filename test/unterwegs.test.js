@@ -52,7 +52,7 @@ test('Datei lesen: Format prüfen, Gerichte übernehmen, Unbrauchbares zählen',
   assert.deepEqual(zusammen.map((g) => `${g.name}:${g.kcal}`), ['Pommes M:330', 'Testburger:500', 'Wrap:450']);
 });
 
-test('Vorschläge: passt ins Budget, sortiert nach Eiweiß, Fett oder Nähe zum Budget', async () => {
+test('Vorschläge: passt ins Budget, sortiert nach Eiweiß, mager oder Nähe zum Budget', async () => {
   const { vorschlaege } = await import('../js/logik/unterwegs.js');
   const liste = bereinigeGerichte([
     { restaurant: 'Testgrill', name: 'Hähnchenwrap', kcal: 400, protein: 30, kh: 40, fett: 12 },
@@ -70,8 +70,8 @@ test('Vorschläge: passt ins Budget, sortiert nach Eiweiß, Fett oder Nähe zum 
   assert.equal(eiweiss[0].protein, 36);
   // keine Obermenge eines Vorschlags („Wrap + Salat + Cola Zero“ bringt nichts Neues)
   assert.ok(!eiweiss.some((v) => v.ids.length === 3 && v.gerichte.some((g) => g.name === 'Cola Zero') && v.gerichte.some((g) => g.name === 'Salat') && v.gerichte.some((g) => g.name === 'Hähnchenwrap')));
-  const fett = vorschlaege(liste, { restaurant: 'Testgrill', budget: 600, ziel: 'fett' });
-  assert.ok(fett[0].fett <= Math.min(...eiweiss.map((v) => v.fett)));
+  const mager = vorschlaege(liste, { restaurant: 'Testgrill', budget: 600, ziel: 'mager' });
+  assert.deepEqual(mager[0].gerichte.map((g) => g.name), ['Hähnchenwrap']); // 30 − 12 = 18, gleich wie mit Salat (36 − 18): weniger Teile gewinnt
   const satt = vorschlaege(liste, { restaurant: 'Testgrill', budget: 600, ziel: 'satt' });
   assert.ok(satt[0].kcal >= Math.max(...eiweiss.map((v) => v.kcal)));
   assert.deepEqual(vorschlaege(liste, { restaurant: 'Testgrill', budget: 0 }), []);
@@ -85,3 +85,20 @@ test('Offene Kalorien: für die Mahlzeit und den Tag, nie unter 0', async () => 
   assert.deepEqual(offeneKcal({ zielKcal: 2400, slots, slot: 'abend', eintraege: [e('mittag', 900), e('abend', 104)] }), { mahlzeit: 500, tag: 1400 });
   assert.deepEqual(offeneKcal({ zielKcal: 2000, slots, slot: 'mittag', eintraege: [e('mittag', 2500)] }), { mahlzeit: 0, tag: 0 });
 });
+
+test('Vorschläge: ohne Getränke und Saucen, höchstens eine Form je Gericht', async () => {
+  const { istGetraenkOderSauce, vorschlaege } = await import('../js/logik/unterwegs.js');
+  for (const name of ['Coca-Cola Classic 0,5l', 'Cappuccino', 'Iced Latte', 'Ketchup 20ml', 'BBQ Sauce', 'Café Grande']) assert.equal(istGetraenkOderSauce(name), true, name);
+  for (const name of ['Big Mac', 'Chicken Teriyaki (Salat)', '9 Chicken McNuggets', 'Whopper', 'Teriyaki Sub', 'Dippers', 'KFC Salat ohne Dressing', 'McSundae Original mit Karamell-Sauce']) assert.equal(istGetraenkOderSauce(name), false, name);
+  const liste = bereinigeGerichte([
+    { restaurant: 'T', name: 'Huhn (Sub)', kcal: 300, protein: 25 },
+    { restaurant: 'T', name: 'Huhn (Salat)', kcal: 120, protein: 15 },
+    { restaurant: 'T', name: 'Cappuccino', kcal: 120, protein: 7 },
+    { restaurant: 'T', name: 'Brot', kcal: 150, protein: 5 },
+  ]);
+  const v = vorschlaege(liste, { restaurant: 'T', budget: 450 });
+  assert.ok(v.every((x) => !x.gerichte.some((g) => g.name === 'Cappuccino')));
+  assert.ok(v.every((x) => x.gerichte.filter((g) => g.name.startsWith('Huhn')).length <= 1));
+  assert.deepEqual(v[0].gerichte.map((g) => g.name), ['Brot', 'Huhn (Sub)']);
+});
+

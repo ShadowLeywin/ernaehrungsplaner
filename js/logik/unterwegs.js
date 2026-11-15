@@ -92,10 +92,17 @@ export const fuegeZusammen = (alt, neu) => bereinigeGerichte([...alt, ...neu]);
 
 /* ---------- Vorschläge: Was passt in mein Budget? ---------- */
 
+// Getränke und Saucen füllen sonst das Budget auf („+ Cappuccino“). Erkannt am Namen: Menge in l/ml oder typische Wörter.
+// Lieber einmal ein Getränk zu viel ausgeschlossen als ein Kaffee als „Mahlzeit“; im Zusammenstellen bleibt alles wählbar.
+// Wortgrenzen über Buchstaben-Klassen statt \\b: \\b kennt kein „é“, sonst rutscht „Café Grande“ durch
+const GETRAENK = /\d+([.,]\d+)?\s?(ml|l|cl)(?!\p{L})|(?<!\p{L})(latte|cappuccino|espresso|café|caffè|kaffee|coffee|macchiato|mocha|chai|tee|tea|cola|fanta|sprite|mezzo|wasser|water|schorle|saft|juice|shake|smoothie|frapp\p{L}*|kakao|bier|beer|heineken|red bull|lipton|limo\p{L}*|sauce|dip|ketchup|mayo\p{L}*|dressing)(?!\p{L})/iu;
+// „KFC Salat ohne Dressing“ oder „Sundae mit Karamell-Sauce“ sind keine Saucen: Zusätze mit „ohne“/„mit“ zählen nicht
+export const istGetraenkOderSauce = (name) => GETRAENK.test(String(name).replace(/\s(ohne|mit)\s.*$/i, ''));
+
 /** Wonach sortiert wird. Neutral benannt: Elan bewertet nicht, es sortiert nach deiner Wahl. */
 export const ZIELE_VORSCHLAG = [
   { id: 'eiweiss', name: 'Viel Eiweiß' },
-  { id: 'fett', name: 'Wenig Fett' },
+  { id: 'mager', name: 'Mager' },
   { id: 'satt', name: 'Budget voll' },
 ];
 
@@ -106,44 +113,60 @@ const wert = (g, w) => (typeof g[w] === 'number' ? g[w] : 0);
  * Budget passen und es zu mindestens untergrenze (Anteil) nutzen. Sortiert nach ziel, dann näher am Budget.
  * Ergebnis: [{ ids, gerichte, kcal, protein, kh, fett }], höchstens anzahl Stück, ohne Kombinationen, die nur
  * eine schlechtere Obermenge einer besseren sind.
- * Bei 100 Gerichten sind das gut 160.000 Dreier: durchprobieren ist schnell genug und findet sicher das Beste.
+ * Durchprobieren findet sicher das Beste; nach kcal sortiert bricht jede Schleife ab, sobald das Budget gesprengt ist.
  */
 export function vorschlaege(gerichte, { restaurant, budget, ziel = 'eiweiss', maxTeile = 3, anzahl = 5, untergrenze = 0.6 }) {
   if (!(budget > 0)) return [];
-  const auswahl = gerichte.filter((g) => g.restaurant === restaurant && g.kcal > 0 && g.kcal <= budget);
-  const ergebnis = [];
-  const pruefe = (teile) => {
-    const s = { kcal: 0, protein: 0, kh: 0, fett: 0 };
-    for (const g of teile) for (const w of WERTE) s[w] += wert(g, w);
-    if (s.kcal > budget || s.kcal < budget * untergrenze) return;
-    ergebnis.push({ ids: teile.map((g) => g.id), gerichte: teile, ...s });
-  };
+  // Nach kcal aufsteigend: Sobald eine Summe das Budget sprengt, sind alle weiteren in der Schleife zu groß (früher Abbruch)
+  const auswahl = gerichte.filter((g) => g.restaurant === restaurant && g.kcal > 0 && g.kcal <= budget && !istGetraenkOderSauce(g.name)).sort((a, b) => a.kcal - b.kcal);
   const n = auswahl.length;
+  const kcal = auswahl.map((g) => g.kcal);
+  const werte = auswahl.map((g) => WERTE.map((w) => wert(g, w))); // [kcal, protein, kh, fett]
+  // „Chicken Fajita (Footlong)“ und „Chicken Fajita (Salat)“ sind dasselbe Gericht: höchstens eine Form je Vorschlag
+  const grund = auswahl.map((g) => g.name.replace(/\s*\(.*\)\s*$/, '').toLocaleLowerCase('de'));
+  const punkte = {
+    eiweiss: (s) => -s[1],
+    // Eiweiß minus Fett, Gramm für Gramm: belohnt mageres Eiweiß, nicht Süßes mit wenig Fett
+    mager: (s) => -(s[1] - s[3]),
+    satt: (s) => budget - s[0],
+  }[ziel] ?? ((s) => -s[1]);
+  const min = budget * untergrenze;
+  // Kompakt sammeln (Indizes und Summen), Objekte erst für die Besten bauen: spart Speicher bei vielen Treffern
+  const treffer = [];
+  const merke = (ids) => {
+    const s = [0, 0, 0, 0];
+    for (const i of ids) for (let w = 0; w < 4; w += 1) s[w] += werte[i][w];
+    if (s[0] < min) return;
+    treffer.push({ ids, s, p: punkte(s) });
+  };
   for (let i = 0; i < n; i += 1) {
-    pruefe([auswahl[i]]);
+    merke([i]);
     if (maxTeile < 2) continue;
     for (let j = i + 1; j < n; j += 1) {
-      if (auswahl[i].kcal + auswahl[j].kcal > budget) continue;
-      pruefe([auswahl[i], auswahl[j]]);
+      if (kcal[i] + kcal[j] > budget) break;
+      if (grund[j] === grund[i]) continue;
+      merke([i, j]);
       if (maxTeile < 3) continue;
-      for (let k = j + 1; k < n; k += 1) pruefe([auswahl[i], auswahl[j], auswahl[k]]);
+      for (let k = j + 1; k < n; k += 1) {
+        if (kcal[i] + kcal[j] + kcal[k] > budget) break;
+        if (grund[k] === grund[i] || grund[k] === grund[j]) continue;
+        merke([i, j, k]);
+      }
     }
   }
-  const bewertung = {
-    eiweiss: (v) => -v.protein,
-    fett: (v) => v.fett,
-    satt: (v) => budget - v.kcal,
-  }[ziel] ?? ((v) => -v.protein);
-  // Gleichstand: weniger Teile zuerst (eine Cola Zero dazu bringt nichts), dann näher am Budget
-  ergebnis.sort((a, b) => bewertung(a) - bewertung(b) || a.ids.length - b.ids.length || (budget - a.kcal) - (budget - b.kcal));
-  // Abwechslung: kein Vorschlag, der nur ein früherer plus ein Extra ist
+  // Gleichstand: weniger Teile zuerst (eine Cola Zero dazu bringt nichts), dann näher am Budget, dann mehr Eiweiß
+  treffer.sort((a, b) => a.p - b.p || a.ids.length - b.ids.length || (budget - a.s[0]) - (budget - b.s[0]) || b.s[1] - a.s[1]);
+  // Abwechslung: kein Vorschlag, der nur ein früherer plus ein Extra ist (oder umgekehrt)
   const gewaehlt = [];
-  for (const v of ergebnis) {
-    if (gewaehlt.some((x) => x.ids.every((id) => v.ids.includes(id)) || v.ids.every((id) => x.ids.includes(id)))) continue;
-    gewaehlt.push(v);
+  for (const t of treffer) {
+    if (gewaehlt.some((x) => x.ids.every((id) => t.ids.includes(id)) || t.ids.every((id) => x.ids.includes(id)))) continue;
+    gewaehlt.push(t);
     if (gewaehlt.length >= anzahl) break;
   }
-  return gewaehlt;
+  return gewaehlt.map((t) => ({
+    ids: t.ids.map((i) => auswahl[i].id), gerichte: t.ids.map((i) => auswahl[i]),
+    kcal: t.s[0], protein: t.s[1], kh: t.s[2], fett: t.s[3],
+  }));
 }
 
 /**

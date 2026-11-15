@@ -309,3 +309,11 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Entscheidung:** Alle Kombinationen durchprobieren statt schlauer Suche: bei 100 Gerichten gut 160.000 Dreier, auf dem Handy Millisekunden, und sicher das Beste. Nur Kombinationen mit 60–100 % des Budgets. Bei Gleichstand weniger Teile zuerst, sonst gewinnt „+ Cola Zero“ (1 kcal näher am Budget). Kein Vorschlag, der nur ein früherer plus ein Extra ist.
 - **Offen:** Werte von McDonald's, Burger King, KFC, Subway. Deren Seiten sperrt die Umgebung (Proxy 403); Freigabe angefragt.
 - **Fachbegriffe:** Brute Force (alle Möglichkeiten durchprobieren), Tie-Break (Regel für Gleichstand).
+
+## Session 14, Runde 11: Ketten-Listen und bessere Vorschläge (15.11.2026)
+
+- **Was und warum:** Léon: „Such dir die Liste online.“ Subway aus dem offiziellen PDF (`pdftotext -layout`, Nährwerte je Portion), McDonald's, Burger King und KFC aus den Tabellen von nutriscan.app, das die Angaben der Ketten mit Datum zitiert. McDonald's selbst blockt automatische Abrufe (Akamai „Access Denied“); das wurde nicht umgangen. 485 Gerichte, Datei nur für Léon, nicht im Repo.
+- **Prüfung:** kcal gegen 4·Eiweiß + 4·KH + 9·Fett. Auffällig nur Bier (Alkohol fehlt in den Makros) und Eistee. Im Subway-PDF widersprechen sich kcal und kJ sechsmal; genommen wird der Wert, der zu den Makros passt (einmal war kJ falsch, fünfmal kcal).
+- **Verbesserungen:** Vorschläge ohne Getränke und Saucen (Cappuccino füllte sonst das Budget), höchstens eine Form je Gericht, „Wenig Fett“ ersetzt durch „Mager“ (Eiweiß minus Fett; vorher gewannen Süßes und Softeis), nach kcal sortiert mit frühem Abbruch (Burger King 242 → 6 ms), Eingabe 250 ms verzögert.
+- **Fehler:** `\b` in JavaScript-Regex kennt kein „é“: „Café Grande“ rutschte durch. Lösung: `(?<!\p{L})…(?!\p{L})` mit Flag `u`. „KFC Salat ohne Dressing“ galt als Sauce: Zusätze mit „ohne“/„mit“ werden vor der Prüfung abgeschnitten.
+- **Fachbegriffe:** Plausibilitätsprüfung, Pruning (Suche früh abbrechen), Debounce (erst nach kurzer Tipp-Pause rechnen), Unicode-Eigenschaften in Regex (`\p{L}`).

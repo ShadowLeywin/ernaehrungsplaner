@@ -88,3 +88,6 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | Spezifität | Gewicht eines CSS-Selektors; bei Konflikten gewinnt die spezifischere Regel, nicht die spätere. | `.unterwegs-restaurants .chip[aria-pressed]` in `css/app.css` |
 | Datalist | HTML-Liste mit Vorschlägen für ein Textfeld; man darf trotzdem frei tippen. | Feld „Wo?“ in `js/ansichten/schnellformular.js` |
 | Brute Force | Alle Möglichkeiten durchprobieren; bei kleinen Mengen schnell genug und sicher optimal. | `vorschlaege` in `js/logik/unterwegs.js` |
+| Pruning | Eine Suche früh abbrechen, wenn sicher nichts Besseres mehr kommt; hier: nach kcal sortiert, Schleife endet beim ersten Gericht über dem Budget. | `vorschlaege` in `js/logik/unterwegs.js` |
+| Debounce | Erst rechnen, wenn der Nutzer kurz nicht mehr tippt, statt bei jedem Zeichen. | Budget-Feld in `js/ansichten/unterwegs.js` |
+| Plausibilitätsprüfung | Daten gegen eine unabhängige Rechnung prüfen, z. B. kcal gegen 4/4/9 aus den Makros. | Lernlog Runde 11 |

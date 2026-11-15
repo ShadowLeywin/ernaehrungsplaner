@@ -13,6 +13,7 @@ Jede Frage hat eine Empfehlung. Léon entscheidet.
 | 7 | Name „Elan“? | gilt (Empfehlung übernommen) | erledigt | nichts |
 | 8 | Alte Daten der früheren App im Browser? | Die frühere App nutzte auf derselben Adresse die Datenbank `ernaehrungsplaner`. Elan fasst sie nicht an | So lassen. Wer aufräumen will: App-Daten im Browser löschen | nichts |
 | 9 | Startwerte für Ziele und Slot-Anteile? | Neutrale Zahlen im Code, beides in der App änderbar (seit 0.3) | erledigt | nichts |
+| 11 | Listen von Fast-Food-Ketten mit der App ausliefern? | Erzeugt am 15.11.2026: McDonald's, Burger King, KFC über nutriscan.app (nach Angaben der Ketten, Stand 21.10.2026) [vermutet richtig, nicht mit den Ketten abgeglichen], Subway aus dem offiziellen PDF (Nov. 2026) [belegt]. Ganze Tabellen in einem öffentlichen Repo könnten das Datenbankrecht der Ketten berühren [vermutet] | Nicht ins Repo; Léon lädt die Datei selbst. Werte veralten, daher Stand in jeder Datei | nichts |
 | 10 | Automatischer APK-Bau auf GitHub? | Workflow ist vorbereitet; das Anlegen einer GitHub Action braucht Léons ausdrückliches Ja | mit Ja: Workflow anlegen und den Schlüssel als zwei Secrets hinterlegen | nur bequemere Updates |
 
 ## Was nicht getestet werden konnte

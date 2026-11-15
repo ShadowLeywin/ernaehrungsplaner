@@ -934,11 +934,14 @@ async function healthLauf(browser) {
   await seite.getByRole('button', { name: 'Testgrill' }).click();
   await seite.locator('#f-unterwegs-budget').fill('700');
   await seite.getByRole('button', { name: 'Viel Eiweiß' }).click();
+  // Das Budget wirkt erst kurz nach dem Tippen (Verzögerung, damit das Handy nicht bei jeder Ziffer rechnet)
+  await seite.locator('.vorschlag', { hasText: '650 kcal' }).first().waitFor();
   const ersterVorschlag = (await seite.locator('.vorschlag').first().innerText()).replace(/\s+/g, ' ');
   await bild(seite, '44-vorschlaege', false);
-  await seite.getByRole('button', { name: 'Wenig Fett' }).click();
+  await seite.getByRole('button', { name: 'Mager' }).click();
   await seite.locator('#f-unterwegs-budget').fill('700');
   await seite.getByRole('button', { name: 'Viel Eiweiß' }).click();
+  await seite.locator('.vorschlag', { hasText: '650 kcal' }).first().waitFor();
   await seite.locator('#vorschlag-0').click();
   await seite.locator('.unterwegs-zeile').first().waitFor();
   const uebernommen = (await seite.locator('#unterwegs-summe').innerText()).replace(/\s+/g, ' ');
