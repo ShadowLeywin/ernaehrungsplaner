@@ -147,9 +147,15 @@ export async function zeigeUnterwegs({ b, datum, slot, beiFertig, korb = new Map
         ? 'Keine Kombination nutzt das Budget zu mindestens 60 %. Leg mehr Gerichte an oder senk das Budget.'
         : `Bei ${gewaehlt} passt nichts in ${zahl(budgetWert)} kcal.`)]));
   };
+  let budgetWarten = null;
   const budgetFeld = el('input', {
     id: 'f-unterwegs-budget', inputmode: 'numeric', autocomplete: 'off', value: String(budgetWert),
-    oninput: (e) => { const w = parseZahl(e.target.value); if (Number.isFinite(w) && w > 0) { budgetWert = Math.min(5000, w); zeigeVorschlaege(); } },
+    // Kurz warten, bis fertig getippt ist: bei vielen Gerichten dauert eine Rechnung auf dem Handy spürbar
+    oninput: (e) => {
+      const w = parseZahl(e.target.value);
+      clearTimeout(budgetWarten);
+      if (Number.isFinite(w) && w > 0) budgetWarten = setTimeout(() => { budgetWert = Math.min(5000, w); zeigeVorschlaege(); }, 250);
+    },
   });
   const setzeBudget = (w) => { budgetWert = w; budgetFeld.value = String(w); zeigeVorschlaege(); };
   const vorschlagBereich = el('div', { class: 'stapel' },
@@ -164,7 +170,7 @@ export async function zeigeUnterwegs({ b, datum, slot, beiFertig, korb = new Map
       onclick: (e) => { zielVorschlag = z.id; for (const k of e.currentTarget.parentElement.children) k.setAttribute('aria-pressed', String(k === e.currentTarget)); zeigeVorschlaege(); },
     }, z.name))),
     vorschlagListe,
-    el('p', { class: 'klein' }, 'Kombinationen aus bis zu drei Gerichten, die dein Budget zu 60 bis 100 % nutzen. Elan sortiert nur nach deiner Wahl, ohne zu bewerten.'));
+    el('p', { class: 'klein' }, 'Kombinationen aus bis zu drei Gerichten, die dein Budget zu 60 bis 100 % nutzen, ohne Getränke und Saucen (die nimmst du unter „Selbst wählen“ dazu). Elan sortiert nur nach deiner Wahl, ohne zu bewerten.'));
 
   const modusWahl = el('div', { class: 'wahl', role: 'group', 'aria-label': 'Ansicht' }, [['vorschlag', 'Vorschläge'], ['selbst', 'Selbst wählen']].map(([id, name]) => el('button', {
     type: 'button', class: 'wahl-knopf', 'aria-pressed': String(id === modus), onclick: () => { modus = id; neuZeigen(); },

@@ -7,7 +7,7 @@ export const NEUIGKEITEN = [
     datum: '2026-11-15',
     titel: 'Unterwegs-Rechner',
     punkte: [
-      'Unterwegs-Vorschläge: Sag, wie viel du offen hast (Elan schlägt vor, was für die Mahlzeit oder den Tag noch frei ist), wähl „Viel Eiweiß“, „Wenig Fett“ oder „Budget voll“, und Elan zeigt passende Kombinationen aus bis zu drei Gerichten. „Übernehmen“ legt sie in die Bestellung.',
+      'Unterwegs-Vorschläge: Sag, wie viel du offen hast (Elan schlägt vor, was für die Mahlzeit oder den Tag noch frei ist), wähl „Viel Eiweiß“, „Mager“ (Eiweiß minus Fett) oder „Budget voll“, und Elan zeigt passende Kombinationen aus bis zu drei Gerichten, ohne Getränke und Saucen. „Übernehmen“ legt sie in die Bestellung.',
       'Unterwegs: Beim Eintragen ganz oben. Restaurant wählen, Gerichte mit Plus und Minus zusammentippen, Summe sehen, mit einem Tipp eintragen. Rückgängig geht auch.',
       'Gerichte legst du einmal an (mit Werten aus der Nährwerttabelle des Restaurants) oder lädst eine Liste aus einer Datei.',
       'Elan bringt keine Werte von Ketten mit: Rezepturen ändern sich, und ein falscher Wert ist schlimmer als keiner.',
