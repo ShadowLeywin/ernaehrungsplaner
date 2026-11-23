@@ -418,3 +418,11 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Entscheidung:** Zutaten ohne Zuordnung werden ausgelassen und genannt, nicht mit 0 kcal gespeichert; `docs/IMPORT-FORMAT.md` angepasst. Vorhandene Rezepte gleichen Namens werden genutzt, nicht überschrieben.
 - **Fehler:** Erster Entwurf suchte vorhandene Rezepte in einem Feld, das es nicht gab (`ergebnis.vorhandeneNach`); der Test „Vorhandenes Rezept wird genutzt“ hätte es gefunden. Jetzt `vorhandene` als Parameter.
 - **Fachbegriffe:** Codeblock-Zaun (```` ``` ```` um Code in Chat-Antworten).
+
+## Session 16, Runde P2.2: Seite „Plan importieren“ (23.11.2026)
+
+- **Was und warum:** `#/woche/import`: Zeitraum → „Vorlage kopieren“ → Chat-Antwort einfügen → „Prüfen“ → Vorschau (Tage, abgelehnte Zeilen, unbekannte Zutaten mit Auswahl über eine Datalist) → „Übernehmen“ mit Rückgängig. P2.2 und P2.3 zusammengelegt: Eine Vorlage ohne Vorschau nützt nichts.
+- **Befehle:** `npm test` (238) · `node tools/pruefe-app.cjs` (168, neu: Codeblock in der Antwort, Zuordnung von Hand, Übernehmen, Rückgängig, 320 px).
+- **Entscheidung:** Die Vorschau rechnet mit `baueUebernahme` und einer Platzhalter-Kennung: Gezeigt wird genau, was gespeichert würde. Verworfen: eigene Vorschau-Rechnung (zwei Wege, die auseinanderlaufen können).
+- **Fehler:** Das Auswahlfeld war auf der Karte unsichtbar: Die Regel des Blatt-Designs (`:root[data-thema='blatt'] input`) ist spezifischer als `.wahl-zeile input`. Lösung wie bei anderen Karten: `:root[data-thema] .wahl-zeile input { background: var(--flaeche-2) }`. „1 neue Rezept“ → „1 neues Rezept“.
+- **Fachbegriffe:** Datalist (Vorschläge zum Tippen, ohne lange Auswahlliste).

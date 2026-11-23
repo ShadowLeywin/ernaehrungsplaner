@@ -5,6 +5,16 @@ export const NEUIGKEITEN = [
   {
     version: '1.0.0',
     datum: '2026-11-23',
+    titel: 'Plan importieren',
+    punkte: [
+      'Plan → ganz unten „Plan importieren“: Vorlage kopieren, zusammen mit deinem Plan in einen Chat geben, die Antwort einfügen, „Prüfen“.',
+      'Die Vorschau zeigt jeden Tag mit seinen Mahlzeiten, sagt, welche Zeilen nicht passen, und lässt dich unbekannte Zutaten zuordnen. Erst „Übernehmen“ speichert; „Rückgängig“ nimmt alles wieder zurück.',
+      'Nährwerte kommen nie aus dem Chat, sondern aus Elans Zutaten.',
+    ],
+  },
+  {
+    version: '1.0.0',
+    datum: '2026-11-23',
     titel: 'Märkte und Preise',
     punkte: [
       'Einkaufsliste mit Preisen: Oben „Preise bei“ einen deiner Märkte wählen. Rechts an jeder Zeile steht, was die Menge dort grob kostet, in ganzen Packungen. Ein gültiges Angebot geht vor, sonst dein gemerkter Preis.',

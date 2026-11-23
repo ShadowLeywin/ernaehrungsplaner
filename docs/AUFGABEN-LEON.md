@@ -66,6 +66,16 @@ Vorher: Mehr → „Backup speichern“ (das Update hebt die Datenbank auf Schem
 | P3-4 | Einkaufsliste → „Preise bei“ einen Markt wählen → bei einer Zutat „€ ?“ → Preis und Packung eintragen | Betrag rechts, oben „Grob … €“ |
 | P3-5 | „Märkte vergleichen“ | Märkte mit Summe und „x von y Posten mit Preis“ |
 
+## P2. Plan-Import am Handy testen (etwa 15 Minuten, nach dem Merge von P2)
+
+| Nr. | Was du tust | Was du sehen solltest |
+|---|---|---|
+| P2-1 | Plan → unten „Plan importieren“ → Zeitraum wählen → „Vorlage kopieren“ | Teilen-Menü oder „Vorlage kopiert“ |
+| P2-2 | In einem Claude-Chat: Vorlage einfügen, darunter deinen Monatsplan, absenden | Antwort ist JSON (gern in einem Codeblock) |
+| P2-3 | Antwort komplett kopieren, in Elan einfügen, „Prüfen“ | Vorschau mit Tagen; abgelehnte Zeilen mit Grund |
+| P2-4 | Unbekannte Zutaten zuordnen (tippen, Vorschlag wählen), „Übernehmen“ | Monat zeigt die Tage mit Punkten je Mahlzeit |
+| P2-5 | Stimmen die Mengen ungefähr? Wenn nicht: die Zeile aus der Chat-Antwort an Claude schicken | |
+
 ## B. Automatischer Bau einrichten (5 Minuten, am Rechner oder Handy)
 
 Erledigt am 23.11.2026: Secrets eingetragen, Release „Elan 1.0.0“ mit signiertem APK gebaut.

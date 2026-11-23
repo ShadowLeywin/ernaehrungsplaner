@@ -58,8 +58,10 @@ export async function zeigeMonat(wurzel, monatTeil) {
     el('div', { class: 'knopfreihe mitte' },
       el('a', { class: 'knopf leise', href: '#/angebote' }, 'Angebote'),
       el('a', { class: 'knopf', href: `#/einkauf/${ersterTag}/${letzterTag}` }, 'Einkaufsliste Monat')),
-    geplanteTage === 0 ? el('p', { class: 'leer' }, 'In diesem Monat ist noch nichts geplant. Tippe auf einen Tag und plane seine Mahlzeiten.') : null,
-    wochen.map((w) => wochenKarte(w, { heute, jeTag, tagSatz, wochenplan, ziele })));
+    geplanteTage === 0 ? el('p', { class: 'leer' }, 'In diesem Monat ist noch nichts geplant. Tippe auf einen Tag und plane seine Mahlzeiten, oder importiere unten einen ganzen Plan.') : null,
+    wochen.map((w) => wochenKarte(w, { heute, jeTag, tagSatz, wochenplan, ziele })),
+    // Ein ganzer Monatsplan aus einem Chat: unten, weil man es selten braucht
+    el('div', { class: 'knopfreihe mitte' }, el('a', { class: 'knopf leise', href: '#/woche/import' }, 'Plan importieren')));
 }
 
 function wochenKarte(woche, { heute, jeTag, tagSatz, wochenplan, ziele }) {
