@@ -5,7 +5,7 @@ export const APP_NAME = 'Elan';
 export const APP_KENNUNG = 'elan';
 export const APP_VERSION = '1.0.0';
 
-export const SCHEMA_VERSION = 8;
+export const SCHEMA_VERSION = 9;
 
 /** Speicher (Object Stores) und ihr Schlüsselfeld. */
 export const STORES = {
@@ -22,4 +22,6 @@ export const STORES = {
   labor: 'id', // ab Version 6: Laborwerte mit Datum und Referenzbereich
   symptome: 'id', // ab Version 6: Symptome mit Stärke und zugeordneten Tagebuch-Einträgen
   angebote: 'id', // ab Version 7: Angebote je Zutat und Markt, von Hand oder aus einer eigenen Datei
+  maerkte: 'id', // ab Version 9: gewählte Märkte (aus OpenStreetMap oder von Hand)
+  preise: 'id', // ab Version 9: selbst gemerkte Preise je Zutat und Markt, Kennung <zutatId>|<marktId>
 };

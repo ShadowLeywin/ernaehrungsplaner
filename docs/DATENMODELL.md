@@ -1,6 +1,6 @@
 # Datenmodell
 
-Stand: Schema-Version 8 (App 1.0.0). Maßgeblich im Code: `js/logik/schema.js` und `js/db.js`.
+Stand: Schema-Version 9 (App 1.0.0). Maßgeblich im Code: `js/logik/schema.js` und `js/db.js`.
 
 ## Grundsätze
 
@@ -10,7 +10,7 @@ Stand: Schema-Version 8 (App 1.0.0). Maßgeblich im Code: `js/logik/schema.js` u
 - Nährwerte gelten immer je 100 g.
 - Darstellung (hell/dunkel) liegt je Gerät im `localStorage` und gehört nicht ins Backup.
 
-## Entitäten heute (Version 8)
+## Entitäten heute (Version 9)
 
 | Speicher | Schlüssel | Felder | Index |
 |---|---|---|---|
@@ -21,6 +21,8 @@ Stand: Schema-Version 8 (App 1.0.0). Maßgeblich im Code: `js/logik/schema.js` u
 | `supplements` (ab 5) | `id` | `name`, `dosis` | – |
 | `labor` (ab 6) | `id` | `name`, `wert`, `einheit`, `datum`, freiwillig `refMin`, `refMax`, `notiz` | – |
 | `angebote` (ab 7) | `id` | `zutatId`, `zutatName`, `markt`, `preis`, `quelle` (`hand`, `datei`); freiwillig `menge`, `gueltigVon`, `gueltigBis`, `notiz` | – |
+| `maerkte` (ab 9) | `id` | `osm:<typ>/<nummer>` aus OpenStreetMap oder `eigen:<uuid>`; `name`, freiwillig `marke` (Kette), `strasse`, `ort`, `lat`, `lon`, `quelle` (`osm`, `eigen`), `erstellt` | – |
+| `preise` (ab 9) | `id` | Kennung `<zutatId>\|<marktId>` (ein Preis je Zutat und Markt); `zutatId`, `marktId`, `preis` (Euro je Packung), `packungGramm`, `datum` | – |
 | `symptome` (ab 6) | `id` | `art`, `staerke` (1 bis 5), `datum`, freiwillig `zeit`, `notiz`; `eintragIds` (zugeordnete Tagebuch-Einträge) | `datum` |
 | `einstellungen` | `schluessel` | `wert`; Schlüssel: `ziele`, `woche`, `slotAnteile` (Prozent je Slot, Summe 100), `gesundheit` (Wochenziel Gewicht, Wasser, Schlaf, Schritte), `referenzgruppe` (`geschlecht`, `alter`), `letztesBackup` | – |
 | `plan` (ab 3) | `id` | wie `eintraege` (`datum`, `slot`, `zutatId`, `name`, `gramm`, `je100`, `rezeptId`), dazu `uebernommen` | `datum` |
@@ -38,6 +40,8 @@ Zutat n ── m Rezept (über rezepte.zutaten), Rezept 1 ── n Eintrag (übe
 Plan-Posten ── wird zu ── Eintrag (Kopie beim Übernehmen, Posten bekommt uebernommen = true)
 Einkaufsliste = berechnet aus Plan-Posten eines Zeitraums (Woche, Monat, frei, höchstens 62 Tage); gespeichert sind nur Häkchen und eigene Posten je Zeitraum
 Zutat 1 ── n Angebot (über zutatId); abgelaufene Angebote bleiben gespeichert, werden aber nicht mehr gezeigt
+Markt 1 ── n gemerkter Preis (über marktId); Angebot ── Markt über den Namen der Kette (`passtZuMarkt`) oder freiwillig `marktId`
+Preis eines Postens = günstigstes gültiges Angebot des Markts mit Packungsgröße, sonst gemerkter Preis, sonst unbekannt (`js/logik/preise.js`)
 Symptom n ── m Eintrag (über symptome.eintragIds); gelöschte Einträge fallen in der Anzeige still weg
 Tagestyp (gym | calisthenics | rest) ── Ziel (in einstellungen.ziele)
 Wochentag ── Tagestyp (in einstellungen.woche), Tag kann abweichen
@@ -73,10 +77,14 @@ Wochentag ── Tagestyp (in einstellungen.woche), Tag kann abweichen
 
 Die Einkaufsliste galt je Woche, ab 8 je Zeitraum. `migriereEinkaufSatz` (`js/logik/zeitraum.js`) macht aus `woche: '2026-11-09'` den Zeitraum `2026-11-09..2026-11-15`; Häkchen bekommen die Kennung `<zeitraum>|<zutatId>`, eigene Posten behalten ihre. Dieselbe Funktion läuft in der Datenbank (`MIGRATIONEN[7]` in `js/db.js`) und für alte Backups (`BACKUP_MIGRATIONEN[7]`). Plan-Posten ändern sich nicht. Geprüft von `test/zeitraum.test.js` und im Browsertest „Migration 7 → 8“.
 
+## Migration 8 → 9 (23.11.2026)
+
+Neue, leere Speicher `maerkte` und `preise`; nichts Bestehendes ändert sich. Alte Backups bekommen zwei leere Listen (`BACKUP_MIGRATIONEN[8]`).
+
 ## Backup-Format
 
 ```json
-{ "app": "elan", "schemaVersion": 8, "erstelltAm": "2026-11-13T10:00:00.000Z",
+{ "app": "elan", "schemaVersion": 9, "erstelltAm": "2026-11-13T10:00:00.000Z",
   "daten": { "zutaten": [], "eintraege": [], "tage": [], "einstellungen": [], "rezepte": [], "plan": [], "einkauf": [], "vorlieben": [], "messungen": [], "supplements": [], "labor": [], "symptome": [], "angebote": [] } }
 ```
 

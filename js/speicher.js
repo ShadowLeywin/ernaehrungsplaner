@@ -220,3 +220,12 @@ export async function speicherStatus() {
 }
 
 export const sichereSpeicher = async () => (navigator.storage?.persist ? navigator.storage.persist() : false);
+
+/* ---------- Märkte und gemerkte Preise (ab Schema 9) ---------- */
+
+export const alleMaerkte = () => db.alle('maerkte');
+export const speichereMarkt = (markt) => db.speichere('maerkte', { ...markt, erstellt: markt.erstellt ?? new Date().toISOString() });
+export const loescheMarkt = (id) => db.loesche('maerkte', id);
+export const allePreise = () => db.alle('preise');
+export const speicherePreis = (preis) => db.speichere('preise', preis);
+export const loeschePreis = (id) => db.loesche('preise', id);

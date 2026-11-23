@@ -8,7 +8,7 @@ Jede Zeile „Status“ wird nach jeder Runde nachgezogen.
 | Paket | Ziel in einem Satz | Status | Reihenfolge |
 |---|---|---|---|
 | P1 Planung und Einkauf | Woche oder Monat planen, je Mahlzeit, Einkaufsliste für jeden Zeitraum | gebaut, wartet auf Push/PR und Handy-Test | 1 |
-| P3 Märkte und Preise | eigene Märkte wählen, grober Preis der Einkaufsliste je Markt | offen | 2 |
+| P3 Märkte und Preise | eigene Märkte wählen, grober Preis der Einkaufsliste je Markt | in Arbeit | 2 |
 | P2 Plan-Import | Monatsplan aus einem Claude-Chat übernehmen | offen | 3 |
 | P4 Angebote und Prospekte | Angebote je Markt wöchentlich als Datei, in der App wie ein Prospekt | offen, ohne automatischen Abruf (E4.1) | 4 |
 | P5 Social-Rezeptimport | „Teilen an Elan“ aus TikTok, Instagram, YouTube, Prompt-Brücke | offen | 5 |
@@ -163,3 +163,4 @@ Die Primärseiten (operations.osmfoundation.org, overpass-api.de, prices.openfoo
 | P1.2 Einkaufsliste für einen Zeitraum | fertig | #34 | 218 Unit, 150/150 Browser |
 | P1.3 Planzeitraum und Monatsansicht | fertig | #35 | 218 Unit, 153/153 Browser |
 | P1.4 Mahlzeiten je Slot planen | fertig | #36 | 219 Unit, 156/156 Browser |
+| P3.1 Preislogik und Schema 9 | fertig | siehe PR | 226 Unit, 156/156 Browser |
