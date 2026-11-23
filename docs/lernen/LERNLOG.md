@@ -418,3 +418,11 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Entscheidung:** Zutaten ohne Zuordnung werden ausgelassen und genannt, nicht mit 0 kcal gespeichert; `docs/IMPORT-FORMAT.md` angepasst. Vorhandene Rezepte gleichen Namens werden genutzt, nicht überschrieben.
 - **Fehler:** Erster Entwurf suchte vorhandene Rezepte in einem Feld, das es nicht gab (`ergebnis.vorhandeneNach`); der Test „Vorhandenes Rezept wird genutzt“ hätte es gefunden. Jetzt `vorhandene` als Parameter.
 - **Fachbegriffe:** Codeblock-Zaun (```` ``` ```` um Code in Chat-Antworten).
+
+## Session 16, Runde P4.1: Format für Prospekt-Angebote (23.11.2026)
+
+- **Was und warum:** P4 nach meiner Festlegung zu E4.1 (Léon: „überlege selber“): kein Abruf ohne erlaubte Quelle. Gebaut: Format `elan-angebote` Version 2 mit Artikeln je Markt (`js/logik/prospekt.js`), Version 1 bleibt lesbar; `data/prospekt-links.json` mit Links zu den Händlern.
+- **Befehle:** `npm test` (242, neu `test/prospekt.test.js` mit `test/daten/angebote-v2.json`) · Websuche nach offiziellen Prospekt-Seiten.
+- **Entscheidung:** Nur Lidls Prospekt-Seite war belegt; bei den anderen Ketten verlinkt Elan die Startseite und sagt das auch („Website öffnen“), statt eine Adresse zu raten. Links aus Dateien nur mit `https://` (ein `javascript:`-Link im Test wird verworfen).
+- **Entscheidung:** Ein Artikel wird nur über das Feld `zutat` mit einer Zutat verknüpft, nicht über den Artikelnamen: „Bio Haferflocken zart“ zu raten wäre oft richtig, aber nicht immer.
+- **Fachbegriffe:** Grundpreis (Preis je kg oder l, Pflichtangabe im Handel).
