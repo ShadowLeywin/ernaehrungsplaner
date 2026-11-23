@@ -367,3 +367,12 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Fehler:** Meine Testerwartung war falsch (540 g statt 440 g: eine Portion des Eintopfs ist ein Viertel von 400 g Apfel). Die App rechnete richtig; Kommentar mit Rechnung im Test ergänzt.
 - **Kleinigkeit:** Ein einzelner Tag hieß zuerst „23. bis 23. November (1 Tage)“; jetzt nur „23. November“.
 - **Fachbegriffe:** `history.replaceState` (Adresse ändern, ohne einen Eintrag im Verlauf anzulegen).
+
+## Session 16, Runde P1.3: Plan als Woche oder Monat (23.11.2026)
+
+- **Was und warum:** Umschalter „Woche | Monat“ (Einstellung `planAnsicht`, keine Schema-Änderung). Monat unter `#/woche/monat/<JJJJ-MM>`: je Woche eine Karte mit KW, sieben Tage als Kacheln mit einem Punkt je Mahlzeit, Einkauf je Woche. Die Leiste heißt „Plan“ ([A] zu E1.1) und öffnet die zuletzt gewählte Ansicht.
+- **Befehle:** `npm test` (218) · `node tools/pruefe-app.cjs` (153 Kriterien) · eigenes Messskript für die Breite bei 320 px.
+- **Fehler:** `var(--leise)` gibt es nicht (heißt `--tinte-leise`); ohne Wert wird die Farbe still ignoriert. Ein `a.chip` braucht `display: inline-flex`, sonst wirkt `min-height` nicht.
+- **Befund:** Mit `setViewportSize(320)` meldet der Emulator auf manchen Seiten 324 px Fensterbreite (zutaten, mehr). Der alte Test vergleicht Inhalt mit Fenster und merkt das nicht. Offen, nicht Teil von P1.
+- **Entscheidung:** „Einkauf dieser Woche“ nur bei Wochen mit Plan. Verworfen: Kalender-Raster ohne Wochenkarten (Auftrag: „einzeln sichtbare Wochen“).
+- **Fachbegriffe:** Kalender-Raster (sieben Spalten, `grid-template-columns: repeat(7, minmax(0, 1fr))`; `minmax(0, …)` verhindert, dass langer Inhalt eine Spalte aufbläht).

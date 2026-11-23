@@ -1037,3 +1037,24 @@ a.ezeile > svg { color: var(--tinte-leise); flex: none; }
 .zeitraum-frei .knopf, .zeitraum-frei .fehlertext { grid-column: 1 / -1; }
 @media (max-width: 340px) { .zeitraum-frei { grid-template-columns: 1fr; } }
 .seite-einkauf > .wahl { margin-top: 0.75rem; }
+
+/* Plan als Monat: eine Karte je Woche, sieben Tage als Kacheln. Bei 320 px bleiben etwa 40 px je Tag */
+.planansicht { margin-top: 0.75rem; }
+.monatswoche { margin-top: 0.75rem !important; padding: 0.75rem 0.25rem; }
+.monatswoche.diese { box-shadow: inset 0 0 0 2px var(--limette); }
+.monatswoche-kopf { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0 0.25rem; }
+.monatswoche-titel { display: flex; flex-direction: column; min-height: 40px; justify-content: center; color: inherit; text-decoration: none; }
+.monatswoche-titel span { font-size: 0.8125rem; color: var(--tinte-leise); }
+.monatstage { list-style: none; margin: 0.5rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.1875rem; }
+.monatstag { display: flex; flex-direction: column; align-items: center; gap: 0.125rem; min-height: 64px; padding: 0.375rem 0 0.4375rem; border-radius: 0.75rem;
+  background: var(--linie); color: inherit; text-decoration: none; line-height: 1; }
+.monatstag small { font-size: 0.625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--tinte-leise); }
+.monatstag strong { font-size: 1rem; font-weight: 760; font-variant-numeric: tabular-nums; }
+.monatstag.geplant { background: color-mix(in srgb, var(--bild-farbe, var(--limette)) 22%, transparent); }
+.monatstag.heute { box-shadow: inset 0 0 0 2px var(--tinte); }
+.monatstag.fremd { opacity: 0.45; }
+.slotpunkte { display: flex; gap: 2px; margin-top: auto; }
+.slotpunkte i { width: 4px; height: 4px; border-radius: 50%; background: color-mix(in srgb, var(--tinte) 25%, transparent); }
+.slotpunkte i.voll { background: var(--bild-farbe, var(--limette)); }
+.monatswoche-fuss { display: flex; justify-content: flex-end; margin-top: 0.5rem; }
+.monatswoche-fuss .chip { display: inline-flex; align-items: center; text-decoration: none; }

@@ -12,6 +12,7 @@ import * as speicher from '../speicher.js';
 import { el, haenge, hinweis, icon, zahl } from '../ui.js';
 import { zeigeEinkauf } from './einkauf.js';
 import { oeffneEintrag, oeffneZutatWahl } from './eintrag.js';
+import { ansichtWahl, ladePlanAnsicht, zeigeMonat } from './monat.js';
 
 const slotName = (id) => SLOTS.find((s) => s.id === id)?.name ?? '';
 const slotRang = (id) => SLOTS.findIndex((s) => s.id === id);
@@ -27,6 +28,9 @@ export function wochenTitel(montag, heute) {
 
 export async function zeigeWoche(wurzel, teile) {
   const heute = isoDatum();
+  if (teile[0] === 'monat') return zeigeMonat(wurzel, teile[1]);
+  // Ohne Datum (Tipp auf die Leiste) öffnet die zuletzt gewählte Ansicht
+  if (!teile.length && (await ladePlanAnsicht()) === 'monat') return zeigeMonat(wurzel);
   const tage = wochenTage(istGueltig(teile[0]) ? teile[0] : heute);
   // Alte Adresse der Wochenliste (bis 23.11.2026): auf die Liste für diesen Zeitraum umleiten, ohne neuen Verlaufseintrag
   if (teile[1] === 'einkauf') {
@@ -51,6 +55,7 @@ export async function zeigeWoche(wurzel, teile) {
       el('div', { class: 'blaettern' },
         el('a', { class: 'rund', href: `#/woche/${verschiebe(tage[0], -7)}`, 'aria-label': 'Eine Woche zurück' }, icon('zurueck')),
         el('a', { class: 'rund', href: `#/woche/${verschiebe(tage[0], 7)}`, 'aria-label': 'Eine Woche weiter' }, icon('vor')))),
+    ansichtWahl('woche', tage.includes(heute) ? heute : tage[0]),
     el('div', { class: 'knopfreihe mitte' },
       el('a', { class: 'knopf leise', href: '#/angebote' }, 'Angebote'),
       el('a', { class: 'knopf', href: `#/einkauf/${tage[0]}/${tage[6]}` }, 'Einkaufsliste')),
