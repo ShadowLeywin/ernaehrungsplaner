@@ -459,3 +459,13 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Fehler:** Alter Test erwartet genau eine `table.naehrwerte`; die neue Mikro-Tabelle hat deshalb eine eigene Klasse (`naehrwerte-mikro`) statt einer Teständerung. Ein neuer Test las die Liste vor dem Neuzeichnen; er wartet jetzt auf den gewählten Knopf.
 - **Offen:** BLS 4.0 (Lizenz ungeprüft).
 - **Fachbegriffe:** Einmischen (Daten aus zwei Quellen beim Laden zusammenführen, hier Datei und Einstellung).
+
+## Session 16, Nachbesserung: Märkte-Suche, Lebensmittel, Barcode (23.11.2026)
+
+- **Was und warum:** Léon am Handy: Märkte-Suche geht nicht („Keine Verbindung“); Zutaten sollen näher an Yazio sein, mit Barcode-Scanner; die runden Kategorie-Knöpfe sahen aus wie Überschriften; der Weg zu den Zutaten war schwer zu finden.
+- **Märkte:** Abfrage ohne Suchgebiet „ganz Deutschland“ (zu teuer), Gemeinde über `de:amtlicher_gemeindeschluessel`. Antwort als Text holen (`holeText`) und mit `deuteOverpassAntwort` deuten; vorher machte jede HTML-Fehlerseite aus dem JSON-Lesen ein „Keine Verbindung“. Ersatzserver, Meldung mit „Technik: …“. Echter Test nicht möglich: overpass-api.de setzt die Verbindung aus dieser Umgebung zurück.
+- **Lebensmittel:** Reiter „Rezepte | Lebensmittel“, Suchzeile mit „Scannen“, Kategorie als Auswahlfeld. Scanner mit `@capacitor/barcode-scanner` 3.1.4 (offiziell, MIT, ML Kit), im Browser `BarcodeDetector`, sonst Hinweis. Prüfziffer nach GS1 vor dem Abruf (`js/logik/barcode.js`).
+- **Befund im Test:** Open Food Facts kann ein Produkt unter anderer Nummer führen; der zweite Scan fand die Zutat nicht. Lösung: gescannte Nummer als `barcode` an der Zutat.
+- **Fehler:** Ein Reiter „Zuletzt“ als Start hätte die alte Zutatensuche gebrochen (alter Test); „Alle“ bleibt Start.
+- **Befehle:** `npm test` (254) · `node tools/pruefe-app.cjs` (185) · `npm install --save-exact @capacitor/barcode-scanner@3.1.4`.
+- **Fachbegriffe:** GS1-Prüfziffer, User-Agent.

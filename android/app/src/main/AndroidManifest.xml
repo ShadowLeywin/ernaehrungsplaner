@@ -106,4 +106,7 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Kamera nur für den Barcode-Scanner (Léons Wunsch vom 23.11.2026). Android fragt beim ersten Scan; Bilder werden nicht gespeichert -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 </manifest>

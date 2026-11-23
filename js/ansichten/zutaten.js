@@ -11,6 +11,7 @@ import { gehe, neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { bestaetige, el, feld, haenge, hinweis, icon, zahl } from '../ui.js';
 import { angebotBereich } from './angebote.js';
+import { scanneZutat } from './scanner.js';
 import { zeigeMagListe } from './magliste.js';
 
 // Zustand der Liste bleibt beim Wechsel zwischen Liste und Detail erhalten
@@ -30,6 +31,19 @@ export async function zeigeZutaten(wurzel, teile) {
     return detail(wurzel, zutat, istObstGemuese(zutat) ? vorlieben.get(zutat.id) : null, angebote, favoriten);
   }
   return liste(wurzel);
+}
+
+/* ---------- Umschalter Rezepte | Lebensmittel ---------- */
+
+/**
+ * Oben auf „Rezepte“ und „Lebensmittel“: zwei Reiter wie in großen Ernährungs-Apps.
+ * Vorher führte nur ein kleiner Textlink zu den Zutaten; Léon fand ihn nicht (23.11.2026).
+ */
+export function essenWahl(aktiv) {
+  return el('nav', { class: 'wahl schmal-voll essen-wahl', 'aria-label': 'Rezepte oder Lebensmittel' },
+    [['rezepte', 'Rezepte', '#/rezepte'], ['zutaten', 'Lebensmittel', '#/zutaten']].map(([id, name, href]) => el('a', {
+      class: 'wahl-knopf', href, 'aria-current': id === aktiv ? 'page' : null,
+    }, name)));
 }
 
 /* ---------- Liste ---------- */
@@ -112,26 +126,30 @@ async function liste(wurzel) {
     type: 'button', class: 'wahl-knopf', 'aria-pressed': String(zustand.filter === wert),
     onclick: () => { zustand.filter = wert; neuZeichnen(); },
   }, text);
-  // Kategorien als Chips zum Wischen; ein zweiter Tipp auf die gewählte hebt den Filter auf
-  const kategorien = el('div', { class: 'kategorie-chips', role: 'group', 'aria-label': 'Kategorie' }, KATEGORIEN.map((k) => el('button', {
-    type: 'button', class: 'chip', 'aria-pressed': String(zustand.kategorie === k.id),
-    onclick: () => { zustand.kategorie = zustand.kategorie === k.id ? null : k.id; neuZeichnen(); },
-  }, k.name)));
+  // Kategorie als Auswahlfeld: Die runden Chips sahen aus wie Überschriften (Léon, 23.11.2026)
+  const kategorien = el('div', { class: 'feld kategorie-feld' },
+    el('label', { for: 'f-zutat-kategorie' }, 'Kategorie'),
+    el('select', {
+      id: 'f-zutat-kategorie',
+      onchange: (e) => { zustand.kategorie = e.target.value || null; zeichneTreffer(); },
+    }, el('option', { value: '' }, 'Alle Kategorien'), KATEGORIEN.map((k) => el('option', { value: k.id, selected: zustand.kategorie === k.id ? true : null }, k.name))));
+  const scanne = async () => { const zutat = await scanneZutat(); if (zutat) gehe(adresse(zutat.id).slice(1)); };
 
   zeichneTreffer();
   zeichneOnline();
-  // Gewählte Kategorie sichtbar halten, auch wenn sie weit rechts in der Chip-Reihe liegt
-  requestAnimationFrame(() => kategorien.querySelector('[aria-pressed="true"]')?.scrollIntoView({ inline: 'center', block: 'nearest' }));
   haenge(wurzel, 
     el('header', { class: 'seitenkopf' },
-      el('h1', {}, 'Zutaten'),
-      el('a', { class: 'knopf klein', href: '#/zutaten/neu' }, icon('plus', 18), 'Neue Zutat')),
-    el('input', {
-      type: 'search', class: 'suchfeld', placeholder: 'Zutat suchen', 'aria-label': 'Zutat suchen', autocomplete: 'off',
-      enterkeyhint: 'search', value: zustand.begriff,
-      oninput: (e) => { zustand.begriff = e.target.value; zeichneTreffer(); zeichneOnline(); },
-    }),
-    el('div', { class: 'wahl schmal-voll', role: 'group', 'aria-label': 'Auswahl' }, filter(`Alle (${zutaten.length})`, 'alle'), filter(`★ (${favoriten.length})`, 'favoriten'), filter(`Eigene (${eigeneIds.size})`, 'eigene')),
+      el('h1', {}, 'Lebensmittel'),
+      el('a', { class: 'knopf klein', href: '#/zutaten/neu' }, icon('plus', 18), 'Neu')),
+    essenWahl('zutaten'),
+    el('div', { class: 'suchzeile' },
+      el('input', {
+        type: 'search', class: 'suchfeld', placeholder: 'Suchen', 'aria-label': 'Zutat suchen', autocomplete: 'off',
+        enterkeyhint: 'search', value: zustand.begriff,
+        oninput: (e) => { zustand.begriff = e.target.value; zeichneTreffer(); zeichneOnline(); },
+      }),
+      el('button', { type: 'button', class: 'scan-knopf', 'aria-label': 'Strichcode scannen', onclick: scanne }, icon('barcode', 22), el('span', {}, 'Scannen'))),
+    el('div', { class: 'wahl schmal-voll', role: 'group', 'aria-label': 'Auswahl' }, filter('Alle', 'alle'), filter('Favoriten', 'favoriten'), filter('Eigene', 'eigene')),
     kategorien,
     el('a', { class: 'textlink', href: '#/zutaten/mag' }, 'Mag-Liste für Obst und Gemüse'),
     el('p', { class: 'klein' }, 'Werte je 100 g'),

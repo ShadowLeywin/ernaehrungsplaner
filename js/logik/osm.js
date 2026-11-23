@@ -3,6 +3,11 @@
 // Daten © OpenStreetMap-Mitwirkende, ODbL: Die Ansicht zeigt den Hinweis mit Link.
 
 export const OVERPASS_URL = 'https://overpass-api.de/api/interpreter';
+/**
+ * Öffentliche Overpass-Server in der Reihenfolge, in der Elan sie fragt. Der zweite springt ein, wenn der erste
+ * nicht antwortet oder ausgelastet ist [vermutet: beide als öffentliche Instanzen im OSM-Wiki gelistet, 23.11.2026].
+ */
+export const OVERPASS_SERVER = [OVERPASS_URL, 'https://overpass.private.coffee/api/interpreter'];
 export const OSM_HINWEIS = '© OpenStreetMap-Mitwirkende';
 export const OSM_LIZENZ_URL = 'https://www.openstreetmap.org/copyright';
 export const MAX_TREFFER = 100;
@@ -24,16 +29,18 @@ export function pruefeOrt(text) {
 const ql = (text) => text.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 
 /**
- * Overpass-Abfrage: Gemeinde (nach Name) oder PLZ-Gebiet in Deutschland, darin alle Lebensmittelläden.
+ * Overpass-Abfrage: PLZ-Gebiet oder deutsche Gemeinde (nach Name), darin alle Lebensmittelläden.
+ * Gesucht wird direkt über die Merkmale der Grenze, nicht „innerhalb Deutschlands“: Das Gebiet ganz Deutschland
+ * ist so groß, dass die Abfrage am Handy zu lange brauchte (Léons Test am 23.11.2026: keine Antwort).
+ * Deutsche Gemeinden erkennt man am amtlichen Gemeindeschlüssel; so fällt ein gleichnamiger Ort in Österreich weg.
  * "out center" liefert für Gebäude (ways) einen Mittelpunkt, damit jeder Treffer Koordinaten hat.
  */
 export function overpassAbfrage(ort) {
   const gebiet = ort.art === 'plz'
-    ? `rel["boundary"="postal_code"]["postal_code"="${ql(ort.wert)}"](area.de)`
-    : `rel["boundary"="administrative"]["name"="${ql(ort.wert)}"](area.de)`;
+    ? `rel["boundary"="postal_code"]["postal_code"="${ql(ort.wert)}"]`
+    : `rel["boundary"="administrative"]["name"="${ql(ort.wert)}"]["de:amtlicher_gemeindeschluessel"]`;
   return [
     '[out:json][timeout:25];',
-    'area["ISO3166-1"="DE"][admin_level=2]->.de;',
     `${gebiet};`,
     'map_to_area->.ort;',
     `nwr["shop"~"^(${Object.keys(LADEN_ARTEN).join('|')})$"](area.ort);`,
@@ -41,7 +48,23 @@ export function overpassAbfrage(ort) {
   ].join('\n');
 }
 
-export const overpassUrl = (ort) => `${OVERPASS_URL}?data=${encodeURIComponent(overpassAbfrage(ort))}`;
+export const overpassUrl = (ort, server = OVERPASS_URL) => `${server}?data=${encodeURIComponent(overpassAbfrage(ort))}`;
+
+/**
+ * Antwort eines Overpass-Servers deuten: { ok, daten } oder { ok: false, weiter, grund }.
+ * weiter = true heißt: Der nächste Server darf es versuchen (ausgelastet, Zeitüberschreitung, Fehlerseite).
+ * Overpass meldet Laufzeitfehler auch mit Status 200 im Feld "remark"; das zählt als Fehler.
+ */
+export function deuteOverpassAntwort(status, text) {
+  const kurz = String(text ?? '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120);
+  if (status === 429) return { ok: false, weiter: true, grund: 'Server ausgelastet (429)' };
+  if (status === 504 || status === 503) return { ok: false, weiter: true, grund: `Server überlastet (${status})` };
+  if (status < 200 || status >= 300) return { ok: false, weiter: true, grund: `Fehler ${status}${kurz ? `: ${kurz}` : ''}` };
+  let daten;
+  try { daten = JSON.parse(text); } catch { return { ok: false, weiter: true, grund: `keine gültige Antwort: ${kurz || 'leer'}` }; }
+  if (typeof daten?.remark === 'string' && /error|timed out|runtime/i.test(daten.remark)) return { ok: false, weiter: true, grund: `Abfrage abgebrochen: ${daten.remark.slice(0, 120)}` };
+  return { ok: true, daten };
+}
 
 /**
  * Antwort von Overpass in Märkte umwandeln: { id: 'osm:node/123', name, marke, art, strasse, plz, ort, lat, lon, quelle: 'osm' }.

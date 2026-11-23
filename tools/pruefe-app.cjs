@@ -1588,7 +1588,11 @@ async function appLauf(browser) {
       nativePromise: async (plugin, methode, optionen) => {
         window.__aufrufe.push({ plugin, methode, optionen });
         if (plugin === 'Filesystem' && methode === 'writeFile') return { uri: `file:///data/cache/${optionen.path}` };
+        // Produkt per Barcode: erstes Produkt der Beispieldaten mit kcal (erfunden), sonst die Suchliste
+        if (plugin === 'CapacitorHttp' && String(optionen.url).includes('/api/v2/product/')) return { status: 200, data: { product: offAntwort.products.find((p) => p.nutriments?.['energy-kcal_100g']) }, headers: {} };
         if (plugin === 'CapacitorHttp') return { status: 200, data: offAntwort, headers: {} };
+        // Barcode-Scanner: liefert einen gültigen EAN-13 (Beispielnummer aus der GS1-Beschreibung)
+        if (plugin === 'CapacitorBarcodeScanner') return { ScanResult: window.__scanCode ?? '4006381333931', format: 9 };
         // Health Connect mit erfundenen Werten: heute 6.543 Schritte, 79,9 kg, letzte Nacht 7,5 h Schlaf
         if (plugin === 'Health') {
           const heute = (stunde, minute = 0) => { const d = new Date(); d.setHours(stunde, minute, 0, 0); return d.toISOString(); };
@@ -1744,6 +1748,27 @@ async function appLauf(browser) {
 
   pruefe('App: Vibration beim Tippen, abschaltbar', tipp.join() === 'impact:LIGHT' && erfolg.join() === 'impact:LIGHT,notification:SUCCESS' && ohne === 0, `Wasser: ${tipp.join() || 'kein Aufruf'}; nach Eintragen: ${erfolg.join()}; aus: ${ohne} Aufrufe`);
   pruefe('App-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
+  // Barcode-Scanner in der App: Lebensmittel → Scannen → Produkt aus Open Food Facts gespeichert und geöffnet
+  await seite.goto(`${URL_APP}#/zutaten`);
+  await seite.getByRole('button', { name: 'Strichcode scannen' }).click();
+  await seite.waitForFunction(() => location.hash.startsWith('#/zutaten/off'));
+  await seite.locator('.stern').waitFor();
+  const scanAdresse = await seite.evaluate(() => location.hash);
+  const scanName = await seite.locator('h1').innerText();
+  const scanAufruf = await seite.evaluate(() => window.__aufrufe.find((a) => a.plugin === 'CapacitorBarcodeScanner'));
+  // Zweiter Scan desselben Codes beim Eintragen: kein Abruf mehr, direkt die Menge
+  const abrufeVorher = await seite.evaluate(() => window.__aufrufe.filter((a) => a.plugin === 'CapacitorHttp').length);
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.getByRole('button', { name: 'Zu Frühstück hinzufügen' }).click();
+  await seite.locator('dialog').getByRole('button', { name: 'Strichcode scannen' }).click();
+  await seite.locator('#f-gramm').waitFor();
+  const blattTitel = await seite.locator('dialog .blatt-titel').innerText();
+  const abrufeNachher = await seite.evaluate(() => window.__aufrufe.filter((a) => a.plugin === 'CapacitorHttp').length);
+  pruefe('App: Barcode scannen, Produkt von Open Food Facts übernehmen; beim zweiten Scan ohne Netz direkt zur Menge',
+    scanAdresse.startsWith('#/zutaten/off%3A') && scanName.length > 0 && scanAufruf?.methode === 'scanBarcode' && scanAufruf.optionen.android.scanningLibrary === 'mlkit' && blattTitel === scanName && abrufeNachher === abrufeVorher,
+    `${scanAdresse}: „${scanName}“; Blatt „${blattTitel}“; Abrufe ${abrufeVorher} → ${abrufeNachher}`);
+  await seite.keyboard.press('Escape');
+
   await kontext.close();
 }
 
@@ -2162,18 +2187,27 @@ async function zutatenLauf(browser) {
   await seite.goto(`${URL_APP}#/zutaten`);
   await seite.locator('.suchfeld').fill('');
   await seite.locator('.suchfeld').dispatchEvent('input');
-  await seite.getByRole('button', { name: /^★ \(1\)/ }).click();
-  await seite.locator('.wahl-knopf[aria-pressed=true]', { hasText: '★' }).waitFor();
+  await seite.getByRole('button', { name: 'Favoriten', exact: true }).click();
+  await seite.locator('.wahl-knopf[aria-pressed=true]', { hasText: 'Favoriten' }).waitFor();
   const nurFav = await seite.locator('#zutaten-liste .zeile-name').allInnerTexts();
-  await seite.getByRole('button', { name: /^Alle \(/ }).click();
-  await seite.locator('.kategorie-chips .chip', { hasText: 'Hülsenfrüchte' }).click();
-  await seite.locator('.kategorie-chips .chip[aria-pressed=true]', { hasText: 'Hülsenfrüchte' }).waitFor();
+  await seite.getByRole('button', { name: 'Alle', exact: true }).click();
+  await seite.locator('#f-zutat-kategorie').selectOption({ label: 'Hülsenfrüchte' });
+  await seite.waitForFunction(() => document.querySelector('#zutaten-zuletzt') === null);
   const kategorieListe = await seite.locator('#zutaten-liste .zeile-name small').allInnerTexts();
   await bild(seite, '58-zutaten-liste');
   pruefe('Zutaten-Liste: zuletzt verwendet oben, Favoriten-Filter, Kategorie-Chips',
     zuletzt.some((z) => z.startsWith('Haferflocken')) && nurFav.length === 1 && nurFav[0].includes('Apfel') && kategorieListe.length > 0 && kategorieListe.every((k) => k === 'Hülsenfrüchte' || k.length > 0) && (await seite.locator('#zutaten-zuletzt').count()) === 0,
     `zuletzt: ${zuletzt.map((z) => z.split('\n')[0]).join(', ')}; Favoriten: ${nurFav.map((z) => z.split('\n')[0]).join(', ')}; Hülsenfrüchte: ${kategorieListe.length} Treffer`);
-  await seite.locator('.kategorie-chips .chip', { hasText: 'Hülsenfrüchte' }).click();
+  await seite.locator('#f-zutat-kategorie').selectOption({ value: '' });
+  // Im Browser ohne Barcode-Erkennung: Hinweis statt Fehler; Reiter Rezepte | Lebensmittel
+  await seite.getByRole('button', { name: 'Strichcode scannen' }).click();
+  const scanHinweis = await seite.locator('.hinweis').innerText();
+  await seite.locator('.essen-wahl').getByRole('link', { name: 'Rezepte' }).click();
+  await seite.locator('.essen-wahl a[aria-current=page]', { hasText: 'Rezepte' }).waitFor();
+  await seite.locator('.essen-wahl').getByRole('link', { name: 'Lebensmittel' }).click();
+  await seite.locator('h1', { hasText: 'Lebensmittel' }).waitFor();
+  pruefe('Lebensmittel: Reiter Rezepte | Lebensmittel, Scan-Knopf neben der Suche, im Browser ohne Erkennung ein Hinweis',
+    scanHinweis.includes('Android-App') && (await seite.locator('.suchzeile .scan-knopf').count()) === 1 && (await seite.locator('#f-zutat-kategorie').count()) === 1, `„${scanHinweis}“`);
   // Beim Eintragen: Favoriten oben, eigene Portion als Knopf
   await seite.goto(`${URL_APP}#/heute`);
   await seite.getByRole('button', { name: 'Zu Mittagessen hinzufügen' }).click();
@@ -2190,6 +2224,33 @@ async function zutatenLauf(browser) {
   const breite = await seite.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   pruefe('Zutat bei 320 px ohne seitliches Rollen', breite <= 0, `${breite} px`);
   pruefe('Zutaten-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
+  await kontext.close();
+}
+
+/** Märkte-Suche bei Störungen: Hauptserver überlastet → Ersatzserver; beide weg → Meldung mit technischem Grund */
+async function marktStoerungLauf(browser) {
+  const { kontext, seite, fehler } = await neueSeite(browser);
+  const overpass = fs.readFileSync(path.resolve(__dirname, '..', 'test', 'daten', 'overpass-maerkte.json'), 'utf8');
+  let ersatz = true;
+  await seite.route('https://overpass-api.de/**', (route) => route.fulfill({ status: 504, contentType: 'text/html', body: '<html><body>Gateway Timeout</body></html>' }));
+  await seite.route('https://overpass.private.coffee/**', (route) => (ersatz
+    ? route.fulfill({ contentType: 'application/json', body: overpass })
+    : route.fulfill({ status: 200, contentType: 'text/html', body: '<html>Wartung</html>' })));
+  await seite.goto(`${URL_APP}#/maerkte`, { waitUntil: 'networkidle' });
+  await seite.locator('#f-markt-ort').fill('12345');
+  await seite.getByRole('button', { name: 'Suchen' }).click();
+  await seite.locator('#markt-treffer li').first().waitFor();
+  const treffer = await seite.locator('#markt-treffer li').count();
+  ersatz = false;
+  await seite.getByRole('button', { name: 'Suchen' }).click();
+  await seite.locator('.merkzettel', { hasText: 'Technik:' }).waitFor();
+  const meldung = await seite.locator('.merkzettel', { hasText: 'Technik:' }).innerText();
+  pruefe('Märkte-Suche: Ersatzserver springt ein; ohne beide eine Meldung mit Grund statt „Bist du online?“',
+    treffer === 3 && meldung.includes('overpass-api.de: Server überlastet (504)') && meldung.includes('overpass.private.coffee: keine gültige Antwort') && !meldung.includes('Bist du online'),
+    `${treffer} Treffer über den Ersatzserver; „${meldung.slice(0, 160)}…“`);
+  // Der Browser meldet die absichtlich simulierte 504-Antwort selbst; das ist kein Fehler der App
+  const echteFehler = fehler.filter((f) => !f.includes('Failed to load resource'));
+  pruefe('Störungs-Lauf ohne Konsolenfehler der App', echteFehler.length === 0, echteFehler.slice(0, 3).join(' | ') || `0 Fehler (${fehler.length} Netzmeldungen des Browsers zum simulierten 504)`);
   await kontext.close();
 }
 
@@ -2214,6 +2275,7 @@ async function zutatenLauf(browser) {
     await migrationsLauf(browser);
     await migration7Lauf(browser);
     await marktLauf(browser);
+    await marktStoerungLauf(browser);
     await planImportLauf(browser);
     await prospektLauf(browser);
     await teilenLauf(browser);

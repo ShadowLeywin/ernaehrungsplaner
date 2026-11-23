@@ -89,6 +89,8 @@ const PFADE = {
   haken: 'M5 12.5l4.5 4.5L19 7.5',
   zu: 'M6 6l12 12M18 6L6 18',
   suche: 'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM20 20l-4-4',
+  // Strichcode: Rahmenecken und Striche, wie das bekannte Scan-Symbol
+  barcode: 'M4 8V5h3M17 5h3v3M20 16v3h-3M7 19H4v-3M8 9v6M11 9v6M13 9v6M16 9v6',
   // Tagesscheibe: Kreis mit drei Schnitten
   heute: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9',
   // Blatt

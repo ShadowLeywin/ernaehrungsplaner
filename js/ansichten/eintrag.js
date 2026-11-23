@@ -13,6 +13,7 @@ import { tippGefuehl } from '../plattform.js';
 import { gehe } from '../router.js';
 import * as speicher from '../speicher.js';
 import { blatt, el, gramm, hinweis, icon, zahl } from '../ui.js';
+import { scanneZutat } from './scanner.js';
 import { schnellFormular } from './schnellformular.js';
 import { zeigeUnterwegs } from './unterwegs.js';
 
@@ -76,10 +77,16 @@ function suchListe({ auswahl, zuletzt = [], favoriten = [], vorlieben = new Map(
       el('span', { class: 'schnellweg-bild', 'aria-hidden': 'true' }, icon('unterwegs', 22)),
       el('span', { class: 'schnellweg-text' }, 'Unterwegs', el('small', {}, 'Restaurant, Imbiss, Fast Food')),
       icon('vor', 18)) : null,
-    el('input', {
-      type: 'search', class: 'suchfeld', placeholder: 'Suchen', 'aria-label': 'Zutat oder Rezept suchen', autocomplete: 'off',
-      enterkeyhint: 'search', oninput: (e) => zeichne(e.target.value),
-    }),
+    // Suchen oder scannen, wie in großen Ernährungs-Apps: der Scanner direkt neben dem Suchfeld
+    el('div', { class: 'suchzeile' },
+      el('input', {
+        type: 'search', class: 'suchfeld', placeholder: 'Suchen', 'aria-label': 'Zutat oder Rezept suchen', autocomplete: 'off',
+        enterkeyhint: 'search', oninput: (e) => zeichne(e.target.value),
+      }),
+      el('button', {
+        type: 'button', class: 'scan-knopf', 'aria-label': 'Strichcode scannen',
+        onclick: async () => { const zutat = await scanneZutat(); if (zutat) beiWahl(zutat); },
+      }, icon('barcode', 22), el('span', {}, 'Scannen'))),
     el('p', { class: 'klein' }, 'Werte je 100 g'),
     liste);
 }

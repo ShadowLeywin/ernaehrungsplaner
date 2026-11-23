@@ -104,6 +104,15 @@ Vorher: Mehr → „Backup speichern“ (das Update hebt die Datenbank auf Schem
 | P6-3 | „Eigene Portion anlegen“: z. B. „Becher, 150“ | Beim Eintragen dieser Zutat gibt es den Knopf „Becher“ |
 | P6-4 | Beim Eintragen: steht oben „Favoriten“? | ja, mit deinen Sternen |
 
+## Nachbesserung 23.11.2026 am Handy testen (etwa 5 Minuten)
+
+| Nr. | Was du tust | Was du sehen solltest |
+|---|---|---|
+| N-1 | Mehr → Märkte → 89344 → „Suchen“ | Läden mit Adresse. Wenn nicht: die ganze Meldung mit „Technik: …“ abschreiben oder als Bild schicken |
+| N-2 | Heute → Plus → „Scannen“ → Strichcode einer Packung | Android fragt einmal nach der Kamera; danach steht das Produkt mit Menge zur Wahl |
+| N-3 | Dieselbe Packung noch einmal scannen | Produkt kommt sofort, ohne Suche |
+| N-4 | Rezepte → oben „Lebensmittel“ | Liste mit Suche, „Scannen“, Reitern und Kategorie-Auswahl |
+
 ## B. Automatischer Bau einrichten (5 Minuten, am Rechner oder Handy)
 
 Erledigt am 23.11.2026: Secrets eingetragen, Release „Elan 1.0.0“ mit signiertem APK gebaut.
