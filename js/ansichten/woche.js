@@ -13,6 +13,7 @@ import { el, haenge, hinweis, icon, zahl } from '../ui.js';
 import { zeigeEinkauf } from './einkauf.js';
 import { oeffneEintrag, oeffneZutatWahl } from './eintrag.js';
 import { ansichtWahl, ladePlanAnsicht, zeigeMonat } from './monat.js';
+import { zeigeTagPlan } from './tagplan.js';
 
 const slotName = (id) => SLOTS.find((s) => s.id === id)?.name ?? '';
 const slotRang = (id) => SLOTS.findIndex((s) => s.id === id);
@@ -29,6 +30,7 @@ export function wochenTitel(montag, heute) {
 export async function zeigeWoche(wurzel, teile) {
   const heute = isoDatum();
   if (teile[0] === 'monat') return zeigeMonat(wurzel, teile[1]);
+  if (teile[0] === 'tag') return zeigeTagPlan(wurzel, teile[1]);
   // Ohne Datum (Tipp auf die Leiste) öffnet die zuletzt gewählte Ansicht
   if (!teile.length && (await ladePlanAnsicht()) === 'monat') return zeigeMonat(wurzel);
   const tage = wochenTage(istGueltig(teile[0]) ? teile[0] : heute);
@@ -92,7 +94,8 @@ function tagBereich({ datum, istHeute, posten, typ, ziele, warnungen }) {
       el('span', { class: `slot-bild kalender tagestyp-${typ}`, 'aria-hidden': 'true' },
         el('small', {}, wochentag.slice(0, 2)), el('strong', {}, String(ausIso(datum).getDate()))),
       el('div', { class: 'slot-text' },
-        el('h2', {}, el('span', { class: 'unsichtbar' }, `${wochentag}, ${formatTagKurz(datum)}: `), typName, istHeute ? el('span', { class: 'marke' }, 'heute') : null),
+        // Der Titel führt in den Tagesplan mit allen sechs Mahlzeiten; das Plus daneben bleibt der schnelle Weg
+        el('h2', {}, el('a', { class: 'tag-link', href: `#/woche/tag/${datum}` }, el('span', { class: 'unsichtbar' }, `${wochentag}, ${formatTagKurz(datum)}: `), typName, istHeute ? el('span', { class: 'marke' }, 'heute') : null)),
         el('p', { class: 'slot-stand' }, `${zahl(geplant)} von ${zahl(ziele[typ].kcal)} kcal`)),
       el('button', {
         type: 'button', class: 'rund plus', 'aria-label': `Für ${wochentag} einplanen`,

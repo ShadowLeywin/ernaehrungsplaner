@@ -67,3 +67,23 @@ test('listeAlsText enthält nur Offenes, auch eigene Posten', () => {
   const text = listeAlsText(liste, [{ name: 'Spülmittel', erledigt: false }, { name: 'Salz', erledigt: true }], new Set(['basis:reis']), 'Einkauf');
   assert.equal(text, 'Einkauf\n- Apfel: 340 g, etwa 2 Stück\n- Spülmittel');
 });
+
+test('planJeSlot: Posten je Mahlzeit, kcal und Ziel aus dem Anteil, leere Mahlzeiten bleiben', async () => {
+  const { planJeSlot } = await import('../js/logik/plan.js');
+  const { slotsMitAnteilen } = await import('../js/logik/ziele.js');
+  const slots = slotsMitAnteilen(null);
+  const je = planJeSlot([
+    { id: 'b', slot: 'abend', gramm: 200, je100: { kcal: 100 }, erstellt: '2026-11-23T10:00:00Z' },
+    { id: 'a', slot: 'abend', gramm: 100, je100: { kcal: 50 }, erstellt: '2026-11-23T09:00:00Z' },
+    { id: 'c', slot: 'fruehstueck', gramm: 80, je100: { kcal: 370 } },
+    { id: 'x', slot: 'gibtsnicht', gramm: 100, je100: { kcal: 999 } },
+  ], slots, 2000);
+  assert.equal(je.length, 6);
+  assert.deepEqual(je.map((s) => s.slot.id), slots.map((s) => s.id));
+  const abend = je.find((s) => s.slot.id === 'abend');
+  assert.deepEqual(abend.posten.map((p) => p.id), ['a', 'b']);
+  assert.equal(abend.kcal, 250);
+  assert.equal(abend.ziel, Math.round(2000 * slots.find((s) => s.id === 'abend').anteil));
+  assert.equal(je.find((s) => s.slot.id === 'fruehstueck').kcal, 296);
+  assert.equal(je.find((s) => s.slot.id === 'mittag').posten.length, 0);
+});

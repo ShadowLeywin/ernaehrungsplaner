@@ -376,3 +376,11 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Befund:** Mit `setViewportSize(320)` meldet der Emulator auf manchen Seiten 324 px Fensterbreite (zutaten, mehr). Der alte Test vergleicht Inhalt mit Fenster und merkt das nicht. Offen, nicht Teil von P1.
 - **Entscheidung:** „Einkauf dieser Woche“ nur bei Wochen mit Plan. Verworfen: Kalender-Raster ohne Wochenkarten (Auftrag: „einzeln sichtbare Wochen“).
 - **Fachbegriffe:** Kalender-Raster (sieben Spalten, `grid-template-columns: repeat(7, minmax(0, 1fr))`; `minmax(0, …)` verhindert, dass langer Inhalt eine Spalte aufbläht).
+
+## Session 16, Runde P1.4: Mahlzeiten je Slot planen (23.11.2026)
+
+- **Was und warum:** Tagesplan `#/woche/tag/<datum>` mit den sechs Mahlzeiten wie auf „Heute“, Plus je Mahlzeit, kcal je Mahlzeit gegen ihr Ziel (Anteil am Tagesziel). Erreichbar über den Tagesnamen in der Woche und jede Kachel im Monat. Reine Funktion `planJeSlot` in `js/logik/plan.js`.
+- **Befehle:** `npm test` (219) · `node tools/pruefe-app.cjs` (156 Kriterien) · eigenes Skript für Bilder in Blatt/Zitrus × hell/dunkel (Testdaten erfunden).
+- **Entscheidung:** Plus am Tag in der Woche bleibt (nächster freier Slot) als schneller Weg; der Tagesplan ist der genaue Weg. Verworfen: sechs Plus-Knöpfe je Tag in der Woche (42 Knöpfe auf einer Seite).
+- **Bewertung der Bilder:** alle vier Darstellungen lesbar; Überzeile brach mit „· CALISTHENICS“ am Zeilenanfang um, jetzt kürzer.
+- **Fachbegriffe:** Slot-Ziel (Tagesziel × Anteil der Mahlzeit, `slotsMitAnteilen`).

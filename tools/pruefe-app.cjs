@@ -720,6 +720,38 @@ async function wochenLauf(browser) {
   await seite.locator('.planansicht').getByRole('button', { name: 'Woche' }).click();
   await seite.locator('.plantag').first().waitFor();
 
+  // Mahlzeiten je Slot planen: Tagesplan mit sechs Mahlzeiten, Plus je Mahlzeit
+  await seite.goto(`${URL_APP}#/woche`);
+  await seite.locator('.plantag.heute .tag-link').click();
+  await seite.locator('#tagplan-summe').waitFor();
+  const tagAdresse = await seite.evaluate(() => location.hash);
+  const slotsImTag = await seite.locator('.seite [id^=planslot-]').count();
+  const vorher = await seite.locator('#planslot-abend .eintrag').count();
+  await seite.getByRole('button', { name: 'In Abendessen einplanen' }).click();
+  await seite.locator('dialog input[type=search]').fill('reis');
+  await seite.locator('dialog .zeilen .zeile').first().click();
+  const vorgewaehlt = await seite.locator('#f-slot').inputValue();
+  await seite.locator('#f-gramm').fill('100');
+  await seite.getByRole('button', { name: 'Einplanen', exact: true }).click();
+  await seite.locator('dialog').waitFor({ state: 'detached' });
+  await seite.locator('#planslot-abend .eintrag').nth(vorher).waitFor();
+  const abendStand = await seite.locator('#planslot-abend .slot-stand').innerText();
+  const summe = await seite.locator('#tagplan-summe').innerText();
+  pruefe('Tagesplan: sechs Mahlzeiten, Plus plant genau in diese Mahlzeit, kcal je Mahlzeit gegen ihr Ziel',
+    /^#\/woche\/tag\/\d{4}-\d\d-\d\d$/.test(tagAdresse) && slotsImTag === 6 && vorgewaehlt === 'abend' && (await seite.locator('#planslot-abend .eintrag').count()) === vorher + 1 && /^\d[\d.]* von \d[\d.]* kcal$/.test(abendStand) && !abendStand.startsWith('0 von'),
+    `${tagAdresse}: ${slotsImTag} Mahlzeiten, Blatt vorbelegt mit ${vorgewaehlt}; Abendessen ${abendStand}; ${summe}`);
+  await bild(seite, '11c-tagplan');
+  await seite.getByRole('button', { name: 'Ins Tagebuch übernehmen' }).click();
+  await seite.locator('.hinweis', { hasText: 'ins Tagebuch übernommen' }).waitFor();
+  const imTagebuchVermerkt = await seite.locator('#planslot-abend .eintrag.erledigt').count();
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.locator('#slot-abend').waitFor();
+  pruefe('Tagesplan: Übernehmen trägt die Mahlzeit im richtigen Slot ein', imTagebuchVermerkt >= 1 && (await seite.locator('#slot-abend .eintrag').count()) >= 1, `${imTagebuchVermerkt} im Plan als übernommen, Abendessen im Tagebuch: ${(await seite.locator('#slot-abend .eintrag-name').allInnerTexts()).join(', ').replace(/\n/g, ' ')}`);
+  await seite.goto(`${URL_APP}#/woche/monat`);
+  await seite.locator('.monatstag.heute').click();
+  await seite.locator('#tagplan-summe').waitFor();
+  pruefe('Monat: Tipp auf einen Tag öffnet seinen Tagesplan', (await seite.evaluate(() => location.hash)) === tagAdresse, await seite.evaluate(() => location.hash));
+
   await seite.goto(`${URL_APP}#/woche/${await seite.evaluate(() => new Date().toISOString().slice(0, 10))}/einkauf`);
   await seite.locator('.zusatz').waitFor();
   const umgeleitet = await seite.evaluate(() => location.hash);
@@ -729,7 +761,7 @@ async function wochenLauf(browser) {
   const freiBreit = await seite.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   pruefe('Einkauf bei 320 px mit offenem Zeitraum-Formular ohne seitliches Rollen', freiBreit <= 0, `${freiBreit} px breiter als das Fenster`);
   await seite.setViewportSize(devices['Galaxy S9+'].viewport);
-  for (const [route, warteAuf] of [['woche', '.plantag'], ['woche/monat', '.monatswoche'], ['einkauf', '.zusatz']]) {
+  for (const [route, warteAuf] of [['woche', '.plantag'], ['woche/monat', '.monatswoche'], ['woche/tag', '#tagplan-summe'], ['einkauf', '.zusatz']]) {
     await seite.goto(`${URL_APP}#/${route}`);
     await seite.locator(warteAuf).first().waitFor();
     const b = await seite.evaluate(() => ({ inhalt: document.documentElement.scrollWidth, fenster: window.innerWidth }));
