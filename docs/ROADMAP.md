@@ -158,8 +158,8 @@ Die Primärseiten (operations.osmfoundation.org, overpass-api.de, prices.openfoo
 
 | Teilschritt | Status | PR | Testergebnis |
 |---|---|---|---|
-| Phase 1: Roadmap, Importformat, Handy-Tests abgehakt | fertig | – (Branch `claude/new-session-clchhs`) | nur Doku |
-| P1.1 Zeiträume und Schema 8 | fertig | – (Branch `claude/p1-1-zeitraum`) | 218 Unit, 146/146 Browser |
-| P1.2 Einkaufsliste für einen Zeitraum | fertig | – (Branch `claude/p1-2-einkauf`) | 218 Unit, 150/150 Browser |
-| P1.3 Planzeitraum und Monatsansicht | fertig | – (Branch `claude/p1-3-monat`) | 218 Unit, 153/153 Browser |
-| P1.4 Mahlzeiten je Slot planen | fertig | – (Branch `claude/p1-4-slots`) | 219 Unit, 156/156 Browser |
+| Phase 1: Roadmap, Importformat, Handy-Tests abgehakt | fertig | #32 | nur Doku |
+| P1.1 Zeiträume und Schema 8 | fertig | #33 | 218 Unit, 146/146 Browser |
+| P1.2 Einkaufsliste für einen Zeitraum | fertig | #34 | 218 Unit, 150/150 Browser |
+| P1.3 Planzeitraum und Monatsansicht | fertig | #35 | 218 Unit, 153/153 Browser |
+| P1.4 Mahlzeiten je Slot planen | fertig | #36 | 219 Unit, 156/156 Browser |
