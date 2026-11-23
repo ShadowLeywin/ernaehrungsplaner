@@ -9,7 +9,7 @@ Jede Zeile „Status“ wird nach jeder Runde nachgezogen.
 |---|---|---|---|
 | P1 Planung und Einkauf | Woche oder Monat planen, je Mahlzeit, Einkaufsliste für jeden Zeitraum | gebaut, wartet auf Push/PR und Handy-Test | 1 |
 | P3 Märkte und Preise | eigene Märkte wählen, grober Preis der Einkaufsliste je Markt | gebaut (P3.1, P3.2, P3.4), Karte und Open Prices zurückgestellt | 2 |
-| P2 Plan-Import | Monatsplan aus einem Claude-Chat übernehmen | offen | 3 |
+| P2 Plan-Import | Monatsplan aus einem Claude-Chat übernehmen | gebaut | 3 |
 | P4 Angebote und Prospekte | Angebote je Markt wöchentlich als Datei, in der App wie ein Prospekt | in Arbeit, ohne automatischen Abruf (E4.1) | 4 |
 | P5 Social-Rezeptimport | „Teilen an Elan“ aus TikTok, Instagram, YouTube, Prompt-Brücke | offen | 5 |
 | P6 Zutaten-Datenbank | Suche, Kategorien, Detailansicht, Favoriten wie Yazio | offen | 6 |
@@ -169,5 +169,6 @@ Die Primärseiten (operations.osmfoundation.org, overpass-api.de, prices.openfoo
 | P3.4 Preise je Markt und Vergleich in der Einkaufsliste | fertig | #39 | 231 Unit, 163/163 Browser |
 | P3.5 Open Prices | zurückgestellt: Abdeckung in Deutschland unbekannt, Dienst in der Arbeitsumgebung nicht erreichbar; erst nach Léons Test am Handy, ob gemerkte Preise reichen | – | – |
 | P2.1 Leser für `elan-import` | fertig | #40 | 238 Unit, 163/163 Browser |
+| P2.2 und P2.3 Seite „Plan importieren“: Vorlage, Vorschau, Übernahme | fertig (zusammengelegt: Vorlage ohne Vorschau nützt nichts) | #41 | 238 Unit, 168/168 Browser |
 | P4.1 Format `elan-angebote` Version 2 | fertig | siehe PR | 242 Unit |
 | P4.2 Action wöchentlich | zurückgestellt: keine Quelle mit erlaubtem Abruf (E4.1) | – | – |

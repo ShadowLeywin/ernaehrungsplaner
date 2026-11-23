@@ -1073,3 +1073,8 @@ a.ezeile > svg { color: var(--tinte-leise); flex: none; }
   background: var(--flaeche); color: var(--tinte); font-weight: 650; font-variant-numeric: tabular-nums; }
 .preis-knopf.offen { border-style: dashed; color: var(--tinte-leise); font-weight: 500; }
 .preis-knopf.angebot { border-color: var(--limette); }
+
+/* Plan-Import: Auswahlfeld in einer Zeile auf der Karte. Sonst hätte es die Farbe der Karte und wäre unsichtbar */
+.wahl-zeile input { flex: 0 0 8.5rem; width: 8.5rem; min-height: 2.75rem; }
+:root[data-thema] .wahl-zeile input { background: var(--flaeche-2); }
+.wahl-zeile .zeile-name { min-width: 0; }

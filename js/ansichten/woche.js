@@ -14,6 +14,7 @@ import { zeigeEinkauf } from './einkauf.js';
 import { oeffneEintrag, oeffneZutatWahl } from './eintrag.js';
 import { ansichtWahl, ladePlanAnsicht, zeigeMonat } from './monat.js';
 import { zeigeTagPlan } from './tagplan.js';
+import { zeigePlanImport } from './planimport.js';
 
 const slotName = (id) => SLOTS.find((s) => s.id === id)?.name ?? '';
 const slotRang = (id) => SLOTS.findIndex((s) => s.id === id);
@@ -31,6 +32,7 @@ export async function zeigeWoche(wurzel, teile) {
   const heute = isoDatum();
   if (teile[0] === 'monat') return zeigeMonat(wurzel, teile[1]);
   if (teile[0] === 'tag') return zeigeTagPlan(wurzel, teile[1]);
+  if (teile[0] === 'import') return zeigePlanImport(wurzel);
   // Ohne Datum (Tipp auf die Leiste) öffnet die zuletzt gewählte Ansicht
   if (!teile.length && (await ladePlanAnsicht()) === 'monat') return zeigeMonat(wurzel);
   const tage = wochenTage(istGueltig(teile[0]) ? teile[0] : heute);
@@ -70,7 +72,8 @@ export async function zeigeWoche(wurzel, teile) {
       typ: tagestypFuer(datum, wochenplan, tagSaetze[i]),
       ziele,
       warnungen,
-    })))));
+    })))),
+    el('div', { class: 'knopfreihe mitte' }, el('a', { class: 'knopf leise', href: '#/woche/import' }, 'Plan importieren')));
 }
 
 function tagBereich({ datum, istHeute, posten, typ, ziele, warnungen }) {
