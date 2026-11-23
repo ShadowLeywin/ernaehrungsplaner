@@ -5,8 +5,10 @@ export const NEUIGKEITEN = [
   {
     version: '1.0.0',
     datum: '2026-11-23',
-    titel: 'Einkaufsliste für jeden Zeitraum',
+    titel: 'Monatsplan und Einkaufsliste für jeden Zeitraum',
     punkte: [
+      'Plan: oben „Woche“ oder „Monat“ wählen. Der Monat zeigt jede Woche als eigene Karte mit Kalenderwoche; ein Punkt je Mahlzeit zeigt, was schon geplant ist. Elan merkt sich deine Wahl.',
+      'Die Leiste heißt jetzt „Plan“.',
       'Einkaufsliste: oben „Woche“, „Monat“ oder „Frei“ wählen. Elan zählt alle geplanten Zutaten im Zeitraum zusammen, nach Kategorie sortiert. Frei geht bis 62 Tage.',
       'Jeder Zeitraum hat eigene Häkchen und eigene Posten. Was du schon für eine Woche abgehakt hattest, ist mit umgezogen.',
     ],

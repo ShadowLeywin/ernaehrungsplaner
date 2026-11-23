@@ -682,16 +682,54 @@ async function wochenLauf(browser) {
 
   const unsinn = [];
   const mass = [];
+  // Planzeitraum Monat: Wochen einzeln als Karten, Wahl bleibt gemerkt, Tipp öffnet Woche, Blättern
+  await seite.goto(`${URL_APP}#/woche`);
+  await seite.locator('.plantag').first().waitFor();
+  await seite.locator('.planansicht').getByRole('button', { name: 'Monat' }).click();
+  await seite.locator('.monatswoche').first().waitFor();
+  const monatTitel = await seite.locator('h1').innerText();
+  const wochenKarten = await seite.locator('.monatswoche').count();
+  const kws = await seite.locator('.monatswoche-titel strong').allInnerTexts();
+  const geplanteKacheln = await seite.locator('.monatstag.geplant').count();
+  const punkte = await seite.locator('.monatstag.heute .slotpunkte i.voll').count();
+  await bild(seite, '11b-monat');
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.locator('.slot').first().waitFor();
+  await seite.getByRole('link', { name: 'Plan', exact: true }).click();
+  await seite.locator('.monatswoche').first().waitFor();
+  const gemerkt = await seite.evaluate(() => location.hash);
+  pruefe('Plan als Monat: einzelne Wochen mit KW, Tage mit Punkt je Mahlzeit, Wahl bleibt gemerkt',
+    /^[A-ZÄÖÜ][a-zäöü]+ \d{4}$/.test(monatTitel) && wochenKarten >= 4 && wochenKarten <= 6 && kws.every((k) => /^KW \d+$/.test(k)) && geplanteKacheln >= 1 && punkte >= 1 && gemerkt === '#/woche',
+    `${monatTitel}: ${wochenKarten} Wochen (${kws.join(', ')}), ${geplanteKacheln} Tage geplant, heute ${punkte} Punkte; Leiste öffnet wieder den Monat`);
+  const ersteKw = seite.locator('.monatswoche').first();
+  const ersteVon = await ersteKw.locator('.monatswoche-titel').getAttribute('href');
+  await ersteKw.locator('.monatswoche-titel').click();
+  await seite.locator('.plantag').first().waitFor();
+  const wocheOffen = await seite.evaluate(() => location.hash);
+  await seite.goto(`${URL_APP}#/woche`);
+  await seite.locator('.monatswoche').first().waitFor();
+  await seite.getByRole('link', { name: 'Ein Monat weiter' }).click();
+  await seite.waitForFunction((t) => document.querySelector('h1')?.innerText !== t, monatTitel);
+  const naechster = await seite.locator('h1').innerText();
+  pruefe('Monat: Tipp auf eine Woche öffnet sie, Blättern zum nächsten Monat', wocheOffen === ersteVon && naechster !== monatTitel && (await seite.locator('.leer').count()) === 1,
+    `${ersteVon} → ${wocheOffen}; ${monatTitel} → ${naechster}`);
+  await seite.setViewportSize({ width: 320, height: 640 });
+  const monatBreit = await seite.evaluate(() => ({ breite: document.documentElement.scrollWidth, fenster: window.innerWidth, tag: Math.round(document.querySelector('.monatstag').getBoundingClientRect().width), hoehe: Math.round(document.querySelector('.monatstag').getBoundingClientRect().height) }));
+  pruefe('Monat bei 320 px: kein seitliches Rollen, Tage mindestens 36 × 40 px', monatBreit.breite <= monatBreit.fenster && monatBreit.tag >= 36 && monatBreit.hoehe >= 40, `Seite ${monatBreit.breite}/${monatBreit.fenster} px, Tag ${monatBreit.tag} × ${monatBreit.hoehe} px`);
+  await seite.setViewportSize(devices['Galaxy S9+'].viewport);
+  await seite.locator('.planansicht').getByRole('button', { name: 'Woche' }).click();
+  await seite.locator('.plantag').first().waitFor();
+
   await seite.goto(`${URL_APP}#/woche/${await seite.evaluate(() => new Date().toISOString().slice(0, 10))}/einkauf`);
   await seite.locator('.zusatz').waitFor();
   const umgeleitet = await seite.evaluate(() => location.hash);
   pruefe('Alte Adresse der Wochenliste leitet auf die Liste des Zeitraums um', /^#\/einkauf\/\d{4}-\d\d-\d\d\/\d{4}-\d\d-\d\d$/.test(umgeleitet) && (await seite.locator('.wahl-knopf[aria-pressed=true]').innerText()) === 'Woche', umgeleitet);
   await seite.setViewportSize({ width: 320, height: 640 });
   await seite.getByRole('button', { name: 'Frei', exact: true }).click();
-  const freiBreit = await seite.evaluate(() => document.documentElement.scrollWidth);
-  pruefe('Einkauf bei 320 px mit offenem Zeitraum-Formular ohne seitliches Rollen', freiBreit <= 320, `${freiBreit} px`);
+  const freiBreit = await seite.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  pruefe('Einkauf bei 320 px mit offenem Zeitraum-Formular ohne seitliches Rollen', freiBreit <= 0, `${freiBreit} px breiter als das Fenster`);
   await seite.setViewportSize(devices['Galaxy S9+'].viewport);
-  for (const [route, warteAuf] of [['woche', '.plantag'], ['einkauf', '.zusatz']]) {
+  for (const [route, warteAuf] of [['woche', '.plantag'], ['woche/monat', '.monatswoche'], ['einkauf', '.zusatz']]) {
     await seite.goto(`${URL_APP}#/${route}`);
     await seite.locator(warteAuf).first().waitFor();
     const b = await seite.evaluate(() => ({ inhalt: document.documentElement.scrollWidth, fenster: window.innerWidth }));
