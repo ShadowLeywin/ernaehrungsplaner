@@ -10,7 +10,7 @@ Jede Zeile „Status“ wird nach jeder Runde nachgezogen.
 | P1 Planung und Einkauf | Woche oder Monat planen, je Mahlzeit, Einkaufsliste für jeden Zeitraum | gebaut, wartet auf Push/PR und Handy-Test | 1 |
 | P3 Märkte und Preise | eigene Märkte wählen, grober Preis der Einkaufsliste je Markt | gebaut (P3.1, P3.2, P3.4), Karte und Open Prices zurückgestellt | 2 |
 | P2 Plan-Import | Monatsplan aus einem Claude-Chat übernehmen | gebaut | 3 |
-| P4 Angebote und Prospekte | Angebote je Markt wöchentlich als Datei, in der App wie ein Prospekt | in Arbeit, ohne automatischen Abruf (E4.1) | 4 |
+| P4 Angebote und Prospekte | Angebote je Markt wöchentlich als Datei, in der App wie ein Prospekt | gebaut ohne automatischen Abruf; Action wartet auf eine erlaubte Quelle (E4.1) | 4 |
 | P5 Social-Rezeptimport | „Teilen an Elan“ aus TikTok, Instagram, YouTube, Prompt-Brücke | offen | 5 |
 | P6 Zutaten-Datenbank | Suche, Kategorien, Detailansicht, Favoriten wie Yazio | offen | 6 |
 
@@ -170,5 +170,12 @@ Die Primärseiten (operations.osmfoundation.org, overpass-api.de, prices.openfoo
 | P3.5 Open Prices | zurückgestellt: Abdeckung in Deutschland unbekannt, Dienst in der Arbeitsumgebung nicht erreichbar; erst nach Léons Test am Handy, ob gemerkte Preise reichen | – | – |
 | P2.1 Leser für `elan-import` | fertig | #40 | 238 Unit, 163/163 Browser |
 | P2.2 und P2.3 Seite „Plan importieren“: Vorlage, Vorschau, Übernahme | fertig (zusammengelegt: Vorlage ohne Vorschau nützt nichts) | #41 | 238 Unit, 168/168 Browser |
-| P4.1 Format `elan-angebote` Version 2 | fertig | siehe PR | 242 Unit |
+| P4.1 Format `elan-angebote` Version 2 | fertig | #42 | 242 Unit, 168/168 Browser |
 | P4.2 Action wöchentlich | zurückgestellt: keine Quelle mit erlaubtem Abruf (E4.1) | – | – |
+| P4.3 und P4.4 Seite „Prospekte“ mit Links zu den Händlern | fertig (zusammengelegt) | siehe PR | 242 Unit, 172/172 Browser |
+
+## Bekannte Fehler (nicht aus diesen Paketen)
+
+| Fehler | Beleg | Nächster Schritt |
+|---|---|---|
+| Eigenes Körpermaß: Der Wert wird gespeichert, der eingegebene Name geht selten verloren (Kachel heißt weiter „Eigenes Maß 1“). Im Browsertest bisher als „wackliger Test“ geführt | Diagnose am 23.11.2026 zweimal: `gespeichert: [88]`, Name nicht in `massNamen` | Ursache suchen (Vermutung: Rennen zwischen Neuzeichnen nach dem vorigen Speichern und dem Öffnen des Blatts); Léon prüft am Handy, ob es dort vorkommt |

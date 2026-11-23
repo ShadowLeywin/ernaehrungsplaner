@@ -10,6 +10,7 @@ import { istEingerichtet, merkeEingerichtet, zeigeWillkommen } from './ansichten
 import { zeigeWoche } from './ansichten/woche.js';
 import { zeigeEinkauf } from './ansichten/einkauf.js';
 import { zeigeMaerkte } from './ansichten/maerkte.js';
+import { zeigeProspekte } from './ansichten/prospekte.js';
 import * as speicher from './speicher.js';
 import { zeigeZutaten } from './ansichten/zutaten.js';
 import { neuZeichnen, route, starte } from './router.js';
@@ -31,6 +32,7 @@ route('woche', zeigeWoche);
 route('angebote', zeigeAngebote);
 route('einkauf', zeigeEinkauf);
 route('maerkte', zeigeMaerkte);
+route('prospekte', zeigeProspekte);
 route('rezepte', zeigeRezepte);
 route('zutaten', zeigeZutaten);
 route('fortschritt', zeigeFortschritt);

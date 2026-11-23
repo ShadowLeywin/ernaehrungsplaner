@@ -433,3 +433,12 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Entscheidung:** Nur Lidls Prospekt-Seite war belegt; bei den anderen Ketten verlinkt Elan die Startseite und sagt das auch („Website öffnen“), statt eine Adresse zu raten. Links aus Dateien nur mit `https://` (ein `javascript:`-Link im Test wird verworfen).
 - **Entscheidung:** Ein Artikel wird nur über das Feld `zutat` mit einer Zutat verknüpft, nicht über den Artikelnamen: „Bio Haferflocken zart“ zu raten wäre oft richtig, aber nicht immer.
 - **Fachbegriffe:** Grundpreis (Preis je kg oder l, Pflichtangabe im Handel).
+
+## Session 16, Runde P4.3: Seite „Prospekte“ (23.11.2026)
+
+- **Was und warum:** `#/prospekte`: Angebotsdatei laden (Version 1 oder 2), je Markt als Chips, Angebote als Kacheln nach Kategorien, „auf deiner Liste“ für Zutaten der Einkaufsliste dieser Woche. „Original-Prospekte“: Links der Ketten deiner gemerkten Märkte, nur auf Tipp, nur `https`, über `oeffneExtern` in `js/plattform.js`.
+- **Befehle:** `npm test` (242) · `node tools/pruefe-app.cjs` (172; `window.open` im Test abgefangen, fremde Hosts gezählt).
+- **Entscheidung:** Daten der Datei als Einstellung `prospekt` (keine Schema-Änderung); Artikel mit Zutat zusätzlich als Angebote (`quelle: 'datei'`), damit Einkaufsliste und Preise sie kennen.
+- **Unsicher:** Ob Capacitor eine fremde Adresse im Browser des Handys statt im WebView öffnet [vermutet]; Léon prüft (P4-1).
+- **Notiert:** Der Maß-Test zeigt einen echten Fehler (Name geht verloren); unter „Bekannte Fehler“ in der Roadmap.
+- **Fachbegriffe:** `noopener` (neuer Tab ohne Zugriff zurück auf die App).

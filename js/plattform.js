@@ -207,3 +207,15 @@ export async function holeJson(url, millisekunden = 15000) {
     clearTimeout(timer);
   }
 }
+
+/**
+ * Eine fremde Seite öffnen (Prospekt eines Händlers), nur nach Tipp und nur https.
+ * App: Die Adresse im WebView aufrufen; Capacitor gibt fremde Adressen an den Browser des Handys weiter [vermutet, am Handy prüfen].
+ * Browser: neuer Tab ohne Zugriff auf Elan (noopener).
+ */
+export function oeffneExtern(url) {
+  if (!/^https:\/\//.test(String(url))) return false;
+  if (istApp()) location.href = url;
+  else window.open(url, '_blank', 'noopener');
+  return true;
+}

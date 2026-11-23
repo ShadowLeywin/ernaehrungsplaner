@@ -76,6 +76,15 @@ Vorher: Mehr → „Backup speichern“ (das Update hebt die Datenbank auf Schem
 | P2-4 | Unbekannte Zutaten zuordnen (tippen, Vorschlag wählen), „Übernehmen“ | Monat zeigt die Tage mit Punkten je Mahlzeit |
 | P2-5 | Stimmen die Mengen ungefähr? Wenn nicht: die Zeile aus der Chat-Antwort an Claude schicken | |
 
+## P4. Prospekte am Handy testen (etwa 5 Minuten, nach dem Merge von P4)
+
+| Nr. | Was du tust | Was du sehen solltest |
+|---|---|---|
+| P4-1 | Mehr → Prospekte → „Prospekt von Lidl öffnen“ (wenn ein Lidl unter Märkte gemerkt ist) | Lidls Prospekt-Seite öffnet sich im Browser, nicht in Elan. Wenn sie in Elan aufgeht: melden |
+| P4-2 | Eine Angebotsdatei laden (Format in `docs/ANGEBOTE-FORMAT.md`, Version 2; ein Chat kann sie aus einem Foto des Prospekts abtippen) | Angebote je Markt als Kacheln |
+| P4-3 | Einkaufsliste öffnen | Angebote mit Zutat stehen bei der Zutat und zählen beim Preis |
+| P4-4 | Gibt es eine Angebotsquelle, die automatischen Abruf erlaubt (oder fragst du einen Anbieter)? Ein Satz an Claude genügt | Dann baut Claude die wöchentliche Action (P4.2) |
+
 ## B. Automatischer Bau einrichten (5 Minuten, am Rechner oder Handy)
 
 Erledigt am 23.11.2026: Secrets eingetragen, Release „Elan 1.0.0“ mit signiertem APK gebaut.
