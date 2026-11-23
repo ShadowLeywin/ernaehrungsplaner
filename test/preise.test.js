@@ -62,7 +62,7 @@ test('Vorrang: Angebot vor gemerktem Preis vor unbekannt', () => {
   const ecke = preisFuerPosten(posten, ECKE, { angebote, preise, tag: TAG });
   assert.deepEqual([ecke.quelle, ecke.betrag], ['unbekannt', null]);
   assert.equal(preisText(ecke), 'Preis unbekannt');
-  assert.equal(preisText(lidl), `2 × 1 kg à ${euroText(1.49)} = ${euroText(2.98)}, Angebot`);
+  assert.equal(preisText(lidl).replace(/\u00a0/g, ' '), `2 × 1 kg à ${euroText(1.49)} = ${euroText(2.98)}, Angebot`);
 });
 
 test('Liste und Vergleich: unbekannte Posten zählen nicht, mehr bekannte Posten gehen vor', () => {
@@ -82,4 +82,10 @@ test('Backup der Version 8 bekommt leere Märkte und Preise', () => {
   const p = pruefeBackup({ app: 'elan', schemaVersion: 8, daten: { zutaten: [] } });
   assert.equal(p.ok, true);
   assert.deepEqual([p.daten.maerkte, p.daten.preise], [[], []]);
+});
+
+test('Kurzer Preistext ohne Summe', () => {
+  const e = { quelle: 'gemerkt', betrag: 2.58, packungen: 2, packungGramm: 500, preis: 1.29, geschaetzt: false };
+  assert.equal(preisText(e, { kurz: true }).replace(/\u00a0/g, ' '), `2 × 500 g à ${euroText(1.29)}`);
+  assert.equal(preisText({ ...e, packungGramm: 1500, geschaetzt: true }, { kurz: true }).replace(/\u00a0/g, ' '), `2 × 1,5 l à ${euroText(1.29)}`);
 });

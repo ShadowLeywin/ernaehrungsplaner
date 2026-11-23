@@ -1926,10 +1926,56 @@ async function marktLauf(browser) {
   await seite.locator('.hinweis', { hasText: 'entfernt' }).getByRole('button', { name: 'Rückgängig' }).click();
   await seite.locator('#meine-maerkte li', { hasText: 'Hofladen Test' }).waitFor();
   pruefe('Markt entfernen mit Rückgängig', (await seite.locator('#meine-maerkte li').count()) === 2);
+  // P3.4: Preise je Markt in der Einkaufsliste. Plan und ein Angebot direkt in die Datenbank (erfundene Werte)
+  await seite.evaluate(() => new Promise((ok) => {
+    const d = new Date();
+    const heute = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const a = indexedDB.open('elan');
+    a.onsuccess = () => {
+      const t = a.result.transaction(['plan', 'angebote'], 'readwrite');
+      t.objectStore('plan').put({ id: 'pp-reis', datum: heute, slot: 'mittag', zutatId: 'basis:reis', name: 'Reis', marke: '', gramm: 200, je100: { kcal: 350 } });
+      t.objectStore('plan').put({ id: 'pp-apfel', datum: heute, slot: 'abend', zutatId: 'basis:apfel', name: 'Apfel', marke: '', gramm: 340, je100: { kcal: 52 } });
+      t.objectStore('angebote').put({ id: 'ang-apfel', zutatId: 'basis:apfel', zutatName: 'Apfel', markt: 'Lidl', preis: 1.99, menge: '1 kg', quelle: 'hand' });
+      t.oncomplete = () => { a.result.close(); ok(); };
+    };
+  }));
+  await seite.goto(`${URL_APP}#/einkauf`);
+  await seite.locator('#f-einkauf-markt').waitFor();
+  await seite.locator('#f-einkauf-markt').selectOption({ label: 'Lidl' });
+  await seite.locator('#f-einkauf-markt option:checked', { hasText: 'Lidl' }).waitFor({ state: 'attached' });
+  await seite.waitForFunction(() => document.querySelector('#einkauf-preis')?.innerText.includes('1 von 2'));
+  const vorher = await seite.locator('#einkauf-preis').innerText();
+  const apfelZeile = (await seite.locator('.haken', { hasText: 'Apfel' }).innerText()).replace(/\u00a0/g, ' ');
+  await seite.getByRole('button', { name: 'Preis für Reis bei Lidl eintragen' }).click();
+  await seite.locator('#f-preis-euro').fill('0,99');
+  await seite.locator('#f-preis-packung').fill('500');
+  await seite.locator('dialog').getByRole('button', { name: 'Merken' }).click();
+  await seite.locator('dialog').waitFor({ state: 'detached' });
+  await seite.waitForFunction(() => document.querySelector('#einkauf-preis')?.innerText.includes('2 von 2'));
+  const nachher = await seite.locator('#einkauf-preis').innerText();
+  pruefe('Einkaufsliste: Preis je Markt, Angebot vor gemerktem Preis, fehlender Preis mit zwei Tipps gemerkt',
+    vorher.includes('Grob 1,99 €') && apfelZeile.includes('1 × 1 kg à 1,99 €, Angebot') && apfelZeile.includes('340 g') && nachher.includes('Grob 2,98 €'),
+    `${vorher.replace(/\n/g, ' · ')} → ${nachher.replace(/\n/g, ' · ')}; Apfel: ${apfelZeile.replace(/\n/g, ' | ')}`);
+  await bild(seite, '51-einkauf-preise');
+  await seite.getByRole('button', { name: 'Märkte vergleichen' }).click();
+  await seite.locator('#markt-vergleich li').first().waitFor();
+  const vergleich = await seite.locator('#markt-vergleich li').allInnerTexts();
+  pruefe('Märkte vergleichen: zuerst, wo die meisten Preise bekannt sind; ohne Preis „unbekannt“',
+    vergleich.length === 2 && vergleich[0].startsWith('Lidl') && vergleich[0].includes('2,98 €') && vergleich[1].includes('0 von 2') && vergleich[1].includes('unbekannt'),
+    vergleich.map((v) => v.replace(/\n/g, ' – ')).join(' | '));
+  await seite.waitForTimeout(400); // Blatt fertig hereingleiten lassen
+  await bild(seite, '52-vergleich', false);
+  await seite.keyboard.press('Escape');
+  await seite.locator('dialog').waitFor({ state: 'detached' });
+
+  // Gemessen wird die Einkaufsliste mit Preisen (die Märkte-Seite hat dieselben Bausteine)
   await seite.setViewportSize({ width: 320, height: 640 });
   const breite = await seite.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-  const klein = await seite.evaluate(() => [...document.querySelectorAll('.seite button, .seite a, .seite input')].filter((e) => e.offsetParent && !e.closest('p') && e.getBoundingClientRect().height < 40).map((e) => e.textContent || e.id));
-  pruefe('Märkte bei 320 px: kein seitliches Rollen, Tippflächen ab 40 px (Links im Fließtext ausgenommen)', breite <= 0 && klein.length === 0, `${breite} px zu breit; zu klein: ${klein.join(', ') || 'nichts'}`);
+  const klein = await seite.evaluate(() => [...document.querySelectorAll('.seite button, .seite a, .seite input:not([type=checkbox])')].filter((e) => e.offsetParent && !e.closest('p') && e.getBoundingClientRect().height < 40).map((e) => e.textContent || e.id));
+  // Der Name darf nicht zusammengequetscht werden (Fehler im ersten Entwurf: „Apfel“ stand Buchstabe für Buchstabe untereinander)
+  const schmalsterName = await seite.evaluate(() => Math.min(...[...document.querySelectorAll('.haken .zeile-name')].map((e) => e.getBoundingClientRect().width)));
+  pruefe('Einkauf mit Preisen bei 320 px: kein seitliches Rollen, Tippflächen ab 40 px (Links im Fließtext ausgenommen), Name mindestens 120 px breit', breite <= 0 && klein.length === 0 && schmalsterName >= 120,
+    `${breite} px zu breit; zu klein: ${klein.join(', ') || 'nichts'}; schmalster Name ${Math.round(schmalsterName)} px`);
   pruefe('Markt-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
   await kontext.close();
 }
