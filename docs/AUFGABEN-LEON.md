@@ -43,7 +43,20 @@ Erledigt am 23.11.2026, alle ohne gemeldeten Fehler ([A] laut Startprompt vom 23
 | A21 ✓ 23.11. | Heute → „Wie geht es dir heute?“: je Frage eine Zahl tippen, dann Fortschritt öffnen | Zahlen bleiben gewählt; „Letzte 7 Tage“ zeigt Energie, Stimmung, Stress |
 | A22 ✓ 23.11. | Fortschritt → Körperwerte: Steht bei HRV ein Wert? | Wenn „noch kein Wert“: Samsung Health gibt HRV nicht an Health Connect weiter; kurz melden |
 
-## B. Automatischer Bau einrichten (5 Minuten, am Rechner oder Handy)
+## P1. Planung und Einkauf am Handy testen (etwa 10 Minuten, nach dem Merge von P1)
+
+Vorher: Mehr → „Backup speichern“ (das Update hebt die Datenbank auf Schema 8).
+
+| Nr. | Was du tust | Was du sehen solltest |
+|---|---|---|
+| P1-1 | Leiste unten: steht dort „Plan“ statt „Woche“? Antippen | Woche wie bisher, oben neu „Woche \| Monat“ |
+| P1-2 | „Monat“ tippen, App schließen, öffnen, „Plan“ tippen | Monat erscheint wieder; jede Woche eine Karte mit „KW …“ |
+| P1-3 | Im Monat auf einen Tag tippen, bei „Abendessen“ auf das Plus, etwas einplanen | Blatt ist mit „Abendessen“ vorbelegt; danach „x von y kcal“ beim Abendessen |
+| P1-4 | „Einkaufsliste Monat“ öffnen, dann „Frei“ und zwei Tage wählen, „Zeigen“ | Liste summiert über den Zeitraum; Datumsfelder im deutschen Format |
+| P1-5 | Hattest du vor dem Update in einer Wochenliste etwas abgehakt? Diese Woche öffnen | Häkchen sind noch da |
+| P1-6 | Datumsfelder bei „Frei“ antippen | Android-Kalender öffnet sich, Tastatur verdeckt „Zeigen“ nicht |
+
+ (5 Minuten, am Rechner oder Handy)
 
 Danach baut GitHub nach jeder Änderung ein signiertes APK und legt es unter „Releases“ ab.
 
