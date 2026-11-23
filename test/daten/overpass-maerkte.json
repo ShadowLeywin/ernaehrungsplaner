@@ -1,0 +1,11 @@
+{
+  "version": 0.6,
+  "generator": "Beispiel für Tests, erfunden",
+  "elements": [
+    { "type": "node", "id": 1001, "lat": 48.1, "lon": 10.1, "tags": { "shop": "supermarket", "name": "Lidl", "brand": "Lidl", "addr:street": "Teststraße", "addr:housenumber": "1", "addr:postcode": "12345", "addr:city": "Musterstadt" } },
+    { "type": "way", "id": 2002, "center": { "lat": 48.2, "lon": 10.2 }, "tags": { "shop": "supermarket", "name": "EDEKA Beispiel", "brand": "EDEKA", "addr:city": "Musterstadt" } },
+    { "type": "node", "id": 3003, "lat": 48.3, "lon": 10.3, "tags": { "shop": "chemist", "name": "dm-drogerie markt", "brand": "dm-drogerie markt", "addr:city": "Anderort" } },
+    { "type": "node", "id": 4004, "lat": 48.4, "lon": 10.4, "tags": { "shop": "convenience" } },
+    { "type": "node", "id": 1001, "lat": 48.1, "lon": 10.1, "tags": { "shop": "supermarket", "name": "Lidl" } }
+  ]
+}

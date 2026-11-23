@@ -169,5 +169,7 @@ export async function zeigeEinkauf(wurzel, teile) {
       beiEntfernen: async () => { await speicher.loescheEinkauf(x.id); neuZeichnen(); },
     }))) : null,
     el('form', { class: 'zusatz', onsubmit: ergaenze }, neuerPosten, el('button', { type: 'submit', class: 'knopf leise' }, 'Dazu')),
-    gesamt ? el('div', { class: 'knopfreihe' }, el('button', { type: 'button', class: 'knopf leise', onclick: teilen }, 'Offene Posten teilen')) : null);
+    el('div', { class: 'knopfreihe' },
+      el('a', { class: 'knopf leise', href: '#/maerkte' }, 'Märkte'),
+      gesamt ? el('button', { type: 'button', class: 'knopf leise', onclick: teilen }, 'Offene Posten teilen') : null));
 }

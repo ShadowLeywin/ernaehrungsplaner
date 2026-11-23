@@ -163,4 +163,5 @@ Die Primärseiten (operations.osmfoundation.org, overpass-api.de, prices.openfoo
 | P1.2 Einkaufsliste für einen Zeitraum | fertig | #34 | 218 Unit, 150/150 Browser |
 | P1.3 Planzeitraum und Monatsansicht | fertig | #35 | 218 Unit, 153/153 Browser |
 | P1.4 Mahlzeiten je Slot planen | fertig | #36 | 219 Unit, 156/156 Browser |
-| P3.1 Preislogik und Schema 9 | fertig | siehe PR | 226 Unit, 156/156 Browser |
+| P3.1 Preislogik und Schema 9 | fertig | #37 | 226 Unit, 156/156 Browser |
+| P3.2 Märkte suchen und merken | fertig | siehe PR | 230 Unit, 161/161 Browser |

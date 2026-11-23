@@ -5,6 +5,15 @@ export const NEUIGKEITEN = [
   {
     version: '1.0.0',
     datum: '2026-11-23',
+    titel: 'Märkte',
+    punkte: [
+      'Neu unter Mehr → Märkte (oder unten in der Einkaufsliste): Ort oder Postleitzahl eingeben, „Suchen“ fragt OpenStreetMap nach Läden dort. „Merken“ legt sie in „Meine Märkte“. Elan schickt nur, was du eintippst, keinen Standort.',
+      'Märkte, die OpenStreetMap nicht kennt, legst du von Hand an.',
+    ],
+  },
+  {
+    version: '1.0.0',
+    datum: '2026-11-23',
     titel: 'Monatsplan und Einkaufsliste für jeden Zeitraum',
     punkte: [
       'Plan: oben „Woche“ oder „Monat“ wählen. Der Monat zeigt jede Woche als eigene Karte mit Kalenderwoche; ein Punkt je Mahlzeit zeigt, was schon geplant ist. Elan merkt sich deine Wahl.',
