@@ -2082,6 +2082,53 @@ async function prospektLauf(browser) {
   await kontext.close();
 }
 
+/** P5: Rezept aus TikTok und Co. über „Teilen an Elan“ (Texte erfunden) und die Prompt-Brücke für reine Videos */
+async function teilenLauf(browser) {
+  const { kontext, seite, fehler, fremd } = await neueSeite(browser, { permissions: ['clipboard-read', 'clipboard-write'] });
+  const unterschrift = ['Proteinreiche Overnight Oats 🥣🔥', 'Zutaten 👇', '🥣 80 g Haferflocken', '🥛 200 g Skyr', 'Zubereitung:', '✅ Alles in ein Glas schichten', '✅ Über Nacht kalt stellen', '#mealprep #protein'].join('\n');
+  // So öffnet Android die App beim Teilen (siehe share_target im Manifest und MainActivity)
+  await seite.goto(`${URL_APP}?titel=${encodeURIComponent('Overnight Oats')}&text=${encodeURIComponent(unterschrift)}&url=${encodeURIComponent('https://vm.tiktok.com/ZMtest123/')}`, { waitUntil: 'networkidle' });
+  await seite.locator('#import-ergebnis h2').waitFor();
+  const kopf = await seite.locator('#import-ergebnis .klein').first().innerText();
+  const zeilen = await seite.locator('#import-ergebnis .zeile').allInnerTexts();
+  await seite.getByRole('button', { name: 'Ins Rezeptformular übernehmen' }).click();
+  await seite.locator('#f-name').waitFor();
+  await seite.getByRole('button', { name: 'Rezept speichern' }).click();
+  await seite.locator('.rezept-quelle').waitFor();
+  const quelle = await seite.locator('.rezept-quelle').innerText();
+  pruefe('Teilen aus TikTok: Bildunterschrift ohne Emojis und Hashtags gelesen, Link als Quelle am Rezept, nichts abgerufen',
+    kopf.includes('Bildunterschrift') && zeilen.length === 2 && zeilen.some((z) => z.includes('Haferflocken')) && quelle.includes('Aus TikTok') && fremd.size === 0,
+    `${kopf.slice(0, 80)}; ${zeilen.map((z) => z.replace(/\n/g, ' → ')).join(' | ')}; Detail: „${quelle}“; fremde Hosts ${fremd.size}`);
+  await bild(seite, '55-rezept-quelle');
+
+  // Nur ein Video-Link: Prompt-Brücke, Antwort eines Chats (elan-import) einfügen
+  await seite.goto(`${URL_APP}?url=${encodeURIComponent('https://www.youtube.com/shorts/test456')}`, { waitUntil: 'networkidle' });
+  await seite.locator('#import-bruecke').waitFor();
+  await seite.evaluate(() => { if (navigator.share) Object.defineProperty(navigator, 'share', { value: undefined }); });
+  await seite.getByRole('button', { name: 'Prompt kopieren' }).click();
+  await seite.locator('.hinweis', { hasText: 'Prompt kopiert' }).waitFor();
+  const prompt = await seite.evaluate(() => navigator.clipboard.readText());
+  await bild(seite, '56-prompt-bruecke');
+  const antwort = JSON.stringify({ format: 'elan-import', version: 1, rezepte: [{ name: 'Testbowl aus dem Video', portionen: 1, zutaten: [{ name: 'Reis', gramm: 80 }, { name: 'Apfel', menge: '1 Stück' }], schritte: ['Kochen.'] }] });
+  await seite.locator('#f-import-text').fill(`Hier das Rezept:\n\`\`\`json\n${antwort}\n\`\`\``);
+  await seite.getByRole('button', { name: 'Rezept erkennen' }).click();
+  await seite.locator('#import-ergebnis h2', { hasText: 'Testbowl' }).waitFor();
+  const chatKopf = await seite.locator('#import-ergebnis .klein').first().innerText();
+  await seite.getByRole('button', { name: 'Ins Rezeptformular übernehmen' }).click();
+  await seite.locator('#f-name').waitFor();
+  await seite.getByRole('button', { name: 'Rezept speichern' }).click();
+  await seite.locator('.rezept-quelle').waitFor();
+  const chatQuelle = await seite.locator('.rezept-quelle').innerText();
+  pruefe('Reines Video: Prompt-Brücke mit Link, Antwort des Chats wird zum Rezept mit Quelle YouTube',
+    prompt.includes('https://www.youtube.com/shorts/test456') && prompt.includes('(YouTube)') && prompt.includes('elan-import') && chatKopf.includes('Antwort des Chats') && chatKopf.includes('2 von 2 Zutaten') && chatQuelle.includes('Aus YouTube') && fremd.size === 0,
+    `Prompt ${prompt.length} Zeichen; „${chatKopf.slice(0, 90)}“; „${chatQuelle}“`);
+  await seite.evaluate(() => { window.__geoeffnet = []; window.open = (url) => { window.__geoeffnet.push(url); return null; }; });
+  await seite.getByRole('button', { name: 'Beitrag öffnen' }).click();
+  pruefe('Beitrag öffnen: Link erst auf Tipp, nichts vorher geladen', (await seite.evaluate(() => window.__geoeffnet)).join() === 'https://www.youtube.com/shorts/test456' && fremd.size === 0);
+  pruefe('Teilen-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
+  await kontext.close();
+}
+
 (async () => {
   if (BILDER) fs.mkdirSync(BILDER, { recursive: true });
   ({ SCHEMA_VERSION } = await import('../js/logik/schema.js'));
@@ -2105,6 +2152,7 @@ async function prospektLauf(browser) {
     await marktLauf(browser);
     await planImportLauf(browser);
     await prospektLauf(browser);
+    await teilenLauf(browser);
     await offlineLauf(browser);
     await dunkelLauf(browser);
   } catch (fehler) {

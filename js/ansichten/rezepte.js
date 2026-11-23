@@ -5,7 +5,9 @@ import { NAEHRSTOFFE } from '../logik/naehrwerte.js';
 import { rezeptBild } from '../logik/rezeptbild.js';
 import { pruefeRezept, rezeptWerte } from '../logik/rezepte.js';
 import { APP_NAME } from '../logik/schema.js';
+import { plattformVon } from '../logik/teilen.js';
 import { parseZahl } from '../logik/zutat.js';
+import { oeffneExtern } from '../plattform.js';
 import { gehe, neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { bestaetige, el, feld, gramm, haenge, hinweis, icon, zahl } from '../ui.js';
@@ -59,6 +61,13 @@ function rezeptBildFlaeche(name, klasse) {
 
 /* ---------- Detail ---------- */
 
+/** Quelle eines importierten Rezepts: Plattform nennen, Link nur auf Tipp öffnen */
+function quelleZeile(link) {
+  const plattform = plattformVon(link);
+  return el('p', { class: 'klein rezept-quelle' }, `Aus ${plattform?.name ?? 'dem Netz'}. `,
+    el('button', { type: 'button', class: 'textlink', onclick: () => oeffneExtern(link) }, 'Beitrag öffnen'));
+}
+
 function detail(wurzel, rezept) {
   document.title = `${rezept.name} – ${APP_NAME}`;
   const w = rezeptWerte(rezept);
@@ -86,6 +95,7 @@ function detail(wurzel, rezept) {
     el('header', { class: 'detailkopf' },
       rezeptBildFlaeche(rezept.name, 'rezept-held'),
       el('h1', {}, rezept.name),
+      rezept.quelle ? quelleZeile(rezept.quelle) : null,
       el('p', {}, `${portionenText(rezept.portionen)}, je etwa ${zahl(w.portionGramm)} g ${w.gekocht ? 'gekocht' : 'Rohgewicht'}`),
       rezept.haltbarTage || rezept.einfrierbar ? el('p', { class: 'klein' }, [
         rezept.haltbarTage ? `Hält im Kühlschrank ${rezept.haltbarTage} ${rezept.haltbarTage === 1 ? 'Tag' : 'Tage'}.` : null,
@@ -160,7 +170,8 @@ function formular(wurzel, vorlage) {
         (erstes?.closest('.feld, .rezeptzeile, .schritt')?.querySelector('input, textarea') ?? erstes)?.focus?.();
         return;
       }
-      const gespeichert = await speicher.speichereRezept({ ...(vorlage?.id ? { id: vorlage.id, erstellt: vorlage.erstellt } : {}), ...pruefung.rezept });
+      // Die Quelle (Link aus TikTok, Instagram …) bleibt am Rezept, auch wenn das Formular sie nicht zeigt
+      const gespeichert = await speicher.speichereRezept({ ...(vorlage?.id ? { id: vorlage.id, erstellt: vorlage.erstellt } : {}), ...(vorlage?.quelle ? { quelle: vorlage.quelle } : {}), ...pruefung.rezept });
       hinweis('Rezept gespeichert.');
       gehe(adresse(gespeichert.id).slice(1));
     };
