@@ -242,3 +242,48 @@ export async function holeText(url, millisekunden = 30000) {
     clearTimeout(timer);
   }
 }
+
+/** Kann dieses Gerät Strichcodes scannen? App: immer (Plugin). Browser: nur mit eingebauter Erkennung und Kamera. */
+export function kannScannen() {
+  if (istApp()) return true;
+  return typeof window !== 'undefined' && 'BarcodeDetector' in window && Boolean(navigator.mediaDevices?.getUserMedia);
+}
+
+/**
+ * Strichcode scannen. App: Scan-Ansicht des offiziellen Plugins (fragt beim ersten Mal nach der Kamera).
+ * Browser: video ist ein <video>-Element in Elans eigenem Blatt; erkannt wird mit BarcodeDetector.
+ * Liefert { code } oder { abgebrochen: true }. Elan speichert dabei keine Bilder.
+ */
+export async function scanneBarcode({ video, signal } = {}) {
+  if (istApp()) {
+    try {
+      const r = await nativ('CapacitorBarcodeScanner', 'scanBarcode', {
+        hint: 17, // alle Formate; Lebensmittel tragen EAN-13 oder EAN-8
+        scanInstructions: 'Halte den Strichcode in den Rahmen',
+        scanButton: false,
+        cameraDirection: 1,
+        android: { scanningLibrary: 'mlkit' },
+      });
+      return r?.ScanResult ? { code: String(r.ScanResult) } : { abgebrochen: true };
+    } catch (fehler) {
+      if (abgebrochen(fehler) || /cancel|abgebrochen/i.test(String(fehler?.message))) return { abgebrochen: true };
+      throw fehler;
+    }
+  }
+  const erkenner = new window.BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e'] });
+  const strom = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+  try {
+    video.srcObject = strom;
+    await video.play();
+    while (!signal?.aborted) {
+      const gefunden = await erkenner.detect(video).catch(() => []);
+      if (gefunden[0]?.rawValue) return { code: gefunden[0].rawValue };
+      await new Promise((r) => setTimeout(r, 250));
+    }
+    return { abgebrochen: true };
+  } finally {
+    // Kamera sofort freigeben, auch bei Abbruch
+    for (const spur of strom.getTracks()) spur.stop();
+    video.srcObject = null;
+  }
+}

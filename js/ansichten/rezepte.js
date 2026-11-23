@@ -13,6 +13,7 @@ import * as speicher from '../speicher.js';
 import { bestaetige, el, feld, gramm, haenge, hinweis, icon, zahl } from '../ui.js';
 import { oeffneRezeptPortion, waehleZutat } from './eintrag.js';
 import { nimmEntwurf, setzeEntwurf, zeigeImport } from './import.js';
+import { essenWahl } from './zutaten.js';
 
 const adresse = (id, anhang = '') => `#/rezepte/${encodeURIComponent(id)}${anhang}`;
 const portionenText = (n) => `${zahl(n, 1)} ${n === 1 ? 'Portion' : 'Portionen'}`;
@@ -38,9 +39,9 @@ async function liste(wurzel) {
     el('header', { class: 'seitenkopf' },
       el('h1', {}, 'Rezepte'),
       el('a', { class: 'knopf klein', href: '#/rezepte/neu' }, icon('plus', 18), 'Neues Rezept')),
+    essenWahl('rezepte'),
     el('div', { class: 'linkreihe' },
-      el('a', { class: 'textlink', href: '#/rezepte/import' }, 'Rezept importieren'),
-      el('a', { class: 'textlink', href: '#/zutaten' }, 'Zutaten und Mag-Liste')),
+      el('a', { class: 'textlink', href: '#/rezepte/import' }, 'Rezept importieren')),
     // Karten in zwei Spalten; statt Fotos ein Symbol auf einem Farbton, beides aus dem Namen
     rezepte.length
       ? el('ul', { class: 'zeilen rezeptliste' }, rezepte.map((r) => {
