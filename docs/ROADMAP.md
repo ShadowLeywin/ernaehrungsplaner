@@ -12,7 +12,7 @@ Jede Zeile „Status“ wird nach jeder Runde nachgezogen.
 | P2 Plan-Import | Monatsplan aus einem Claude-Chat übernehmen | gebaut | 3 |
 | P4 Angebote und Prospekte | Angebote je Markt wöchentlich als Datei, in der App wie ein Prospekt | gebaut ohne automatischen Abruf; Action wartet auf eine erlaubte Quelle (E4.1) | 4 |
 | P5 Social-Rezeptimport | „Teilen an Elan“ aus TikTok, Instagram, YouTube, Prompt-Brücke | gebaut | 5 |
-| P6 Zutaten-Datenbank | Suche, Kategorien, Detailansicht, Favoriten wie Yazio | offen | 6 |
+| P6 Zutaten-Datenbank | Suche, Kategorien, Detailansicht, Favoriten wie Yazio | gebaut (P6.1 bis P6.3); BLS 4.0 offen | 6 |
 
 **Reihenfolge:** P1, P3, P2, P4, P5, P6 (Léons Ja zu E0.1 vom 23.11.2026). Früherer Vorschlag:
 P2 vor P4 ziehen. Grund: P4 hängt an einer rechtlich ungeklärten Quelle (E4.1) und kann Wochen stehen; P2 braucht nur P1 und das Importformat, das jetzt schon fertig ist (`docs/IMPORT-FORMAT.md`). → Entscheidung E0.1.
@@ -91,7 +91,9 @@ Die Primärseiten (operations.osmfoundation.org, overpass-api.de, prices.openfoo
 |---|---|---|
 | P4.1 Format `elan-angebote` Version 2 | Angebote je Markt (Kette, Filiale), Gültigkeit, Preis, Grundpreis, Bild-Link der Quelle; Leser in `js/logik/angebote.js`, Version 1 bleibt lesbar | Tests mit Beispieldatei, Doku in `docs/ANGEBOTE-FORMAT.md` |
 | P4.2 Action wöchentlich | Workflow auf eigenem Branch, schreibt `data/angebote.json` nur aus einer erlaubten Quelle; bricht bei Fehler ohne Überschreiben ab | läuft mit `workflow_dispatch` grün; keine Schlüssel aus fremden Webseiten |
-| P5.1 bis P5.3 Geteiltes einordnen, Bildunterschrift lesen, Prompt-Brücke | fertig (ein PR: alles auf der Seite „Rezept importieren“) | siehe PR | 246 Unit, 176/176 Browser |
+| P5.1 bis P5.3 Geteiltes einordnen, Bildunterschrift lesen, Prompt-Brücke | fertig (ein PR: alles auf der Seite „Rezept importieren“) | #44 | 246 Unit, 176/176 Browser |
+| P6.1 bis P6.3 Detailseite, Favoriten, Kategorien | fertig (ein PR) | siehe PR | 250 Unit, 181/181 Browser |
+| P6.4 BLS 4.0 | offen: Lizenz nicht geprüft (`OFFENE-FRAGEN.md` Nr. 1) | – | – |
 | P4.3 Bereich „Prospekte“ | je Markt eine Seite mit Angeboten als Kacheln, nach Kategorie; Treffer zur Einkaufsliste markiert | lädt nur die mitgelieferte Datei; kein Netz ohne Tipp |
 | P4.4 Original-Prospekt | Knopf „Prospekt des Händlers öffnen“ öffnet die offizielle Seite im Browser | keine Prospektbilder oder PDFs im Repo oder in der App gespeichert |
 
@@ -173,7 +175,7 @@ Die Primärseiten (operations.osmfoundation.org, overpass-api.de, prices.openfoo
 | P2.2 und P2.3 Seite „Plan importieren“: Vorlage, Vorschau, Übernahme | fertig (zusammengelegt: Vorlage ohne Vorschau nützt nichts) | #41 | 238 Unit, 168/168 Browser |
 | P4.1 Format `elan-angebote` Version 2 | fertig | #42 | 242 Unit, 168/168 Browser |
 | P4.2 Action wöchentlich | zurückgestellt: keine Quelle mit erlaubtem Abruf (E4.1) | – | – |
-| P4.3 und P4.4 Seite „Prospekte“ mit Links zu den Händlern | fertig (zusammengelegt) | siehe PR | 242 Unit, 172/172 Browser |
+| P4.3 und P4.4 Seite „Prospekte“ mit Links zu den Händlern | fertig (zusammengelegt) | #43 | 242 Unit, 172/172 Browser |
 
 ## Bekannte Fehler (nicht aus diesen Paketen)
 

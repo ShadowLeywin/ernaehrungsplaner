@@ -1091,3 +1091,19 @@ a.ezeile > svg { color: var(--tinte-leise); flex: none; }
 .prospekt-preis { font-size: 1.375rem; font-weight: 760; font-variant-numeric: tabular-nums; }
 .prospekt-artikel { font-weight: 600; overflow-wrap: anywhere; }
 .prospekt-kachel small { color: var(--tinte-leise); }
+
+/* Zutaten (P6): Kategorien zum Wischen, Stern im Kopf, unbekannte Nährwerte blass */
+.kategorie-chips { display: flex; gap: 0.5rem; overflow-x: auto; scrollbar-width: none; padding: 0.125rem 0; margin-top: 0.625rem; }
+.kategorie-chips .chip { flex: none; }
+:root .kategorie-chips .chip[aria-pressed='true'] { background: var(--limette); color: var(--auf-limette); border-color: transparent; font-weight: 700; }
+.zutat-kopf { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; }
+.stern { flex: none; font-size: 1.5rem; line-height: 1; }
+.stern[aria-pressed='true'] { color: var(--zitrone); }
+.stern-klein { color: var(--zitrone); }
+.naehrwerte tr.unbekannt td { color: var(--tinte-leise); font-style: italic; }
+/* Mikro-Tabelle der Zutat: gleiches Aussehen, eigene Klasse (die Seite hat genau eine Haupttabelle .naehrwerte) */
+.naehrwerte-mikro { width: 100%; border-collapse: collapse; }
+.naehrwerte-mikro th, .naehrwerte-mikro td { padding: 0.5rem 0; border-bottom: 1px solid var(--linie); font-weight: 500; }
+.naehrwerte-mikro th { text-align: left; }
+.naehrwerte-mikro td { text-align: right; }
+.naehrwerte-mikro tr.unbekannt td { color: var(--tinte-leise); font-style: italic; }

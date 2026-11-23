@@ -6,6 +6,7 @@ import { bereinigeGesundheit, messungId } from './logik/gesundheit.js';
 import { bereinigeGruppe, werteFuer } from './logik/referenz.js';
 import { rezeptAlsZutat } from './logik/rezepte.js';
 import { bereinigeWoche, bereinigeZiele, slotsMitAnteilen } from './logik/ziele.js';
+import { bereinigeFavoriten, mitExtraPortionen } from './logik/zutatenbank.js';
 
 /* ---------- Zutaten ---------- */
 
@@ -45,15 +46,21 @@ export function ladeBasis() {
 
 /** Eigene Zutaten zuerst, dann die mitgelieferten. */
 export async function alleZutaten() {
-  const [eigene, mitgeliefert] = await Promise.all([
+  const [eigene, mitgeliefert, extra] = await Promise.all([
     db.alle('zutaten'),
     ladeBasis().catch((fehler) => { console.warn(fehler); return []; }),
+    einstellung('portionenExtra', {}),
   ]);
-  return [...eigene, ...mitgeliefert];
+  // Mitgelieferte Zutaten sind nur lesbar; selbst angelegte Portionen dazu liegen in einer Einstellung (P6)
+  return [...eigene, ...mitgeliefert.map((z) => mitExtraPortionen(z, extra))];
 }
 
 export async function holeZutat(id) {
-  if (String(id).startsWith('basis:')) return (await ladeBasis()).find((z) => z.id === id) ?? null;
+  if (String(id).startsWith('basis:')) {
+    const [basisListe, extra] = await Promise.all([ladeBasis(), einstellung('portionenExtra', {})]);
+    const zutat = basisListe.find((z) => z.id === id);
+    return zutat ? mitExtraPortionen(zutat, extra) : null;
+  }
   if (String(id).startsWith('rezept:')) {
     const rezept = await db.hole('rezepte', String(id).slice(7));
     return rezept ? rezeptAlsZutat(rezept) : null;
@@ -238,3 +245,8 @@ export function ladeProspektLinks() {
     .catch(() => { prospektLinks = undefined; return { ketten: [] }; });
   return prospektLinks;
 }
+
+/* ---------- Zutaten-Favoriten (P6) ---------- */
+
+export const ladeFavoriten = async () => bereinigeFavoriten(await einstellung('zutatFavoriten'));
+export const setzeFavoriten = (liste) => setzeEinstellung('zutatFavoriten', bereinigeFavoriten(liste));

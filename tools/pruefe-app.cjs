@@ -2129,6 +2129,70 @@ async function teilenLauf(browser) {
   await kontext.close();
 }
 
+/** P6: Zutaten wie in großen Ernährungs-Apps: Stern, Filter, Kategorien, je Portion, eigene Portion */
+async function zutatenLauf(browser) {
+  const { kontext, seite, fehler } = await neueSeite(browser);
+  await seite.goto(`${URL_APP}#/heute`, { waitUntil: 'networkidle' });
+  await trageEin(seite, 'Frühstück', 'haferflocken', 80);
+  await seite.goto(`${URL_APP}#/zutaten`);
+  await seite.locator('#zutaten-zuletzt').waitFor();
+  const zuletzt = await seite.locator('#zutaten-zuletzt .zeile-name').allInnerTexts();
+  // Apfel öffnen, Stern setzen, Portion umschalten, eigene Portion anlegen
+  await seite.locator('.suchfeld').fill('apfel');
+  await seite.locator('#zutaten-liste a', { hasText: /^Apfel/ }).first().click();
+  await seite.locator('.stern').waitFor();
+  await seite.locator('.stern').click();
+  await seite.locator('.stern[aria-pressed=true]').waitFor();
+  const je100 = await seite.locator('#naehrwerte-makro tr').first().innerText();
+  const portionChip = seite.locator('.kategorie-chips .chip', { hasText: 'Stück' });
+  const hatStueck = await portionChip.count();
+  if (hatStueck) await portionChip.click();
+  const jePortion = await seite.locator('#naehrwerte-makro tr').first().innerText();
+  const unbekannt = await seite.locator('#naehrwerte-makro tr.unbekannt, #naehrwerte-mikro tr.unbekannt').count();
+  await seite.locator('#portion-anlegen summary').click();
+  await seite.locator('#f-portion-name').fill('Testschale');
+  await seite.locator('#f-portion-gramm').fill('250');
+  await seite.getByRole('button', { name: 'Portion speichern' }).click();
+  await seite.locator('.kategorie-chips .chip', { hasText: 'Testschale' }).waitFor();
+  await bild(seite, '57-zutat-detail');
+  pruefe('Zutat: Stern, Werte je 100 g und je Portion, fehlende als unbekannt, eigene Portion an mitgelieferter Zutat',
+    hatStueck === 1 && je100.replace(/\s+/g, ' ') !== jePortion.replace(/\s+/g, ' ') && unbekannt > 0 && (await seite.locator('.stern').innerText()) === '★',
+    `je 100 g „${je100.replace(/\s+/g, ' ')}“, je Stück „${jePortion.replace(/\s+/g, ' ')}“; ${unbekannt} Werte unbekannt`);
+  // Liste: Favoriten-Filter, Kategorie, Zuletzt
+  await seite.goto(`${URL_APP}#/zutaten`);
+  await seite.locator('.suchfeld').fill('');
+  await seite.locator('.suchfeld').dispatchEvent('input');
+  await seite.getByRole('button', { name: /^★ \(1\)/ }).click();
+  await seite.locator('.wahl-knopf[aria-pressed=true]', { hasText: '★' }).waitFor();
+  const nurFav = await seite.locator('#zutaten-liste .zeile-name').allInnerTexts();
+  await seite.getByRole('button', { name: /^Alle \(/ }).click();
+  await seite.locator('.kategorie-chips .chip', { hasText: 'Hülsenfrüchte' }).click();
+  await seite.locator('.kategorie-chips .chip[aria-pressed=true]', { hasText: 'Hülsenfrüchte' }).waitFor();
+  const kategorieListe = await seite.locator('#zutaten-liste .zeile-name small').allInnerTexts();
+  await bild(seite, '58-zutaten-liste');
+  pruefe('Zutaten-Liste: zuletzt verwendet oben, Favoriten-Filter, Kategorie-Chips',
+    zuletzt.some((z) => z.startsWith('Haferflocken')) && nurFav.length === 1 && nurFav[0].includes('Apfel') && kategorieListe.length > 0 && kategorieListe.every((k) => k === 'Hülsenfrüchte' || k.length > 0) && (await seite.locator('#zutaten-zuletzt').count()) === 0,
+    `zuletzt: ${zuletzt.map((z) => z.split('\n')[0]).join(', ')}; Favoriten: ${nurFav.map((z) => z.split('\n')[0]).join(', ')}; Hülsenfrüchte: ${kategorieListe.length} Treffer`);
+  await seite.locator('.kategorie-chips .chip', { hasText: 'Hülsenfrüchte' }).click();
+  // Beim Eintragen: Favoriten oben, eigene Portion als Knopf
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.getByRole('button', { name: 'Zu Mittagessen hinzufügen' }).click();
+  await seite.locator('#wahl-favoriten').waitFor();
+  const favImBlatt = await seite.locator('#wahl-favoriten .zeile-name').allInnerTexts();
+  await seite.locator('#wahl-favoriten .zeile').first().click();
+  const portionKnopf = await seite.locator('dialog button', { hasText: 'Testschale' }).count();
+  pruefe('Eintragen: Favoriten oben, selbst angelegte Portion steht zur Wahl', favImBlatt.length === 1 && favImBlatt[0].startsWith('Apfel') && portionKnopf === 1,
+    `Favoriten im Blatt: ${favImBlatt.map((z) => z.split('\n')[0]).join(', ')}; Portion „Testschale“: ${portionKnopf}`);
+  await seite.keyboard.press('Escape');
+  await seite.goto(`${URL_APP}#/zutaten/basis%3Aapfel`);
+  await seite.locator('.stern').waitFor();
+  await seite.setViewportSize({ width: 320, height: 640 });
+  const breite = await seite.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  pruefe('Zutat bei 320 px ohne seitliches Rollen', breite <= 0, `${breite} px`);
+  pruefe('Zutaten-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
+  await kontext.close();
+}
+
 (async () => {
   if (BILDER) fs.mkdirSync(BILDER, { recursive: true });
   ({ SCHEMA_VERSION } = await import('../js/logik/schema.js'));
@@ -2153,6 +2217,7 @@ async function teilenLauf(browser) {
     await planImportLauf(browser);
     await prospektLauf(browser);
     await teilenLauf(browser);
+    await zutatenLauf(browser);
     await offlineLauf(browser);
     await dunkelLauf(browser);
   } catch (fehler) {

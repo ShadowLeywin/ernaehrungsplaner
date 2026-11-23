@@ -133,3 +133,6 @@ Health-Speicher brauchen keine Sonderbehandlung im Backup: neue Speicher kommen 
 - `vorlagen` (Einstellung, seit 23.11.2026): „Meine Mahlzeiten“, `[{ id, name, teile: [{ name, marke, gramm, je100, zutatId?, rezeptId?, schnell? }] }]`, höchstens 50, neueste zuerst. Teile ohne Datum, Mahlzeit und Kennung (`js/logik/vorlagen.js`).
 - `unterwegsFavoriten` (Einstellung, seit 23.11.2026): Kennungen der Unterwegs-Gerichte mit Stern (`gerichtId`).
 - `unterwegsAus` (Einstellung, seit 23.11.2026): Namen der ausgeblendeten Restaurants.
+- `zutatFavoriten` (Einstellung, seit 23.11.2026): Kennungen der Zutaten mit Stern, neueste zuerst, höchstens 200 (`bereinigeFavoriten` in `js/logik/zutatenbank.js`).
+- `portionenExtra` (Einstellung, seit 23.11.2026): selbst angelegte Portionen für mitgelieferte Zutaten, `{ zutatId: [{ name, gramm }] }`, höchstens 10 je Zutat. Eigene Zutaten speichern Portionen direkt an der Zutat. `alleZutaten` und `holeZutat` mischen sie ein (`mitExtraPortionen`).
+- `planAnsicht` (`woche` oder `monat`), `einkaufMarkt` (Kennung des Markts für Preise), `prospekt` (zuletzt geladene Angebotsdatei Version 2: `quelle`, `stand`, `links`, `artikel`), alle seit 23.11.2026.
