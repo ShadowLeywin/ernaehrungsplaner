@@ -2,6 +2,7 @@
 // Die Ansichten rufen diese Datei nie direkt auf, sondern js/speicher.js.
 
 import { APP_KENNUNG, SCHEMA_VERSION, STORES } from './logik/schema.js';
+import { migriereEinkaufSatz } from './logik/zeitraum.js';
 
 /**
  * Eine Migration je Schema-Version, in Reihenfolge. MIGRATIONEN[0] baut Version 1 aus dem Nichts,
@@ -42,6 +43,20 @@ export const MIGRATIONEN = [
   // Version 7: Angebote
   (db) => {
     db.createObjectStore('angebote', { keyPath: 'id' });
+  },
+  // Version 8: Einkaufsliste je Zeitraum (Woche, Monat, frei) statt je Woche.
+  // Die Sätze werden in derselben Upgrade-Transaktion umgeschrieben; bricht sie ab, bleibt Version 7 ganz erhalten.
+  (db, t) => {
+    const store = t.objectStore('einkauf');
+    store.createIndex('zeitraum', 'zeitraum');
+    store.deleteIndex('woche');
+    store.getAll().onsuccess = (ereignis) => {
+      for (const alt of ereignis.target.result) {
+        const neu = migriereEinkaufSatz(alt);
+        if (neu.id !== alt.id) store.delete(alt.id);
+        store.put(neu);
+      }
+    };
   },
 ];
 

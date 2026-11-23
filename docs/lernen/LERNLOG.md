@@ -349,3 +349,12 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Widerspruch:** Die alte Angebots-Action (marktguru, Schlüssel aus der Webseite) wird nicht wieder aufgebaut. Ersatz: erlaubte Quelle suchen, bis dahin Datei und Link auf den Original-Prospekt.
 - **Fund:** Die Einkaufsliste gilt schon je Woche, nicht je Tag; „Teilen an Elan“ gibt es schon (Intent-Filter `text/plain`).
 - **Fachbegriffe:** Overpass (Abfragedienst für OSM-Daten), ODbL (Datenbanklizenz mit Namensnennung und Weitergabe unter gleicher Lizenz), Referer (Kopfzeile mit der Herkunftsseite einer Anfrage).
+
+## Session 16, Runde P1.1: Zeiträume und Schema 8 (23.11.2026)
+
+- **Was und warum:** Grundlage für Monatsplan und Einkaufsliste über beliebige Zeiträume. Neue reine Funktionen in `js/logik/zeitraum.js` (Woche, Monat, frei bis 62 Tage, Kalenderwoche, Wochen eines Monats). Einkauf-Häkchen hängen jetzt an `<von>..<bis>` statt am Montag.
+- **Befehle:** `npm test` (218, neu `test/zeitraum.test.js`) · `node tools/pruefe-app.cjs` (146 Kriterien, neu „Migration 7 → 8“).
+- **Entscheidung:** Eine Funktion `migriereEinkaufSatz` für Datenbank und Backup, damit beide gleich umziehen. Verworfen: alte Kennungen weiterlesen und doppelt suchen (zwei Wege, doppelt so viele Fehlerquellen).
+- **Trick:** Der Browsertest baut Version 7 mit den echten `MIGRATIONEN` der App (`import('/js/db.js')` auf einer Seite ohne App-Code). So prüft er genau den Weg, den ein Handy beim Update geht.
+- **Fehler:** `test/projekt.test.js` meldete die neue Datei, die in `sw.js` fehlte; eingetragen, `VERSION` auf v52.
+- **Fachbegriffe:** ISO-Kalenderwoche (Woche 1 enthält den ersten Donnerstag), Upgrade-Transaktion (Schemaänderung, die ganz oder gar nicht gilt).

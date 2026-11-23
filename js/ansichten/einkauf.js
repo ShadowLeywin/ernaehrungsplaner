@@ -6,6 +6,7 @@ import { formatTag, isoDatum } from '../logik/datum.js';
 import { einkaufsliste, listeAlsText, mengeText } from '../logik/plan.js';
 import { APP_NAME } from '../logik/schema.js';
 import { kategorieName } from '../logik/zutat.js';
+import { zeitraumSchluessel } from '../logik/zeitraum.js';
 import { teileText, tippGefuehl } from '../plattform.js';
 import { neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
@@ -13,8 +14,9 @@ import { el, haenge, hinweis, icon } from '../ui.js';
 
 export async function zeigeEinkauf(wurzel, tage) {
   const woche = tage[0];
+  const listenSchluessel = zeitraumSchluessel({ von: tage[0], bis: tage[6] });
   const [posten, rezepte, zutaten, gespeichert, angebote] = await Promise.all([
-    speicher.planZwischen(tage[0], tage[6]), speicher.alleRezepte(), speicher.alleZutaten(), speicher.einkaufDerWoche(woche), speicher.alleAngebote(),
+    speicher.planZwischen(tage[0], tage[6]), speicher.alleRezepte(), speicher.alleZutaten(), speicher.einkaufImZeitraum(listenSchluessel), speicher.alleAngebote(),
   ]);
   // Je Zutat das günstigste Angebot, das heute gilt
   const guenstig = aktuelleJeZutat(angebote, isoDatum());
@@ -34,8 +36,8 @@ export async function zeigeEinkauf(wurzel, tage) {
     stand.textContent = gesamt ? `${fertig} von ${gesamt} erledigt` : '';
   };
   const hake = async (schluessel, an) => {
-    const id = `${woche}|${schluessel}`;
-    if (an) { erledigt.add(schluessel); await speicher.speichereEinkauf({ id, woche, schluessel, erledigt: true }); }
+    const id = `${listenSchluessel}|${schluessel}`;
+    if (an) { erledigt.add(schluessel); await speicher.speichereEinkauf({ id, zeitraum: listenSchluessel, schluessel, erledigt: true }); }
     else { erledigt.delete(schluessel); await speicher.loescheEinkauf(id); }
   };
   const zeile = ({ id, name, klein, menge, an, beiWechsel, beiEntfernen }) => el('li', { class: an ? 'haken erledigt' : 'haken' },
@@ -74,7 +76,7 @@ export async function zeigeEinkauf(wurzel, tage) {
     e.preventDefault();
     const name = neuerPosten.value.trim();
     if (!name) { neuerPosten.focus(); return; }
-    await speicher.speichereEinkauf({ woche, eigen: true, name, erledigt: false, erstellt: new Date().toISOString() });
+    await speicher.speichereEinkauf({ zeitraum: listenSchluessel, eigen: true, name, erledigt: false, erstellt: new Date().toISOString() });
     neuZeichnen();
   };
 
