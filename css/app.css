@@ -1028,3 +1028,12 @@ a.ezeile > svg { color: var(--tinte-leise); flex: none; }
 /* Zeilenliste innerhalb einer Karte (z. B. Ziele für Health): eine Stufe getönt */
 .bereich .eliste { background: var(--flaeche-2); }
 .unterseite > .einstellungen > .wahl:first-child { margin-top: 0.25rem; }
+
+/* Einkaufsliste: Zeitraum frei wählen. Zwei Datumsfelder nebeneinander, Knopf darunter; bei 320 px untereinander */
+.zeitraum-frei { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 0.75rem; margin-top: 0.75rem !important; align-items: end; }
+.zeitraum-frei[hidden] { display: none; }
+.zeitraum-frei .feld { margin: 0; min-width: 0; }
+.zeitraum-frei input { width: 100%; min-width: 0; }
+.zeitraum-frei .knopf, .zeitraum-frei .fehlertext { grid-column: 1 / -1; }
+@media (max-width: 340px) { .zeitraum-frei { grid-template-columns: 1fr; } }
+.seite-einkauf > .wahl { margin-top: 0.75rem; }

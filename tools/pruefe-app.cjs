@@ -626,6 +626,38 @@ async function wochenLauf(browser) {
   const kopie = await seite.evaluate(() => navigator.clipboard.readText());
   pruefe('Offene Posten als Text', kopie.startsWith('Einkauf ') && kopie.includes('- Spülmittel') && kopie.split('\n').length === 3, kopie.replace(/\n/g, ' / '));
 
+  // Zeitraum wählen: Monat summiert alle geplanten Tage des Monats, frei mit zwei Tagen, zu lang wird abgelehnt
+  const wochenAdresse = await seite.evaluate(() => location.hash);
+  await seite.getByRole('button', { name: 'Monat', exact: true }).click();
+  await seite.locator('.wahl-knopf[aria-pressed=true]', { hasText: 'Monat' }).waitFor();
+  const monatAdresse = await seite.evaluate(() => location.hash);
+  const monatPosten = await seite.locator('.haken').evaluateAll((z) => z.map((x) => x.innerText.replace(/\n+/g, ' | ')));
+  const monatStand = await seite.locator('#einkauf-stand').innerText().catch(() => '');
+  // Beide Plantage liegen in dieser Woche; liegen sie im selben Monat, zählt der Monat dieselben 710 g Apfel
+  const monatApfel = monatPosten.find((x) => x.startsWith('Apfel')) ?? '';
+  pruefe('Einkaufsliste für den Monat: eigener Zeitraum, eigene Häkchen', /^#\/einkauf\/\d{4}-\d\d-01\/\d{4}-\d\d-\d\d$/.test(monatAdresse) && /\d+ g/.test(monatApfel) && monatStand.startsWith('0 von'),
+    `${monatAdresse}: ${monatPosten.join(' ; ')}; ${monatStand}`);
+  await bild(seite, '12b-einkauf-monat');
+  await seite.getByRole('button', { name: 'Frei', exact: true }).click();
+  await seite.locator('#f-zeitraum-von').fill('2026-01-01');
+  await seite.locator('#f-zeitraum-bis').fill('2026-03-31');
+  await seite.getByRole('button', { name: 'Zeigen' }).click();
+  const zuLang = await seite.locator('#f-zeitraum-fehler').innerText();
+  const heuteIso = await seite.evaluate(() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; });
+  await seite.locator('#f-zeitraum-von').fill(heuteIso);
+  await seite.locator('#f-zeitraum-bis').fill(heuteIso);
+  await seite.getByRole('button', { name: 'Zeigen' }).click();
+  await seite.waitForFunction((t) => location.hash === `#/einkauf/${t}/${t}`, heuteIso);
+  await seite.locator('.wahl-knopf[aria-pressed=true]', { hasText: 'Frei' }).waitFor();
+  const tagPosten = await seite.locator('.haken').evaluateAll((z) => z.map((x) => x.innerText.replace(/\n+/g, ' | ')));
+  const tagApfel = tagPosten.find((x) => x.startsWith('Apfel')) ?? '';
+  // Nur heute: 1 Portion Eintopf (ein Viertel von 400 g = 100 g Apfel) + 340 g Apfel = 440 g
+  pruefe('Einkaufsliste frei gewählt: nur die Tage im Zeitraum, höchstens 62 Tage', zuLang.includes('Höchstens 62 Tage') && tagApfel.includes('440 g') && (await seite.locator('.tagestitel .ueberzeile').innerText()).includes('1 Tage') === false,
+    `zu lang: „${zuLang}“; nur heute: ${tagPosten.join(' ; ')}; Kopf ${await seite.locator('.tagestitel .ueberzeile').innerText()}`);
+  await bild(seite, '12c-einkauf-frei');
+  await seite.goto(`${URL_APP}${wochenAdresse}`);
+  await seite.locator('.haken').first().waitFor();
+
   await seite.goto(`${URL_APP}#/heute`);
   await seite.locator('.geplant').waitFor();
   const merk = await seite.locator('.geplant p').innerText();
@@ -650,7 +682,16 @@ async function wochenLauf(browser) {
 
   const unsinn = [];
   const mass = [];
-  for (const [route, warteAuf] of [['woche', '.plantag'], ['woche/' + (await seite.evaluate(() => new Date().toISOString().slice(0, 10))) + '/einkauf', '.zusatz']]) {
+  await seite.goto(`${URL_APP}#/woche/${await seite.evaluate(() => new Date().toISOString().slice(0, 10))}/einkauf`);
+  await seite.locator('.zusatz').waitFor();
+  const umgeleitet = await seite.evaluate(() => location.hash);
+  pruefe('Alte Adresse der Wochenliste leitet auf die Liste des Zeitraums um', /^#\/einkauf\/\d{4}-\d\d-\d\d\/\d{4}-\d\d-\d\d$/.test(umgeleitet) && (await seite.locator('.wahl-knopf[aria-pressed=true]').innerText()) === 'Woche', umgeleitet);
+  await seite.setViewportSize({ width: 320, height: 640 });
+  await seite.getByRole('button', { name: 'Frei', exact: true }).click();
+  const freiBreit = await seite.evaluate(() => document.documentElement.scrollWidth);
+  pruefe('Einkauf bei 320 px mit offenem Zeitraum-Formular ohne seitliches Rollen', freiBreit <= 320, `${freiBreit} px`);
+  await seite.setViewportSize(devices['Galaxy S9+'].viewport);
+  for (const [route, warteAuf] of [['woche', '.plantag'], ['einkauf', '.zusatz']]) {
     await seite.goto(`${URL_APP}#/${route}`);
     await seite.locator(warteAuf).first().waitFor();
     const b = await seite.evaluate(() => ({ inhalt: document.documentElement.scrollWidth, fenster: window.innerWidth }));
