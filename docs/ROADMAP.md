@@ -9,12 +9,12 @@ Jede Zeile „Status“ wird nach jeder Runde nachgezogen.
 |---|---|---|---|
 | P1 Planung und Einkauf | Woche oder Monat planen, je Mahlzeit, Einkaufsliste für jeden Zeitraum | gebaut, wartet auf Push/PR und Handy-Test | 1 |
 | P3 Märkte und Preise | eigene Märkte wählen, grober Preis der Einkaufsliste je Markt | offen | 2 |
-| P4 Angebote und Prospekte | Angebote je Markt wöchentlich als Datei, in der App wie ein Prospekt | offen, **blockiert durch Quelle** (E4.1) | 3 |
-| P2 Plan-Import | Monatsplan aus einem Claude-Chat übernehmen | offen | 4 |
+| P2 Plan-Import | Monatsplan aus einem Claude-Chat übernehmen | offen | 3 |
+| P4 Angebote und Prospekte | Angebote je Markt wöchentlich als Datei, in der App wie ein Prospekt | offen, ohne automatischen Abruf (E4.1) | 4 |
 | P5 Social-Rezeptimport | „Teilen an Elan“ aus TikTok, Instagram, YouTube, Prompt-Brücke | offen | 5 |
 | P6 Zutaten-Datenbank | Suche, Kategorien, Detailansicht, Favoriten wie Yazio | offen | 6 |
 
-**Reihenfolge:** wie empfohlen P1, P3, P4, P2, P5, P6. Eine Abweichung schlage ich vor, ändere sie aber nicht ohne Léon:
+**Reihenfolge:** P1, P3, P2, P4, P5, P6 (Léons Ja zu E0.1 vom 23.11.2026). Früherer Vorschlag:
 P2 vor P4 ziehen. Grund: P4 hängt an einer rechtlich ungeklärten Quelle (E4.1) und kann Wochen stehen; P2 braucht nur P1 und das Importformat, das jetzt schon fertig ist (`docs/IMPORT-FORMAT.md`). → Entscheidung E0.1.
 
 ## Was die Vorbilder machen (Recherche 23.11.2026)
@@ -143,16 +143,16 @@ Die Primärseiten (operations.osmfoundation.org, overpass-api.de, prices.openfoo
 
 ## Entscheidungen, die nur Léon treffen kann
 
-| Nr. | Frage | Empfehlung |
-|---|---|---|
-| E0.1 | P2 vor P4 ziehen? | ja, P4 hängt an der Quelle |
-| E1.1 | Leiste „Plan“ statt „Woche“ | ja |
-| E3.1 | GPS-Recht oder Ort eintippen | Ort eintippen |
-| E3.2 | Karte oder nur Liste | Liste zuerst |
-| E3.3 | Leaflet als Datei erlaubt | ja, falls Karte |
-| E4.1 | Quelle der Angebote | Anbieter um Erlaubnis fragen |
-| E4.2 | Märkte zuerst | die fünf aus der alten Action |
-| E2.1 | Import ersetzt oder ergänzt | ergänzen |
+| Nr. | Frage | Empfehlung | Entscheidung (23.11.2026) |
+|---|---|---|---|
+| E0.1 | P2 vor P4 ziehen? | ja, P4 hängt an der Quelle | ja (Léon) |
+| E1.1 | Leiste „Plan“ statt „Woche“ | ja | ja (Léon: „Joa“), umgesetzt in P1.3 |
+| E3.1 | GPS-Recht oder Ort eintippen | Ort eintippen | Ort eintippen, kein neues Recht (Léon) |
+| E3.2 | Karte oder nur Liste | Liste zuerst | Liste zuerst, P3.3 Karte zurückgestellt (Léon) |
+| E3.3 | Leaflet als Datei erlaubt | ja, falls Karte | entfällt vorerst (keine Karte) |
+| E4.1 | Quelle der Angebote | Anbieter um Erlaubnis fragen | Léon: „überlege selber“. Festgelegt: kein Abruf ohne belegte Erlaubnis. P4 baut Format v2, Prospekt-Seite aus Datei und Link zum Original-Prospekt; die Action bekommt erst eine Quelle, wenn deren Bedingungen den Abruf erlauben [A] |
+| E4.2 | Märkte zuerst | die fünf aus der alten Action | festgelegt: Netto Offingen, Edeka Offingen, Lidl Burgau, Kaufland Dillingen, dm Lauingen [A] |
+| E2.1 | Import ersetzt oder ergänzt | ergänzen | offen, Vorgabe „ergänzen“ [A] |
 
 ## Statusliste
 
