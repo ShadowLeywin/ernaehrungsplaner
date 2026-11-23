@@ -41,6 +41,7 @@ const MENUE = [
     { id: 'zutaten', titel: 'Zutaten und Mag-Liste', adresse: '#/zutaten', stand: (w) => anzahlText(w.vorlieben, 'Angabe in der Mag-Liste', 'Angaben in der Mag-Liste', 'Eigene Zutaten und Vorlieben') },
     { id: 'unterwegs', titel: 'Unterwegs', stand: (w) => w.unterwegs },
     { id: 'angebote', titel: 'Angebote', adresse: '#/angebote', stand: (w) => anzahlText(w.angebote, 'Angebot', 'Angebote', 'Noch keine Angebote') },
+    { id: 'prospekte', titel: 'Prospekte', adresse: '#/prospekte', stand: () => 'Angebote je Markt' },
     { id: 'maerkte', titel: 'Märkte', adresse: '#/maerkte', stand: (w) => anzahlText(w.maerkte, 'Markt', 'Märkte', 'Noch keine Märkte') },
   ] },
   { gruppe: 'Daten und Verbindung', eintraege: [

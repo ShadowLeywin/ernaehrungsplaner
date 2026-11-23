@@ -229,3 +229,12 @@ export const loescheMarkt = (id) => db.loesche('maerkte', id);
 export const allePreise = () => db.alle('preise');
 export const speicherePreis = (preis) => db.speichere('preise', preis);
 export const loeschePreis = (id) => db.loesche('preise', id);
+
+let prospektLinks;
+/** Mitgelieferte Links zu den Händlern (data/prospekt-links.json). Nur lesen, einmal laden. */
+export function ladeProspektLinks() {
+  prospektLinks ??= fetch('./data/prospekt-links.json')
+    .then((antwort) => (antwort.ok ? antwort.json() : { ketten: [] }))
+    .catch(() => { prospektLinks = undefined; return { ketten: [] }; });
+  return prospektLinks;
+}

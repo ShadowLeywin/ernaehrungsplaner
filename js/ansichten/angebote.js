@@ -126,6 +126,7 @@ export async function zeigeAngebote(wurzel) {
       el('p', { class: 'klein' }, 'Eine eingelesene Datei ersetzt die Angebote der vorigen Datei. Von Hand eingetragene bleiben.'),
       meldung,
       el('div', { class: 'knopfreihe' },
+        el('a', { class: 'knopf leise', href: '#/prospekte' }, 'Prospekte'),
         el('label', { class: 'knopf leise', for: 'f-angebote-datei' }, 'Angebotsdatei einlesen'),
         el('input', { type: 'file', accept: 'application/json,.json', class: 'unsichtbar', id: 'f-angebote-datei', onchange: liesDatei })),
       el('details', { class: 'aufklappen' }, el('summary', {}, 'So sieht die Datei aus'),

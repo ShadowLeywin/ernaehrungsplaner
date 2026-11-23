@@ -3,7 +3,7 @@
 
 /** Reihenfolge der Leiste; Unterbereiche zählen zu ihrem Eintrag. */
 const LEISTE = ['heute', 'woche', 'rezepte', 'health', 'mehr'];
-const GEHOERT_ZU = { zutaten: 'rezepte', angebote: 'woche', einkauf: 'woche', maerkte: 'woche' };
+const GEHOERT_ZU = { zutaten: 'rezepte', angebote: 'woche', einkauf: 'woche', maerkte: 'woche', prospekte: 'woche' };
 
 const ISO = /^\d{4}-\d{2}-\d{2}$/;
 const teile = (hash) => String(hash ?? '').replace(/^#\/?/, '').split('/').filter(Boolean);

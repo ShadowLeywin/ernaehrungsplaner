@@ -5,6 +5,15 @@ export const NEUIGKEITEN = [
   {
     version: '1.0.0',
     datum: '2026-11-23',
+    titel: 'Prospekte',
+    punkte: [
+      'Neu: Prospekte (Mehr → Prospekte, oder unter Angebote). Eine Angebotsdatei laden, dann blätterst du die Angebote je Markt wie im Prospekt, nach Kategorien. Was auf deiner Einkaufsliste dieser Woche steht, ist markiert.',
+      '„Prospekt von Lidl öffnen“ (und bei anderen Ketten „Website öffnen“) bringt dich zur Seite des Händlers im Browser. Elan lädt selbst keine Prospekte.',
+    ],
+  },
+  {
+    version: '1.0.0',
+    datum: '2026-11-23',
     titel: 'Plan importieren',
     punkte: [
       'Plan → ganz unten „Plan importieren“: Vorlage kopieren, zusammen mit deinem Plan in einen Chat geben, die Antwort einfügen, „Prüfen“.',

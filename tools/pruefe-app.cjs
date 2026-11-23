@@ -2032,6 +2032,56 @@ async function planImportLauf(browser) {
   await kontext.close();
 }
 
+/** P4: Prospekte aus einer Angebotsdatei (Version 2, erfunden) und Links zu den Händlern, nur auf Tipp */
+async function prospektLauf(browser) {
+  const { kontext, seite, fehler, fremd } = await neueSeite(browser);
+  await seite.goto(`${URL_APP}#/angebote`, { waitUntil: 'networkidle' });
+  // Ein gemerkter Lidl-Markt und ein Apfel im Plan dieser Woche (Testwerte)
+  await seite.evaluate(() => new Promise((ok) => {
+    const d = new Date();
+    const heute = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const a = indexedDB.open('elan');
+    a.onsuccess = () => {
+      const t = a.result.transaction(['maerkte', 'plan'], 'readwrite');
+      t.objectStore('maerkte').put({ id: 'osm:node/7', name: 'Lidl', marke: 'Lidl', quelle: 'osm' });
+      t.objectStore('plan').put({ id: 'pa', datum: heute, slot: 'abend', zutatId: 'basis:apfel', name: 'Apfel', gramm: 340, je100: { kcal: 52 } });
+      t.oncomplete = () => { a.result.close(); ok(); };
+    };
+  }));
+  await seite.getByRole('link', { name: 'Prospekte' }).click();
+  await seite.locator('h1', { hasText: 'Prospekte' }).waitFor();
+  const leer = await seite.locator('.leer').innerText();
+  const linkText = await seite.locator('#prospekt-links button').allInnerTexts();
+  await seite.locator('#f-prospekt-datei').setInputFiles(path.resolve(__dirname, '..', 'test', 'daten', 'angebote-v2.json'));
+  await seite.locator('#prospekt-seite').waitFor();
+  const meldung = await seite.locator('.hinweis').innerText();
+  // Die Beispieldatei gilt vom 23. bis 28.11.2026; an anderen Tagen ist sie abgelaufen
+  const chips = await seite.locator('.prospekt-maerkte .chip').allInnerTexts();
+  await seite.locator('.prospekt-maerkte .chip', { hasText: 'Testmarkt' }).click().catch(() => {});
+  await seite.locator('#prospekt-seite h3', { hasText: 'Testmarkt' }).waitFor().catch(() => {});
+  const kacheln = await seite.locator('#prospekt-seite .prospekt-kachel').allInnerTexts();
+  const markiert = await seite.locator('#prospekt-seite .prospekt-kachel.auf-liste').allInnerTexts();
+  const heute = await seite.evaluate(() => new Date().toISOString().slice(0, 10));
+  const imZeitraum = heute >= '2026-11-23' && heute <= '2026-11-28';
+  pruefe('Prospekte: Datei laden, je Markt als Kacheln, Treffer zur Einkaufsliste markiert',
+    leer.includes('Noch keine Angebotsdatei') && meldung.includes('5 Artikel geladen') && meldung.includes('2 davon bei deinen Zutaten') && (!imZeitraum || (chips.length === 2 && kacheln.length === 3 && markiert.length === 1 && markiert[0].includes('Äpfel Elstar') && markiert[0].includes('1,99'))),
+    `„${meldung}“; Märkte ${chips.join(', ')}; ${kacheln.length} Kacheln; markiert: ${markiert.map((m) => m.replace(/\n/g, ' ')).join(' | ')}${imZeitraum ? '' : ' (außerhalb der Gültigkeit der Beispieldatei: nur Laden geprüft)'}`);
+  await bild(seite, '54-prospekte');
+  // Link zum Original-Prospekt: erst auf Tipp, nur https, ohne dass Elan selbst etwas lädt
+  await seite.evaluate(() => { window.__geoeffnet = []; window.open = (url) => { window.__geoeffnet.push(url); return null; }; });
+  const vorTipp = fremd.size;
+  await seite.getByRole('button', { name: 'Prospekt von Lidl öffnen' }).click();
+  const geoeffnet = await seite.evaluate(() => window.__geoeffnet);
+  pruefe('Original-Prospekt: Link der Kette eines gemerkten Markts, geöffnet erst auf Tipp, kein Abruf durch Elan',
+    linkText.includes('Prospekt von Lidl öffnen') && geoeffnet.length === 1 && geoeffnet[0].startsWith('https://www.lidl.de/') && vorTipp === 0 && fremd.size === 0,
+    `Knöpfe: ${linkText.join(', ')}; geöffnet: ${geoeffnet.join(', ')}; fremde Hosts ${fremd.size}`);
+  await seite.setViewportSize({ width: 320, height: 640 });
+  const breite = await seite.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  pruefe('Prospekte bei 320 px ohne seitliches Rollen', breite <= 0, `${breite} px`);
+  pruefe('Prospekt-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
+  await kontext.close();
+}
+
 (async () => {
   if (BILDER) fs.mkdirSync(BILDER, { recursive: true });
   ({ SCHEMA_VERSION } = await import('../js/logik/schema.js'));
@@ -2054,6 +2104,7 @@ async function planImportLauf(browser) {
     await migration7Lauf(browser);
     await marktLauf(browser);
     await planImportLauf(browser);
+    await prospektLauf(browser);
     await offlineLauf(browser);
     await dunkelLauf(browser);
   } catch (fehler) {
