@@ -1,6 +1,7 @@
 // Wochenplan und Einkaufsliste. Reine Funktionen.
 // Ein Plan-Posten sieht aus wie ein Tagebuch-Eintrag (datum, slot, zutatId, name, gramm, je100), ist aber nur vorgemerkt.
 
+import { summeEintraege } from './naehrwerte.js';
 import { rezeptWerte } from './rezepte.js';
 import { SLOTS } from './ziele.js';
 import { KATEGORIEN } from './zutat.js';
@@ -75,4 +76,16 @@ export function listeAlsText(liste, eigene, erledigt, titel) {
   }
   for (const e of eigene) if (!e.erledigt) zeilen.push(`- ${e.name}`);
   return zeilen.join('\n');
+}
+
+/**
+ * Plan eines Tages nach Mahlzeiten: je Slot die Posten (in der Reihenfolge des Anlegens), die kcal
+ * und das Ziel der Mahlzeit (Anteil am Tagesziel). slots aus slotsMitAnteilen, zielKcal ist das Tagesziel.
+ * Liefert [{ slot, posten, kcal, ziel }] in der Reihenfolge des Tages, auch für leere Mahlzeiten.
+ */
+export function planJeSlot(posten, slots, zielKcal) {
+  return slots.map((slot) => {
+    const eigene = posten.filter((p) => p.slot === slot.id).sort((a, b) => String(a.erstellt ?? '').localeCompare(String(b.erstellt ?? '')));
+    return { slot, posten: eigene, kcal: summeEintraege(eigene).kcal ?? 0, ziel: Math.round(zielKcal * slot.anteil) };
+  });
 }

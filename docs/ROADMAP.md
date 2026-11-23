@@ -7,7 +7,7 @@ Jede Zeile „Status“ wird nach jeder Runde nachgezogen.
 
 | Paket | Ziel in einem Satz | Status | Reihenfolge |
 |---|---|---|---|
-| P1 Planung und Einkauf | Woche oder Monat planen, je Mahlzeit, Einkaufsliste für jeden Zeitraum | in Arbeit (siehe unten) | 1 |
+| P1 Planung und Einkauf | Woche oder Monat planen, je Mahlzeit, Einkaufsliste für jeden Zeitraum | gebaut, wartet auf Push/PR und Handy-Test | 1 |
 | P3 Märkte und Preise | eigene Märkte wählen, grober Preis der Einkaufsliste je Markt | offen | 2 |
 | P4 Angebote und Prospekte | Angebote je Markt wöchentlich als Datei, in der App wie ein Prospekt | offen, **blockiert durch Quelle** (E4.1) | 3 |
 | P2 Plan-Import | Monatsplan aus einem Claude-Chat übernehmen | offen | 4 |
@@ -162,3 +162,4 @@ Die Primärseiten (operations.osmfoundation.org, overpass-api.de, prices.openfoo
 | P1.1 Zeiträume und Schema 8 | fertig | – (Branch `claude/p1-1-zeitraum`) | 218 Unit, 146/146 Browser |
 | P1.2 Einkaufsliste für einen Zeitraum | fertig | – (Branch `claude/p1-2-einkauf`) | 218 Unit, 150/150 Browser |
 | P1.3 Planzeitraum und Monatsansicht | fertig | – (Branch `claude/p1-3-monat`) | 218 Unit, 153/153 Browser |
+| P1.4 Mahlzeiten je Slot planen | fertig | – (Branch `claude/p1-4-slots`) | 219 Unit, 156/156 Browser |

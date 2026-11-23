@@ -80,7 +80,7 @@ function wochenKarte(woche, { heute, jeTag, tagSatz, wochenplan, ziele }) {
       const name = WOCHENTAGE[(ausIso(datum).getDay() + 6) % 7];
       const klassen = ['monatstag', `tagestyp-${typ}`, imMonat ? '' : 'fremd', datum === heute ? 'heute' : '', tag.length ? 'geplant' : ''].filter(Boolean).join(' ');
       return el('li', {}, el('a', {
-        class: klassen, href: `#/woche/${datum}`,
+        class: klassen, href: `#/woche/tag/${datum}`,
         'aria-label': `${name}, ${ausIso(datum).getDate()}.: ${tag.length ? `${belegt.size} von 6 Mahlzeiten geplant, ${zahl(tagKcal)} von ${zahl(ziele[typ].kcal)} kcal` : 'nichts geplant'}`,
       },
       el('small', { 'aria-hidden': 'true' }, name.slice(0, 2)),

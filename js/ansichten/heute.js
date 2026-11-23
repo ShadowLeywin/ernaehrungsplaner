@@ -367,7 +367,7 @@ function alleNaehrwerte(eintraege, wochenEintraege, woche, referenz) {
 
 /* ---------- Slots ---------- */
 
-const SLOT_EMOJI = { fruehstueck: '☕', morgensnack: '🍎', mittag: '🍝', nachmittagssnack: '🍌', abend: '🥗', abendsnack: '🥛' };
+export const SLOT_EMOJI = { fruehstueck: '☕', morgensnack: '🍎', mittag: '🍝', nachmittagssnack: '🍌', abend: '🥗', abendsnack: '🥛' };
 
 function slotBereich({ slot, datum, eintraege, vortag, kcal, zielKcal }) {
   const stand = zielKcal > 0 ? `${zahl(kcal)} von ${zahl(zielKcal)} kcal` : `${zahl(kcal)} kcal`;
