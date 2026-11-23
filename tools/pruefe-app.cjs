@@ -1980,6 +1980,58 @@ async function marktLauf(browser) {
   await kontext.close();
 }
 
+/** P2.2: Plan aus einer Chat-Antwort importieren (Beispieldatei aus test/daten, erfunden) */
+async function planImportLauf(browser) {
+  const { kontext, seite, fehler, fremd } = await neueSeite(browser, { permissions: ['clipboard-read', 'clipboard-write'] });
+  const datei = fs.readFileSync(path.resolve(__dirname, '..', 'test', 'daten', 'import-plan.json'), 'utf8');
+  await seite.goto(`${URL_APP}#/woche`, { waitUntil: 'networkidle' });
+  await seite.getByRole('link', { name: 'Plan importieren' }).click();
+  await seite.locator('h1', { hasText: 'Plan importieren' }).waitFor();
+  await seite.evaluate(() => { if (navigator.share) Object.defineProperty(navigator, 'share', { value: undefined }); });
+  await seite.locator('#f-import-von').fill('2026-12-01');
+  await seite.locator('#f-import-bis').fill('2026-12-31');
+  await seite.getByRole('button', { name: 'Vorlage kopieren' }).click();
+  await seite.locator('.hinweis', { hasText: 'Vorlage kopiert' }).waitFor();
+  const vorlage = await seite.evaluate(() => navigator.clipboard.readText());
+  await seite.getByRole('button', { name: 'Prüfen' }).click();
+  const leerFehler = await seite.locator('#f-planimport-fehler').innerText();
+  // So wie ein Chat antwortet: mit Text und Codeblock drumherum
+  await seite.locator('#f-planimport-text').fill(`Hier ist dein Plan:\n\`\`\`json\n${datei}\n\`\`\``);
+  await seite.getByRole('button', { name: 'Prüfen' }).click();
+  await seite.locator('#planimport-vorschau').waitFor();
+  const stand = await seite.locator('#planimport-stand').innerText();
+  const abgelehnt = await seite.locator('#planimport-abgelehnt li').allInnerTexts();
+  const offen = await seite.locator('#planimport-offen .zeile-name').allInnerTexts();
+  pruefe('Plan importieren: Vorlage mit Zeitraum, Chat-Antwort mit Codeblock gelesen, abgelehnte Zeilen und unbekannte Zutaten genannt',
+    vorlage.includes('Zeitraum: 2026-12-01 bis 2026-12-31') && leerFehler.includes('Füge zuerst') && stand.startsWith('2 Plan-Einträge an 2 Tagen, 1 neues Rezept') && abgelehnt.length === 2 && abgelehnt[0].includes('brunch') && offen.length === 2,
+    `„${stand}“; abgelehnt: ${abgelehnt.join(' | ')}; offen: ${offen.map((o) => o.split('\n')[0]).join(', ')}`);
+  await bild(seite, '53-planimport');
+  // Eine unbekannte Zutat von Hand zuordnen: danach 3 Einträge
+  const feld = seite.locator('#planimport-offen li', { hasText: 'Drachenfrucht-Chips' }).locator('input');
+  await feld.fill('Apfel');
+  await feld.dispatchEvent('change');
+  await seite.waitForFunction(() => document.querySelector('#planimport-stand')?.innerText.startsWith('3 Plan-Einträge'));
+  const ohneNetz = fremd.size;
+  await seite.getByRole('button', { name: 'Übernehmen' }).click();
+  await seite.locator('.monatswoche').first().waitFor();
+  const adresse = await seite.evaluate(() => location.hash);
+  const geplant = await seite.evaluate(() => new Promise((ok) => { const a = indexedDB.open('elan'); a.onsuccess = () => { const t = a.result.transaction(['plan', 'rezepte']); const p = t.objectStore('plan').getAll(); const r = t.objectStore('rezepte').getAll(); t.oncomplete = () => { a.result.close(); ok({ plan: p.result.map((x) => `${x.datum} ${x.slot} ${x.name} ${x.gramm} g`), rezepte: r.result.map((x) => `${x.name}: ${x.zutaten.length} Zutaten`) }); }; }; }));
+  pruefe('Übernehmen legt Plan-Posten und Rezept an und zeigt den Monat; kein Netz',
+    adresse === '#/woche/monat/2026-12' && geplant.plan.length === 3 && geplant.rezepte.join() === 'Testbrei: 2 Zutaten' && geplant.plan.some((p) => p.includes('Testbrei 145 g')) && ohneNetz === 0,
+    `${adresse}; ${geplant.plan.join(' | ')}; ${geplant.rezepte.join(', ')}; fremde Hosts ${ohneNetz}`);
+  await seite.locator('.hinweis').getByRole('button', { name: 'Rückgängig' }).click();
+  await seite.locator('.hinweis', { hasText: 'zurückgenommen' }).waitFor();
+  const danach = await seite.evaluate(() => new Promise((ok) => { const a = indexedDB.open('elan'); a.onsuccess = () => { const t = a.result.transaction(['plan', 'rezepte']); const p = t.objectStore('plan').count(); const r = t.objectStore('rezepte').count(); t.oncomplete = () => { a.result.close(); ok(`${p.result}/${r.result}`); }; }; }));
+  pruefe('Rückgängig nimmt den ganzen Import zurück', danach === '0/0', `Plan/Rezepte danach: ${danach}`);
+  await seite.goto(`${URL_APP}#/woche/import`);
+  await seite.locator('#f-planimport-text').waitFor();
+  await seite.setViewportSize({ width: 320, height: 640 });
+  const breite = await seite.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  pruefe('Plan importieren bei 320 px ohne seitliches Rollen', breite <= 0, `${breite} px`);
+  pruefe('Plan-Import-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
+  await kontext.close();
+}
+
 (async () => {
   if (BILDER) fs.mkdirSync(BILDER, { recursive: true });
   ({ SCHEMA_VERSION } = await import('../js/logik/schema.js'));
@@ -2001,6 +2053,7 @@ async function marktLauf(browser) {
     await migrationsLauf(browser);
     await migration7Lauf(browser);
     await marktLauf(browser);
+    await planImportLauf(browser);
     await offlineLauf(browser);
     await dunkelLauf(browser);
   } catch (fehler) {
