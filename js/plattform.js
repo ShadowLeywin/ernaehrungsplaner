@@ -219,3 +219,26 @@ export function oeffneExtern(url) {
   else window.open(url, '_blank', 'noopener');
   return true;
 }
+
+/**
+ * Text von einer fremden Adresse holen, z. B. Overpass. Anders als holeJson wird nichts automatisch als JSON gelesen:
+ * Eine Fehlerseite in HTML soll als Fehler mit Inhalt ankommen, nicht als „keine Verbindung“.
+ * App: natives HTTP mit eigener Kennung (User-Agent), wie es Overpass erbittet. Liefert { status, text }.
+ */
+export async function holeText(url, millisekunden = 30000) {
+  if (istApp()) {
+    const antwort = await nativ('CapacitorHttp', 'request', {
+      url, method: 'GET', headers: { Accept: 'application/json', 'User-Agent': 'Elan/1.0 (private Ernaehrungs-App; Android)' },
+      responseType: 'text', connectTimeout: millisekunden, readTimeout: millisekunden,
+    });
+    return { status: antwort.status, text: typeof antwort.data === 'string' ? antwort.data : JSON.stringify(antwort.data) };
+  }
+  const abbruch = new AbortController();
+  const timer = setTimeout(() => abbruch.abort(), millisekunden);
+  try {
+    const antwort = await fetch(url, { signal: abbruch.signal, credentials: 'omit', headers: { Accept: 'application/json' } });
+    return { status: antwort.status, text: await antwort.text() };
+  } finally {
+    clearTimeout(timer);
+  }
+}
