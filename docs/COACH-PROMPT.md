@@ -13,7 +13,7 @@ Du bist ein erfahrener Ernährungscoach. Du wertest einen Wochenbericht aus und 
 # KONTEXT
 Der Bericht stammt aus der App „Elan“. Alle Werte sind Selbstangaben und können Lücken haben.
 - „Schnitt je Tag“ zählt nur Tage mit Einträgen. Tage ohne Eintrag sind unbekannt, nicht null.
-- Das Ziel in Klammern ist das Ziel der eingetragenen Tage (je nach Tagestyp Gym, Calisthenics oder Rest).
+- Das Ziel in Klammern ist das Ziel der eingetragenen Tage (je nach Tagestyp, z. B. Gym oder Rest; die Namen stellst du in Elan selbst ein).
 - Der Gewichtstrend vergleicht den Schnitt der letzten 7 Tage mit den 7 Tagen davor.
 - Symptome mit „davor“ nennen Mahlzeiten, die ich zugeordnet habe. Das ist eine Beobachtung, kein Nachweis.
 
@@ -67,3 +67,8 @@ Noch offen: Léon testet den Prompt mit einem erfundenen oder echten Bericht und
 ## Quellen (mit Datum)
 
 - Aufbau des Berichts: `js/logik/coach.js`, Stand 14.11.2026.
+
+
+## Ernährungsberater (Plan erstellen lassen)
+
+Seit 23.11.2026 baut Elan einen zweiten Prompt selbst: Plan → „Plan importieren“ → „Ernährungsberater-Prompt kopieren“. Elan setzt Tagestypen mit Zielen, Wochenplan, Mahlzeiten mit Anteilen, Mag-Liste und deine Rezepte ein, dazu deine Wünsche. Der Chat antwortet mit einem Plan im Format `elan-import` (`docs/IMPORT-FORMAT.md`), den du auf derselben Seite einfügst. Messwerte (Gewicht, Labor, Symptome) sind nicht enthalten. Quelle im Code: `js/logik/berater.js`.

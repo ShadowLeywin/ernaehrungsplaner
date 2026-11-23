@@ -5,6 +5,15 @@ export const NEUIGKEITEN = [
   {
     version: '1.0.0',
     datum: '2026-11-23',
+    titel: 'Ernährungsberater-Prompt',
+    punkte: [
+      'Plan → „Plan importieren“ → „Ernährungsberater-Prompt kopieren“: Elan setzt deine Tagestypen mit Zielen, den Wochenplan, die Mahlzeiten, die Mag-Liste und deine Rezepte ein. In einem Claude-Chat einfügen, der erstellt den ganzen Plan; die Antwort fügst du auf derselben Seite ein.',
+      'Ins Feld „Wünsche“ schreibst du, was der Plan beachten soll, z. B. „unter der Woche wenig kochen“.',
+    ],
+  },
+  {
+    version: '1.0.0',
+    datum: '2026-11-23',
     titel: 'Eigene Tagestypen',
     punkte: [
       'Tagestypen frei benennen und in der Anzahl anpassen (1 bis 5): bei der Ersteinrichtung oder unter Mehr → Wochenplan. Zum Beispiel „Training“, „Lauf“, „Ruhetag“.',
