@@ -8,14 +8,15 @@ import { MAX_TAGE, baueUebernahme, lesePlanImport, offeneZutaten, promptVorlage 
 import { APP_NAME } from '../logik/schema.js';
 import { normalisiere } from '../logik/suche.js';
 import { monatUm, monatVon, verschiebeMonat } from '../logik/zeitraum.js';
-import { SLOTS } from '../logik/ziele.js';
+import { SLOTS, TAGESTYPEN } from '../logik/ziele.js';
+import { beraterPrompt } from '../logik/berater.js';
 import { teileText } from '../plattform.js';
 import { gehe, neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { el, haenge, hinweis, icon, zahl } from '../ui.js';
 
 // Getipptes und die Vorschau überleben ein Neuzeichnen
-const entwurf = { text: '', von: null, bis: null, ergebnis: null, wahl: new Map() };
+const entwurf = { text: '', von: null, bis: null, ergebnis: null, wahl: new Map(), wunsch: '' };
 const slotName = (id) => SLOTS.find((s) => s.id === id)?.name ?? id;
 
 export async function zeigePlanImport(wurzel) {
@@ -32,6 +33,23 @@ export async function zeigePlanImport(wurzel) {
   const kopiere = async () => {
     try {
       if ((await teileText(promptVorlage({ von: entwurf.von, bis: entwurf.bis }), 'Vorlage für den Plan-Import')) === 'kopiert') hinweis('Vorlage kopiert. Füge sie im Chat ein, dazu deinen Plan.');
+    } catch {
+      hinweis('Kopieren hat nicht geklappt.');
+    }
+  };
+  // Ernährungsberater: Der Chat erstellt den Plan selbst, aus Elans Zielen, Wochenplan, Mahlzeiten und Vorlieben
+  const wunschFeld = el('textarea', {
+    id: 'f-berater-wunsch', rows: 3, 'aria-label': 'Deine Wünsche an den Plan',
+    placeholder: 'Wünsche, z. B. „unter der Woche wenig kochen, viel Hähnchen, kein Fisch“',
+    oninput: (e) => { entwurf.wunsch = e.target.value; },
+  }, entwurf.wunsch);
+  const kopiereBerater = async () => {
+    const [ziele, woche, slots, vorliebenMap] = await Promise.all([speicher.ladeZiele(), speicher.ladeWoche(), speicher.ladeSlots(), speicher.alleVorlieben()]);
+    const nachId = new Map(zutaten.map((z) => [z.id, z.name]));
+    const vorlieben = [...vorliebenMap.values()].filter((v) => nachId.has(v.zutatId)).map((v) => ({ name: nachId.get(v.zutatId), mag: v.mag }));
+    const text = beraterPrompt({ von: entwurf.von, bis: entwurf.bis, typen: TAGESTYPEN, ziele, woche, slots, vorlieben, rezepte: rezepte.map((r) => r.name), wunsch: entwurf.wunsch });
+    try {
+      if ((await teileText(text, 'Ernährungsberater')) === 'kopiert') hinweis('Prompt kopiert. In einem neuen Claude-Chat einfügen und abschicken.');
     } catch {
       hinweis('Kopieren hat nicht geklappt.');
     }
@@ -58,11 +76,16 @@ export async function zeigePlanImport(wurzel) {
       el('h1', {}, 'Plan importieren'),
       el('p', {}, 'Deinen Ernährungsplan aus einem Chat übernehmen. Nährwerte rechnet Elan selbst, aus seinen Zutaten.')),
 
-    el('h2', {}, '1. Vorlage kopieren'),
+    el('h2', {}, '1. Prompt für den Chat'),
     el('div', { class: 'zeitraum-frei' },
       el('div', { class: 'feld' }, el('label', { for: 'f-import-von' }, 'Von'), von),
       el('div', { class: 'feld' }, el('label', { for: 'f-import-bis' }, 'Bis'), bis)),
-    el('p', { class: 'klein' }, `Die Vorlage sagt dem Chat, wie die Antwort aussehen muss. Höchstens ${MAX_TAGE} Tage auf einmal.`),
+    el('p', { class: 'klein' }, `Höchstens ${MAX_TAGE} Tage auf einmal.`),
+    el('h3', {}, 'Plan erstellen lassen'),
+    el('p', { class: 'klein' }, 'Der Chat wird zum Ernährungsberater: Elan setzt deine Tagestypen mit Zielen, den Wochenplan, die Mahlzeiten, die Mag-Liste und deine Rezepte ein. Keine Messwerte wie Gewicht oder Labor.'),
+    wunschFeld,
+    el('button', { type: 'button', class: 'knopf', onclick: kopiereBerater }, 'Ernährungsberater-Prompt kopieren'),
+    el('h3', {}, 'Oder: Plan, den du schon hast'),
     el('button', { type: 'button', class: 'knopf leise', onclick: kopiere }, 'Vorlage kopieren'),
 
     el('h2', {}, '2. Antwort einfügen'),

@@ -2018,6 +2018,13 @@ async function planImportLauf(browser) {
   await seite.getByRole('button', { name: 'Vorlage kopieren' }).click();
   await seite.locator('.hinweis', { hasText: 'Vorlage kopiert' }).waitFor();
   const vorlage = await seite.evaluate(() => navigator.clipboard.readText());
+  // Ernährungsberater-Prompt: Ziele, Wochenplan und Wünsche aus Elan eingesetzt
+  await seite.locator('#f-berater-wunsch').fill('wenig kochen unter der Woche');
+  await seite.getByRole('button', { name: 'Ernährungsberater-Prompt kopieren' }).click();
+  await seite.locator('.hinweis', { hasText: 'Prompt kopiert' }).waitFor();
+  const berater = await seite.evaluate(() => navigator.clipboard.readText());
+  pruefe('Ernährungsberater-Prompt: Zeitraum, Ziele je Tagestyp, Wochenplan, Wünsche, Importformat', berater.includes('Ernährungsberater') && berater.includes('Zeitraum: 2026-12-01 bis 2026-12-31') && /- Gym: Energie \d+ kcal/.test(berater) && berater.includes('Montag Gym') && berater.includes('wenig kochen unter der Woche') && berater.includes('"format":"elan-import"'),
+    `${berater.length} Zeichen; ${berater.split('\n').slice(4, 7).join(' | ')}`);
   await seite.getByRole('button', { name: 'Prüfen' }).click();
   const leerFehler = await seite.locator('#f-planimport-fehler').innerText();
   // So wie ein Chat antwortet: mit Text und Codeblock drumherum

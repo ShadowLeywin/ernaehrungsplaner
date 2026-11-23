@@ -478,3 +478,9 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Alter Test:** Die Ersteinrichtung behält ihre drei Schritte und das Feld `#f-start-gym`; Namen und kcal stehen auf derselben Seite.
 - **Befehle:** `npm test` (258, neu `test/tagestypen.test.js`) · `node tools/pruefe-app.cjs` (189).
 - **Fachbegriffe:** Live-Binding (ein `export let` ändert sich für alle Importe zugleich).
+
+## Session 16, Runde: Ernährungsberater-Prompt (23.11.2026)
+
+- **Was und warum:** Léon: „der neue Ernährungsberater-Chat-Prompt wie am Anfang geplant“. [A] Gemeint ist ein Prompt, mit dem ein Chat den Plan selbst erstellt, statt nur einen vorhandenen umzuwandeln. `js/logik/berater.js` baut ihn aus Tagestypen mit Zielen, Wochenplan, Mahlzeiten mit Anteilen, Mag-Liste, Rezepten und Wünschen; Antwort im Format `elan-import`.
+- **Entscheidung:** Keine Messwerte (Gewicht, Labor, Symptome) im Prompt; Ziele und Vorlieben reichen für einen Plan. Nährwerte bleiben Elans Sache.
+- **Befehle:** `npm test` (260, neu `test/berater.test.js`) · `node tools/pruefe-app.cjs` (190).
