@@ -1887,6 +1887,53 @@ async function migration7Lauf(browser) {
   await kontext.close();
 }
 
+/** P3.2: Märkte in OpenStreetMap suchen (Antwort aus test/daten, kein echter Abruf), merken, von Hand anlegen */
+async function marktLauf(browser) {
+  const { kontext, seite, fehler, fremd } = await neueSeite(browser);
+  const overpass = fs.readFileSync(path.resolve(__dirname, '..', 'test', 'daten', 'overpass-maerkte.json'), 'utf8');
+  const anfragen = [];
+  await seite.route('https://overpass-api.de/**', (route) => { anfragen.push(decodeURIComponent(route.request().url())); route.fulfill({ contentType: 'application/json', body: overpass }); });
+  await seite.goto(`${URL_APP}#/mehr`, { waitUntil: 'networkidle' });
+  await seite.getByRole('link', { name: /^Märkte/ }).click();
+  await seite.locator('h1', { hasText: 'Märkte' }).waitFor();
+  const ohneTipp = fremd.size;
+  await seite.locator('#f-markt-ort').fill('1234');
+  await seite.getByRole('button', { name: 'Suchen' }).click();
+  const plzFehler = await seite.locator('#f-markt-ort-fehler').innerText();
+  await seite.locator('#f-markt-ort').fill('12345');
+  await seite.getByRole('button', { name: 'Suchen' }).click();
+  await seite.locator('#markt-treffer li').first().waitFor();
+  const treffer = await seite.locator('#markt-treffer .zeile-name').allInnerTexts();
+  const hinweisOsm = await seite.locator('a', { hasText: 'OpenStreetMap-Mitwirkende' }).count();
+  pruefe('Märkte suchen: erst auf Knopfdruck, eine Anfrage mit der PLZ, Treffer mit Adresse, Quelle genannt',
+    ohneTipp === 0 && plzFehler.includes('fünf Ziffern') && anfragen.length === 1 && anfragen[0].includes('"postal_code"="12345"') && treffer.length === 3 && treffer.some((t) => t.includes('Teststraße 1, 12345 Musterstadt')) && hinweisOsm === 1,
+    `vor dem Tipp ${ohneTipp} fremde Hosts; „${plzFehler}“; ${anfragen.length} Anfrage; ${treffer.map((t) => t.replace(/\n/g, ' – ')).join(' | ')}`);
+  await bild(seite, '50-maerkte-suche');
+  const lidl = seite.locator('#markt-treffer li', { hasText: 'Teststraße' });
+  await lidl.getByRole('button', { name: 'Merken' }).click();
+  await lidl.getByRole('button', { name: 'Gemerkt' }).waitFor();
+  const trefferNachMerken = await seite.locator('#markt-treffer li').count();
+  await seite.locator('#f-markt-name').fill('Hofladen Test');
+  await seite.locator('#f-markt-eigen-ort').fill('Musterstadt');
+  await seite.getByRole('button', { name: 'Anlegen' }).click();
+  await seite.locator('#meine-maerkte li', { hasText: 'Hofladen Test' }).waitFor();
+  await seite.reload({ waitUntil: 'networkidle' });
+  await seite.locator('#meine-maerkte li').first().waitFor();
+  const meine = await seite.locator('#meine-maerkte .zeile-name').allInnerTexts();
+  pruefe('Märkte merken und von Hand anlegen, beide bleiben nach Neuladen', trefferNachMerken === 3 && meine.length === 2 && meine.some((m) => m.startsWith('Lidl')) && meine.some((m) => m.startsWith('Hofladen Test')),
+    meine.map((m) => m.replace(/\n/g, ' – ')).join(' | '));
+  await seite.getByRole('button', { name: 'Hofladen Test entfernen' }).click();
+  await seite.locator('.hinweis', { hasText: 'entfernt' }).getByRole('button', { name: 'Rückgängig' }).click();
+  await seite.locator('#meine-maerkte li', { hasText: 'Hofladen Test' }).waitFor();
+  pruefe('Markt entfernen mit Rückgängig', (await seite.locator('#meine-maerkte li').count()) === 2);
+  await seite.setViewportSize({ width: 320, height: 640 });
+  const breite = await seite.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  const klein = await seite.evaluate(() => [...document.querySelectorAll('.seite button, .seite a, .seite input')].filter((e) => e.offsetParent && !e.closest('p') && e.getBoundingClientRect().height < 40).map((e) => e.textContent || e.id));
+  pruefe('Märkte bei 320 px: kein seitliches Rollen, Tippflächen ab 40 px (Links im Fließtext ausgenommen)', breite <= 0 && klein.length === 0, `${breite} px zu breit; zu klein: ${klein.join(', ') || 'nichts'}`);
+  pruefe('Markt-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
+  await kontext.close();
+}
+
 (async () => {
   if (BILDER) fs.mkdirSync(BILDER, { recursive: true });
   ({ SCHEMA_VERSION } = await import('../js/logik/schema.js'));
@@ -1907,6 +1954,7 @@ async function migration7Lauf(browser) {
     await willkommenLauf(browser);
     await migrationsLauf(browser);
     await migration7Lauf(browser);
+    await marktLauf(browser);
     await offlineLauf(browser);
     await dunkelLauf(browser);
   } catch (fehler) {

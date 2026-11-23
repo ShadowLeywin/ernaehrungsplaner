@@ -392,3 +392,12 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Entscheidung:** Preise nur mit Packungsgröße. Ein Angebot „0,50 € je Packung“ ohne Gramm wird nicht gerechnet, sonst wäre der Betrag erfunden. Liter zählen wie Kilogramm und sind als Schätzung markiert.
 - **Entscheidung:** Der Vergleich sortiert zuerst nach Zahl der Posten mit Preis, dann nach Summe. Verworfen: nur nach Summe (ein Markt mit einem bekannten Posten wäre „am billigsten“).
 - **Fachbegriffe:** Packungslogik (man kauft ganze Packungen, `Math.ceil`), Vorrangregel (feste Reihenfolge der Quellen).
+
+## Session 16, Runde P3.2: Märkte suchen und merken (23.11.2026)
+
+- **Was und warum:** Seite `#/maerkte`: Ort oder PLZ → eine Overpass-Abfrage auf Knopfdruck → Treffer mit Adresse → „Merken“. Eigene Märkte von Hand. Hinweis „Daten © OpenStreetMap-Mitwirkende“ mit Link. Reine Funktionen in `js/logik/osm.js`.
+- **Befehle:** `npm test` (230, neu `test/osm.test.js` mit `test/daten/overpass-maerkte.json`) · `node tools/pruefe-app.cjs` (161; Overpass per `seite.route` mit der Beispieldatei beantwortet).
+- **Entscheidung:** Gebiet über Gemeindename oder PLZ-Grenze in Overpass selbst (`map_to_area`), ohne zweiten Dienst zum Geokodieren (Nominatim). Verworfen: Standort per GPS (Léon: E3.1 „Ort eintippen“).
+- **Fehler:** Kriterium „Tippflächen ab 40 px“ schlug beim Quellen-Link im Satz an. Links im Fließtext sind nach WCAG 2.5.8 ausgenommen; Kriterium nimmt `p a` aus.
+- **Nicht testbar:** Echter Abruf bei Overpass (Host in der Umgebung gesperrt). Léon testet am Handy.
+- **Fachbegriffe:** Overpass QL (Abfragesprache für OSM-Daten), `map_to_area` (macht aus einer Grenze ein Suchgebiet).

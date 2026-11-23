@@ -41,6 +41,7 @@ const MENUE = [
     { id: 'zutaten', titel: 'Zutaten und Mag-Liste', adresse: '#/zutaten', stand: (w) => anzahlText(w.vorlieben, 'Angabe in der Mag-Liste', 'Angaben in der Mag-Liste', 'Eigene Zutaten und Vorlieben') },
     { id: 'unterwegs', titel: 'Unterwegs', stand: (w) => w.unterwegs },
     { id: 'angebote', titel: 'Angebote', adresse: '#/angebote', stand: (w) => anzahlText(w.angebote, 'Angebot', 'Angebote', 'Noch keine Angebote') },
+    { id: 'maerkte', titel: 'Märkte', adresse: '#/maerkte', stand: (w) => anzahlText(w.maerkte, 'Markt', 'Märkte', 'Noch keine Märkte') },
   ] },
   { gruppe: 'Daten und Verbindung', eintraege: [
     { id: 'healthconnect', titel: 'Health Connect', stand: (w) => w.healthConnect },
@@ -92,15 +93,15 @@ export async function zeigeMehr(wurzel, [unterseite]) {
 /** Alle Werte für die Zusammenfassungen in einem Zug laden; Fehler in einer Quelle lassen die Zeile nur leer. */
 async function ladeStand() {
   const heute = isoDatum();
-  const [eintraege, rezepte, ziele, woche, anteile, referenz, gesundheit, wasserMengen, vorlieben, angebote, letztesBackup, hc, erinnerungen, unterwegs] = await Promise.all([
+  const [eintraege, rezepte, ziele, woche, anteile, referenz, gesundheit, wasserMengen, vorlieben, angebote, letztesBackup, hc, erinnerungen, unterwegs, maerkte] = await Promise.all([
     speicher.alleEintraege(), speicher.alleRezepte(), speicher.ladeZiele(), speicher.ladeWoche(),
     speicher.einstellung('slotAnteile').then(bereinigeAnteile), speicher.ladeReferenz(), speicher.ladeGesundheit(),
     speicher.einstellung('wasserMengen').then(bereinigeWasserMengen), speicher.alleVorlieben(), speicher.alleAngebote(),
-    speicher.einstellung('letztesBackup'), healthConnectStand(), speicher.einstellung('erinnerungen'), unterwegsStand(),
+    speicher.einstellung('letztesBackup'), healthConnectStand(), speicher.einstellung('erinnerungen'), unterwegsStand(), speicher.alleMaerkte(),
   ]);
   return {
     heute, eintraege, rezepte, ziele, woche, anteile, referenz, gesundheit, wasserMengen, letztesBackup,
-    vorlieben: vorlieben.size, angebote: angebote.length, healthConnect: hc, erinnerungen, unterwegs,
+    vorlieben: vorlieben.size, angebote: angebote.length, maerkte: maerkte.length, healthConnect: hc, erinnerungen, unterwegs,
   };
 }
 
