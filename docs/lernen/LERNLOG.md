@@ -450,3 +450,12 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Fehler:** Ein alter Test fiel: Ein eingefügter Seitenquelltext enthält Links und landete im Weg für Bildunterschriften. Lösung: Schema.org-Daten zuerst prüfen. Den alten Satz „ruft keine fremden Seiten ab“ behalten, statt den Test zu ändern.
 - **Entscheidung:** Plattform nur über ganze Hostnamen („nichttiktok.com“ ist nicht TikTok). Verworfen: Video-Inhalte holen (verboten, und Elan lädt nichts).
 - **Fachbegriffe:** `\p{Extended_Pictographic}` (Unicode-Eigenschaft für Emojis in Regex), Prompt-Brücke (Mensch trägt Daten zwischen Chat und App).
+
+## Session 16, Runden P6.1 bis P6.3: Zutaten wie in großen Ernährungs-Apps (23.11.2026)
+
+- **Was und warum:** Favoriten mit Stern (Einstellung `zutatFavoriten`), Filter „★“ und Kategorien-Chips, „Zuletzt verwendet“, Werte je 100 g oder je Portion, alle Nährwerte mit „unbekannt“, eigene Portionen auch für mitgelieferte Zutaten (`portionenExtra`). Reine Funktionen in `js/logik/zutatenbank.js`.
+- **Befehle:** `npm test` (250, neu `test/zutatenbank.test.js`) · `node tools/pruefe-app.cjs` (181).
+- **Fehler, eigener:** Ein Python-Schritt öffnete `zutaten.js` zum Schreiben, bevor er sie las: Die Datei war leer. Gemerkt über `git diff --stat` (262 Zeilen weg), zurück mit `git checkout`. Merke: nie `open(p,'w').write(open(p).read())`.
+- **Fehler:** Alter Test erwartet genau eine `table.naehrwerte`; die neue Mikro-Tabelle hat deshalb eine eigene Klasse (`naehrwerte-mikro`) statt einer Teständerung. Ein neuer Test las die Liste vor dem Neuzeichnen; er wartet jetzt auf den gewählten Knopf.
+- **Offen:** BLS 4.0 (Lizenz ungeprüft).
+- **Fachbegriffe:** Einmischen (Daten aus zwei Quellen beim Laden zusammenführen, hier Datei und Einstellung).

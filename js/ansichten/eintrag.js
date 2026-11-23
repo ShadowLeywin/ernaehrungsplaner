@@ -19,7 +19,7 @@ import { zeigeUnterwegs } from './unterwegs.js';
 const slotName = (id) => SLOTS.find((s) => s.id === id)?.name ?? '';
 
 /** Suchfeld mit Trefferliste. beiWahl bekommt die angetippte Zutat (oder das als Zutat verpackte Rezept). */
-function suchListe({ auswahl, zuletzt = [], vorlieben = new Map(), mengen = new Map(), beiWahl, beiNeu, beiSchnell = null, beiNurKcal = null, beiUnterwegs = null, vorlagen = [], beiVorlage = null, beiVorlageLoeschen = null }) {
+function suchListe({ auswahl, zuletzt = [], favoriten = [], vorlieben = new Map(), mengen = new Map(), beiWahl, beiNeu, beiSchnell = null, beiNurKcal = null, beiUnterwegs = null, vorlagen = [], beiVorlage = null, beiVorlageLoeschen = null }) {
   const liste = el('div', { class: 'wahl-liste' });
   let aktuell = '';
   // Meine Mahlzeiten: ein Tipp trägt alle Teile ein; beim Suchen nur die, deren Name passt
@@ -47,8 +47,11 @@ function suchListe({ auswahl, zuletzt = [], vorlieben = new Map(), mengen = new 
     const treffer = sortiereNachVorliebe(sucheZutaten(auswahl, begriff, 40), vorlieben);
     const zeigeZuletzt = !begriff.trim() && zuletzt.length > 0;
     const vorlagenStuecke = [vorlagenTeil(begriff)].flat().filter(Boolean);
+    const zeigeFavoriten = !begriff.trim() && favoriten.length > 0;
     liste.replaceChildren(
       ...vorlagenStuecke,
+      zeigeFavoriten ? el('h3', { class: 'zwischentitel' }, 'Favoriten') : '',
+      zeigeFavoriten ? el('ul', { class: 'zeilen', id: 'wahl-favoriten' }, favoriten.map(zeile)) : '',
       zeigeZuletzt ? el('h3', { class: 'zwischentitel' }, 'Zuletzt eingetragen') : '',
       zeigeZuletzt ? el('ul', { class: 'zeilen' }, zuletzt.map((zutat) => (beiSchnell && mengen.has(zutat.id)
         ? el('li', { class: 'zeile-schnell' },
@@ -58,7 +61,7 @@ function suchListe({ auswahl, zuletzt = [], vorlieben = new Map(), mengen = new 
             onclick: () => beiSchnell(zutat, mengen.get(zutat.id)),
           }, `+ ${zahl(mengen.get(zutat.id), 1)} g`))
         : zeile(zutat)))) : '',
-      zeigeZuletzt || vorlagenStuecke.length ? el('h3', { class: 'zwischentitel' }, 'Alles') : '',
+      zeigeZuletzt || zeigeFavoriten || vorlagenStuecke.length ? el('h3', { class: 'zwischentitel' }, 'Alles') : '',
       treffer.length ? el('ul', { class: 'zeilen' }, treffer.map(zeile)) : el('p', { class: 'leer' }, `Nichts passt zu „${begriff.trim()}“.`),
       // Mensa, Restaurant, Snack bei Freunden: ohne Datenbank, nur mit Kalorien. Der Suchbegriff wird zum Namen
       beiNurKcal ? el('button', { type: 'button', class: 'chip schnell nur-kcal', id: 'nur-kcal', onclick: () => beiNurKcal(begriff.trim()) },
@@ -87,17 +90,19 @@ function suchListe({ auswahl, zuletzt = [], vorlieben = new Map(), mengen = new 
  */
 export async function oeffneZutatWahl({ datum, slot, beiFertig, ziel = 'tagebuch' }) {
   const plan = ziel === 'plan';
-  const [zutaten, rezepte, alleEintraege, vorlieben, vorlagenRoh] = await Promise.all([speicher.alleZutaten(), speicher.alleRezepte(), speicher.alleEintraege(), speicher.alleVorlieben(), speicher.einstellung('vorlagen')]);
+  const [zutaten, rezepte, alleEintraege, vorlieben, vorlagenRoh, favoritenIds] = await Promise.all([speicher.alleZutaten(), speicher.alleRezepte(), speicher.alleEintraege(), speicher.alleVorlieben(), speicher.einstellung('vorlagen'), speicher.ladeFavoriten()]);
   const vorlagen = bereinigeVorlagen(vorlagenRoh).filter((v) => !plan || fuerPlanGeeignet(v));
   const auswahl = [...rezepte.map(rezeptAlsZutat).filter((r) => r.portionen.length), ...zutaten];
   const nachId = new Map(auswahl.map((z) => [z.id, z]));
   const zuletzt = zuletztVerwendet(alleEintraege).map((id) => nachId.get(id)).filter(Boolean);
+  const favoriten = favoritenIds.map((id) => nachId.get(id)).filter(Boolean).slice(0, 12);
 
   blatt({
     titel: plan ? 'Einplanen' : slotName(slot),
     inhalt: (b) => suchListe({
       auswahl,
       zuletzt,
+      favoriten,
       vorlieben,
       mengen: letzteMengen(alleEintraege),
       beiNeu: () => { b.schliessen(); gehe('/zutaten/neu'); },

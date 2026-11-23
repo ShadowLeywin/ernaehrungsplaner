@@ -95,6 +95,15 @@ Vorher: Mehr → „Backup speichern“ (das Update hebt die Datenbank auf Schem
 | P5-4 | Gespeichertes Rezept öffnen → „Beitrag öffnen“ | Video öffnet sich in der App oder im Browser |
 | P5-5 | Teilen, während Elan schon offen ist | Elan springt trotzdem zu „Rezept importieren“ mit dem neuen Inhalt |
 
+## P6. Zutaten am Handy testen (etwa 5 Minuten, nach dem Merge von P6)
+
+| Nr. | Was du tust | Was du sehen solltest |
+|---|---|---|
+| P6-1 | Rezepte → Zutaten → eine Zutat öffnen → Stern | Stern gelb; in der Liste unter „★“ |
+| P6-2 | Bei der Zutat „1 Stück“ statt „100 g“ antippen | Zahlen der Tabelle ändern sich |
+| P6-3 | „Eigene Portion anlegen“: z. B. „Becher, 150“ | Beim Eintragen dieser Zutat gibt es den Knopf „Becher“ |
+| P6-4 | Beim Eintragen: steht oben „Favoriten“? | ja, mit deinen Sternen |
+
 ## B. Automatischer Bau einrichten (5 Minuten, am Rechner oder Handy)
 
 Erledigt am 23.11.2026: Secrets eingetragen, Release „Elan 1.0.0“ mit signiertem APK gebaut.

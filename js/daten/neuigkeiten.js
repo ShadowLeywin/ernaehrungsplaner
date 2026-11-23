@@ -5,6 +5,17 @@ export const NEUIGKEITEN = [
   {
     version: '1.0.0',
     datum: '2026-11-23',
+    titel: 'Zutaten mit Favoriten',
+    punkte: [
+      'Stern an einer Zutat: Sie steht dann oben in der Zutatenliste und beim Eintragen unter „Favoriten“.',
+      'Zutatenliste: „Zuletzt verwendet“ oben, Filter „★“ und „Eigene“, Kategorien zum Wischen.',
+      'Detail einer Zutat: Werte je 100 g oder je Portion umschalten; alle Nährwerte, fehlende stehen als „unbekannt“ da.',
+      'Eigene Portion anlegen (z. B. „Becher, 150 g“), auch bei mitgelieferten Zutaten. Beim Eintragen ist sie ein Knopf.',
+    ],
+  },
+  {
+    version: '1.0.0',
+    datum: '2026-11-23',
     titel: 'Rezepte aus TikTok, Instagram, YouTube',
     punkte: [
       'In TikTok, Instagram oder YouTube auf „Teilen“ → Elan: Steht das Rezept in der Bildunterschrift, erkennt Elan es, ohne Emojis und Hashtags.',

@@ -2,7 +2,8 @@
 
 import { NAEHRSTOFFE } from '../logik/naehrwerte.js';
 import { APP_NAME } from '../logik/schema.js';
-import { sucheZutaten } from '../logik/suche.js';
+import { zuletztVerwendet } from '../logik/suche.js';
+import { ergaenzePortion, naehrwertZeilen, pruefePortion, schalteFavorit, zutatenAuswahl } from '../logik/zutatenbank.js';
 import { MAG, istObstGemuese } from '../logik/vorlieben.js';
 import { FORMULAR_FELDER, KATEGORIEN, QUELLEN, kategorieName, pruefeZutat } from '../logik/zutat.js';
 import { sucheOnline } from '../off-abruf.js';
@@ -13,7 +14,7 @@ import { angebotBereich } from './angebote.js';
 import { zeigeMagListe } from './magliste.js';
 
 // Zustand der Liste bleibt beim Wechsel zwischen Liste und Detail erhalten
-const zustand = { begriff: '', nurEigene: false, online: null };
+const zustand = { begriff: '', filter: 'alle', kategorie: null, online: null };
 
 const adresse = (id, anhang = '') => `#/zutaten/${encodeURIComponent(id)}${anhang}`;
 const istEigen = (zutat) => !String(zutat.id).startsWith('basis:');
@@ -25,8 +26,8 @@ export async function zeigeZutaten(wurzel, teile) {
     const zutat = await speicher.holeZutat(teile[0]);
     if (!zutat) return nichtGefunden(wurzel);
     if (teile[1] === 'bearbeiten' && istEigen(zutat)) return formular(wurzel, zutat, false);
-    const [vorlieben, angebote] = await Promise.all([speicher.alleVorlieben(), speicher.alleAngebote()]);
-    return detail(wurzel, zutat, istObstGemuese(zutat) ? vorlieben.get(zutat.id) : null, angebote);
+    const [vorlieben, angebote, favoriten] = await Promise.all([speicher.alleVorlieben(), speicher.alleAngebote(), speicher.ladeFavoriten()]);
+    return detail(wurzel, zutat, istObstGemuese(zutat) ? vorlieben.get(zutat.id) : null, angebote, favoriten);
   }
   return liste(wurzel);
 }
@@ -34,25 +35,32 @@ export async function zeigeZutaten(wurzel, teile) {
 /* ---------- Liste ---------- */
 
 async function liste(wurzel) {
-  const zutaten = await speicher.alleZutaten();
+  const [zutaten, favoriten, eintraege] = await Promise.all([speicher.alleZutaten(), speicher.ladeFavoriten(), speicher.alleEintraege()]);
   const eigeneIds = new Set(zutaten.filter(istEigen).map((z) => z.id));
+  const favSet = new Set(favoriten);
+  const nachId = new Map(zutaten.map((z) => [z.id, z]));
+  const zuletzt = zuletztVerwendet(eintraege, 6).map((id) => nachId.get(id)).filter(Boolean);
   document.title = `Zutaten – ${APP_NAME}`;
 
   const treffer = el('div', {});
   const online = el('div', { class: 'online' });
 
   const zeile = (zutat) => el('li', {}, el('a', { class: 'zeile', href: adresse(zutat.id) },
-    el('span', { class: 'zeile-name' }, zutat.name, el('small', {}, zutat.marke || kategorieName(zutat.kategorie))),
+    el('span', { class: 'zeile-name' }, favSet.has(zutat.id) ? el('span', { class: 'stern-klein', 'aria-label': 'Favorit' }, '★ ') : null, zutat.name, el('small', {}, zutat.marke || kategorieName(zutat.kategorie))),
     el('span', { class: 'zeile-wert' }, `${zahl(zutat.je100.kcal)} kcal`)));
 
   const zeichneTreffer = () => {
-    const auswahl = zustand.nurEigene ? zutaten.filter(istEigen) : zutaten;
-    const gefunden = sucheZutaten(auswahl, zustand.begriff, 200);
+    const gefunden = zutatenAuswahl(zutaten, { begriff: zustand.begriff, filter: zustand.filter, kategorie: zustand.kategorie, favoriten, istEigen });
     let leer = `Keine Zutat passt zu „${zustand.begriff.trim()}“.`;
-    if (!zustand.begriff.trim() && zustand.nurEigene) leer = 'Du hast noch keine eigene Zutat angelegt.';
-    treffer.replaceChildren(gefunden.length
-      ? el('ul', { class: 'zeilen' }, gefunden.map(zeile))
-      : el('p', { class: 'leer' }, leer));
+    if (!zustand.begriff.trim() && zustand.filter === 'eigene') leer = 'Du hast noch keine eigene Zutat angelegt.';
+    if (!zustand.begriff.trim() && zustand.filter === 'favoriten') leer = 'Noch keine Favoriten. Öffne eine Zutat und tippe auf den Stern.';
+    // Ohne Suche und Filter: was du zuletzt gegessen hast, steht oben
+    const zeigeZuletzt = !zustand.begriff.trim() && zustand.filter === 'alle' && !zustand.kategorie && zuletzt.length > 0;
+    treffer.replaceChildren(
+      zeigeZuletzt ? el('h2', { class: 'zwischentitel' }, 'Zuletzt verwendet') : '',
+      zeigeZuletzt ? el('ul', { class: 'zeilen', id: 'zutaten-zuletzt' }, zuletzt.map(zeile)) : '',
+      zeigeZuletzt ? el('h2', { class: 'zwischentitel' }, 'Alle Zutaten') : '',
+      gefunden.length ? el('ul', { class: 'zeilen', id: 'zutaten-liste' }, gefunden.map(zeile)) : el('p', { class: 'leer' }, leer));
   };
 
   const zeichneOnline = () => {
@@ -100,13 +108,20 @@ async function liste(wurzel) {
     zeichneOnline();
   }
 
-  const filter = (text, nurEigene) => el('button', {
-    type: 'button', class: 'wahl-knopf', 'aria-pressed': String(zustand.nurEigene === nurEigene),
-    onclick: () => { zustand.nurEigene = nurEigene; neuZeichnen(); },
+  const filter = (text, wert) => el('button', {
+    type: 'button', class: 'wahl-knopf', 'aria-pressed': String(zustand.filter === wert),
+    onclick: () => { zustand.filter = wert; neuZeichnen(); },
   }, text);
+  // Kategorien als Chips zum Wischen; ein zweiter Tipp auf die gewählte hebt den Filter auf
+  const kategorien = el('div', { class: 'kategorie-chips', role: 'group', 'aria-label': 'Kategorie' }, KATEGORIEN.map((k) => el('button', {
+    type: 'button', class: 'chip', 'aria-pressed': String(zustand.kategorie === k.id),
+    onclick: () => { zustand.kategorie = zustand.kategorie === k.id ? null : k.id; neuZeichnen(); },
+  }, k.name)));
 
   zeichneTreffer();
   zeichneOnline();
+  // Gewählte Kategorie sichtbar halten, auch wenn sie weit rechts in der Chip-Reihe liegt
+  requestAnimationFrame(() => kategorien.querySelector('[aria-pressed="true"]')?.scrollIntoView({ inline: 'center', block: 'nearest' }));
   haenge(wurzel, 
     el('header', { class: 'seitenkopf' },
       el('h1', {}, 'Zutaten'),
@@ -116,7 +131,8 @@ async function liste(wurzel) {
       enterkeyhint: 'search', value: zustand.begriff,
       oninput: (e) => { zustand.begriff = e.target.value; zeichneTreffer(); zeichneOnline(); },
     }),
-    el('div', { class: 'wahl schmal', role: 'group', 'aria-label': 'Auswahl' }, filter(`Alle (${zutaten.length})`, false), filter(`Eigene (${eigeneIds.size})`, true)),
+    el('div', { class: 'wahl schmal-voll', role: 'group', 'aria-label': 'Auswahl' }, filter(`Alle (${zutaten.length})`, 'alle'), filter(`★ (${favoriten.length})`, 'favoriten'), filter(`Eigene (${eigeneIds.size})`, 'eigene')),
+    kategorien,
     el('a', { class: 'textlink', href: '#/zutaten/mag' }, 'Mag-Liste für Obst und Gemüse'),
     el('p', { class: 'klein' }, 'Werte je 100 g'),
     treffer,
@@ -125,14 +141,64 @@ async function liste(wurzel) {
 
 /* ---------- Detail ---------- */
 
-function detail(wurzel, zutat, vorliebe, angebote) {
+function detail(wurzel, zutat, vorliebe, angebote, favoriten) {
   document.title = `${zutat.name} – ${APP_NAME}`;
-  const zeilen = (gruppe) => NAEHRSTOFFE
-    .filter((n) => n.gruppe === gruppe && typeof zutat.je100[n.id] === 'number')
-    .map((n) => el('tr', { class: n.unter ? 'unterzeile' : null },
-      el('th', { scope: 'row' }, n.name),
-      el('td', {}, `${zahl(zutat.je100[n.id], n.einheit === 'kcal' ? 0 : 2)} ${n.einheit}`)));
-  const mikros = zeilen('mikro');
+  const istFavorit = favoriten.includes(zutat.id);
+  // Menge für die Tabelle: 100 g oder eine Portion. Umschalten ändert nur die Zahlen, die Seite bleibt stehen
+  const mengen = [{ name: '100 g', gramm: 100 }, ...(zutat.portionen ?? []).map((p) => ({ name: `1 ${p.name} (${zahl(p.gramm)} g)`, gramm: p.gramm }))];
+  const tabelle = (gruppe, gramm) => naehrwertZeilen(zutat.je100, NAEHRSTOFFE.filter((n) => n.gruppe === gruppe), gramm)
+    .map((r) => el('tr', { class: [r.unter ? 'unterzeile' : '', r.wert === null ? 'unbekannt' : ''].filter(Boolean).join(' ') || null },
+      el('th', { scope: 'row' }, r.name),
+      el('td', {}, r.wert === null ? 'unbekannt' : `${zahl(r.wert, r.einheit === 'kcal' ? 0 : 2)} ${r.einheit}`)));
+  const makroKoerper = el('tbody', { id: 'naehrwerte-makro' });
+  const mikroKoerper = el('tbody', { id: 'naehrwerte-mikro' });
+  const titel = el('caption', {});
+  const mikroBekannt = NAEHRSTOFFE.filter((n) => n.gruppe === 'mikro' && typeof zutat.je100[n.id] === 'number').length;
+  const zeigeMenge = (m) => {
+    titel.textContent = `Nährwerte je ${m.name}`;
+    makroKoerper.replaceChildren(...tabelle('makro', m.gramm));
+    mikroKoerper.replaceChildren(...tabelle('mikro', m.gramm));
+  };
+  zeigeMenge(mengen[0]);
+  const mengenWahl = mengen.length > 1 ? el('div', { class: 'kategorie-chips', role: 'group', 'aria-label': 'Menge' }, mengen.map((m, i) => el('button', {
+    type: 'button', class: 'chip', 'aria-pressed': String(i === 0),
+    onclick: (e) => {
+      for (const k of e.currentTarget.parentElement.children) k.setAttribute('aria-pressed', String(k === e.currentTarget));
+      zeigeMenge(m);
+    },
+  }, m.name))) : null;
+
+  const stern = el('button', {
+    type: 'button', class: 'rund stern', 'aria-pressed': String(istFavorit), 'aria-label': istFavorit ? 'Aus den Favoriten nehmen' : 'Als Favorit merken',
+    onclick: async (e) => {
+      const knopf = e.currentTarget;
+      const neu = schalteFavorit(await speicher.ladeFavoriten(), zutat.id);
+      await speicher.setzeFavoriten(neu);
+      const an = neu.includes(zutat.id);
+      knopf.setAttribute('aria-pressed', String(an));
+      knopf.setAttribute('aria-label', an ? 'Aus den Favoriten nehmen' : 'Als Favorit merken');
+      knopf.textContent = an ? '★' : '☆';
+      hinweis(an ? `${zutat.name} ist jetzt ein Favorit.` : `${zutat.name} ist kein Favorit mehr.`);
+    },
+  }, istFavorit ? '★' : '☆');
+
+  // Eigene Portion: bei eigenen Zutaten direkt an der Zutat, bei mitgelieferten als Einstellung (die Datei ist nur lesbar)
+  const portionName = el('input', { id: 'f-portion-name', placeholder: 'z. B. Becher', maxlength: 30, autocomplete: 'off' });
+  const portionGramm = el('input', { id: 'f-portion-gramm', placeholder: 'Gramm', inputmode: 'decimal', autocomplete: 'off' });
+  const portionFehler = el('p', { class: 'fehlertext', role: 'alert' });
+  const legePortion = async (e) => {
+    e.preventDefault();
+    const pruefung = pruefePortion({ name: portionName.value, gramm: portionGramm.value });
+    if (!pruefung.ok) { portionFehler.textContent = pruefung.fehler.name ?? pruefung.fehler.gramm; return; }
+    if (istEigen(zutat)) {
+      const andere = (zutat.portionen ?? []).filter((p) => p.name.toLowerCase() !== pruefung.portion.name.toLowerCase());
+      await speicher.speichereZutat({ ...zutat, portionen: [...andere, pruefung.portion] });
+    } else {
+      await speicher.setzeEinstellung('portionenExtra', ergaenzePortion(await speicher.einstellung('portionenExtra', {}), zutat.id, pruefung.portion));
+    }
+    hinweis(`Portion „${pruefung.portion.name}“ gespeichert. Beim Eintragen steht sie zur Wahl.`);
+    neuZeichnen();
+  };
 
   const loeschen = async () => {
     const ja = await bestaetige({
@@ -145,21 +211,29 @@ function detail(wurzel, zutat, vorliebe, angebote) {
     gehe('/zutaten');
   };
 
-  haenge(wurzel, 
+  haenge(wurzel,
     el('a', { class: 'zurueck', href: '#/zutaten' }, icon('zurueck', 18), 'Zutaten'),
-    el('header', { class: 'detailkopf' },
-      el('h1', {}, zutat.name),
-      el('p', {}, [zutat.marke, kategorieName(zutat.kategorie)].filter(Boolean).join(', ')),
-      el('p', { class: 'klein' }, `Quelle: ${QUELLEN[zutat.quelle] ?? 'unbekannt'}`)),
+    el('header', { class: 'detailkopf zutat-kopf' },
+      el('div', {},
+        el('h1', {}, zutat.name),
+        el('p', {}, [zutat.marke, kategorieName(zutat.kategorie)].filter(Boolean).join(', ')),
+        el('p', { class: 'klein' }, `Quelle: ${QUELLEN[zutat.quelle] ?? 'unbekannt'}`)),
+      stern),
     istObstGemuese(zutat) ? magBereich(zutat, vorliebe) : null,
     zutat.unvollstaendig ? el('p', { class: 'merkzettel' }, 'Bei dieser Zutat fehlen Angaben. Summen im Tagebuch fallen dadurch zu niedrig aus.') : null,
-    el('table', { class: 'naehrwerte' },
-      el('caption', {}, 'Nährwerte je 100 g'),
-      el('tbody', {}, zeilen('makro'))),
-    mikros.length ? el('details', { class: 'aufklappen' },
-      el('summary', {}, `Vitamine und Mineralstoffe (${mikros.length})`),
-      el('table', { class: 'naehrwerte' }, el('tbody', {}, mikros))) : null,
-    zutat.portionen?.length ? el('p', {}, `Portion: ${zutat.portionen.map((p) => `1 ${p.name} = ${zahl(p.gramm)} g`).join(', ')}`) : null,
+    mengenWahl,
+    el('table', { class: 'naehrwerte', id: 'naehrwerte' }, titel, makroKoerper),
+    el('details', { class: 'aufklappen' },
+      el('summary', {}, `Vitamine und Mineralstoffe (${mikroBekannt} von ${NAEHRSTOFFE.filter((n) => n.gruppe === 'mikro').length} bekannt)`),
+      el('table', { class: 'naehrwerte-mikro' }, mikroKoerper)),
+    el('details', { class: 'aufklappen', id: 'portion-anlegen' },
+      el('summary', {}, 'Eigene Portion anlegen'),
+      el('form', { class: 'stapel', onsubmit: legePortion },
+        el('div', { class: 'zeitraum-frei' },
+          el('div', { class: 'feld' }, el('label', { for: 'f-portion-name' }, 'Name'), portionName),
+          el('div', { class: 'feld' }, el('label', { for: 'f-portion-gramm' }, 'Gramm'), portionGramm)),
+        portionFehler,
+        el('button', { type: 'submit', class: 'knopf leise' }, 'Portion speichern'))),
     angebotBereich(zutat, angebote),
     el('div', { class: 'knopfreihe' },
       istEigen(zutat) ? el('button', { type: 'button', class: 'knopf leise', onclick: loeschen }, 'Löschen') : null,
