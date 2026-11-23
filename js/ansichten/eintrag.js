@@ -6,6 +6,7 @@ import { rezeptAlsZutat } from '../logik/rezepte.js';
 import { schnellAlsText, schnellEintrag } from '../logik/schnell.js';
 import { letzteMengen, sucheZutaten, zuletztVerwendet } from '../logik/suche.js';
 import { magHinweis, sortiereNachVorliebe } from '../logik/vorlieben.js';
+import { bereinigeVorlagen, fuerPlanGeeignet, pruefeVorlagenName, vorlageAus, vorlageEintraege, vorlageText } from '../logik/vorlagen.js';
 import { SLOTS, slotFuerUhrzeit } from '../logik/ziele.js';
 import { pruefeMenge } from '../logik/zutat.js';
 import { tippGefuehl } from '../plattform.js';
@@ -18,8 +19,22 @@ import { zeigeUnterwegs } from './unterwegs.js';
 const slotName = (id) => SLOTS.find((s) => s.id === id)?.name ?? '';
 
 /** Suchfeld mit Trefferliste. beiWahl bekommt die angetippte Zutat (oder das als Zutat verpackte Rezept). */
-function suchListe({ auswahl, zuletzt = [], vorlieben = new Map(), mengen = new Map(), beiWahl, beiNeu, beiSchnell = null, beiNurKcal = null, beiUnterwegs = null }) {
+function suchListe({ auswahl, zuletzt = [], vorlieben = new Map(), mengen = new Map(), beiWahl, beiNeu, beiSchnell = null, beiNurKcal = null, beiUnterwegs = null, vorlagen = [], beiVorlage = null, beiVorlageLoeschen = null }) {
   const liste = el('div', { class: 'wahl-liste' });
+  let aktuell = '';
+  // Meine Mahlzeiten: ein Tipp trägt alle Teile ein; beim Suchen nur die, deren Name passt
+  const vorlagenTeil = (begriff) => {
+    const passend = vorlagen.filter((v) => !begriff.trim() || v.name.toLocaleLowerCase('de').includes(begriff.trim().toLocaleLowerCase('de')));
+    if (!beiVorlage || !passend.length) return '';
+    return [el('h3', { class: 'zwischentitel' }, 'Meine Mahlzeiten'), el('ul', { class: 'zeilen vorlagen' }, passend.map((v) => el('li', { class: 'zeile-schnell' },
+      el('button', { type: 'button', class: 'zeile', 'aria-label': `${v.name} eintragen`, onclick: () => beiVorlage(v) },
+        el('span', { class: 'zeile-name' }, v.name, el('small', {}, vorlageText(v))),
+        el('span', { class: 'zeile-wert vorlage-plus' }, icon('plus', 18))),
+      beiVorlageLoeschen ? el('button', {
+        type: 'button', class: 'rund', 'aria-label': `${v.name} vergessen`,
+        onclick: async () => { await beiVorlageLoeschen(v); vorlagen = vorlagen.filter((x) => x.id !== v.id); zeichne(aktuell); },
+      }, icon('zu', 18)) : null)))];
+  };
   const klein = (zutat) => {
     const text = zutat.istRezept ? 'Rezept' : (magHinweis(vorlieben.get(zutat.id)) || zutat.marke);
     return text ? el('small', {}, text) : null;
@@ -28,9 +43,12 @@ function suchListe({ auswahl, zuletzt = [], vorlieben = new Map(), mengen = new 
     el('span', { class: 'zeile-name' }, zutat.name, klein(zutat)),
     el('span', { class: 'zeile-wert' }, `${zahl(zutat.je100.kcal ?? 0)} kcal`)));
   const zeichne = (begriff) => {
+    aktuell = begriff;
     const treffer = sortiereNachVorliebe(sucheZutaten(auswahl, begriff, 40), vorlieben);
     const zeigeZuletzt = !begriff.trim() && zuletzt.length > 0;
+    const vorlagenStuecke = [vorlagenTeil(begriff)].flat().filter(Boolean);
     liste.replaceChildren(
+      ...vorlagenStuecke,
       zeigeZuletzt ? el('h3', { class: 'zwischentitel' }, 'Zuletzt eingetragen') : '',
       zeigeZuletzt ? el('ul', { class: 'zeilen' }, zuletzt.map((zutat) => (beiSchnell && mengen.has(zutat.id)
         ? el('li', { class: 'zeile-schnell' },
@@ -40,7 +58,7 @@ function suchListe({ auswahl, zuletzt = [], vorlieben = new Map(), mengen = new 
             onclick: () => beiSchnell(zutat, mengen.get(zutat.id)),
           }, `+ ${zahl(mengen.get(zutat.id), 1)} g`))
         : zeile(zutat)))) : '',
-      zeigeZuletzt ? el('h3', { class: 'zwischentitel' }, 'Alles') : '',
+      zeigeZuletzt || vorlagenStuecke.length ? el('h3', { class: 'zwischentitel' }, 'Alles') : '',
       treffer.length ? el('ul', { class: 'zeilen' }, treffer.map(zeile)) : el('p', { class: 'leer' }, `Nichts passt zu „${begriff.trim()}“.`),
       // Mensa, Restaurant, Snack bei Freunden: ohne Datenbank, nur mit Kalorien. Der Suchbegriff wird zum Namen
       beiNurKcal ? el('button', { type: 'button', class: 'chip schnell nur-kcal', id: 'nur-kcal', onclick: () => beiNurKcal(begriff.trim()) },
@@ -69,7 +87,8 @@ function suchListe({ auswahl, zuletzt = [], vorlieben = new Map(), mengen = new 
  */
 export async function oeffneZutatWahl({ datum, slot, beiFertig, ziel = 'tagebuch' }) {
   const plan = ziel === 'plan';
-  const [zutaten, rezepte, alleEintraege, vorlieben] = await Promise.all([speicher.alleZutaten(), speicher.alleRezepte(), speicher.alleEintraege(), speicher.alleVorlieben()]);
+  const [zutaten, rezepte, alleEintraege, vorlieben, vorlagenRoh] = await Promise.all([speicher.alleZutaten(), speicher.alleRezepte(), speicher.alleEintraege(), speicher.alleVorlieben(), speicher.einstellung('vorlagen')]);
+  const vorlagen = bereinigeVorlagen(vorlagenRoh).filter((v) => !plan || fuerPlanGeeignet(v));
   const auswahl = [...rezepte.map(rezeptAlsZutat).filter((r) => r.portionen.length), ...zutaten];
   const nachId = new Map(auswahl.map((z) => [z.id, z]));
   const zuletzt = zuletztVerwendet(alleEintraege).map((id) => nachId.get(id)).filter(Boolean);
@@ -82,6 +101,23 @@ export async function oeffneZutatWahl({ datum, slot, beiFertig, ziel = 'tagebuch
       vorlieben,
       mengen: letzteMengen(alleEintraege),
       beiNeu: () => { b.schliessen(); gehe('/zutaten/neu'); },
+      vorlagen,
+      beiVorlage: async (vorlage) => {
+        const speichere = plan ? speicher.speicherePlan : speicher.speichereEintrag;
+        const gespeichert = [];
+        for (const e of vorlageEintraege(vorlage, datum, slot)) gespeichert.push(await speichere(e));
+        tippGefuehl('erfolg');
+        b.schliessen();
+        beiFertig();
+        hinweis(`${vorlage.name} ${plan ? 'eingeplant' : 'eingetragen'}.`, {
+          aktion: 'Rückgängig', beiAktion: async () => { for (const x of gespeichert) await (plan ? speicher.loeschePlan : speicher.loescheEintrag)(x.id); beiFertig(); },
+        });
+      },
+      beiVorlageLoeschen: async (vorlage) => {
+        const alle = bereinigeVorlagen(await speicher.einstellung('vorlagen'));
+        await speicher.setzeEinstellung('vorlagen', alle.filter((v) => v.id !== vorlage.id));
+        hinweis(`„${vorlage.name}“ vergessen.`, { aktion: 'Rückgängig', beiAktion: async () => { await speicher.setzeEinstellung('vorlagen', bereinigeVorlagen([vorlage, ...bereinigeVorlagen(await speicher.einstellung('vorlagen'))])); } });
+      },
       // Im Plan nicht: Ein Posten ohne Zutat hätte keinen Platz auf der Einkaufsliste
       beiUnterwegs: plan ? null : () => zeigeUnterwegs({ b, datum, slot, beiFertig }),
       beiNurKcal: plan ? null : (begriff) => b.setze('Schnell eintragen', schnellFormular({
@@ -126,6 +162,34 @@ function neuerEintrag(zutat, datum, { gramm: menge, slot }) {
   const eintrag = { datum, slot, zutatId: zutat.id, name: zutat.name, marke: zutat.marke ?? '', gramm: menge, je100: zutat.je100 };
   if (zutat.istRezept) eintrag.rezeptId = zutat.id.slice(7);
   return eintrag;
+}
+
+/** Eine Mahlzeit als Vorlage merken (aus „Heute“): Name vorschlagen, Teile zeigen, speichern. */
+export function merkeAlsVorlage({ eintraege, slotName: name }) {
+  const fehler = el('p', { class: 'fehlertext', id: 'f-vorlage-name-fehler', role: 'alert' });
+  const feldName = el('input', { id: 'f-vorlage-name', maxlength: 40, autocomplete: 'off', value: `Mein ${name}`, 'aria-describedby': 'f-vorlage-name-fehler', oninput: () => { fehler.textContent = ''; } });
+  const b = blatt({
+    titel: 'Als Mahlzeit merken',
+    inhalt: el('form', {
+      class: 'stapel', novalidate: true,
+      onsubmit: async (e) => {
+        e.preventDefault();
+        const vorlagen = bereinigeVorlagen(await speicher.einstellung('vorlagen'));
+        const name = pruefeVorlagenName(feldName.value, vorlagen);
+        if (!name.ok) { fehler.textContent = name.fehler; feldName.focus(); return; }
+        const neu = vorlageAus(eintraege, name.name, crypto.randomUUID());
+        await speicher.setzeEinstellung('vorlagen', bereinigeVorlagen([neu, ...vorlagen]));
+        tippGefuehl('erfolg');
+        b.schliessen();
+        hinweis(`„${name.name}“ gemerkt. Du findest sie beim Plus unter „Meine Mahlzeiten“.`);
+      },
+    },
+    el('div', { class: 'feld' }, el('label', { for: 'f-vorlage-name' }, 'Name'), el('div', { class: 'eingabe' }, feldName), fehler),
+    el('ul', { class: 'zeilen vorlage-vorschau' }, eintraege.map((e) => el('li', { class: 'zeile' },
+      el('span', { class: 'zeile-name' }, e.name), el('span', { class: 'zeile-wert' }, e.schnell ? 'Portion' : `${zahl(e.gramm, 1)} g`)))),
+    el('div', { class: 'knopfreihe' }, el('button', { type: 'submit', class: 'knopf' }, 'Merken'))),
+  });
+  queueMicrotask(() => feldName.select());
 }
 
 /** Rezept-Formular: nur eine Zutat auswählen, die Menge fragt das Formular selbst ab. */

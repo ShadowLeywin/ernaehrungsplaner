@@ -332,3 +332,11 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Fehler:** Die Obergrenze von 1.000 Gerichten schnitt 26 ab (Elans Leser meldete „verworfen 26“); jetzt 3.000. Extras wie „Whey Protein“, „Collagen Matcha“, „Americano (Medium)“ landeten in Vorschlägen; Liste der Ausschlusswörter erweitert, Größen in Klammern gelten als Getränk. Geräte mit Stand „2026-11-15“ hätten die neuen Ketten nicht bekommen: `stand` darf jetzt eine Uhrzeit haben.
 - **Fehler:** Knöpfe auf der Vorschlagskarte waren unsichtbar (gleiche Farbe wie die Karte), die Theme-Regel gewann bei gleicher Spezifität, weil sie später steht. Lösung: `:root[data-thema]` davor.
 - **Befehle:** `python3 -I tools/ketten-listen.py <ordner> 2026-11-15T16:00` (Liste bauen) · `npm test` (203) · `node tools/pruefe-app.cjs` (141).
+
+## Session 15, Runde 14: Meine Mahlzeiten, Favoriten, Ketten ausblenden (23.11.2026)
+
+- **Was und warum:** Léon: „Baue die App weiter.“ Gewählt nach Alltagsnutzen und ohne neue Rechte: Mahlzeit als Vorlage merken und mit einem Tipp eintragen (`js/logik/vorlagen.js`), Stern an Unterwegs-Gerichten mit Filter „Nur aus meinen Favoriten“, Restaurants unter Mehr → Unterwegs ausblenden. Alles als Einstellungen, keine neue Schema-Version.
+- **Befehle:** `npm test` (208, neu `test/vorlagen.test.js`) · `node tools/pruefe-app.cjs` (143 Kriterien, mehrfach).
+- **Entscheidung:** Vorlagen mit Schnell-Einträgen gibt es nicht im Wochenplan (Einkaufsliste braucht Zutaten). Stern ändert die Reihenfolge erst beim nächsten Öffnen, damit die Zeile nicht unter dem Finger wegspringt.
+- **Fehler:** Nach „Liste aus Datei laden“ kam der Hinweis vor dem Neuzeichnen; ein Test las deshalb die Restaurants zu früh. Lösung: erst `await neuZeigen()`, dann der Hinweis. Bei 320 px quetschten Stern, Minus, Anzahl und Plus den Namen auf drei Zeilen: Minus und Anzahl erscheinen jetzt erst nach der ersten Auswahl.
+- **Offen:** Der Maß-Test („Unterbauch: 88 cm gespeichert“) scheitert selten (heute 2 von 7 Läufen). Ursache unbekannt; die Diagnose prüft jetzt zusätzlich, ob der Wert in IndexedDB steht.
