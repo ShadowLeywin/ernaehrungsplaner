@@ -384,3 +384,11 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Entscheidung:** Plus am Tag in der Woche bleibt (nächster freier Slot) als schneller Weg; der Tagesplan ist der genaue Weg. Verworfen: sechs Plus-Knöpfe je Tag in der Woche (42 Knöpfe auf einer Seite).
 - **Bewertung der Bilder:** alle vier Darstellungen lesbar; Überzeile brach mit „· CALISTHENICS“ am Zeilenanfang um, jetzt kürzer.
 - **Fachbegriffe:** Slot-Ziel (Tagesziel × Anteil der Mahlzeit, `slotsMitAnteilen`).
+
+## Session 16, Runde P3.1: Preise je Markt, Schema 9 (23.11.2026)
+
+- **Was und warum:** Léon: „baue direkt jetzt weiter“. P3 nach seinen Entscheidungen (Ort statt GPS, Liste statt Karte). Erst die Rechnung: `js/logik/preise.js` mit Vorrang Angebot → gemerkter Preis → „unbekannt“, ganze Packungen, Summe und Vergleich je Markt. Speicher `maerkte` und `preise` (Schema 9).
+- **Befehle:** `npm test` (226, neu `test/preise.test.js`) · `node tools/pruefe-app.cjs` (156, Migrationen bis 9).
+- **Entscheidung:** Preise nur mit Packungsgröße. Ein Angebot „0,50 € je Packung“ ohne Gramm wird nicht gerechnet, sonst wäre der Betrag erfunden. Liter zählen wie Kilogramm und sind als Schätzung markiert.
+- **Entscheidung:** Der Vergleich sortiert zuerst nach Zahl der Posten mit Preis, dann nach Summe. Verworfen: nur nach Summe (ein Markt mit einem bekannten Posten wäre „am billigsten“).
+- **Fachbegriffe:** Packungslogik (man kauft ganze Packungen, `Math.ceil`), Vorrangregel (feste Reihenfolge der Quellen).

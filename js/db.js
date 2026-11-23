@@ -58,6 +58,11 @@ export const MIGRATIONEN = [
       }
     };
   },
+  // Version 9: Märkte und gemerkte Preise
+  (db) => {
+    db.createObjectStore('maerkte', { keyPath: 'id' });
+    db.createObjectStore('preise', { keyPath: 'id' });
+  },
 ];
 
 let offen;

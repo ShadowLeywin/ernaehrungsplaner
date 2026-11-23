@@ -24,6 +24,8 @@ export const BACKUP_MIGRATIONEN = {
   6: (daten) => ({ ...daten, angebote: [] }),
   // Version 7 führte die Einkaufsliste je Woche; ab 8 je Zeitraum
   7: (daten) => ({ ...daten, einkauf: Array.isArray(daten.einkauf) ? daten.einkauf.map(migriereEinkaufSatz) : daten.einkauf }),
+  // Version 8 kannte noch keine Märkte und gemerkten Preise
+  8: (daten) => ({ ...daten, maerkte: [], preise: [] }),
 };
 
 export function erstelleBackup(daten, jetzt = new Date()) {
