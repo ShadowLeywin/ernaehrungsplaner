@@ -5,7 +5,7 @@ import { WOCHENTAGE, ausIso, formatZeitraum, isoDatum } from '../logik/datum.js'
 import { summeEintraege } from '../logik/naehrwerte.js';
 import { APP_NAME } from '../logik/schema.js';
 import { istMonat, monatVon, monatsName, monatsWochen, verschiebeMonat } from '../logik/zeitraum.js';
-import { SLOTS, tagestypFuer } from '../logik/ziele.js';
+import { SLOTS, tagestypFuer, tagestypKlasse } from '../logik/ziele.js';
 import { gehe } from '../router.js';
 import * as speicher from '../speicher.js';
 import { el, haenge, icon, zahl } from '../ui.js';
@@ -80,7 +80,7 @@ function wochenKarte(woche, { heute, jeTag, tagSatz, wochenplan, ziele }) {
       const typ = tagestypFuer(datum, wochenplan, tagSatz.get(datum));
       const tagKcal = summeEintraege(tag).kcal ?? 0;
       const name = WOCHENTAGE[(ausIso(datum).getDay() + 6) % 7];
-      const klassen = ['monatstag', `tagestyp-${typ}`, imMonat ? '' : 'fremd', datum === heute ? 'heute' : '', tag.length ? 'geplant' : ''].filter(Boolean).join(' ');
+      const klassen = ['monatstag', tagestypKlasse(typ), imMonat ? '' : 'fremd', datum === heute ? 'heute' : '', tag.length ? 'geplant' : ''].filter(Boolean).join(' ');
       return el('li', {}, el('a', {
         class: klassen, href: `#/woche/tag/${datum}`,
         'aria-label': `${name}, ${ausIso(datum).getDate()}.: ${tag.length ? `${belegt.size} von 6 Mahlzeiten geplant, ${zahl(tagKcal)} von ${zahl(ziele[typ].kcal)} kcal` : 'nichts geplant'}`,

@@ -469,3 +469,12 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Fehler:** Ein Reiter „Zuletzt“ als Start hätte die alte Zutatensuche gebrochen (alter Test); „Alle“ bleibt Start.
 - **Befehle:** `npm test` (254) · `node tools/pruefe-app.cjs` (185) · `npm install --save-exact @capacitor/barcode-scanner@3.1.4`.
 - **Fachbegriffe:** GS1-Prüfziffer, User-Agent.
+
+## Session 16, Runde: Eigene Tagestypen (23.11.2026)
+
+- **Was und warum:** Léon: „bei der Einführung kann man variabel die Tage benennen und die Anzahl anpassen“. Tagestypen (bisher fest Gym, Calisthenics, Rest) sind jetzt eine Einstellung `tagestypen` mit 1 bis 5 Einträgen, bearbeitbar in der Ersteinrichtung (Name, kcal, ×, „+ Tagestyp“) und unter Mehr → Wochenplan.
+- **Entscheidung:** `TAGESTYPEN` bleibt der eine Ort, ist aber eine veränderliche Modul-Bindung (`export let`), die `setzeTagestypen` beim Start, nach dem Speichern und nach einem Backup setzt. So sehen alle 15 Verwender die eigenen Namen ohne Umbau. Verworfen: die Liste durch jede Funktion reichen (viele Änderungen, viel Risiko).
+- **Entscheidung:** Kennungen bleiben beim Umbenennen; neue Typen bekommen `typ-…`. Entfernte Typen: Wochenplan und alte Tage fallen auf den ersten Typ zurück. Farben nach Stelle (`tagestyp-farbe-0…4`).
+- **Alter Test:** Die Ersteinrichtung behält ihre drei Schritte und das Feld `#f-start-gym`; Namen und kcal stehen auf derselben Seite.
+- **Befehle:** `npm test` (258, neu `test/tagestypen.test.js`) · `node tools/pruefe-app.cjs` (189).
+- **Fachbegriffe:** Live-Binding (ein `export let` ändert sich für alle Importe zugleich).

@@ -646,9 +646,12 @@ body:has(.seite-willkommen) .navigation { display: none; }
 .slot-bild.kalender { flex-direction: column; gap: 0; line-height: 1; }
 .slot-bild.kalender small { font-size: 0.625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
 .slot-bild.kalender strong { font-size: 1.0625rem; font-weight: 760; }
-.tagestyp-gym { --bild-farbe: var(--grapefruit); }
-.tagestyp-calisthenics { --bild-farbe: var(--mandarine); }
-.tagestyp-rest { --bild-farbe: var(--avocado); }
+/* Farbe je Tagestyp nach seiner Stelle in der Liste (eigene Tagestypen, seit 23.11.2026) */
+.tagestyp-farbe-0 { --bild-farbe: var(--grapefruit); }
+.tagestyp-farbe-1 { --bild-farbe: var(--mandarine); }
+.tagestyp-farbe-2 { --bild-farbe: var(--avocado); }
+.tagestyp-farbe-3 { --bild-farbe: var(--heidelbeere); }
+.tagestyp-farbe-4 { --bild-farbe: var(--wasser); }
 
 /* ---------- Einstellungen: Gruppen aus Zeilen (wie iOS) ---------- */
 
@@ -1120,3 +1123,9 @@ a.ezeile > svg { color: var(--tinte-leise); flex: none; }
 .essen-wahl a.wahl-knopf { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; color: inherit; }
 .kategorie-feld { margin-top: 0.625rem !important; }
 .kategorie-feld select { width: 100%; }
+
+/* Ersteinrichtung und Wochenplan: je Tagestyp eine Zeile mit Name, Energie und Entfernen */
+.typ-zeile { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) auto; gap: 0.5rem; align-items: end; }
+.typ-zeile .feld { margin: 0; min-width: 0; }
+.typ-zeile .rund { margin-bottom: 0.25rem; }
+.typ-zeile.ohne-kcal { grid-template-columns: minmax(0, 1fr) auto; }

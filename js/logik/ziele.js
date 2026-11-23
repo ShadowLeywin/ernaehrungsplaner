@@ -3,11 +3,66 @@
 
 import { wochentagIndex } from './datum.js';
 
-export const TAGESTYPEN = [
+export const STANDARD_TAGESTYPEN = [
   { id: 'gym', name: 'Gym' },
   { id: 'calisthenics', name: 'Calisthenics' },
   { id: 'rest', name: 'Rest' },
 ];
+
+/**
+ * Die Tagestypen des Nutzers (Léons Wunsch vom 23.11.2026: Namen und Anzahl frei, schon bei der Ersteinrichtung).
+ * Absichtlich eine veränderliche Bindung: Beim Start und nach jeder Änderung setzt die App die Liste aus der
+ * Einstellung „tagestypen“ (setzeTagestypen); alle Module sehen dann sofort die eigenen Namen.
+ * Kennungen bleiben beim Umbenennen gleich, damit Ziele, Wochenplan und alte Tage ihre Zuordnung behalten.
+ */
+export let TAGESTYPEN = STANDARD_TAGESTYPEN.map((t) => ({ ...t }));
+export const MAX_TAGESTYPEN = 5;
+export const MAX_TYPNAME = 16;
+
+/** Gespeicherte Liste prüfen: 1 bis 5 Einträge, Kennung aus Kleinbuchstaben, Ziffern, Bindestrich, Name 1 bis 16 Zeichen, keine Doppelten */
+export function bereinigeTagestypen(roh) {
+  if (!Array.isArray(roh)) return STANDARD_TAGESTYPEN.map((t) => ({ ...t }));
+  const ids = new Set();
+  const namen = new Set();
+  const liste = [];
+  for (const t of roh) {
+    const id = String(t?.id ?? '');
+    const name = String(t?.name ?? '').trim().slice(0, MAX_TYPNAME);
+    if (!/^[a-z0-9-]{1,24}$/.test(id) || !name || ids.has(id) || namen.has(name.toLowerCase())) continue;
+    ids.add(id);
+    namen.add(name.toLowerCase());
+    liste.push({ id, name });
+    if (liste.length === MAX_TAGESTYPEN) break;
+  }
+  return liste.length ? liste : STANDARD_TAGESTYPEN.map((t) => ({ ...t }));
+}
+
+export function setzeTagestypen(roh) {
+  TAGESTYPEN = bereinigeTagestypen(roh);
+  return TAGESTYPEN;
+}
+
+/** Eingabe aus Ersteinrichtung oder Einstellungen prüfen: [{ id, name }]. Liefert { ok, fehler, typen } */
+export function pruefeTagestypen(eingabe) {
+  const typen = (eingabe ?? []).map((t) => ({ id: t.id, name: String(t.name ?? '').trim() }));
+  if (!typen.length) return { ok: false, fehler: 'Mindestens ein Tagestyp.' };
+  if (typen.length > MAX_TAGESTYPEN) return { ok: false, fehler: `Höchstens ${MAX_TAGESTYPEN} Tagestypen.` };
+  if (typen.some((t) => !t.name)) return { ok: false, fehler: 'Jeder Tagestyp braucht einen Namen.' };
+  if (typen.some((t) => t.name.length > MAX_TYPNAME)) return { ok: false, fehler: `Namen höchstens ${MAX_TYPNAME} Zeichen.` };
+  const klein = typen.map((t) => t.name.toLowerCase());
+  if (new Set(klein).size !== klein.length) return { ok: false, fehler: 'Zwei Tagestypen heißen gleich.' };
+  return { ok: true, fehler: null, typen };
+}
+
+/** Kennung für einen neuen Tagestyp, die es noch nicht gibt */
+export function neueTypKennung(typen, zufall = Math.random) {
+  let id;
+  do { id = `typ-${Math.floor(zufall() * 1e6).toString(36)}`; } while (typen.some((t) => t.id === id));
+  return id;
+}
+
+/** Farbe eines Tagestyps nach seiner Stelle in der Liste (CSS-Klassen tagestyp-farbe-0 bis -4) */
+export const tagestypKlasse = (id) => `tagestyp-farbe-${Math.max(0, TAGESTYPEN.findIndex((t) => t.id === id)) % MAX_TAGESTYPEN}`;
 
 /** Sechs Slots. anteil = Anteil am Tagesziel (Summe 1), bestimmt die Größe des Segments in der Tagesscheibe. */
 export const SLOTS = [
@@ -64,14 +119,19 @@ export function bereinigeZiele(roh) {
     for (const feld of ZIEL_FELDER) {
       const wert = roh?.[id]?.[feld.id];
       const gueltig = typeof wert === 'number' && Number.isFinite(wert) && wert >= 0 && wert <= feld.max;
-      ziele[id][feld.id] = gueltig ? wert : STANDARD_ZIELE[id][feld.id];
+      // Ein eigener Tagestyp startet mit den mittleren Startwerten
+      ziele[id][feld.id] = gueltig ? wert : (STANDARD_ZIELE[id] ?? STANDARD_ZIELE.calisthenics)[feld.id];
     }
   }
   return ziele;
 }
 
 export function bereinigeWoche(roh) {
-  return STANDARD_WOCHE.map((standard, i) => (istTagestyp(roh?.[i]) ? roh[i] : standard));
+  // Ein gelöschter Tagestyp fällt auf den Startwert zurück, und wenn es den auch nicht mehr gibt, auf den ersten Typ
+  return STANDARD_WOCHE.map((standard, i) => {
+    if (istTagestyp(roh?.[i])) return roh[i];
+    return istTagestyp(standard) ? standard : TAGESTYPEN[0].id;
+  });
 }
 
 /** Anteile der Slots in Prozent, so wie sie im Code stehen. */

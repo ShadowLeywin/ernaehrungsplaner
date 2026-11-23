@@ -112,6 +112,7 @@ Vorher: Mehr → „Backup speichern“ (das Update hebt die Datenbank auf Schem
 | N-2 | Heute → Plus → „Scannen“ → Strichcode einer Packung | Android fragt einmal nach der Kamera; danach steht das Produkt mit Menge zur Wahl |
 | N-3 | Dieselbe Packung noch einmal scannen | Produkt kommt sofort, ohne Suche |
 | N-4 | Rezepte → oben „Lebensmittel“ | Liste mit Suche, „Scannen“, Reitern und Kategorie-Auswahl |
+| N-5 | Mehr → Wochenplan → Tagestypen: einen umbenennen, einen dazu, „Tagestypen speichern“ | Heute, Woche und Ziele zeigen die neuen Namen |
 
 ## B. Automatischer Bau einrichten (5 Minuten, am Rechner oder Handy)
 

@@ -5,6 +5,15 @@ export const NEUIGKEITEN = [
   {
     version: '1.0.0',
     datum: '2026-11-23',
+    titel: 'Eigene Tagestypen',
+    punkte: [
+      'Tagestypen frei benennen und in der Anzahl anpassen (1 bis 5): bei der Ersteinrichtung oder unter Mehr → Wochenplan. Zum Beispiel „Training“, „Lauf“, „Ruhetag“.',
+      'Umbenennen behält Ziele und Wochenplan. Jeder Typ hat seine eigene Farbe.',
+    ],
+  },
+  {
+    version: '1.0.0',
+    datum: '2026-11-23',
     titel: 'Barcode-Scanner, Märkte-Suche repariert',
     punkte: [
       'Barcode-Scanner: Neben jeder Suche (Eintragen, Lebensmittel) steht „Scannen“. Elan erkennt den Strichcode, sucht zuerst bei deinen Zutaten und sonst bei Open Food Facts. Android fragt beim ersten Mal nach der Kamera; Bilder speichert Elan nie.',

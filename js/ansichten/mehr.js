@@ -8,7 +8,7 @@ import { WOCHENTAGE, formatKurz, isoDatum, verschiebe } from '../logik/datum.js'
 import { APP_NAME, APP_VERSION } from '../logik/schema.js';
 import { anteileText, anzahlText, backupText, dabeiSeit, darstellungText, kennzahlen, koerperText, referenzText, wochenplanText, zieleText } from '../logik/zusammenfassung.js';
 import { wochenTage } from '../logik/woche.js';
-import { RINGE, SLOTS, STANDARD_ANTEILE, STANDARD_ZIELE, TAGESTYPEN, ZIEL_FELDER, bereinigeAnteile, bereinigeRinge, makroAbweichung, pruefeAnteile } from '../logik/ziele.js';
+import { RINGE, SLOTS, STANDARD_ANTEILE, STANDARD_ZIELE, MAX_TAGESTYPEN, MAX_TYPNAME, TAGESTYPEN, ZIEL_FELDER, neueTypKennung, pruefeTagestypen, bereinigeAnteile, bereinigeRinge, makroAbweichung, pruefeAnteile } from '../logik/ziele.js';
 import { parseZahl } from '../logik/zutat.js';
 import { erinnerungErlaubnis, gibDatei, hcEinstellungen, hcErlaubt, hcVerbinden, hcVerfuegbar, istApp, planeBenachrichtigungen, setzeVibration, teileText, tippGefuehl, vibrationAn } from '../plattform.js';
 import { ALLE_IDS, bereinigeErinnerungen, erinnerungenText, planeErinnerungen } from '../logik/erinnerungen.js';
@@ -21,7 +21,7 @@ import { restaurants } from '../logik/unterwegs.js';
 import { neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { FUNKTIONEN, NEUIGKEITEN } from '../daten/neuigkeiten.js';
-import { bestaetige, el, gruppe, haenge, hinweis, icon, svg, zahl, zeileFeld, zeileSchalter, zeileWahl, zeilenAuswahl } from '../ui.js';
+import { bestaetige, el, feld, gruppe, haenge, hinweis, icon, svg, zahl, zeileFeld, zeileSchalter, zeileWahl, zeilenAuswahl } from '../ui.js';
 
 let gewaehlterTyp = 'gym';
 
@@ -66,7 +66,7 @@ export async function zeigeMehr(wurzel, [unterseite]) {
   document.title = `${eintrag.titel} – ${APP_NAME}`;
   const bauen = {
     ziele: async () => [zielBereich(await speicher.ladeZiele()), ringeBereich(bereinigeRinge(await speicher.einstellung('ringe')))],
-    wochenplan: async () => wochenBereich(await speicher.ladeWoche()),
+    wochenplan: async () => [typenBereich(), wochenBereich(await speicher.ladeWoche())],
     mahlzeiten: async () => anteileBereich(bereinigeAnteile(await speicher.einstellung('slotAnteile'))),
     referenz: async () => referenzBereich(await speicher.ladeReferenz()),
     backup: async () => {
@@ -213,6 +213,8 @@ function zielBereich(ziele) {
   };
 
   const zeichne = (zeigeFehler = false) => {
+    // Ein entfernter Tagestyp darf nicht gewählt bleiben
+    if (!TAGESTYPEN.some((t) => t.id === gewaehlterTyp)) gewaehlterTyp = TAGESTYPEN[0].id;
     const typ = gewaehlterTyp;
     const { werte, fehler } = lies(typ);
     const vollstaendig = Object.keys(fehler).length === 0;
@@ -259,6 +261,39 @@ function zielBereich(ziele) {
   };
   zeichne();
   return bereich;
+}
+
+/* ---------- Tagestypen (seit 23.11.2026: Namen und Anzahl frei) ---------- */
+
+// Entwurf, damit „+ Tagestyp“ und × nichts Getipptes verlieren
+let typEntwurf = null;
+
+function typenBereich() {
+  typEntwurf ??= TAGESTYPEN.map((t) => ({ ...t }));
+  const fehler = el('p', { class: 'fehlertext', role: 'alert' });
+  const speichern = async () => {
+    const pruefung = pruefeTagestypen(typEntwurf);
+    if (!pruefung.ok) { fehler.textContent = pruefung.fehler; return; }
+    await speicher.setzeEinstellung('tagestypen', pruefung.typen);
+    typEntwurf = null;
+    hinweis('Tagestypen gespeichert. Energieziele für neue Typen stellst du unter Ziele ein.');
+    neuZeichnen();
+  };
+  const zeile = (t) => el('div', { class: 'typ-zeile ohne-kcal' },
+    feld({ name: `typname-${t.id}`, beschriftung: 'Name', value: t.name, maxlength: MAX_TYPNAME, oninput: (e) => { t.name = e.target.value; } }),
+    typEntwurf.length > 1 ? el('button', {
+      type: 'button', class: 'rund', 'aria-label': `${t.name || 'Tagestyp'} entfernen`,
+      onclick: () => { typEntwurf = typEntwurf.filter((x) => x !== t); neuZeichnen(); },
+    }, icon('zu', 20)) : null);
+  return el('section', { class: 'stapel', id: 'tagestypen' },
+    el('h2', {}, 'Tagestypen'),
+    el('p', { class: 'klein' }, 'Benenne deine Tagestypen frei (z. B. Training, Lauf, Ruhetag), höchstens fünf. Umbenennen behält Ziele und Wochenplan. Wird ein Typ entfernt, gilt an seinen Tagen der erste Typ.'),
+    typEntwurf.map(zeile),
+    typEntwurf.length < MAX_TAGESTYPEN ? el('button', {
+      type: 'button', class: 'knopf leise', onclick: () => { typEntwurf.push({ id: neueTypKennung(typEntwurf), name: '' }); neuZeichnen(); },
+    }, icon('plus', 18), 'Tagestyp') : null,
+    fehler,
+    el('div', { class: 'knopfreihe' }, el('button', { type: 'button', class: 'knopf', onclick: speichern }, 'Tagestypen speichern')));
 }
 
 /* ---------- Wochenplan ---------- */
