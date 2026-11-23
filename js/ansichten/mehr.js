@@ -16,6 +16,8 @@ import { automatischAn, gleicheAb, setzeAutomatisch, zuletztAbgeglichen } from '
 import { bereinigeWasserMengen } from '../logik/gesundheit.js';
 import { HC_ARTEN } from '../logik/healthconnect.js';
 import { koerperZielBereich } from './health.js';
+import { ladeMitKetten } from './unterwegs.js';
+import { restaurants } from '../logik/unterwegs.js';
 import { neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { FUNKTIONEN, NEUIGKEITEN } from '../daten/neuigkeiten.js';
@@ -37,6 +39,7 @@ const MENUE = [
   ] },
   { gruppe: 'Lebensmittel', eintraege: [
     { id: 'zutaten', titel: 'Zutaten und Mag-Liste', adresse: '#/zutaten', stand: (w) => anzahlText(w.vorlieben, 'Angabe in der Mag-Liste', 'Angaben in der Mag-Liste', 'Eigene Zutaten und Vorlieben') },
+    { id: 'unterwegs', titel: 'Unterwegs', stand: (w) => w.unterwegs },
     { id: 'angebote', titel: 'Angebote', adresse: '#/angebote', stand: (w) => anzahlText(w.angebote, 'Angebot', 'Angebote', 'Noch keine Angebote') },
   ] },
   { gruppe: 'Daten und Verbindung', eintraege: [
@@ -73,6 +76,7 @@ export async function zeigeMehr(wurzel, [unterseite]) {
     koerper: async () => koerperZielBereich(await speicher.ladeGesundheit(), bereinigeWasserMengen(await speicher.einstellung('wasserMengen'))),
     healthconnect: async () => healthConnectBereich(),
     erinnerungen: async () => erinnerungenBereich(),
+    unterwegs: async () => unterwegsBereich(),
     ueber: async () => ueberBereich(),
     neu: async () => neuBereich(),
     datenschutz: async () => datenschutzBereich(),
@@ -88,16 +92,43 @@ export async function zeigeMehr(wurzel, [unterseite]) {
 /** Alle Werte für die Zusammenfassungen in einem Zug laden; Fehler in einer Quelle lassen die Zeile nur leer. */
 async function ladeStand() {
   const heute = isoDatum();
-  const [eintraege, rezepte, ziele, woche, anteile, referenz, gesundheit, wasserMengen, vorlieben, angebote, letztesBackup, hc, erinnerungen] = await Promise.all([
+  const [eintraege, rezepte, ziele, woche, anteile, referenz, gesundheit, wasserMengen, vorlieben, angebote, letztesBackup, hc, erinnerungen, unterwegs] = await Promise.all([
     speicher.alleEintraege(), speicher.alleRezepte(), speicher.ladeZiele(), speicher.ladeWoche(),
     speicher.einstellung('slotAnteile').then(bereinigeAnteile), speicher.ladeReferenz(), speicher.ladeGesundheit(),
     speicher.einstellung('wasserMengen').then(bereinigeWasserMengen), speicher.alleVorlieben(), speicher.alleAngebote(),
-    speicher.einstellung('letztesBackup'), healthConnectStand(), speicher.einstellung('erinnerungen'),
+    speicher.einstellung('letztesBackup'), healthConnectStand(), speicher.einstellung('erinnerungen'), unterwegsStand(),
   ]);
   return {
     heute, eintraege, rezepte, ziele, woche, anteile, referenz, gesundheit, wasserMengen, letztesBackup,
-    vorlieben: vorlieben.size, angebote: angebote.length, healthConnect: hc, erinnerungen,
+    vorlieben: vorlieben.size, angebote: angebote.length, healthConnect: hc, erinnerungen, unterwegs,
   };
+}
+
+/** „8 Restaurants“ oder „7 von 8 Restaurants“ für die Zeile im Menü */
+async function unterwegsStand() {
+  const [gerichte, aus] = await Promise.all([ladeMitKetten(), speicher.einstellung('unterwegsAus')]);
+  const alle = restaurants(gerichte);
+  const an = alle.filter((r) => !(aus ?? []).includes(r)).length;
+  return an === alle.length ? `${alle.length} Restaurants` : `${an} von ${alle.length} Restaurants`;
+}
+
+/** Welche Restaurants im Unterwegs-Rechner erscheinen. Schalter speichern sofort, ohne die Seite neu zu zeichnen. */
+async function unterwegsBereich() {
+  const [gerichte, ausRoh, stand] = await Promise.all([ladeMitKetten(), speicher.einstellung('unterwegsAus'), speicher.einstellung('unterwegsStand')]);
+  let aus = Array.isArray(ausRoh) ? ausRoh : [];
+  const alle = restaurants(gerichte);
+  return [
+    gruppe({ titel: 'Restaurants', fuss: 'Ausgeblendete Restaurants erscheinen nicht im Unterwegs-Rechner. Ihre Gerichte bleiben gespeichert und kommen mit dem Schalter zurück.' },
+      alle.map((r, i) => zeileSchalter({
+        id: `f-kette-${i}`, beschriftung: r, text: `${zahl(gerichte.filter((g) => g.restaurant === r).length)} Gerichte`, an: !aus.includes(r),
+        onchange: async (e) => {
+          aus = e.target.checked ? aus.filter((x) => x !== r) : [...new Set([...aus, r])];
+          await speicher.setzeEinstellung('unterwegsAus', aus);
+        },
+      }))),
+    gruppe({ titel: 'Werte der Ketten', fuss: 'Die Werte stammen aus den Nährwerttabellen der Ketten (Quellen in der Liste). Rezepturen ändern sich: im Zweifel gilt die Angabe im Restaurant. Elan aktualisiert die Liste mit neuen Fassungen der App.' },
+      el('div', { class: 'ezeile' }, el('span', { class: 'ezeile-text' }, 'Stand der Liste'), el('span', { class: 'ezeile-wert klein' }, stand ? formatKurz(String(stand).slice(0, 10)) : 'noch nicht geladen'))),
+  ];
 }
 
 async function healthConnectStand() {

@@ -3,7 +3,7 @@
 // einer Datei (docs/UNTERWEGS-FORMAT.md). Elan liefert keine Werte von Ketten mit: die ändern sich, und
 // ein falscher Nährwert ist schlimmer als keiner.
 
-import { FRUEHSTUECKS_SLOTS, ZIELE_VORSCHLAG, bereinigeGerichte, fuegeZusammen, korbEintraege, korbSumme, leseUnterwegsDatei, mischeKetten, nullGetraenke, offeneKcal, pruefeGericht, restaurants, setzeGericht, vorschlaege } from '../logik/unterwegs.js';
+import { FRUEHSTUECKS_SLOTS, ZIELE_VORSCHLAG, bereinigeFavoriten, bereinigeGerichte, favoritenZuerst, sichtbareRestaurants, fuegeZusammen, korbEintraege, korbSumme, leseUnterwegsDatei, mischeKetten, nullGetraenke, offeneKcal, pruefeGericht, restaurants, setzeGericht, vorschlaege } from '../logik/unterwegs.js';
 import { formatKurz } from '../logik/datum.js';
 import { SLOTS, tagestypFuer } from '../logik/ziele.js';
 import { parseZahl } from '../logik/zutat.js';
@@ -16,6 +16,7 @@ import { schnellFormular } from './schnellformular.js';
 let gewaehlt = null;
 let modus = 'vorschlag';
 let zielVorschlag = 'eiweiss';
+let nurFavoriten = false;
 
 /** Offene kcal für Mahlzeit und Tag, aus Tagesziel, Anteilen der Mahlzeiten und dem schon Gegessenen */
 async function ladeOffen(datum, slot) {
@@ -29,7 +30,7 @@ const ladeGerichte = async () => bereinigeGerichte(await speicher.einstellung('u
  * Mitgelieferte Ketten (data/unterwegs-ketten.json, liegt im App-Cache, kein Netz nötig) beim ersten Öffnen und bei
  * jedem neueren Stand in die eigene Liste einmischen. Klappt das Laden nicht, geht es mit der eigenen Liste weiter.
  */
-async function ladeMitKetten() {
+export async function ladeMitKetten() {
   const [eigene, stand] = await Promise.all([ladeGerichte(), speicher.einstellung('unterwegsStand')]);
   try {
     const antwort = await fetch('./data/unterwegs-ketten.json');
@@ -50,10 +51,17 @@ const kurzWerte = (g) => [`${zahl(g.kcal)} kcal`, typeof g.protein === 'number' 
  * Restaurants und das Anlegen eines Gerichts, nicht aber das Schließen des Blatts.
  */
 export async function zeigeUnterwegs({ b, datum, slot, beiFertig, korb = new Map(), budget = null }) {
-  const [gerichte, offen] = await Promise.all([ladeMitKetten(), ladeOffen(datum, slot)]);
+  const [gerichte, offen, favRoh, aus] = await Promise.all([ladeMitKetten(), ladeOffen(datum, slot), speicher.einstellung('unterwegsFavoriten'), speicher.einstellung('unterwegsAus')]);
+  // Favoriten: Stern an einem Gericht, steht dann oben und lässt sich in den Vorschlägen allein nutzen
+  const favoriten = new Set(bereinigeFavoriten(favRoh));
+  const setzeFavorit = async (id, an) => {
+    if (an) favoriten.add(id); else favoriten.delete(id);
+    await speicher.setzeEinstellung('unterwegsFavoriten', [...favoriten]);
+  };
   // Budget: was für diese Mahlzeit offen ist; ist sie schon voll, was für den Tag offen ist
   let budgetWert = budget ?? (offen.mahlzeit || offen.tag || 600);
-  const namen = restaurants(gerichte);
+  // Ausgeblendete Ketten (Mehr → Unterwegs) erscheinen nicht als Restaurant
+  const namen = sichtbareRestaurants(gerichte, Array.isArray(aus) ? aus : []);
   if (!namen.includes(gewaehlt)) gewaehlt = namen[0] ?? null;
   const neuZeigen = () => zeigeUnterwegs({ b, datum, slot, beiFertig, korb, budget: budgetWert });
 
@@ -86,8 +94,9 @@ export async function zeigeUnterwegs({ b, datum, slot, beiFertig, korb = new Map
       if (!r.ok) { hinweis(r.fehler); return; }
       await sichere(fuegeZusammen(await ladeGerichte(), r.gerichte));
       const anzahlR = restaurants(r.gerichte).length;
+      // Erst neu zeichnen, dann melden: sonst sagt der Hinweis „geladen“, bevor die Liste es zeigt
+      await neuZeigen();
       hinweis(`${r.gerichte.length} Gerichte von ${anzahlR} ${anzahlR === 1 ? 'Restaurant' : 'Restaurants'} geladen${r.stand ? `, Stand ${formatKurz(r.stand.slice(0, 10))}` : ''}${r.verworfen ? `; ${r.verworfen} ohne brauchbare Werte übersprungen` : ''}.`);
-      neuZeigen();
     },
   });
   const verwalten = el('div', { class: 'unterwegs-links' },
@@ -128,7 +137,13 @@ export async function zeigeUnterwegs({ b, datum, slot, beiFertig, korb = new Map
     };
     minus.onclick = () => aendere(-1);
     minus.disabled = !korb.get(g.id);
+    // Stern an Ort und Stelle umschalten; die Reihenfolge ändert sich erst beim nächsten Öffnen (springt nicht unter dem Finger weg)
+    const stern = el('button', {
+      type: 'button', class: 'rund stern', 'aria-label': `${g.name} als Favorit`, 'aria-pressed': String(favoriten.has(g.id)),
+      onclick: async (e) => { const an = !favoriten.has(g.id); e.currentTarget.setAttribute('aria-pressed', String(an)); if (an) tippGefuehl(); await setzeFavorit(g.id, an); },
+    }, icon('stern', 18));
     const li = el('li', { class: korb.get(g.id) ? 'unterwegs-zeile gewaehlt' : 'unterwegs-zeile' },
+      stern,
       el('button', { type: 'button', class: 'unterwegs-name', 'aria-label': `${g.name} bearbeiten`, onclick: () => bearbeiten(g) },
         el('span', {}, g.name), el('small', {}, kurzWerte(g))),
       el('span', { class: 'zaehler' }, minus, anzahl,
@@ -136,7 +151,7 @@ export async function zeigeUnterwegs({ b, datum, slot, beiFertig, korb = new Map
     return li;
   };
   const liste = el('ul', { class: 'zeilen unterwegs-liste' });
-  const zeigeListe = () => liste.replaceChildren(...gerichte.filter((g) => g.restaurant === gewaehlt).map(zeile));
+  const zeigeListe = () => liste.replaceChildren(...favoritenZuerst(gerichte.filter((g) => g.restaurant === gewaehlt), favoriten).map(zeile));
   const wahl = el('div', { class: 'chips unterwegs-restaurants', role: 'group', 'aria-label': 'Restaurant' }, namen.map((n) => el('button', {
     type: 'button', class: 'chip', 'aria-pressed': String(n === gewaehlt),
     onclick: (e) => {
@@ -150,9 +165,15 @@ export async function zeigeUnterwegs({ b, datum, slot, beiFertig, korb = new Map
 
   /* Vorschläge: Budget eingeben, Sortierung wählen, passende Kombinationen sehen und übernehmen */
   const vorschlagListe = el('div', { class: 'stapel vorschlag-liste', 'aria-live': 'polite', id: 'vorschlaege' });
+  // „Nur Favoriten“ erscheint nur, wenn es bei diesem Restaurant Favoriten gibt
+  const favWahl = el('label', { class: 'ezeile schalter-zeile nur-favoriten' },
+    el('span', { class: 'ezeile-text' }, 'Nur aus meinen Favoriten'),
+    el('input', { type: 'checkbox', role: 'switch', class: 'schalter', id: 'f-nur-favoriten', checked: nurFavoriten ? true : null, onchange: (e) => { nurFavoriten = e.target.checked; zeigeVorschlaege(); } }));
   const zeigeVorschlaege = () => {
     // Frühstücksartikel (McMuffin, Pancakes …) nur, wenn für Frühstück oder Morgensnack eingetragen wird
-    const treffer = vorschlaege(gerichte, { restaurant: gewaehlt, budget: budgetWert, ziel: zielVorschlag, fruehstueck: FRUEHSTUECKS_SLOTS.includes(slot) });
+    const favHier = gerichte.some((g) => g.restaurant === gewaehlt && favoriten.has(g.id));
+    favWahl.hidden = !favHier;
+    const treffer = vorschlaege(gerichte, { restaurant: gewaehlt, budget: budgetWert, ziel: zielVorschlag, fruehstueck: FRUEHSTUECKS_SLOTS.includes(slot), nur: nurFavoriten && favHier ? favoriten : null });
     // Getränk ohne Kalorien als Tipp: ändert das Budget nicht, ein Tipp nimmt Vorschlag und Getränk zusammen
     const getraenke = nullGetraenke(gerichte, gewaehlt);
     const uebernimm = (ids) => { korb.clear(); for (const id of ids) korb.set(id, 1); modus = 'selbst'; neuZeigen(); };
@@ -192,6 +213,7 @@ export async function zeigeUnterwegs({ b, datum, slot, beiFertig, korb = new Map
       type: 'button', class: 'wahl-knopf', 'aria-pressed': String(z.id === zielVorschlag),
       onclick: (e) => { zielVorschlag = z.id; for (const k of e.currentTarget.parentElement.children) k.setAttribute('aria-pressed', String(k === e.currentTarget)); zeigeVorschlaege(); },
     }, z.name))),
+    favWahl,
     vorschlagListe,
     el('p', { class: 'klein' }, 'Kombinationen aus bis zu drei Gerichten, die dein Budget zu 60 bis 100 % nutzen, ohne Getränke und Saucen (die nimmst du unter „Selbst wählen“ dazu); Frühstück nur morgens. Werte der Ketten: Stand laut Liste, im Zweifel gilt die Angabe im Restaurant. Elan sortiert nur nach deiner Wahl, ohne zu bewerten.'));
 

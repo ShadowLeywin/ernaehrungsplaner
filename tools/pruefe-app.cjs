@@ -987,6 +987,80 @@ async function healthLauf(browser) {
       && /2 Gerichte von 1 Restaurant geladen, Stand 01\.11\.2026; 1 ohne brauchbare Werte/.test(geladen) && chips.join() === "Burger King,Coffee Fellows,Dateigrill,dean&david,Hans im Glück,KFC,McDonald's,Peter Pane,Subway,Testgrill,Wrapladen",
     `Ketten ${kettenAnfang.join(', ')}; Getränk-Tipp „${getraenkChip}“; McDonald's 600 kcal: „${mcdVorschlaege.slice(0, 90)}…“; Vorschlag „${ersterVorschlag}“, übernommen „${uebernommen}“; Korb „${korbText}“ (Burger ${nochDa}); Abendessen „${abend.slice(0, 120)}“; Datei: „${geladen}“; Restaurants ${chips.join(', ')}`);
 
+  // Meine Mahlzeiten: Frühstück merken, an einem anderen Tag mit einem Tipp eintragen, Rückgängig, vergessen
+  const schnellIns = async (slotName, name, kcal) => {
+    await seite.getByRole('button', { name: `Zu ${slotName} hinzufügen` }).click();
+    await seite.locator('dialog .suchfeld').fill(name);
+    await seite.locator('#nur-kcal').click();
+    await seite.locator('#f-schnell-kcal').fill(kcal);
+    await seite.locator('dialog').getByRole('button', { name: 'Eintragen' }).click();
+    await seite.locator('dialog').waitFor({ state: 'detached' });
+  };
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.locator('#slot-fruehstueck').waitFor();
+  await schnellIns('Frühstück', 'Testmüsli', '400');
+  await schnellIns('Frühstück', 'Testkaffee', '50');
+  await seite.locator('#slot-fruehstueck .als-vorlage').click();
+  const vorlageName = await seite.locator('#f-vorlage-name').inputValue();
+  await seite.locator('dialog').getByRole('button', { name: 'Merken' }).click();
+  await seite.locator('.hinweis', { hasText: 'gemerkt' }).waitFor();
+  // aufräumen: die beiden Einträge von heute wieder löschen
+  for (const name of ['Testmüsli', 'Testkaffee']) {
+    await seite.locator('#slot-fruehstueck .eintrag', { hasText: name }).click();
+    await seite.locator('dialog').getByRole('button', { name: 'Löschen' }).click();
+    await seite.locator('dialog').waitFor({ state: 'detached' });
+  }
+  await seite.getByRole('link', { name: 'Einen Tag zurück' }).click();
+  await seite.locator('h1', { hasText: 'Gestern' }).waitFor();
+  await seite.getByRole('button', { name: 'Zu Morgensnack hinzufügen' }).click();
+  const vorlageZeile = (await seite.locator('dialog .vorlagen li').first().innerText()).replace(/\s+/g, ' ');
+  await bild(seite, '46-vorlagen', false);
+  await seite.getByRole('button', { name: 'Mein Frühstück eintragen' }).click();
+  await seite.locator('dialog').waitFor({ state: 'detached' });
+  const eingetragen = (await seite.locator('#slot-morgensnack .eintraege').innerText()).replace(/\s+/g, ' ');
+  await seite.locator('.hinweis').getByRole('button', { name: 'Rückgängig' }).click();
+  await seite.locator('#slot-morgensnack .eintraege').waitFor({ state: 'detached' });
+  await seite.getByRole('button', { name: 'Zu Morgensnack hinzufügen' }).click();
+  await seite.getByRole('button', { name: 'Mein Frühstück vergessen' }).click();
+  await seite.locator('dialog .vorlagen').waitFor({ state: 'detached' });
+  await seite.keyboard.press('Escape');
+  await seite.locator('dialog').waitFor({ state: 'detached' });
+  pruefe('Meine Mahlzeiten: merken, an anderem Tag mit einem Tipp eintragen, Rückgängig, vergessen',
+    vorlageName === 'Mein Frühstück' && /2 Teile, 450 kcal/.test(vorlageZeile) && /Testmüsli/.test(eingetragen) && /Testkaffee/.test(eingetragen),
+    `Name „${vorlageName}“; im Blatt „${vorlageZeile}“; eingetragen „${eingetragen}“; danach zurückgenommen und vergessen`);
+
+  // Unterwegs: Kette unter Mehr ausblenden, Gericht als Favorit markieren, Vorschläge nur aus Favoriten
+  await seite.goto(`${URL_APP}#/mehr/unterwegs`);
+  await seite.locator('label', { hasText: 'KFC' }).locator('input').uncheck();
+  await seite.goto(`${URL_APP}#/mehr`);
+  const menueUnterwegs = (await seite.locator('#menue-unterwegs').innerText()).replace(/\s+/g, ' ');
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.getByRole('button', { name: 'Zu Abendessen hinzufügen' }).click();
+  await seite.locator('#unterwegs-oeffnen').click();
+  await seite.locator('.unterwegs-restaurants .chip').first().waitFor();
+  const ohneKfc = await seite.locator('.unterwegs-restaurants .chip').allInnerTexts();
+  await seite.getByRole('button', { name: 'Selbst wählen' }).click();
+  await seite.getByRole('button', { name: 'Testgrill' }).click();
+  await seite.getByRole('button', { name: 'Salat als Favorit' }).click();
+  await seite.keyboard.press('Escape');
+  await seite.locator('dialog').waitFor({ state: 'detached' });
+  await seite.getByRole('button', { name: 'Zu Abendessen hinzufügen' }).click();
+  await seite.locator('#unterwegs-oeffnen').click();
+  const ersteZeile = await seite.locator('.unterwegs-zeile .unterwegs-name span').first().innerText();
+  await seite.getByRole('button', { name: 'Vorschläge' }).click();
+  await seite.locator('#f-unterwegs-budget').fill('200');
+  await seite.locator('#f-nur-favoriten').check();
+  await seite.locator('.vorschlag', { hasText: 'Salat' }).first().waitFor();
+  const nurFav = (await seite.locator('#vorschlaege').innerText()).replace(/\s+/g, ' ');
+  await seite.locator('#f-nur-favoriten').uncheck();
+  await seite.keyboard.press('Escape');
+  await seite.locator('dialog').waitFor({ state: 'detached' });
+  await seite.goto(`${URL_APP}#/mehr/unterwegs`);
+  await seite.locator('label', { hasText: 'KFC' }).locator('input').check();
+  pruefe('Unterwegs: Kette ausblenden, Favorit oben, Vorschläge nur aus Favoriten',
+    !ohneKfc.includes('KFC') && ohneKfc.includes("McDonald's") && /von .* Restaurants/.test(menueUnterwegs) && ersteZeile === 'Salat' && /Salat/.test(nurFav) && !/Testburger|Pommes/.test(nurFav),
+    `Menü „${menueUnterwegs}“; Restaurants ohne KFC: ${ohneKfc.join(', ')}; erste Zeile „${ersteZeile}“; nur Favoriten: „${nurFav.slice(0, 80)}“`);
+
   // Körpermaße: Kacheln wie beim Maßband, Eintragen im Blatt, eigenes Maß mit Namen
   await seite.goto(`${URL_APP}#/fortschritt`);
   await seite.locator('.mass-kachel').first().waitFor();
@@ -1006,6 +1080,13 @@ async function healthLauf(browser) {
     const zustand = await seite.evaluate(() => ({
       dialoge: [...document.querySelectorAll('dialog')].map((d) => `${d.className}|offen=${d.open}|${d.querySelector('.blatt-titel')?.textContent}|fehler=${d.querySelector('.fehlertext')?.textContent}|name=${d.querySelector('#f-mass-name')?.value}|wert=${d.querySelector('#f-mass-wert')?.value}`),
       hinweis: document.getElementById('hinweis').textContent, adresse: location.hash,
+      kachel: document.getElementById('mass-eigen1')?.textContent,
+    }));
+    // Unterscheidet „gespeichert, nur Hinweis verpasst“ von „Klick ging verloren, nichts gespeichert“
+    zustand.gespeichert = await seite.evaluate(() => new Promise((ok) => {
+      const r = indexedDB.open('elan');
+      r.onsuccess = () => { const q = r.result.transaction('messungen').objectStore('messungen').getAll(); q.onsuccess = () => ok(q.result.filter((m) => m.art === 'mass:eigen1').map((m) => m.wert)); q.onerror = () => ok('Lesefehler'); };
+      r.onerror = () => ok('DB nicht offen');
     }));
     console.log('DIAGNOSE', JSON.stringify(zustand));
     throw fehlerBeimWarten;

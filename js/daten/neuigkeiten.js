@@ -4,6 +4,17 @@
 export const NEUIGKEITEN = [
   {
     version: '1.0.0',
+    datum: '2026-11-23',
+    titel: 'Meine Mahlzeiten, Favoriten',
+    punkte: [
+      'Meine Mahlzeiten: Unter jeder Mahlzeit auf „Heute“ steht „Als Mahlzeit merken“. Danach findest du sie beim Plus ganz oben und trägst alles mit einem Tipp ein, mit Rückgängig. Das × vergisst eine Vorlage wieder.',
+      'Unterwegs-Favoriten: Stern an einem Gericht, dann steht es oben. In den Vorschlägen gibt es „Nur aus meinen Favoriten“.',
+      'Mehr → Unterwegs: Restaurants ein- und ausblenden, die du nie besuchst. Ihre Gerichte bleiben gespeichert.',
+      'Unterwegs zeigt Minus und Anzahl erst, wenn du etwas gewählt hast: mehr Platz für die Namen.',
+    ],
+  },
+  {
+    version: '1.0.0',
     datum: '2026-11-15',
     titel: 'Fast-Food-Ketten dabei',
     punkte: [
@@ -169,6 +180,7 @@ export const FUNKTIONEN = [
   { titel: 'Rezepte', text: 'Zutaten, Portionen und Schritte, je Schritt mit „Prinzip dahinter“. Meal-Prep mit Gewicht nach dem Kochen und Haltbarkeit. Import aus Text.' },
   { titel: 'Zutaten', text: '184 Lebensmittel sind dabei, eigene kommen dazu. Suche bei Open Food Facts nur auf Knopfdruck. Die Mag-Liste merkt sich, was du (nicht) magst.' },
   { titel: 'Fortschritt', text: 'Rückblick der Woche, Gewicht mit 7-Tage-Schnitt gegen dein Wochenziel, Ruhepuls und HRV, alle Körpermaße als Kacheln, Verläufe, Laborwerte und Symptome. Eingetragen wird auf „Heute“.' },
+  { titel: 'Meine Mahlzeiten', text: 'Eine Mahlzeit als Vorlage merken und an jedem Tag mit einem Tipp eintragen, auch in den Wochenplan.' },
   { titel: 'Unterwegs', text: 'Im Restaurant oder Imbiss: Vorschläge, was in deine offenen Kalorien passt, sortiert nach Eiweiß, Fett oder Budget. Oder die Bestellung selbst zusammentippen und auf einmal eintragen. McDonald\'s, Burger King, KFC, Subway, dean&david, Hans im Glück, Peter Pane und Coffee Fellows sind dabei; weitere Gerichte selbst anlegen oder als Liste laden.' },
   { titel: 'Check-in', text: 'Energie, Stimmung und Stress je Tag mit einem Tipp, im Rückblick als Wochenschnitt. Die App deutet die Werte nicht.' },
   { titel: 'Erinnerungen (Android)', text: 'Wasser, Supplements und Check-in zu festen Uhrzeiten, geplant auf dem Handy, ohne Server.' },

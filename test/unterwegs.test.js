@@ -139,3 +139,18 @@ test('Getränk-Tipp: ohne Kalorien, Zero zuerst, je Getränk eine Größe, keine
   assert.deepEqual(nullGetraenke(liste, 'K', 3).map((g) => g.name), ['Coca-Cola Zero 0,5 l', 'Wasser Still 0,5l', 'Espresso']);
   assert.deepEqual(nullGetraenke(liste, 'Nirgends'), []);
 });
+
+test('Favoriten und ausgeblendete Restaurants', async () => {
+  const { bereinigeFavoriten, favoritenZuerst, sichtbareRestaurants, vorschlaege } = await import('../js/logik/unterwegs.js');
+  const liste = bereinigeGerichte([
+    { restaurant: 'A', name: 'Eins', kcal: 300, protein: 30 },
+    { restaurant: 'A', name: 'Zwei', kcal: 300, protein: 10 },
+    { restaurant: 'B', name: 'Drei', kcal: 300 },
+  ]);
+  assert.deepEqual(sichtbareRestaurants(liste, ['B']), ['A']);
+  assert.deepEqual(sichtbareRestaurants(liste, ['A', 'B']), ['A', 'B'], 'alle aus: alle zeigen statt leer');
+  const fav = new Set([gerichtId('A', 'Zwei')]);
+  assert.deepEqual(favoritenZuerst(liste.filter((g) => g.restaurant === 'A'), fav).map((g) => g.name), ['Zwei', 'Eins']);
+  assert.deepEqual(vorschlaege(liste, { restaurant: 'A', budget: 320, nur: fav }).map((v) => v.gerichte[0].name), ['Zwei']);
+  assert.deepEqual(bereinigeFavoriten(['a', 'a', 3, '', null, 'b']), ['a', 'b']);
+});

@@ -843,6 +843,14 @@ a.ezeile > svg { color: var(--tinte-leise); flex: none; }
 .unterwegs-name { flex: 1; min-width: 0; min-height: 2.75rem; padding: 0.375rem 0.75rem; border: 0; background: none; color: var(--tinte); text-align: left; font: inherit; font-weight: 560; }
 .unterwegs-name small { display: block; font-size: 0.8125rem; font-weight: 400; color: var(--tinte-leise); }
 .unterwegs-zeile.gewaehlt .unterwegs-name { color: var(--blatt); }
+/* Favoriten-Stern: leer = Umriss, gewählt = gefüllt in Akzentfarbe */
+.unterwegs-zeile .stern { width: 2.5rem; height: 2.5rem; flex: none; color: var(--tinte-leise); background: transparent; border: 0; }
+.unterwegs-zeile .stern[aria-pressed='true'] { color: var(--akzent); }
+.unterwegs-zeile .stern[aria-pressed='true'] path { fill: currentColor; }
+.unterwegs-zeile { padding-left: 0.25rem; }
+.nur-favoriten { padding: 0.25rem 0.25rem; min-height: 2.75rem; }
+/* Minus und Anzahl erst, wenn etwas gewählt ist: mehr Platz für den Namen bei 320 px */
+.unterwegs-zeile:not(.gewaehlt) .zaehler > :not(.plus) { display: none; }
 .zaehler { display: flex; align-items: center; gap: 0.25rem; flex: none; }
 .zaehler .rund { width: 2.5rem; height: 2.5rem; }
 .zaehler .rund:disabled { opacity: 0.35; }
@@ -873,6 +881,11 @@ a.ezeile > svg { color: var(--tinte-leise); flex: none; }
 .unterwegs-aktion { display: flex; gap: 0.5rem; }
 .unterwegs-aktion select { flex: 1; min-width: 0; }
 .unterwegs-aktion .knopf:disabled { opacity: 0.45; }
+
+/* Meine Mahlzeiten: Plus rechts statt kcal, „Als Mahlzeit merken“ klein unter den Einträgen */
+.vorlage-plus { color: var(--blatt); }
+.als-vorlage { font-size: 0.875rem; margin: 0.125rem 0 0.25rem; }
+.vorlage-vorschau .zeile { cursor: default; }
 
 /* Check-in: fünf gleich breite Stufen je Frage, Worte an den Enden */
 .checkin-reihe + .checkin-reihe { margin-top: 0.875rem; }

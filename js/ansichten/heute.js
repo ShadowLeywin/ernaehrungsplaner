@@ -14,7 +14,7 @@ import { aktualisiereWidget, tippGefuehl } from '../plattform.js';
 import { gehe, neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { blatt, el, gramm, haenge, hinweis, icon, svg, zahl } from '../ui.js';
-import { oeffneEintrag, oeffneZutatWahl } from './eintrag.js';
+import { merkeAlsVorlage, oeffneEintrag, oeffneZutatWahl } from './eintrag.js';
 import { checkinKarte, supplementKarte, tageswerteKarte } from './health.js';
 
 const nameVon = (id) => NAEHRSTOFFE.find((n) => n.id === id).name;
@@ -391,6 +391,8 @@ function slotBereich({ slot, datum, eintraege, vortag, kcal, zielKcal }) {
         el('span', { class: 'eintrag-name' }, e.name, e.rezeptId ? el('small', {}, 'Rezept') : (e.marke ? el('small', {}, e.marke) : null)),
         el('span', { class: 'eintrag-menge' }, e.schnell ? 'Portion' : `${zahl(e.gramm, 1)} g`),
         el('span', { class: 'eintrag-kcal' }, `${zahl(fuerMenge(e.je100, e.gramm).kcal ?? 0)} kcal`))))) : null,
+    // Wer morgens oft dasselbe isst: einmal merken, dann mit einem Tipp beim Plus eintragen
+    eintraege.length ? el('button', { type: 'button', class: 'textlink als-vorlage', onclick: () => merkeAlsVorlage({ eintraege, slotName: slot.name }) }, 'Als Mahlzeit merken') : null,
     // Viele essen morgens dasselbe: ein Tipp statt mehrerer Suchen
     !eintraege.length && vortag.length ? el('button', { type: 'button', class: 'chip wie-vortag', onclick: wieVortag },
       `Wie am Vortag: ${eintraegeText(vortag.length)}, ${zahl(summeEintraege(vortag).kcal ?? 0)} kcal`) : null);

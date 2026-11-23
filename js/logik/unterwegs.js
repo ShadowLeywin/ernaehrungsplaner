@@ -116,11 +116,11 @@ const wert = (g, w) => (typeof g[w] === 'number' ? g[w] : 0);
  * eine schlechtere Obermenge einer besseren sind.
  * Durchprobieren findet sicher das Beste; nach kcal sortiert bricht jede Schleife ab, sobald das Budget gesprengt ist.
  */
-export function vorschlaege(gerichte, { restaurant, budget, ziel = 'eiweiss', maxTeile = 3, anzahl = 5, untergrenze = 0.6, fruehstueck = true }) {
+export function vorschlaege(gerichte, { restaurant, budget, ziel = 'eiweiss', maxTeile = 3, anzahl = 5, untergrenze = 0.6, fruehstueck = true, nur = null }) {
   if (!(budget > 0)) return [];
   // Nach kcal aufsteigend: Sobald eine Summe das Budget sprengt, sind alle weiteren in der Schleife zu groß (früher Abbruch)
   const auswahl = gerichte.filter((g) => g.restaurant === restaurant && g.kcal > 0 && g.kcal <= budget && !istGetraenkOderSauce(g.name)
-    && (fruehstueck || !istFruehstueck(g.name))).sort((a, b) => a.kcal - b.kcal);
+    && (fruehstueck || !istFruehstueck(g.name)) && (!nur || nur.has(g.id))).sort((a, b) => a.kcal - b.kcal);
   const n = auswahl.length;
   const kcal = auswahl.map((g) => g.kcal);
   const werte = auswahl.map((g) => WERTE.map((w) => wert(g, w))); // [kcal, protein, kh, fett]
@@ -215,3 +215,18 @@ export function nullGetraenke(gerichte, restaurant, anzahl = 2) {
   const gesehen = new Set();
   return kandidaten.filter((g) => !gesehen.has(grund(g.name)) && gesehen.add(grund(g.name))).slice(0, anzahl);
 }
+
+/* ---------- Favoriten und ausgeblendete Restaurants ---------- */
+
+/** Restaurants ohne die ausgeblendeten; sind alle aus, bleiben alle sichtbar (sonst wäre der Rechner leer) */
+export function sichtbareRestaurants(gerichte, aus = []) {
+  const alle = restaurants(gerichte);
+  const sichtbar = alle.filter((r) => !aus.includes(r));
+  return sichtbar.length ? sichtbar : alle;
+}
+
+/** Favoriten zuerst, sonst bleibt die Reihenfolge */
+export const favoritenZuerst = (liste, favoriten) => [...liste.filter((g) => favoriten.has(g.id)), ...liste.filter((g) => !favoriten.has(g.id))];
+
+/** Gespeicherte Favoriten (Liste von Gericht-Kennungen) prüfen: nur Text, ohne Doppelte, höchstens 500 */
+export const bereinigeFavoriten = (roh) => [...new Set((Array.isArray(roh) ? roh : []).filter((x) => typeof x === 'string' && x))].slice(0, 500);
