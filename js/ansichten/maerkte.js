@@ -49,7 +49,7 @@ export async function zeigeMaerkte(wurzel) {
   };
 
   // Suche
-  const ortFeld = el('input', { id: 'f-markt-ort', type: 'search', value: entwurf.ort, placeholder: 'Ort oder Postleitzahl', autocomplete: 'off', enterkeyhint: 'search', 'aria-describedby': 'f-markt-ort-fehler', oninput: (e) => { entwurf.ort = e.target.value; } });
+  const ortFeld = el('input', { id: 'f-markt-ort', type: 'search', value: entwurf.ort, placeholder: 'Ort oder PLZ', autocomplete: 'off', enterkeyhint: 'search', 'aria-describedby': 'f-markt-ort-fehler', oninput: (e) => { entwurf.ort = e.target.value; } });
   const ortFehler = el('p', { class: 'fehlertext', id: 'f-markt-ort-fehler', role: 'alert' });
   const suchKnopf = el('button', { type: 'submit', class: 'knopf' }, 'Suchen');
   const suche = async (e) => {

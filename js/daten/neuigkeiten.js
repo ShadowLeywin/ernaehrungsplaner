@@ -5,8 +5,11 @@ export const NEUIGKEITEN = [
   {
     version: '1.0.0',
     datum: '2026-11-23',
-    titel: 'Märkte',
+    titel: 'Märkte und Preise',
     punkte: [
+      'Einkaufsliste mit Preisen: Oben „Preise bei“ einen deiner Märkte wählen. Rechts an jeder Zeile steht, was die Menge dort grob kostet, in ganzen Packungen. Ein gültiges Angebot geht vor, sonst dein gemerkter Preis.',
+      'Fehlt ein Preis, steht „€ ?“. Antippen, Preis und Packungsgröße eintragen, fertig. Elan rät nie: Ohne Preis bleibt es bei „unbekannt“.',
+      '„Märkte vergleichen“ zeigt den groben Preis der Liste in jedem deiner Märkte, zuerst dort, wo die meisten Preise bekannt sind.',
       'Neu unter Mehr → Märkte (oder unten in der Einkaufsliste): Ort oder Postleitzahl eingeben, „Suchen“ fragt OpenStreetMap nach Läden dort. „Merken“ legt sie in „Meine Märkte“. Elan schickt nur, was du eintippst, keinen Standort.',
       'Märkte, die OpenStreetMap nicht kennt, legst du von Hand an.',
     ],

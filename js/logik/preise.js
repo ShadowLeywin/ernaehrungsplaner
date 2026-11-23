@@ -98,9 +98,14 @@ export function vergleicheMaerkte(liste, maerkte, daten) {
     .sort((a, b) => b.mitPreis - a.mitPreis || a.summe - b.summe || String(a.markt.name).localeCompare(String(b.markt.name), 'de'));
 }
 
-/** Text für eine Zeile: "2 × 500 g à 1,29 € = 2,58 €, Angebot" oder "Preis unbekannt" */
-export function preisText(e) {
+/**
+ * Text für eine Zeile: "2 × 500 g à 1,29 € = 2,58 €, Angebot" oder "Preis unbekannt".
+ * kurz: ohne Summe ("2 × 500 g à 1,29 €, Angebot"), wenn der Betrag ohnehin daneben steht.
+ */
+export function preisText(e, { kurz = false } = {}) {
   if (e.betrag === null) return 'Preis unbekannt';
   const packung = e.packungGramm >= 1000 ? `${(e.packungGramm / 1000).toLocaleString('de-DE')} ${e.geschaetzt ? 'l' : 'kg'}` : `${e.packungGramm.toLocaleString('de-DE')} ${e.geschaetzt ? 'ml' : 'g'}`;
-  return `${e.packungen} × ${packung} à ${euroText(e.preis)} = ${euroText(e.betrag)}${e.quelle === 'angebot' ? ', Angebot' : ''}`;
+  // Geschützte Leerzeichen: "2 × 500 g" und "à 1,29 €" sollen nicht mitten in der Angabe umbrechen
+  const fest = (text) => text.replace(/ /g, '\u00a0');
+  return `${fest(`${e.packungen} × ${packung}`)} ${fest(`à ${euroText(e.preis)}`)}${kurz ? '' : ` = ${fest(euroText(e.betrag))}`}${e.quelle === 'angebot' ? ', Angebot' : ''}`;
 }

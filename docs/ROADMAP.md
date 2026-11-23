@@ -8,7 +8,7 @@ Jede Zeile „Status“ wird nach jeder Runde nachgezogen.
 | Paket | Ziel in einem Satz | Status | Reihenfolge |
 |---|---|---|---|
 | P1 Planung und Einkauf | Woche oder Monat planen, je Mahlzeit, Einkaufsliste für jeden Zeitraum | gebaut, wartet auf Push/PR und Handy-Test | 1 |
-| P3 Märkte und Preise | eigene Märkte wählen, grober Preis der Einkaufsliste je Markt | in Arbeit | 2 |
+| P3 Märkte und Preise | eigene Märkte wählen, grober Preis der Einkaufsliste je Markt | gebaut (P3.1, P3.2, P3.4), Karte und Open Prices zurückgestellt | 2 |
 | P2 Plan-Import | Monatsplan aus einem Claude-Chat übernehmen | offen | 3 |
 | P4 Angebote und Prospekte | Angebote je Markt wöchentlich als Datei, in der App wie ein Prospekt | offen, ohne automatischen Abruf (E4.1) | 4 |
 | P5 Social-Rezeptimport | „Teilen an Elan“ aus TikTok, Instagram, YouTube, Prompt-Brücke | offen | 5 |
@@ -164,4 +164,7 @@ Die Primärseiten (operations.osmfoundation.org, overpass-api.de, prices.openfoo
 | P1.3 Planzeitraum und Monatsansicht | fertig | #35 | 218 Unit, 153/153 Browser |
 | P1.4 Mahlzeiten je Slot planen | fertig | #36 | 219 Unit, 156/156 Browser |
 | P3.1 Preislogik und Schema 9 | fertig | #37 | 226 Unit, 156/156 Browser |
-| P3.2 Märkte suchen und merken | fertig | siehe PR | 230 Unit, 161/161 Browser |
+| P3.2 Märkte suchen und merken | fertig | #38 | 230 Unit, 161/161 Browser |
+| P3.3 Karte | zurückgestellt (E3.2: Liste statt Karte) | – | – |
+| P3.4 Preise je Markt und Vergleich in der Einkaufsliste | fertig | #39 | 231 Unit, 163/163 Browser |
+| P3.5 Open Prices | zurückgestellt: Abdeckung in Deutschland unbekannt, Dienst in der Arbeitsumgebung nicht erreichbar; erst nach Léons Test am Handy, ob gemerkte Preise reichen | – | – |

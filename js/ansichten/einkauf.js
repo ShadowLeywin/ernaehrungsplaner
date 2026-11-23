@@ -6,12 +6,16 @@ import { aktuelleJeZutat, angebotText } from '../logik/angebote.js';
 import { formatTag, formatZeitraum, isoDatum, istGueltig, tageZwischen, verschiebe } from '../logik/datum.js';
 import { einkaufsliste, listeAlsText, mengeText } from '../logik/plan.js';
 import { APP_NAME } from '../logik/schema.js';
+import { euroText, listenPreis, preisId, preisText, pruefePreis, vergleicheMaerkte } from '../logik/preise.js';
 import { MAX_TAGE, freierZeitraum, monatUm, monatsName, verschiebeMonat, wocheUm, zeitraumSchluessel } from '../logik/zeitraum.js';
 import { kategorieName } from '../logik/zutat.js';
 import { teileText, tippGefuehl } from '../plattform.js';
 import { gehe, neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
-import { el, haenge, hinweis, icon } from '../ui.js';
+import { blatt, el, haenge, hinweis, icon } from '../ui.js';
+
+// Getipptes im Feld „Noch etwas?“ übersteht ein Neuzeichnen (z. B. nach der Wahl eines anderen Markts)
+const entwurf = { posten: '' };
 
 const adresse = ({ von, bis }) => `/einkauf/${von}/${bis}`;
 
@@ -42,9 +46,14 @@ export function zeitraumAusAdresse(teile, heute = isoDatum()) {
 export async function zeigeEinkauf(wurzel, teile) {
   const z = zeitraumAusAdresse(teile);
   const listenSchluessel = zeitraumSchluessel(z);
-  const [posten, rezepte, zutaten, gespeichert, angebote] = await Promise.all([
+  const [posten, rezepte, zutaten, gespeichert, angebote, maerkte, preise, gewaehlt] = await Promise.all([
     speicher.planZwischen(z.von, z.bis), speicher.alleRezepte(), speicher.alleZutaten(), speicher.einkaufImZeitraum(listenSchluessel), speicher.alleAngebote(),
+    speicher.alleMaerkte(), speicher.allePreise(), speicher.einstellung('einkaufMarkt'),
   ]);
+  maerkte.sort((a, b) => a.name.localeCompare(b.name, 'de'));
+  // Preise gelten für einen gewählten Markt; ohne Wahl der erste der Liste
+  const markt = maerkte.find((m) => m.id === gewaehlt) ?? maerkte[0] ?? null;
+  const preisDaten = { angebote, preise, tag: isoDatum() };
   // Je Zutat das günstigste Angebot, das heute gilt
   const guenstig = aktuelleJeZutat(angebote, isoDatum());
   const angebotHinweis = (schluessel) => (guenstig.has(schluessel) ? `Angebot ${angebotText(guenstig.get(schluessel)[0])}` : null);
@@ -52,6 +61,7 @@ export async function zeigeEinkauf(wurzel, teile) {
   const erledigt = new Set(gespeichert.filter((s) => s.schluessel && s.erledigt).map((s) => s.schluessel));
   const eigene = gespeichert.filter((s) => s.eigen).sort((a, b) => String(a.erstellt).localeCompare(String(b.erstellt)));
   const tageMitPlan = new Set(posten.map((p) => p.datum)).size;
+  const preisListe = markt ? listenPreis(liste, markt, preisDaten) : null;
   document.title = `Einkaufsliste – ${APP_NAME}`;
 
   // Ein Häkchen ändert nur seine Zeile und den Zähler. Würde die ganze Liste neu gezeichnet,
@@ -67,7 +77,7 @@ export async function zeigeEinkauf(wurzel, teile) {
     if (an) { erledigt.add(schluessel); await speicher.speichereEinkauf({ id, zeitraum: listenSchluessel, schluessel, erledigt: true }); }
     else { erledigt.delete(schluessel); await speicher.loescheEinkauf(id); }
   };
-  const zeile = ({ id, name, klein, menge, an, beiWechsel, beiEntfernen }) => el('li', { class: an ? 'haken erledigt' : 'haken' },
+  const zeile = ({ id, name, klein, menge, an, beiWechsel, beiEntfernen, preis }) => el('li', { class: an ? 'haken erledigt' : 'haken' },
     el('label', {},
       el('input', {
         type: 'checkbox', id, checked: an ? true : null,
@@ -80,6 +90,7 @@ export async function zeigeEinkauf(wurzel, teile) {
       }),
       el('span', { class: 'zeile-name' }, name, klein ? el('small', {}, klein) : null)),
     menge ? el('span', { class: 'zeile-wert' }, menge) : null,
+    preis ?? null,
     beiEntfernen ? el('button', { type: 'button', class: 'rund', 'aria-label': `${name} entfernen`, onclick: beiEntfernen }, icon('zu', 20)) : null);
 
   // Nach Kategorie gruppieren: so liegt zusammen, was im Markt zusammen steht
@@ -97,13 +108,94 @@ export async function zeigeEinkauf(wurzel, teile) {
     }
   };
 
-  const neuerPosten = el('input', { id: 'f-eigener-posten', 'aria-label': 'Eigener Posten', placeholder: 'Noch etwas? Zum Beispiel Spülmittel', maxlength: 80, autocomplete: 'off', enterkeyhint: 'done' });
+  const neuerPosten = el('input', { id: 'f-eigener-posten', 'aria-label': 'Eigener Posten', placeholder: 'Noch etwas? Zum Beispiel Spülmittel', maxlength: 80, autocomplete: 'off', enterkeyhint: 'done', value: entwurf.posten, oninput: (e) => { entwurf.posten = e.target.value; } });
   const ergaenze = async (e) => {
     e.preventDefault();
     const name = neuerPosten.value.trim();
     if (!name) { neuerPosten.focus(); return; }
     await speicher.speichereEinkauf({ zeitraum: listenSchluessel, eigen: true, name, erledigt: false, erstellt: new Date().toISOString() });
+    entwurf.posten = '';
     neuZeichnen();
+  };
+
+  /* ---------- Preise je Markt (P3) ---------- */
+
+  // Unter dem Namen: Marke, Preis im gewählten Markt, und ein Angebot anderswo, falls es eines gibt
+  const mengeTextFuer = (p) => (p.stueck ? `${mengeText(p.gramm)}, etwa ${p.stueck} Stück` : mengeText(p.gramm));
+  const kleinText = (p) => {
+    const e = preisListe?.je.get(p.schluessel);
+    const teile = [markt ? mengeTextFuer(p) : null, p.marke];
+    if (e && e.betrag !== null) teile.push(preisText(e, { kurz: true }));
+    if (!e || e.quelle !== 'angebot') teile.push(angebotHinweis(p.schluessel));
+    return teile.filter(Boolean).join(', ');
+  };
+
+  const oeffnePreis = (p) => {
+    const e = preisListe.je.get(p.schluessel);
+    const alt = preise.find((x) => x.id === preisId(p.schluessel, markt.id));
+    const preisFeld = el('input', { id: 'f-preis-euro', inputmode: 'decimal', autocomplete: 'off', value: alt ? String(alt.preis).replace('.', ',') : '' });
+    const packungFeld = el('input', { id: 'f-preis-packung', inputmode: 'decimal', autocomplete: 'off', value: String(alt?.packungGramm ?? e?.packungGramm ?? '').replace('.', ',') });
+    const fehlerText = el('p', { class: 'fehlertext', role: 'alert' });
+    const b = blatt({
+      titel: `${p.name} bei ${markt.name}`,
+      inhalt: el('form', {
+        class: 'stapel', novalidate: true,
+        onsubmit: async (ev) => {
+          ev.preventDefault();
+          const pruefung = pruefePreis({ preis: preisFeld.value, packung: packungFeld.value });
+          if (!pruefung.ok) { fehlerText.textContent = pruefung.fehler.preis ?? pruefung.fehler.packung; return; }
+          await speicher.speicherePreis({ id: preisId(p.schluessel, markt.id), zutatId: p.schluessel, marktId: markt.id, ...pruefung.wert, datum: isoDatum() });
+          b.schliessen();
+          hinweis(`Preis für ${p.name} gemerkt.`);
+          neuZeichnen();
+        },
+      },
+      el('p', { class: 'klein' }, e?.quelle === 'angebot' ? `Gerade gilt ein Angebot: ${preisText(e)}. Ein gemerkter Preis zählt, wenn kein Angebot gilt.` : 'Was kostet eine Packung? Elan rechnet daraus ganze Packungen für die Menge auf der Liste.'),
+      el('div', { class: 'feld' }, el('label', { for: 'f-preis-euro' }, 'Preis je Packung (€)'), preisFeld),
+      el('div', { class: 'feld' }, el('label', { for: 'f-preis-packung' }, 'Packung (g oder ml)'), packungFeld),
+      fehlerText,
+      el('div', { class: 'knopfreihe' },
+        alt ? el('button', { type: 'button', class: 'knopf leise', onclick: async () => { await speicher.loeschePreis(alt.id); b.schliessen(); neuZeichnen(); } }, 'Vergessen') : null,
+        el('button', { type: 'submit', class: 'knopf' }, 'Merken'))),
+    });
+  };
+
+  // Rechts in der Zeile: Betrag im gewählten Markt, oder „€ ?“ zum Eintragen
+  const preisKnopf = (p) => {
+    if (!markt) return null;
+    const e = preisListe.je.get(p.schluessel);
+    return el('button', {
+      type: 'button', class: e.betrag === null ? 'preis-knopf offen' : `preis-knopf ${e.quelle}`,
+      'aria-label': e.betrag === null ? `Preis für ${p.name} bei ${markt.name} eintragen` : `${p.name} bei ${markt.name}: ${euroText(e.betrag)}, ändern`,
+      onclick: () => oeffnePreis(p),
+    }, e.betrag === null ? '€ ?' : euroText(e.betrag));
+  };
+
+  const oeffneVergleich = () => {
+    const vergleich = vergleicheMaerkte(liste, maerkte, preisDaten);
+    blatt({
+      titel: 'Märkte vergleichen',
+      inhalt: el('div', { class: 'stapel' },
+        el('p', { class: 'klein' }, 'Grober Preis dieser Liste je Markt: Angebote, sonst deine gemerkten Preise. Posten ohne Preis zählen nicht mit; deshalb steht zuerst, wo die meisten Preise bekannt sind.'),
+        el('ul', { class: 'zeilen', id: 'markt-vergleich' }, vergleich.map((v) => el('li', { class: 'zeile' },
+          el('span', { class: 'zeile-name' }, v.markt.name, el('small', {}, `${v.mitPreis} von ${v.gesamt} Posten mit Preis`)),
+          el('span', { class: 'zeile-wert' }, v.mitPreis ? euroText(v.summe) : 'unbekannt'))))),
+    });
+  };
+
+  const preisKarte = () => {
+    // Ohne Markt kein Preis; der Weg dahin ist der Knopf „Märkte“ unten auf der Seite
+    if (!markt) return el('p', { class: 'klein' }, 'Grober Preis je Markt: Wähle unten unter „Märkte“, wo du einkaufst.');
+    const wahl = el('select', {
+      id: 'f-einkauf-markt', 'aria-label': 'Markt für die Preise',
+      onchange: async (ev) => { await speicher.setzeEinstellung('einkaufMarkt', ev.target.value); neuZeichnen(); },
+    }, maerkte.map((m) => el('option', { value: m.id, selected: m.id === markt.id ? true : null }, m.name)));
+    return el('section', { class: 'karte preiskarte', 'aria-label': 'Preis der Liste' },
+      el('div', { class: 'feld' }, el('label', { for: 'f-einkauf-markt' }, 'Preise bei'), wahl),
+      el('p', { class: 'preis-summe', id: 'einkauf-preis' },
+        preisListe.mitPreis ? `Grob ${euroText(preisListe.summe)}` : 'Preis noch unbekannt',
+        el('small', {}, `${preisListe.mitPreis} von ${preisListe.gesamt} Posten mit Preis`)),
+      maerkte.length > 1 ? el('button', { type: 'button', class: 'knopf leise', onclick: oeffneVergleich }, 'Märkte vergleichen') : null);
   };
 
   // Zeitraum wählen: Woche und Monat rund um den Anfang des jetzigen Zeitraums, oder frei mit zwei Tagen
@@ -153,12 +245,14 @@ export async function zeigeEinkauf(wurzel, teile) {
       z.art === 'frei' ? `Frei wählbar bis ${MAX_TAGE} Tage.` : null,
     ].filter(Boolean).join(' ')),
     gesamt ? stand : null,
+    liste.length ? preisKarte() : null,
     liste.length === 0 && eigene.length === 0 ? el('p', { class: 'leer' }, 'Die Liste ist leer. Plane Mahlzeiten in diesem Zeitraum, dann stehen die Zutaten hier.') : null,
     gruppen.map((g) => [
       el('h2', {}, kategorieName(g.kategorie)),
       el('ul', { class: 'zeilen' }, g.posten.map((p) => zeile({
-        id: `haken-${p.schluessel}`, name: p.name, klein: [p.marke, angebotHinweis(p.schluessel)].filter(Boolean).join(', '), an: erledigt.has(p.schluessel),
-        menge: p.stueck ? `${mengeText(p.gramm)}, etwa ${p.stueck} Stück` : mengeText(p.gramm),
+        id: `haken-${p.schluessel}`, name: p.name, klein: kleinText(p), an: erledigt.has(p.schluessel), preis: preisKnopf(p),
+        // Mit Preis-Knopf rechts wäre die Zeile zu voll: die Menge rückt dann in die kleine Zeile unter den Namen
+        menge: markt ? null : mengeTextFuer(p),
         beiWechsel: (an) => hake(p.schluessel, an),
       }))),
     ]),

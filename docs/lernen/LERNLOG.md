@@ -401,3 +401,12 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Fehler:** Kriterium „Tippflächen ab 40 px“ schlug beim Quellen-Link im Satz an. Links im Fließtext sind nach WCAG 2.5.8 ausgenommen; Kriterium nimmt `p a` aus.
 - **Nicht testbar:** Echter Abruf bei Overpass (Host in der Umgebung gesperrt). Léon testet am Handy.
 - **Fachbegriffe:** Overpass QL (Abfragesprache für OSM-Daten), `map_to_area` (macht aus einer Grenze ein Suchgebiet).
+
+## Session 16, Runde P3.4: Preise je Markt in der Einkaufsliste (23.11.2026)
+
+- **Was und warum:** „Preise bei“ (Auswahl unter den eigenen Märkten, Einstellung `einkaufMarkt`), Betrag je Zeile als Knopf („€ ?“ zum Eintragen), Summe „Grob … € · x von y Posten mit Preis“, Blatt „Märkte vergleichen“.
+- **Befehle:** `npm test` (231) · `node tools/pruefe-app.cjs` (163) · Bild-Skript für vier Darstellungen.
+- **Fehler:** Erster Entwurf quetschte den Namen auf eine Buchstabenbreite (Menge und Preis rechts). Kein Test merkte es, erst das Bild. Lösung: Menge in die kleine Zeile, Kriterium „Name mindestens 120 px“. Danach brach „1 × 1 kg“ um: geschützte Leerzeichen (` `).
+- **Fehler im Bild-Skript:** Transaktion schrieb in `einstellungen`, ohne ihn anzumelden; IndexedDB warf im Callback, das Skript hing. Merke: Jeder Speicher muss in `transaction([...])` stehen.
+- **Zurückgestellt:** Karte (E3.2) und Open Prices (Abdeckung unklar, nicht erreichbar).
+- **Fachbegriffe:** geschütztes Leerzeichen (verhindert Zeilenumbruch), Vorschau-Kriterium (Test, der eine Layout-Regel misst statt nur Text).

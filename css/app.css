@@ -1062,3 +1062,14 @@ a.ezeile > svg { color: var(--tinte-leise); flex: none; }
 /* Woche: der Tagestitel ist ein Link in den Tagesplan, sieht aber wie die Überschrift aus */
 .tag-link { color: inherit; text-decoration: none; display: inline-flex; align-items: center; min-height: 40px; }
 .tag-link::after { content: '›'; margin-left: 0.375rem; color: var(--tinte-leise); font-weight: 400; }
+
+/* Einkaufsliste: Preis je Markt (P3). Der Preis-Knopf rechts in der Zeile, gestrichelt, solange kein Preis bekannt ist */
+.preiskarte { margin-top: 0.75rem !important; display: grid; gap: 0.5rem; }
+.preiskarte .feld { margin: 0; }
+.preiskarte select { width: 100%; }
+.preis-summe { margin: 0; font-size: 1.375rem; font-weight: 760; display: flex; flex-direction: column; }
+.preis-summe small { font-size: 0.8125rem; font-weight: 400; color: var(--tinte-leise); }
+.preis-knopf { flex: none; min-height: 40px; min-width: 3.25rem; padding: 0 0.5rem; border-radius: 0.75rem; border: 1.5px solid var(--linie);
+  background: var(--flaeche); color: var(--tinte); font-weight: 650; font-variant-numeric: tabular-nums; }
+.preis-knopf.offen { border-style: dashed; color: var(--tinte-leise); font-weight: 500; }
+.preis-knopf.angebot { border-color: var(--limette); }

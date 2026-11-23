@@ -56,17 +56,29 @@ Vorher: Mehr → „Backup speichern“ (das Update hebt die Datenbank auf Schem
 | P1-5 | Hattest du vor dem Update in einer Wochenliste etwas abgehakt? Diese Woche öffnen | Häkchen sind noch da |
 | P1-6 | Datumsfelder bei „Frei“ antippen | Android-Kalender öffnet sich, Tastatur verdeckt „Zeigen“ nicht |
 
- (5 Minuten, am Rechner oder Handy)
+## P3. Märkte und Preise am Handy testen (etwa 10 Minuten, nach dem Merge von P3)
+
+| Nr. | Was du tust | Was du sehen solltest |
+|---|---|---|
+| P3-1 | Mehr → Märkte → deine Postleitzahl → „Suchen“ | Liste mit Läden und Adressen; bei Fehler den Wortlaut notieren |
+| P3-2 | Dasselbe mit dem Ortsnamen, z. B. „Burgau“ | Läden dieses Orts; falls „Keine Läden gefunden“, melden |
+| P3-3 | Zwei Märkte „Merken“, einen Hofladen von Hand anlegen | alle drei unter „Meine Märkte“ |
+| P3-4 | Einkaufsliste → „Preise bei“ einen Markt wählen → bei einer Zutat „€ ?“ → Preis und Packung eintragen | Betrag rechts, oben „Grob … €“ |
+| P3-5 | „Märkte vergleichen“ | Märkte mit Summe und „x von y Posten mit Preis“ |
+
+## B. Automatischer Bau einrichten (5 Minuten, am Rechner oder Handy)
+
+Erledigt am 23.11.2026: Secrets eingetragen, Release „Elan 1.0.0“ mit signiertem APK gebaut.
 
 Danach baut GitHub nach jeder Änderung ein signiertes APK und legt es unter „Releases“ ab.
 
 | Nr. | Was du tust |
 |---|---|
-| B1 | Auf github.com das Repo `ernaehrungsplaner` öffnen → **Settings** → **Secrets and variables** → **Actions** |
-| B2 | **New repository secret**: Name `ELAN_KEYSTORE_BASE64`, Wert: die lange Zeile ganz unten aus `Elan-Signaturschluessel.txt` (alles in einer Zeile) → **Add secret** |
-| B3 | Noch einmal **New repository secret**: Name `ELAN_KEYSTORE_PASSWORT`, Wert: das Passwort aus derselben Datei → **Add secret** |
-| B4 | Reiter **Actions** → „Android-App bauen“ → **Run workflow** → **Run workflow** |
-| B5 | Nach etwa 5 Minuten: Startseite des Repos → rechts **Releases** → „Elan 1.0.0“ → APK antippen. Updates installieren sich über die vorhandene App, die Daten bleiben |
+| B1 ✓ 23.11. | Auf github.com das Repo `ernaehrungsplaner` öffnen → **Settings** → **Secrets and variables** → **Actions** |
+| B2 ✓ 23.11. | **New repository secret**: Name `ELAN_KEYSTORE_BASE64`, Wert: die lange Zeile ganz unten aus `Elan-Signaturschluessel.txt` (alles in einer Zeile) → **Add secret** |
+| B3 ✓ 23.11. | Noch einmal **New repository secret**: Name `ELAN_KEYSTORE_PASSWORT`, Wert: das Passwort aus derselben Datei → **Add secret** |
+| B4 ✓ 23.11. | Reiter **Actions** → „Android-App bauen“ → **Run workflow** → **Run workflow** |
+| B5 ✓ 23.11. | Nach etwa 5 Minuten: Startseite des Repos → rechts **Releases** → „Elan 1.0.0“ → APK antippen. Updates installieren sich über die vorhandene App, die Daten bleiben |
 
 Was du als Nächstes verbessert haben willst: ein Satz an Claude genügt.
 
