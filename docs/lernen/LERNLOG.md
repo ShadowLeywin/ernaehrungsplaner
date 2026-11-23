@@ -410,3 +410,11 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Fehler im Bild-Skript:** Transaktion schrieb in `einstellungen`, ohne ihn anzumelden; IndexedDB warf im Callback, das Skript hing. Merke: Jeder Speicher muss in `transaction([...])` stehen.
 - **Zurückgestellt:** Karte (E3.2) und Open Prices (Abdeckung unklar, nicht erreichbar).
 - **Fachbegriffe:** geschütztes Leerzeichen (verhindert Zeilenumbruch), Vorschau-Kriterium (Test, der eine Layout-Regel misst statt nur Text).
+
+## Session 16, Runde P2.1: Leser für den Plan-Import (23.11.2026)
+
+- **Was und warum:** Léon: „Mach alles bis du erstmal ganz fertig bist.“ Nächstes Paket nach der Roadmap: P2. `js/logik/planimport.js` liest `elan-import`, entfernt Codeblock-Zäune aus Chat-Antworten, ordnet Zutaten zu (nur ganze Wörter: „Reis“ wird nicht „Reiswaffeln“), nennt jede abgelehnte Zeile mit Grund und baut Rezepte und Plan-Posten.
+- **Befehle:** `npm test` (238, neu `test/planimport.test.js` mit `test/daten/import-plan.json`).
+- **Entscheidung:** Zutaten ohne Zuordnung werden ausgelassen und genannt, nicht mit 0 kcal gespeichert; `docs/IMPORT-FORMAT.md` angepasst. Vorhandene Rezepte gleichen Namens werden genutzt, nicht überschrieben.
+- **Fehler:** Erster Entwurf suchte vorhandene Rezepte in einem Feld, das es nicht gab (`ergebnis.vorhandeneNach`); der Test „Vorhandenes Rezept wird genutzt“ hätte es gefunden. Jetzt `vorhandene` als Parameter.
+- **Fachbegriffe:** Codeblock-Zaun (```` ``` ```` um Code in Chat-Antworten).

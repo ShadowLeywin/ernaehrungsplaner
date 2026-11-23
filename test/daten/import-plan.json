@@ -1,0 +1,15 @@
+{
+  "format": "elan-import",
+  "version": 1,
+  "quelle": { "art": "chat", "notiz": "Beispielplan, erfunden für Tests" },
+  "rezepte": [
+    { "name": "Testbrei", "portionen": 2, "zutaten": [{ "name": "Haferflocken", "gramm": 120 }, { "name": "Apfel", "menge": "1 Stück" }, { "name": "Zauberpulver", "gramm": 10 }], "schritte": ["Alles mischen."] }
+  ],
+  "plan": [
+    { "datum": "2026-12-01", "mahlzeit": "fruehstueck", "rezept": "Testbrei", "portionen": 1 },
+    { "datum": "2026-12-01", "mahlzeit": "mittag", "zutat": "Reis", "gramm": 80 },
+    { "datum": "2026-12-02", "mahlzeit": "abend", "zutat": "Drachenfrucht-Chips", "gramm": 50 },
+    { "datum": "2026-12-02", "mahlzeit": "brunch", "zutat": "Reis", "gramm": 80 },
+    { "datum": "2026-12-03", "mahlzeit": "mittag", "rezept": "Gibt es nicht" }
+  ]
+}

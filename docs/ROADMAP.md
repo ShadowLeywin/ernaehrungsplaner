@@ -168,3 +168,4 @@ Die Primärseiten (operations.osmfoundation.org, overpass-api.de, prices.openfoo
 | P3.3 Karte | zurückgestellt (E3.2: Liste statt Karte) | – | – |
 | P3.4 Preise je Markt und Vergleich in der Einkaufsliste | fertig | #39 | 231 Unit, 163/163 Browser |
 | P3.5 Open Prices | zurückgestellt: Abdeckung in Deutschland unbekannt, Dienst in der Arbeitsumgebung nicht erreichbar; erst nach Léons Test am Handy, ob gemerkte Preise reichen | – | – |
+| P2.1 Leser für `elan-import` | fertig | siehe PR | 238 Unit |
