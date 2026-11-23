@@ -1,0 +1,16 @@
+{
+  "format": "elan-angebote",
+  "version": 2,
+  "quelle": "von Hand abgetippt, Beispiel für Tests (erfunden)",
+  "stand": "2026-11-23",
+  "links": [{ "kette": "Testmarkt", "url": "https://www.example.org/prospekt", "art": "prospekt" }, { "kette": "Böse", "url": "javascript:alert(1)" }],
+  "angebote": [
+    { "markt": "Testmarkt", "artikel": "Bio Haferflocken zart", "zutat": "Haferflocken", "preis": 0.79, "menge": "500 g", "grundpreis": "1,58 €/kg", "kategorie": "getreide", "gueltigVon": "2026-11-23", "gueltigBis": "2026-11-28" },
+    { "markt": "Testmarkt", "artikel": "Äpfel Elstar", "zutat": "Apfel", "preis": 1.99, "menge": "1 kg", "kategorie": "obst", "gueltigBis": "2026-11-28" },
+    { "markt": "Testmarkt", "artikel": "Schokoriegel 5er", "preis": 1.49, "menge": "5 Stück", "kategorie": "suesses", "gueltigBis": "2026-11-28" },
+    { "markt": "Anderer Markt", "artikel": "Drachenfrucht", "zutat": "Drachenfrucht", "preis": 2.49, "menge": "1 Stück", "kategorie": "obst" },
+    { "markt": "Anderer Markt", "artikel": "Abgelaufenes", "preis": 0.5, "gueltigBis": "2026-11-01" },
+    { "markt": "", "artikel": "Ohne Markt", "preis": 1 },
+    { "markt": "Testmarkt", "artikel": "Ohne Preis" }
+  ]
+}

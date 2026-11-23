@@ -1,0 +1,16 @@
+{
+  "stand": "2026-11-23",
+  "hinweis": "Links zu den Händlern. Elan öffnet sie nur auf Knopfdruck im Browser und speichert nichts davon. Nur der Lidl-Link führt nachweislich direkt zu den Prospekten; bei den anderen ist es die Startseite (Prospekt-Adresse nicht belegt).",
+  "ketten": [
+    { "kette": "Lidl", "url": "https://www.lidl.de/c/online-prospekte/s10005610", "art": "prospekt", "beleg": "Websuche 23.11.2026" },
+    { "kette": "Kaufland", "url": "https://www.kaufland.de/", "art": "startseite" },
+    { "kette": "EDEKA", "url": "https://www.edeka.de/", "art": "startseite" },
+    { "kette": "Netto Marken-Discount", "url": "https://www.netto-online.de/", "art": "startseite" },
+    { "kette": "dm-drogerie markt", "url": "https://www.dm.de/", "art": "startseite" },
+    { "kette": "ALDI SÜD", "url": "https://www.aldi-sued.de/", "art": "startseite" },
+    { "kette": "ALDI Nord", "url": "https://www.aldi-nord.de/", "art": "startseite" },
+    { "kette": "REWE", "url": "https://www.rewe.de/", "art": "startseite" },
+    { "kette": "PENNY", "url": "https://www.penny.de/", "art": "startseite" },
+    { "kette": "NORMA", "url": "https://www.norma-online.de/", "art": "startseite" }
+  ]
+}

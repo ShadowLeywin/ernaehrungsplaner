@@ -43,3 +43,37 @@ Zugeordnet wird nur bei ganzen Wörtern: „Apfel“ trifft „Apfel“, nicht �
 ## Quellen (mit Datum)
 
 - `js/logik/angebote.js` und `test/daten/angebote-beispiel.json`, Stand 14.11.2026.
+
+## Version 2: Prospekt (`elan-angebote`, seit 23.11.2026)
+
+Angebote je Markt wie im Prospekt, auch ohne passende Zutat. Lesen: `leseProspektDatei` in `js/logik/prospekt.js`. Version 1 (oben) bleibt lesbar.
+
+```json
+{
+  "format": "elan-angebote",
+  "version": 2,
+  "quelle": "Woher die Angebote stammen, z. B. „von Hand aus dem Prospekt abgetippt“",
+  "stand": "2026-11-23",
+  "links": [{ "kette": "Mein Markt", "url": "https://…", "art": "prospekt" }],
+  "angebote": [
+    { "markt": "Mein Markt", "artikel": "Bio Haferflocken zart", "zutat": "Haferflocken", "preis": 0.79, "menge": "500 g",
+      "grundpreis": "1,58 €/kg", "kategorie": "getreide", "gueltigVon": "2026-11-23", "gueltigBis": "2026-11-28" }
+  ]
+}
+```
+
+| Feld | Pflicht | Inhalt |
+|---|---|---|
+| `format`, `version` | ja | `elan-angebote`, `2` |
+| `quelle`, `stand` | nein | Herkunft (höchstens 200 Zeichen), Datum |
+| `links[]` | nein | `kette`, `url` (nur `https://`), `art`: `prospekt` oder `startseite`. Geht vor `data/prospekt-links.json` |
+| `angebote[].markt` | ja | Kette oder Filiale, höchstens 40 Zeichen |
+| `angebote[].artikel` | ja | Name wie im Prospekt, höchstens 80 Zeichen |
+| `angebote[].preis` | ja | Euro, größer 0 |
+| `angebote[].zutat` | nein | Name oder Kennung einer Zutat; nur dann erscheint das Angebot in der Einkaufsliste (ganze Wörter) |
+| `angebote[].menge` | nein | Packungsgröße als Text („500 g“); ohne sie kann die Einkaufsliste keinen Preis für eine Menge rechnen |
+| `angebote[].grundpreis` | nein | Text, z. B. „1,58 €/kg“ |
+| `angebote[].kategorie` | nein | eine der Zutaten-Kategorien (`obst`, `gemuese`, `getreide`, …), sonst `sonstiges` |
+| `gueltigVon`, `gueltigBis` | nein | wie in Version 1 |
+
+**Woher die Datei kommt:** Elan ruft keine Prospekte ab (Entscheidung E4.1). Eine GitHub Action, die diese Datei wöchentlich schreibt, kommt erst, wenn es eine Quelle gibt, deren Bedingungen das erlauben (`docs/ROADMAP.md`, P4). Bis dahin: von Hand pflegen oder von einem Chat aus einem selbst abfotografierten Prospekt abtippen lassen. Prospektbilder kommen nie ins Repo.

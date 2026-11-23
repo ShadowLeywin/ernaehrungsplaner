@@ -426,3 +426,10 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Entscheidung:** Die Vorschau rechnet mit `baueUebernahme` und einer Platzhalter-Kennung: Gezeigt wird genau, was gespeichert würde. Verworfen: eigene Vorschau-Rechnung (zwei Wege, die auseinanderlaufen können).
 - **Fehler:** Das Auswahlfeld war auf der Karte unsichtbar: Die Regel des Blatt-Designs (`:root[data-thema='blatt'] input`) ist spezifischer als `.wahl-zeile input`. Lösung wie bei anderen Karten: `:root[data-thema] .wahl-zeile input { background: var(--flaeche-2) }`. „1 neue Rezept“ → „1 neues Rezept“.
 - **Fachbegriffe:** Datalist (Vorschläge zum Tippen, ohne lange Auswahlliste).
+## Session 16, Runde P4.1: Format für Prospekt-Angebote (23.11.2026)
+
+- **Was und warum:** P4 nach meiner Festlegung zu E4.1 (Léon: „überlege selber“): kein Abruf ohne erlaubte Quelle. Gebaut: Format `elan-angebote` Version 2 mit Artikeln je Markt (`js/logik/prospekt.js`), Version 1 bleibt lesbar; `data/prospekt-links.json` mit Links zu den Händlern.
+- **Befehle:** `npm test` (242, neu `test/prospekt.test.js` mit `test/daten/angebote-v2.json`) · Websuche nach offiziellen Prospekt-Seiten.
+- **Entscheidung:** Nur Lidls Prospekt-Seite war belegt; bei den anderen Ketten verlinkt Elan die Startseite und sagt das auch („Website öffnen“), statt eine Adresse zu raten. Links aus Dateien nur mit `https://` (ein `javascript:`-Link im Test wird verworfen).
+- **Entscheidung:** Ein Artikel wird nur über das Feld `zutat` mit einer Zutat verknüpft, nicht über den Artikelnamen: „Bio Haferflocken zart“ zu raten wäre oft richtig, aber nicht immer.
+- **Fachbegriffe:** Grundpreis (Preis je kg oder l, Pflichtangabe im Handel).
