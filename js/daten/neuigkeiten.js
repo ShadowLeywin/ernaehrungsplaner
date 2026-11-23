@@ -5,6 +5,16 @@ export const NEUIGKEITEN = [
   {
     version: '1.0.0',
     datum: '2026-11-23',
+    titel: 'Rezepte aus TikTok, Instagram, YouTube',
+    punkte: [
+      'In TikTok, Instagram oder YouTube auf „Teilen“ → Elan: Steht das Rezept in der Bildunterschrift, erkennt Elan es, ohne Emojis und Hashtags.',
+      'Nur ein Video ohne Text? Elan zeigt „Prompt kopieren“: im Claude-Chat einfügen, Antwort zurück in Elan, „Rezept erkennen“. Elan selbst öffnet keine Videos.',
+      'Das Rezept merkt sich, woher es kommt: „Aus TikTok · Beitrag öffnen“.',
+    ],
+  },
+  {
+    version: '1.0.0',
+    datum: '2026-11-23',
     titel: 'Prospekte',
     punkte: [
       'Neu: Prospekte (Mehr → Prospekte, oder unter Angebote). Eine Angebotsdatei laden, dann blätterst du die Angebote je Markt wie im Prospekt, nach Kategorien. Was auf deiner Einkaufsliste dieser Woche steht, ist markiert.',

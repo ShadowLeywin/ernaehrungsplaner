@@ -2,10 +2,13 @@
 // Die App ruft dabei keine fremden Seiten ab; verarbeitet wird nur, was eingefügt oder geteilt wurde.
 
 import { alsVorlage, leseRezept, ordneZu } from '../logik/import.js';
+import { lesePlanImport, promptVorlage } from '../logik/planimport.js';
+import { bereinigeBildunterschrift, ordneGeteiltesEin } from '../logik/teilen.js';
+import { teileText } from '../plattform.js';
 import { APP_NAME } from '../logik/schema.js';
 import { gehe } from '../router.js';
 import * as speicher from '../speicher.js';
-import { el, haenge, icon, zahl } from '../ui.js';
+import { el, haenge, hinweis, icon, zahl } from '../ui.js';
 
 export const GETEILT_SCHLUESSEL = 'elan.geteilt';
 
@@ -23,6 +26,8 @@ export function nimmEntwurf() {
 }
 
 let text = '';
+// Link eines geteilten Beitrags: bleibt erhalten, wenn danach die Antwort eines Chats ins Feld kommt
+let quelleLink = null;
 
 export async function zeigeImport(wurzel) {
   const zutaten = await speicher.alleZutaten();
@@ -43,16 +48,45 @@ export async function zeigeImport(wurzel) {
   const erkenne = () => {
     const eingabe = text.trim();
     if (!eingabe) { ergebnis.replaceChildren(el('p', { class: 'fehlertext', role: 'alert' }, 'Füge zuerst einen Rezepttext ein.')); feldText.focus(); return; }
-    if (/^https?:\/\/\S+$/.test(eingabe)) {
-      ergebnis.replaceChildren(el('p', { class: 'merkzettel' }, 'Das ist nur eine Adresse. Die App ruft keine fremden Seiten ab. Öffne die Seite, kopiere den Rezepttext und füge ihn hier ein.'));
+    // Antwort eines Chats im Format elan-import (Prompt-Brücke, P5.3)
+    if (/"format"\s*:\s*"elan-import"/.test(eingabe)) {
+      const gelesen = lesePlanImport(eingabe, { zutaten });
+      const r = gelesen.ok ? gelesen.rezepte[0] : null;
+      if (!r) { ergebnis.replaceChildren(el('p', { class: 'fehlertext', role: 'alert' }, gelesen.ok ? 'Die Antwort enthält kein Rezept.' : gelesen.fehler.join(' '))); return; }
+      zeigeVorschlag({ name: r.name, portionen: r.portionen, schritte: r.schritte, zutaten: [] }, r.zutaten.map((z) => ({ ...z, roh: z.name })), 'chat', gelesen.quelle?.link ?? quelleLink);
       return;
     }
-    const { quelle, rezept } = leseRezept(eingabe);
+    // Eingefügter Seitenquelltext mit Rezeptdaten (Schema.org) geht vor: Er enthält auch Links, ist aber keine Bildunterschrift
+    const roh = leseRezept(eingabe);
+    if (roh.quelle === 'schema') { zeigeVorschlag(roh.rezept, ordneZu(roh.rezept.zutaten, zutaten), 'schema', null); return; }
+    const geteilt = ordneGeteiltesEin(eingabe);
+    if (geteilt.link) quelleLink = geteilt.link;
+    // Nur ein Link (meist ein Video): Elan lädt nichts. Weg über einen Chat anbieten
+    if (geteilt.link && geteilt.nurLink) { zeigeBruecke(geteilt, 'Hier steht nur ein Link, kein Rezepttext. Elan ruft keine fremden Seiten ab und öffnet keine Videos.'); return; }
+    const { quelle, rezept } = geteilt.link ? leseRezept(bereinigeBildunterschrift(geteilt.text)) : roh;
     if (!rezept.zutaten.length && !rezept.schritte.length) {
+      if (geteilt.link) { zeigeBruecke(geteilt, 'In der Bildunterschrift habe ich kein Rezept gefunden.'); return; }
       ergebnis.replaceChildren(el('p', { class: 'merkzettel' }, 'Darin habe ich kein Rezept erkannt. Am besten klappt es mit den Überschriften „Zutaten“ und „Zubereitung“ und einer Zutat je Zeile.'));
       return;
     }
-    const zugeordnet = ordneZu(rezept.zutaten, zutaten);
+    zeigeVorschlag(rezept, ordneZu(rezept.zutaten, zutaten), geteilt.link ? 'teilen' : quelle, geteilt.link);
+  };
+
+  // Prompt-Brücke: Vorlage mit Link und Bildunterschrift kopieren, im Chat fragen, Antwort hier einfügen
+  const zeigeBruecke = (geteilt, grund) => {
+    const kopiere = async () => {
+      const inhalt = [`Rezept aus diesem Beitrag${geteilt.plattform ? ` (${geteilt.plattform.name})` : ''}: ${geteilt.link}`, geteilt.text].filter(Boolean).join('\n');
+      try {
+        if ((await teileText(promptVorlage({ inhalt }), 'Rezept per Chat holen')) === 'kopiert') hinweis('Prompt kopiert. Im Chat einfügen, Antwort hierher kopieren.');
+      } catch { hinweis('Kopieren hat nicht geklappt.'); }
+    };
+    ergebnis.replaceChildren(el('div', { class: 'merkzettel', id: 'import-bruecke' },
+      el('p', {}, grund),
+      el('p', {}, 'So holst du das Rezept trotzdem: Prompt kopieren, in einem Claude-Chat einfügen (am besten mit dem, was du im Video siehst oder hörst), die Antwort komplett kopieren, hier ins Feld einfügen und „Rezept erkennen“ tippen.'),
+      el('button', { type: 'button', class: 'knopf', onclick: kopiere }, 'Prompt kopieren')));
+  };
+
+  const zeigeVorschlag = (rezept, zugeordnet, quelle, link) => {
     const gefunden = zugeordnet.filter((z) => z.treffer).length;
     const zusatz = (z) => {
       if (!z.treffer) return 'nicht gefunden, bitte im Formular von Hand ergänzen';
@@ -62,8 +96,8 @@ export async function zeigeImport(wurzel) {
     ergebnis.replaceChildren(
       el('h2', {}, rezept.name || 'Rezept ohne Namen'),
       el('p', { class: 'klein' }, [
-        quelle === 'schema' ? 'Gelesen aus den Rezeptdaten der Seite.' : 'Gelesen aus dem Text.',
-        rezept.portionen ? `${zahl(rezept.portionen, 1)} Portionen.` : 'Portionen nicht gefunden, Startwert ist 4.',
+        { schema: 'Gelesen aus den Rezeptdaten der Seite.', teilen: 'Gelesen aus der Bildunterschrift.', chat: 'Gelesen aus der Antwort des Chats.' }[quelle] ?? 'Gelesen aus dem Text.',
+        rezept.portionen ? `${zahl(rezept.portionen, 1)} ${rezept.portionen === 1 ? 'Portion' : 'Portionen'}.` : 'Portionen nicht gefunden, Startwert ist 4.',
         `${gefunden} von ${zugeordnet.length} Zutaten zugeordnet, ${rezept.schritte.length} ${rezept.schritte.length === 1 ? 'Schritt' : 'Schritte'}.`,
       ].join(' ')),
       zugeordnet.length ? el('ul', { class: 'zeilen' }, zugeordnet.map((z) => el('li', { class: z.treffer ? 'zeile' : 'zeile offen' },
@@ -71,7 +105,7 @@ export async function zeigeImport(wurzel) {
       el('p', { class: 'klein' }, 'Das ist ein Vorschlag. Im Formular prüfst du Zutaten und Mengen, bevor du speicherst.'),
       el('div', { class: 'knopfreihe' }, el('button', {
         type: 'button', class: 'knopf',
-        onclick: () => { entwurf = alsVorlage(rezept, zugeordnet); text = ''; gehe('/rezepte/neu'); },
+        onclick: () => { entwurf = { ...alsVorlage(rezept, zugeordnet), ...(link ? { quelle: link } : {}) }; text = ''; quelleLink = null; gehe('/rezepte/neu'); },
       }, 'Ins Rezeptformular übernehmen')));
   };
 

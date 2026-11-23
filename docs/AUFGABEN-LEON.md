@@ -85,6 +85,16 @@ Vorher: Mehr → „Backup speichern“ (das Update hebt die Datenbank auf Schem
 | P4-3 | Einkaufsliste öffnen | Angebote mit Zutat stehen bei der Zutat und zählen beim Preis |
 | P4-4 | Gibt es eine Angebotsquelle, die automatischen Abruf erlaubt (oder fragst du einen Anbieter)? Ein Satz an Claude genügt | Dann baut Claude die wöchentliche Action (P4.2) |
 
+## P5. Rezepte aus Social Media am Handy testen (etwa 10 Minuten, nach dem Merge von P5)
+
+| Nr. | Was du tust | Was du sehen solltest |
+|---|---|---|
+| P5-1 | TikTok: ein Rezept-Video mit Rezept in der Beschreibung → Teilen → Elan | „Rezept importieren“ mit erkannten Zutaten, „Gelesen aus der Bildunterschrift“. Wenn nur ein Link ankommt: notieren (dann gibt TikTok den Text nicht mit) |
+| P5-2 | Dasselbe aus Instagram (Reel) und YouTube (Short) | wie P5-1; je App notieren, ob Text oder nur Link ankommt |
+| P5-3 | Bei „nur Link“: „Prompt kopieren“ → Claude-Chat → Antwort zurück → „Rezept erkennen“ | Rezept mit Zutaten; im Formular speichern |
+| P5-4 | Gespeichertes Rezept öffnen → „Beitrag öffnen“ | Video öffnet sich in der App oder im Browser |
+| P5-5 | Teilen, während Elan schon offen ist | Elan springt trotzdem zu „Rezept importieren“ mit dem neuen Inhalt |
+
 ## B. Automatischer Bau einrichten (5 Minuten, am Rechner oder Handy)
 
 Erledigt am 23.11.2026: Secrets eingetragen, Release „Elan 1.0.0“ mit signiertem APK gebaut.

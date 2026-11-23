@@ -11,7 +11,7 @@ Jede Zeile „Status“ wird nach jeder Runde nachgezogen.
 | P3 Märkte und Preise | eigene Märkte wählen, grober Preis der Einkaufsliste je Markt | gebaut (P3.1, P3.2, P3.4), Karte und Open Prices zurückgestellt | 2 |
 | P2 Plan-Import | Monatsplan aus einem Claude-Chat übernehmen | gebaut | 3 |
 | P4 Angebote und Prospekte | Angebote je Markt wöchentlich als Datei, in der App wie ein Prospekt | gebaut ohne automatischen Abruf; Action wartet auf eine erlaubte Quelle (E4.1) | 4 |
-| P5 Social-Rezeptimport | „Teilen an Elan“ aus TikTok, Instagram, YouTube, Prompt-Brücke | offen | 5 |
+| P5 Social-Rezeptimport | „Teilen an Elan“ aus TikTok, Instagram, YouTube, Prompt-Brücke | gebaut | 5 |
 | P6 Zutaten-Datenbank | Suche, Kategorien, Detailansicht, Favoriten wie Yazio | offen | 6 |
 
 **Reihenfolge:** P1, P3, P2, P4, P5, P6 (Léons Ja zu E0.1 vom 23.11.2026). Früherer Vorschlag:
@@ -91,6 +91,7 @@ Die Primärseiten (operations.osmfoundation.org, overpass-api.de, prices.openfoo
 |---|---|---|
 | P4.1 Format `elan-angebote` Version 2 | Angebote je Markt (Kette, Filiale), Gültigkeit, Preis, Grundpreis, Bild-Link der Quelle; Leser in `js/logik/angebote.js`, Version 1 bleibt lesbar | Tests mit Beispieldatei, Doku in `docs/ANGEBOTE-FORMAT.md` |
 | P4.2 Action wöchentlich | Workflow auf eigenem Branch, schreibt `data/angebote.json` nur aus einer erlaubten Quelle; bricht bei Fehler ohne Überschreiben ab | läuft mit `workflow_dispatch` grün; keine Schlüssel aus fremden Webseiten |
+| P5.1 bis P5.3 Geteiltes einordnen, Bildunterschrift lesen, Prompt-Brücke | fertig (ein PR: alles auf der Seite „Rezept importieren“) | siehe PR | 246 Unit, 176/176 Browser |
 | P4.3 Bereich „Prospekte“ | je Markt eine Seite mit Angeboten als Kacheln, nach Kategorie; Treffer zur Einkaufsliste markiert | lädt nur die mitgelieferte Datei; kein Netz ohne Tipp |
 | P4.4 Original-Prospekt | Knopf „Prospekt des Händlers öffnen“ öffnet die offizielle Seite im Browser | keine Prospektbilder oder PDFs im Repo oder in der App gespeichert |
 

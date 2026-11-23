@@ -442,3 +442,11 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Unsicher:** Ob Capacitor eine fremde Adresse im Browser des Handys statt im WebView öffnet [vermutet]; Léon prüft (P4-1).
 - **Notiert:** Der Maß-Test zeigt einen echten Fehler (Name geht verloren); unter „Bekannte Fehler“ in der Roadmap.
 - **Fachbegriffe:** `noopener` (neuer Tab ohne Zugriff zurück auf die App).
+
+## Session 16, Runden P5.1 bis P5.3: Rezepte aus Social Media (23.11.2026)
+
+- **Was und warum:** „Teilen an Elan“ gab es schon (Intent-Filter, `onNewIntent`). Neu: `js/logik/teilen.js` erkennt Link und Plattform am Hostnamen und räumt Bildunterschriften auf (Emojis vor Zeilen, Hashtags, „Zutaten 👇“). Reiner Link → Prompt-Brücke mit `promptVorlage`. Antwort im Format `elan-import` → Vorschlag. Der Link bleibt als `quelle` am Rezept („Aus TikTok · Beitrag öffnen“, nur auf Tipp).
+- **Befehle:** `npm test` (246, neu `test/teilen.test.js`) · `node tools/pruefe-app.cjs` (176; Teilen über `?titel=&text=&url=` wie Android).
+- **Fehler:** Ein alter Test fiel: Ein eingefügter Seitenquelltext enthält Links und landete im Weg für Bildunterschriften. Lösung: Schema.org-Daten zuerst prüfen. Den alten Satz „ruft keine fremden Seiten ab“ behalten, statt den Test zu ändern.
+- **Entscheidung:** Plattform nur über ganze Hostnamen („nichttiktok.com“ ist nicht TikTok). Verworfen: Video-Inhalte holen (verboten, und Elan lädt nichts).
+- **Fachbegriffe:** `\p{Extended_Pictographic}` (Unicode-Eigenschaft für Emojis in Regex), Prompt-Brücke (Mensch trägt Daten zwischen Chat und App).
