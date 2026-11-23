@@ -1,9 +1,9 @@
 // Märkte: die eigenen Märkte für Preise und Vergleich. Suchen in OpenStreetMap nur auf Knopfdruck,
 // mit dem eingegebenen Ort oder der Postleitzahl, nie mit einem Standort. Oder einen Markt von Hand anlegen.
 
-import { OSM_HINWEIS, OSM_LIZENZ_URL, adresseText, leseOverpass, overpassUrl, pruefeEigenerMarkt, pruefeOrt } from '../logik/osm.js';
+import { OSM_HINWEIS, OSM_LIZENZ_URL, OVERPASS_SERVER, adresseText, deuteOverpassAntwort, leseOverpass, overpassUrl, pruefeEigenerMarkt, pruefeOrt } from '../logik/osm.js';
 import { APP_NAME } from '../logik/schema.js';
-import { holeJson } from '../plattform.js';
+import { holeText } from '../plattform.js';
 import { neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { el, haenge, hinweis, icon } from '../ui.js';
@@ -11,18 +11,31 @@ import { el, haenge, hinweis, icon } from '../ui.js';
 // Suche und Treffer überleben ein Neuzeichnen der Seite (nach „Merken“ oder „Entfernen“)
 const entwurf = { ort: '', treffer: null, meldung: '' };
 
-/** Overpass fragen. Fehler als verständlicher Satz; bei 429 nicht wiederholen, wer oft drängelt, wird gesperrt. */
+/**
+ * Overpass fragen: erst den Hauptserver, bei Ausfall oder Überlastung einmal den Ersatzserver.
+ * Jeder Server bekommt genau eine Anfrage je Tipp (wer drängelt, wird gesperrt).
+ * Die Fehlermeldung nennt den technischen Grund, damit Léon ihn weitergeben kann.
+ */
 async function sucheMaerkte(ort) {
-  let antwort;
-  try {
-    antwort = await holeJson(overpassUrl(ort), 30000);
-  } catch (fehler) {
-    if (fehler.name === 'AbortError') throw new Error('OpenStreetMap hat nicht rechtzeitig geantwortet. Versuch es später noch einmal.');
-    throw new Error('Keine Verbindung zu OpenStreetMap. Bist du online?');
+  const gruende = [];
+  for (const server of OVERPASS_SERVER) {
+    const name = new URL(server).hostname;
+    let antwort;
+    try {
+      antwort = await holeText(overpassUrl(ort, server), 35000);
+    } catch (fehler) {
+      gruende.push(`${name}: ${fehler.name === 'AbortError' ? 'keine Antwort in 35 s' : (fehler.message || 'keine Verbindung')}`);
+      continue;
+    }
+    const gedeutet = deuteOverpassAntwort(antwort.status, antwort.text);
+    if (gedeutet.ok) return leseOverpass(gedeutet.daten);
+    gruende.push(`${name}: ${gedeutet.grund}`);
+    if (!gedeutet.weiter) break;
   }
-  if (antwort.status === 429 || antwort.status === 504) throw new Error('Der Suchdienst von OpenStreetMap ist gerade ausgelastet. Versuch es in ein paar Minuten noch einmal.');
-  if (antwort.status < 200 || antwort.status >= 300) throw new Error(`Der Suchdienst antwortet mit Fehler ${antwort.status}.`);
-  return leseOverpass(antwort.daten);
+  const offline = typeof navigator !== 'undefined' && navigator.onLine === false;
+  throw new Error(offline
+    ? 'Du bist offline. Die Suche braucht eine Verbindung.'
+    : `Die Märkte-Suche hat gerade nicht geklappt. Versuch es später noch einmal, oder leg den Markt unten von Hand an. Technik: ${gruende.join(' · ')}`);
 }
 
 export async function zeigeMaerkte(wurzel) {

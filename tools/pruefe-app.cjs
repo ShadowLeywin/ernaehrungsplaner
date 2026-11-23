@@ -2193,6 +2193,33 @@ async function zutatenLauf(browser) {
   await kontext.close();
 }
 
+/** Märkte-Suche bei Störungen: Hauptserver überlastet → Ersatzserver; beide weg → Meldung mit technischem Grund */
+async function marktStoerungLauf(browser) {
+  const { kontext, seite, fehler } = await neueSeite(browser);
+  const overpass = fs.readFileSync(path.resolve(__dirname, '..', 'test', 'daten', 'overpass-maerkte.json'), 'utf8');
+  let ersatz = true;
+  await seite.route('https://overpass-api.de/**', (route) => route.fulfill({ status: 504, contentType: 'text/html', body: '<html><body>Gateway Timeout</body></html>' }));
+  await seite.route('https://overpass.private.coffee/**', (route) => (ersatz
+    ? route.fulfill({ contentType: 'application/json', body: overpass })
+    : route.fulfill({ status: 200, contentType: 'text/html', body: '<html>Wartung</html>' })));
+  await seite.goto(`${URL_APP}#/maerkte`, { waitUntil: 'networkidle' });
+  await seite.locator('#f-markt-ort').fill('12345');
+  await seite.getByRole('button', { name: 'Suchen' }).click();
+  await seite.locator('#markt-treffer li').first().waitFor();
+  const treffer = await seite.locator('#markt-treffer li').count();
+  ersatz = false;
+  await seite.getByRole('button', { name: 'Suchen' }).click();
+  await seite.locator('.merkzettel', { hasText: 'Technik:' }).waitFor();
+  const meldung = await seite.locator('.merkzettel', { hasText: 'Technik:' }).innerText();
+  pruefe('Märkte-Suche: Ersatzserver springt ein; ohne beide eine Meldung mit Grund statt „Bist du online?“',
+    treffer === 3 && meldung.includes('overpass-api.de: Server überlastet (504)') && meldung.includes('overpass.private.coffee: keine gültige Antwort') && !meldung.includes('Bist du online'),
+    `${treffer} Treffer über den Ersatzserver; „${meldung.slice(0, 160)}…“`);
+  // Der Browser meldet die absichtlich simulierte 504-Antwort selbst; das ist kein Fehler der App
+  const echteFehler = fehler.filter((f) => !f.includes('Failed to load resource'));
+  pruefe('Störungs-Lauf ohne Konsolenfehler der App', echteFehler.length === 0, echteFehler.slice(0, 3).join(' | ') || `0 Fehler (${fehler.length} Netzmeldungen des Browsers zum simulierten 504)`);
+  await kontext.close();
+}
+
 (async () => {
   if (BILDER) fs.mkdirSync(BILDER, { recursive: true });
   ({ SCHEMA_VERSION } = await import('../js/logik/schema.js'));
@@ -2214,6 +2241,7 @@ async function zutatenLauf(browser) {
     await migrationsLauf(browser);
     await migration7Lauf(browser);
     await marktLauf(browser);
+    await marktStoerungLauf(browser);
     await planImportLauf(browser);
     await prospektLauf(browser);
     await teilenLauf(browser);
