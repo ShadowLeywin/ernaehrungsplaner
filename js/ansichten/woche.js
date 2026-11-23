@@ -6,7 +6,7 @@ import { alsEintraege, naechsterFreierSlot } from '../logik/plan.js';
 import { haltbarkeitsWarnungen } from '../logik/rezepte.js';
 import { APP_NAME } from '../logik/schema.js';
 import { wochenTage } from '../logik/woche.js';
-import { SLOTS, TAGESTYPEN, tagestypFuer } from '../logik/ziele.js';
+import { SLOTS, TAGESTYPEN, tagestypFuer, tagestypKlasse } from '../logik/ziele.js';
 import { neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { el, haenge, hinweis, icon, zahl } from '../ui.js';
@@ -94,7 +94,7 @@ function tagBereich({ datum, istHeute, posten, typ, ziele, warnungen }) {
   return el('section', { class: istHeute ? 'slot plantag heute' : 'slot plantag', id: `tag-${datum}` },
     el('div', { class: 'slot-kopf' },
       // Kalenderkachel „Do 12“, gefärbt nach Tagestyp: Datum und Typ auf einen Blick, ohne lange Zeile
-      el('span', { class: `slot-bild kalender tagestyp-${typ}`, 'aria-hidden': 'true' },
+      el('span', { class: `slot-bild kalender ${tagestypKlasse(typ)}`, 'aria-hidden': 'true' },
         el('small', {}, wochentag.slice(0, 2)), el('strong', {}, String(ausIso(datum).getDate()))),
       el('div', { class: 'slot-text' },
         // Der Titel führt in den Tagesplan mit allen sechs Mahlzeiten; das Plus daneben bleibt der schnelle Weg

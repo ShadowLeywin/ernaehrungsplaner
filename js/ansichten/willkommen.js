@@ -3,11 +3,11 @@
 
 import { APP_NAME } from '../logik/schema.js';
 import { GESCHLECHTER } from '../logik/referenz.js';
-import { TAGESTYPEN, skaliereZiel } from '../logik/ziele.js';
+import { MAX_TAGESTYPEN, MAX_TYPNAME, STANDARD_ZIELE, TAGESTYPEN, neueTypKennung, pruefeTagestypen, skaliereZiel } from '../logik/ziele.js';
 import { parseZahl } from '../logik/zutat.js';
 import { gehe } from '../router.js';
 import * as speicher from '../speicher.js';
-import { el, feld, haenge, hinweis } from '../ui.js';
+import { el, feld, haenge, hinweis, icon } from '../ui.js';
 
 const SCHLUESSEL = 'elan.eingerichtet';
 
@@ -20,6 +20,7 @@ export function merkeEingerichtet() {
 }
 
 let schritt = 1;
+let entwurf = null;
 
 export async function zeigeWillkommen(wurzel) {
   document.title = `Willkommen – ${APP_NAME}`;
@@ -35,7 +36,7 @@ export async function zeigeWillkommen(wurzel) {
       el('ul', { class: 'vorteile' },
         el('li', {}, el('strong', {}, 'Alles bleibt auf dem Handy. '), 'Kein Konto, kein Server, keine Werbung.'),
         el('li', {}, el('strong', {}, 'Schnell eintragen. '), 'Zuletzt Gegessenes geht mit einem Tipp.'),
-        el('li', {}, el('strong', {}, 'Ziele je Tagestyp. '), 'Gym, Calisthenics und Rest haben eigene Ziele.')),
+        el('li', {}, el('strong', {}, 'Ziele je Tagestyp. '), 'Training, Ruhetag oder was du willst: Namen und Anzahl wählst du selbst.')),
       el('div', { class: 'knopfreihe' },
         el('a', { class: 'knopf leise', href: '#/mehr/backup', onclick: () => merkeEingerichtet() }, 'Backup einspielen'),
         el('button', { type: 'button', class: 'knopf', onclick: () => weiter(2) }, 'Los geht’s'))));
@@ -43,29 +44,43 @@ export async function zeigeWillkommen(wurzel) {
 
   if (schritt === 2) {
     const ziele = await speicher.ladeZiele();
-    const eingabe = Object.fromEntries(TAGESTYPEN.map((t) => [t.id, String(ziele[t.id].kcal)]));
+    // Entwurf über ein Neuzeichnen hinweg (Typ dazu oder weg): Namen und kcal bleiben stehen
+    entwurf ??= TAGESTYPEN.map((t) => ({ id: t.id, name: t.name, kcal: String(ziele[t.id]?.kcal ?? STANDARD_ZIELE.calisthenics.kcal) }));
     const fehler = el('p', { class: 'fehlertext', role: 'alert' });
+    const neuZeichnenSchritt = () => weiter(2);
     const speichern = async () => {
+      const pruefung = pruefeTagestypen(entwurf);
+      if (!pruefung.ok) { fehler.textContent = pruefung.fehler; return; }
       const neu = {};
-      for (const t of TAGESTYPEN) {
-        const kcal = parseZahl(eingabe[t.id]);
+      for (const t of entwurf) {
+        const kcal = parseZahl(t.kcal);
         if (kcal === null || Number.isNaN(kcal) || kcal < 800 || kcal > 8000) { fehler.textContent = `${t.name}: eine Zahl von 800 bis 8.000.`; return; }
-        neu[t.id] = kcal === ziele[t.id].kcal ? ziele[t.id] : skaliereZiel(ziele[t.id], kcal);
+        const basis = ziele[t.id] ?? STANDARD_ZIELE[t.id] ?? STANDARD_ZIELE.calisthenics;
+        neu[t.id] = kcal === basis.kcal ? basis : skaliereZiel(basis, kcal);
       }
+      await speicher.setzeEinstellung('tagestypen', pruefung.typen.map(({ id, name }) => ({ id, name })));
       await speicher.setzeEinstellung('ziele', neu);
+      entwurf = null;
       weiter(3);
     };
+    const zeile = (t) => el('div', { class: 'typ-zeile' },
+      feld({ name: `typname-${t.id}`, beschriftung: 'Name', value: t.name, maxlength: MAX_TYPNAME, oninput: (e) => { t.name = e.target.value; } }),
+      feld({ name: `start-${t.id}`, beschriftung: 'Energie', einheit: 'kcal', inputmode: 'numeric', value: t.kcal, oninput: (e) => { t.kcal = e.target.value; } }),
+      entwurf.length > 1 ? el('button', {
+        type: 'button', class: 'rund', 'aria-label': `${t.name || 'Tagestyp'} entfernen`,
+        onclick: () => { entwurf = entwurf.filter((x) => x !== t); neuZeichnenSchritt(); },
+      }, icon('zu', 20)) : null);
     return haenge(wurzel, el('div', { class: 'willkommen stapel' },
       punkte,
-      el('h1', {}, 'Deine Energieziele'),
-      el('p', {}, 'Wie viel willst du an welchem Tagestyp essen? Die Startwerte sind Platzhalter. Eiweiß bleibt gleich, Kohlenhydrate und Fett passt Elan an. Genauer geht es später unter Mehr → Ziele.'),
-      el('div', { class: 'stapel' }, TAGESTYPEN.map((t) => feld({
-        name: `start-${t.id}`, beschriftung: t.name, einheit: 'kcal', inputmode: 'numeric', value: eingabe[t.id],
-        oninput: (e) => { eingabe[t.id] = e.target.value; },
-      }))),
+      el('h1', {}, 'Deine Tagestypen'),
+      el('p', {}, 'An welchen Arten von Tagen isst du unterschiedlich viel? Benenne sie, wie du willst (zum Beispiel Training, Lauf, Ruhetag), und gib jedem ein Energieziel. Eiweiß bleibt gleich, Kohlenhydrate und Fett passt Elan an. Ändern geht später unter Mehr → Wochenplan und Mehr → Ziele.'),
+      el('div', { class: 'stapel', id: 'start-typen' }, entwurf.map(zeile)),
+      entwurf.length < MAX_TAGESTYPEN ? el('button', {
+        type: 'button', class: 'knopf leise', onclick: () => { entwurf.push({ id: neueTypKennung(entwurf), name: '', kcal: String(STANDARD_ZIELE.calisthenics.kcal) }); neuZeichnenSchritt(); },
+      }, icon('plus', 18), 'Tagestyp') : null,
       fehler,
       el('div', { class: 'knopfreihe' },
-        el('button', { type: 'button', class: 'knopf leise', onclick: () => weiter(3) }, 'Startwerte lassen'),
+        el('button', { type: 'button', class: 'knopf leise', onclick: () => { entwurf = null; weiter(3); } }, 'Startwerte lassen'),
         el('button', { type: 'button', class: 'knopf', onclick: speichern }, 'Weiter'))));
   }
 

@@ -2254,6 +2254,53 @@ async function marktStoerungLauf(browser) {
   await kontext.close();
 }
 
+/** Eigene Tagestypen: bei der Ersteinrichtung benennen, Anzahl ändern; später unter Mehr → Wochenplan */
+async function tagestypLauf(browser) {
+  const { kontext, seite, fehler } = await neueSeite(browser, { einrichtung: true });
+  await seite.goto(URL_APP, { waitUntil: 'networkidle' });
+  await seite.getByRole('button', { name: 'Los geht’s' }).click();
+  await seite.locator('#f-typname-gym').fill('Training');
+  await seite.getByRole('button', { name: 'Calisthenics entfernen' }).click();
+  await seite.locator('#f-typname-calisthenics').waitFor({ state: 'detached' });
+  const nameNachEntfernen = await seite.locator('#f-typname-gym').inputValue();
+  await seite.getByRole('button', { name: 'Tagestyp', exact: true }).click();
+  const neuesFeld = seite.locator('#start-typen .typ-zeile').last().locator('input').first();
+  await neuesFeld.fill('Lauf');
+  await seite.locator('#start-typen .typ-zeile').last().locator('input').nth(1).fill('2800');
+  await bild(seite, '59-start-tagestypen', false);
+  await seite.getByRole('button', { name: 'Weiter' }).click();
+  await seite.getByRole('button', { name: 'Fertig' }).click();
+  await seite.locator('.slot').first().waitFor();
+  const wahlHeute = await seite.locator('[aria-label=Tagestyp] .wahl-knopf').allInnerTexts();
+  await seite.goto(`${URL_APP}#/woche`);
+  await seite.locator('.plantag').first().waitFor();
+  const wocheText = await seite.locator('.wochenliste').innerText();
+  pruefe('Ersteinrichtung: Tagestypen frei benennen, entfernen, hinzufügen; überall sichtbar',
+    // Ein neuer Typ kommt ans Ende; die Tage des entfernten Typs gehen an den ersten
+    nameNachEntfernen === 'Training' && wahlHeute.join() === 'Training,Rest,Lauf' && wocheText.includes('Training') && wocheText.includes('Rest') && !/Gym|Calisthenics/.test(wocheText),
+    `Heute: ${wahlHeute.join(', ')}; Woche: ${[...new Set(wocheText.match(/Training|Rest|Lauf|Gym|Calisthenics/g))].join(', ')}`);
+  // Später umbenennen unter Mehr → Wochenplan
+  await seite.goto(`${URL_APP}#/mehr/wochenplan`);
+  await seite.locator('#tagestypen').waitFor();
+  await seite.locator('#f-typname-rest').fill('Ruhetag');
+  await seite.getByRole('button', { name: 'Tagestypen speichern' }).click();
+  await seite.locator('.hinweis', { hasText: 'Tagestypen gespeichert' }).waitFor();
+  const wochenWahl = await seite.locator('#f-woche-6 option').allInnerTexts();
+  await seite.reload({ waitUntil: 'networkidle' });
+  await seite.goto(`${URL_APP}#/mehr/ziele`);
+  await seite.locator('.wahl-knopf').first().waitFor();
+  const zieleTypen = await seite.locator('[aria-label=Tagestyp] .wahl-knopf').allInnerTexts();
+  pruefe('Mehr → Wochenplan: Tagestyp umbenennen, gilt sofort und nach Neustart (Wochenplan, Ziele)',
+    wochenWahl.join() === 'Training,Ruhetag,Lauf' && zieleTypen.join() === 'Training,Ruhetag,Lauf', `Wochenplan: ${wochenWahl.join(', ')}; Ziele: ${zieleTypen.join(', ')}`);
+  await seite.setViewportSize({ width: 320, height: 640 });
+  await seite.goto(`${URL_APP}#/heute`);
+  await seite.locator('.slot').first().waitFor();
+  const breite = await seite.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  pruefe('Eigene Tagestypen bei 320 px ohne seitliches Rollen', breite <= 0, `${breite} px`);
+  pruefe('Tagestyp-Lauf ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
+  await kontext.close();
+}
+
 (async () => {
   if (BILDER) fs.mkdirSync(BILDER, { recursive: true });
   ({ SCHEMA_VERSION } = await import('../js/logik/schema.js'));
@@ -2272,6 +2319,7 @@ async function marktStoerungLauf(browser) {
     await feinschliffLauf(browser);
     await appLauf(browser);
     await willkommenLauf(browser);
+    await tagestypLauf(browser);
     await migrationsLauf(browser);
     await migration7Lauf(browser);
     await marktLauf(browser);

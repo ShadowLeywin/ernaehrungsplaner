@@ -5,7 +5,7 @@ import { erstelleBackup } from './logik/backup.js';
 import { bereinigeGesundheit, messungId } from './logik/gesundheit.js';
 import { bereinigeGruppe, werteFuer } from './logik/referenz.js';
 import { rezeptAlsZutat } from './logik/rezepte.js';
-import { bereinigeWoche, bereinigeZiele, slotsMitAnteilen } from './logik/ziele.js';
+import { bereinigeWoche, bereinigeZiele, setzeTagestypen, slotsMitAnteilen } from './logik/ziele.js';
 import { bereinigeFavoriten, mitExtraPortionen } from './logik/zutatenbank.js';
 
 /* ---------- Zutaten ---------- */
@@ -205,7 +205,12 @@ export async function einstellung(schluessel, standard = null) {
   return (await db.hole('einstellungen', schluessel))?.wert ?? standard;
 }
 
-export const setzeEinstellung = (schluessel, wert) => db.speichere('einstellungen', { schluessel, wert });
+export async function setzeEinstellung(schluessel, wert) {
+  const satz = await db.speichere('einstellungen', { schluessel, wert });
+  // Tagestypen gelten sofort in der ganzen App, nicht erst nach einem Neustart
+  if (schluessel === 'tagestypen') setzeTagestypen(wert);
+  return satz;
+}
 
 export const ladeZiele = async () => bereinigeZiele(await einstellung('ziele'));
 export const ladeWoche = async () => bereinigeWoche(await einstellung('woche'));
@@ -215,7 +220,10 @@ export const ladeSlots = async () => slotsMitAnteilen(await einstellung('slotAnt
 /* ---------- Backup ---------- */
 
 export const exportiere = async () => erstelleBackup(await db.allesLesen());
-export const importiere = (daten) => db.allesErsetzen(daten);
+export async function importiere(daten) {
+  await db.allesErsetzen(daten);
+  setzeTagestypen((daten.einstellungen ?? []).find((e) => e.schluessel === 'tagestypen')?.wert ?? null);
+}
 
 /* ---------- Speicher des Browsers ---------- */
 

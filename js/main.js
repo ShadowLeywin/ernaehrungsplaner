@@ -12,6 +12,7 @@ import { zeigeEinkauf } from './ansichten/einkauf.js';
 import { zeigeMaerkte } from './ansichten/maerkte.js';
 import { zeigeProspekte } from './ansichten/prospekte.js';
 import * as speicher from './speicher.js';
+import { setzeTagestypen } from './logik/ziele.js';
 import { zeigeZutaten } from './ansichten/zutaten.js';
 import { neuZeichnen, route, starte } from './router.js';
 import { automatischAn, gleicheAb } from './abgleich.js';
@@ -50,6 +51,8 @@ if (!istEingerichtet() && startseite) {
   if ((await speicher.anzahlEintraege().catch(() => 0)) > 0) merkeEingerichtet();
   else history.replaceState(null, '', `${location.pathname}${location.search}#/willkommen`);
 }
+// Eigene Tagestypen vor dem ersten Zeichnen laden, damit keine Seite kurz „Gym“ zeigt
+setzeTagestypen(await speicher.einstellung('tagestypen').catch(() => null));
 starte(document.getElementById('inhalt'), 'heute');
 
 /* ---------- Health Connect: beim Öffnen abgleichen, wenn eingeschaltet ---------- */
