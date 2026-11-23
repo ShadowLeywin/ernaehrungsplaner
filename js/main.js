@@ -8,6 +8,7 @@ import { zeigeMehr } from './ansichten/mehr.js';
 import { zeigeRezepte } from './ansichten/rezepte.js';
 import { istEingerichtet, merkeEingerichtet, zeigeWillkommen } from './ansichten/willkommen.js';
 import { zeigeWoche } from './ansichten/woche.js';
+import { zeigeEinkauf } from './ansichten/einkauf.js';
 import * as speicher from './speicher.js';
 import { zeigeZutaten } from './ansichten/zutaten.js';
 import { neuZeichnen, route, starte } from './router.js';
@@ -27,6 +28,7 @@ if (geteilt.has('text') || geteilt.has('titel') || geteilt.has('url')) {
 route('heute', zeigeHeute);
 route('woche', zeigeWoche);
 route('angebote', zeigeAngebote);
+route('einkauf', zeigeEinkauf);
 route('rezepte', zeigeRezepte);
 route('zutaten', zeigeZutaten);
 route('fortschritt', zeigeFortschritt);

@@ -5,6 +5,15 @@ export const NEUIGKEITEN = [
   {
     version: '1.0.0',
     datum: '2026-11-23',
+    titel: 'Einkaufsliste für jeden Zeitraum',
+    punkte: [
+      'Einkaufsliste: oben „Woche“, „Monat“ oder „Frei“ wählen. Elan zählt alle geplanten Zutaten im Zeitraum zusammen, nach Kategorie sortiert. Frei geht bis 62 Tage.',
+      'Jeder Zeitraum hat eigene Häkchen und eigene Posten. Was du schon für eine Woche abgehakt hattest, ist mit umgezogen.',
+    ],
+  },
+  {
+    version: '1.0.0',
+    datum: '2026-11-23',
     titel: 'Meine Mahlzeiten, Favoriten',
     punkte: [
       'Meine Mahlzeiten: Unter jeder Mahlzeit auf „Heute“ steht „Als Mahlzeit merken“. Danach findest du sie beim Plus ganz oben und trägst alles mit einem Tipp ein, mit Rückgängig. Das × vergisst eine Vorlage wieder.',

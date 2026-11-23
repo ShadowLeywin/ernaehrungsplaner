@@ -358,3 +358,12 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Trick:** Der Browsertest baut Version 7 mit den echten `MIGRATIONEN` der App (`import('/js/db.js')` auf einer Seite ohne App-Code). So prüft er genau den Weg, den ein Handy beim Update geht.
 - **Fehler:** `test/projekt.test.js` meldete die neue Datei, die in `sw.js` fehlte; eingetragen, `VERSION` auf v52.
 - **Fachbegriffe:** ISO-Kalenderwoche (Woche 1 enthält den ersten Donnerstag), Upgrade-Transaktion (Schemaänderung, die ganz oder gar nicht gilt).
+
+## Session 16, Runde P1.2: Einkaufsliste für Woche, Monat, frei (23.11.2026)
+
+- **Was und warum:** Die Liste hat eine eigene Adresse `#/einkauf/<von>/<bis>` und einen Umschalter Woche/Monat/Frei. Die alte Adresse `#/woche/<datum>/einkauf` leitet mit `history.replaceState` um (kein zusätzlicher Schritt für die Zurück-Taste).
+- **Befehle:** `npm test` (218) · `BILDER=… node tools/pruefe-app.cjs` (150 Kriterien, neu: Monat, frei, Umleitung, 320 px mit offenem Formular).
+- **Entscheidung:** Blättern springt beim Monat zum ganzen Nachbarmonat, sonst um die gleiche Zahl Tage. Verworfen: Woche und Monat als getrennte Seiten (doppelter Code).
+- **Fehler:** Meine Testerwartung war falsch (540 g statt 440 g: eine Portion des Eintopfs ist ein Viertel von 400 g Apfel). Die App rechnete richtig; Kommentar mit Rechnung im Test ergänzt.
+- **Kleinigkeit:** Ein einzelner Tag hieß zuerst „23. bis 23. November (1 Tage)“; jetzt nur „23. November“.
+- **Fachbegriffe:** `history.replaceState` (Adresse ändern, ohne einen Eintrag im Verlauf anzulegen).

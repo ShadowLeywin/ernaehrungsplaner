@@ -28,7 +28,11 @@ export function wochenTitel(montag, heute) {
 export async function zeigeWoche(wurzel, teile) {
   const heute = isoDatum();
   const tage = wochenTage(istGueltig(teile[0]) ? teile[0] : heute);
-  if (teile[1] === 'einkauf') return zeigeEinkauf(wurzel, tage, heute);
+  // Alte Adresse der Wochenliste (bis 23.11.2026): auf die Liste für diesen Zeitraum umleiten, ohne neuen Verlaufseintrag
+  if (teile[1] === 'einkauf') {
+    history.replaceState(null, '', `#/einkauf/${tage[0]}/${tage[6]}`);
+    return zeigeEinkauf(wurzel, [tage[0], tage[6]]);
+  }
 
   // Die Vorwoche wird mitgelesen: Was am Sonntag gekocht wurde, kann am Dienstag schon zu alt sein
   const [mitVorwoche, ziele, wochenplan, tagSaetze, rezepte] = await Promise.all([
@@ -49,7 +53,7 @@ export async function zeigeWoche(wurzel, teile) {
         el('a', { class: 'rund', href: `#/woche/${verschiebe(tage[0], 7)}`, 'aria-label': 'Eine Woche weiter' }, icon('vor')))),
     el('div', { class: 'knopfreihe mitte' },
       el('a', { class: 'knopf leise', href: '#/angebote' }, 'Angebote'),
-      el('a', { class: 'knopf', href: `#/woche/${tage[0]}/einkauf` }, 'Einkaufsliste')),
+      el('a', { class: 'knopf', href: `#/einkauf/${tage[0]}/${tage[6]}` }, 'Einkaufsliste')),
     posten.length === 0 ? el('p', { class: 'leer' }, 'Noch nichts geplant. Tippe an einem Tag auf das Plus und merke vor, was du essen willst.') : null,
     // Alle Tage in einer Karte, wie die Mahlzeiten auf „Heute“: ruhiger als sieben Einzelkarten
     el('section', { class: 'karte wochenliste', 'aria-label': 'Tage der Woche' }, el('div', { class: 'slots' }, tage.map((datum, i) => tagBereich({
