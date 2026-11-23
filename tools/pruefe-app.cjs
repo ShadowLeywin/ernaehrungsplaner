@@ -2066,7 +2066,7 @@ async function planImportLauf(browser) {
 
 /** P4: Prospekte aus einer Angebotsdatei (Version 2, erfunden) und Links zu den Händlern, nur auf Tipp */
 async function prospektLauf(browser) {
-  const { kontext, seite, fehler, fremd } = await neueSeite(browser);
+  const { kontext, seite, fehler, fremd } = await neueSeite(browser, { permissions: ['clipboard-read', 'clipboard-write'] });
   await seite.goto(`${URL_APP}#/angebote`, { waitUntil: 'networkidle' });
   // Ein gemerkter Lidl-Markt und ein Apfel im Plan dieser Woche (Testwerte)
   await seite.evaluate(() => new Promise((ok) => {
@@ -2107,6 +2107,32 @@ async function prospektLauf(browser) {
   pruefe('Original-Prospekt: Link der Kette eines gemerkten Markts, geöffnet erst auf Tipp, kein Abruf durch Elan',
     linkText.includes('Prospekt von Lidl öffnen') && geoeffnet.length === 1 && geoeffnet[0].startsWith('https://www.lidl.de/') && vorTipp === 0 && fremd.size === 0,
     `Knöpfe: ${linkText.join(', ')}; geöffnet: ${geoeffnet.join(', ')}; fremde Hosts ${fremd.size}`);
+  // Angebote aus Screenshots: Prompt mit eigenen Märkten und Einkaufsliste, Antwort einfügen, je Markt gemischt
+  await seite.getByRole('button', { name: 'Angebots-Prompt kopieren' }).click();
+  await seite.locator('.hinweis', { hasText: 'Prompt kopiert' }).waitFor();
+  const angebotsPrompt = await seite.evaluate(() => navigator.clipboard.readText());
+  pruefe('Angebots-Prompt: eigene Märkte, Einkaufsliste der Woche, Format elan-angebote, keine erfundenen Preise',
+    angebotsPrompt.includes('Meine Märkte: Lidl.') && angebotsPrompt.includes('brauche ich gerade: Apfel') && angebotsPrompt.includes('"format": "elan-angebote"') && angebotsPrompt.includes('Erfinde nichts') && fremd.size === 0,
+    `${angebotsPrompt.length} Zeichen; ${angebotsPrompt.split('\n').slice(4, 7).join(' | ')}`);
+  await seite.getByRole('button', { name: 'Antwort laden' }).click();
+  const leerAntwort = await seite.locator('#f-angebote-fehler').innerText();
+  const bis = await seite.evaluate(() => { const d = new Date(Date.now() + 3 * 864e5); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; });
+  const antwort = { format: 'elan-angebote', version: 2, quelle: 'Screenshots (erfunden)', angebote: [
+    { markt: 'Lidl', artikel: 'Äpfel Braeburn', zutat: 'Apfel', preis: 1.79, menge: '1 kg', kategorie: 'obst', gueltigBis: bis },
+    { markt: 'Lidl', artikel: 'Ohne Preis' },
+  ] };
+  await seite.locator('#f-angebote-antwort').fill(`Ein Preis war unscharf.\n\`\`\`json\n${JSON.stringify(antwort)}\n\`\`\``);
+  await seite.getByRole('button', { name: 'Antwort laden' }).click();
+  await seite.locator('#prospekt-seite h3', { hasText: 'Lidl' }).waitFor();
+  const meldungAntwort = await seite.locator('.hinweis').last().innerText();
+  const chipsDanach = await seite.locator('.prospekt-maerkte .chip').allInnerTexts();
+  const lidlKacheln = await seite.locator('#prospekt-seite .prospekt-kachel').allInnerTexts();
+  const feldLeer = await seite.locator('#f-angebote-antwort').inputValue();
+  pruefe('Antwort des Chats: leeres Feld gemeldet, Lidl dazu, Testmarkt bleibt, Apfel auf der Liste markiert, Feld geleert',
+    leerAntwort.includes('Füge zuerst') && meldungAntwort.includes('1 Artikel geladen') && meldungAntwort.includes('1 Zeile ungültig') && lidlKacheln.length === 1 && lidlKacheln[0].includes('auf deiner Liste') && lidlKacheln[0].includes('1,79') && feldLeer === '' && (!imZeitraum || chipsDanach.some((c) => c.startsWith('Testmarkt'))),
+    `„${leerAntwort}“; „${meldungAntwort}“; Märkte ${chipsDanach.join(', ')}; Lidl: ${lidlKacheln.map((k) => k.replace(/\n/g, ' ')).join(' | ')}`);
+  await seite.locator('#angebote-schritte').scrollIntoViewIfNeeded();
+  await bild(seite, '54b-angebote-screenshots');
   await seite.setViewportSize({ width: 320, height: 640 });
   const breite = await seite.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   pruefe('Prospekte bei 320 px ohne seitliches Rollen', breite <= 0, `${breite} px`);

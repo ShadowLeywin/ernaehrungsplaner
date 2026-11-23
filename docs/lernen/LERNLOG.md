@@ -484,3 +484,10 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Was und warum:** Léon: „der neue Ernährungsberater-Chat-Prompt wie am Anfang geplant“. [A] Gemeint ist ein Prompt, mit dem ein Chat den Plan selbst erstellt, statt nur einen vorhandenen umzuwandeln. `js/logik/berater.js` baut ihn aus Tagestypen mit Zielen, Wochenplan, Mahlzeiten mit Anteilen, Mag-Liste, Rezepten und Wünschen; Antwort im Format `elan-import`.
 - **Entscheidung:** Keine Messwerte (Gewicht, Labor, Symptome) im Prompt; Ziele und Vorlieben reichen für einen Plan. Nährwerte bleiben Elans Sache.
 - **Befehle:** `npm test` (260, neu `test/berater.test.js`) · `node tools/pruefe-app.cjs` (190).
+
+## Session 16, Runde: Angebote aus Screenshots (23.11.2026)
+
+- **Was und warum:** Léon wollte die Angebote automatisch von marktguru oder kaufDA abrufen lassen („privat, also legal“). Widersprochen: Laut § 87c Abs. 1 Nr. 1 UrhG gilt die Privatkopie nicht für Datenbanken mit einzeln online abrufbaren Einträgen, und Code und APK sind öffentlich. Stattdessen macht Léon Screenshots, und ein Chat liest sie ab.
+- **Gebaut:** `js/logik/angebotsprompt.js` mit `angebotsPrompt` (setzt eigene Märkte und Einkaufsliste ein), `leseAngebotsAntwort` (Zäune weg, dann `leseProspektDatei`), `mischeProspekt` (je Markt ersetzen, Abgelaufenes weg) und `angeboteAusArtikeln`. Die Seite Prospekte hat drei Schritte, ein Antwortfeld und „Antwort laden“.
+- **Entscheidung:** Mischen statt Ersetzen, auch beim Laden einer Datei, damit Léon Markt für Markt einlesen kann. Verworfen: alles ersetzen (jeder zweite Markt hätte den ersten gelöscht).
+- **Befehle:** `npm test` (267, neu `test/angebotsprompt.test.js`) · `node tools/pruefe-app.cjs` (192).

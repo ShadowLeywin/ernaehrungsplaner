@@ -113,6 +113,7 @@ Vorher: Mehr → „Backup speichern“ (das Update hebt die Datenbank auf Schem
 | N-3 | Dieselbe Packung noch einmal scannen | Produkt kommt sofort, ohne Suche |
 | N-4 | Rezepte → oben „Lebensmittel“ | Liste mit Suche, „Scannen“, Reitern und Kategorie-Auswahl |
 | N-5 | Mehr → Wochenplan → Tagestypen: einen umbenennen, einen dazu, „Tagestypen speichern“ | Heute, Woche und Ziele zeigen die neuen Namen |
+| N-6 | Plan → Angebote → Prospekte: „Prospekt von Lidl öffnen“, 2 bis 3 Screenshots, „Angebots-Prompt kopieren“, beides in einen Claude-Chat, Antwort einfügen, „Antwort laden“ | Lidl-Angebote als Kacheln; was auf der Einkaufsliste steht, ist markiert. Preise stichprobenartig mit dem Prospekt vergleichen |
 
 ## B. Automatischer Bau einrichten (5 Minuten, am Rechner oder Handy)
 

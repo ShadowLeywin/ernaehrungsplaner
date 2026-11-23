@@ -5,6 +5,15 @@ export const NEUIGKEITEN = [
   {
     version: '1.0.0',
     datum: '2026-11-23',
+    titel: 'Angebote aus Screenshots',
+    punkte: [
+      'Angebote → Prospekte → „Angebots-Prompt kopieren“: Elan setzt deine Märkte und die Einkaufsliste der Woche ein. Prompt und Prospekt-Screenshots in einen Claude-Chat, die Antwort fügst du auf derselben Seite ein.',
+      'Markt für Markt einlesen: Eine neue Antwort ersetzt nur die Angebote ihres Markts, die anderen bleiben. Abgelaufenes fällt weg.',
+    ],
+  },
+  {
+    version: '1.0.0',
+    datum: '2026-11-23',
     titel: 'Ernährungsberater-Prompt',
     punkte: [
       'Plan → „Plan importieren“ → „Ernährungsberater-Prompt kopieren“: Elan setzt deine Tagestypen mit Zielen, den Wochenplan, die Mahlzeiten, die Mag-Liste und deine Rezepte ein. In einem Claude-Chat einfügen, der erstellt den ganzen Plan; die Antwort fügst du auf derselben Seite ein.',
