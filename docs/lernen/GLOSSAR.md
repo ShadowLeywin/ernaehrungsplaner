@@ -91,3 +91,7 @@ Wächst über alle Sessions. Ergänzen statt neu schreiben.
 | Pruning | Eine Suche früh abbrechen, wenn sicher nichts Besseres mehr kommt; hier: nach kcal sortiert, Schleife endet beim ersten Gericht über dem Budget. | `vorschlaege` in `js/logik/unterwegs.js` |
 | Debounce | Erst rechnen, wenn der Nutzer kurz nicht mehr tippt, statt bei jedem Zeichen. | Budget-Feld in `js/ansichten/unterwegs.js` |
 | Plausibilitätsprüfung | Daten gegen eine unabhängige Rechnung prüfen, z. B. kcal gegen 4/4/9 aus den Makros. | Lernlog Runde 11 |
+| Overpass | Abfragedienst, der Objekte aus OpenStreetMap liefert, z. B. alle Supermärkte im Umkreis. | `docs/ROADMAP.md` (P3) |
+| ODbL | Open Database License: Daten frei nutzbar mit Namensnennung, Änderungen unter gleicher Lizenz. | `docs/ROADMAP.md` (Open Prices) |
+| Referer | Kopfzeile einer Anfrage, die sagt, von welcher Seite sie kommt; OSM sperrt Kachel-Abrufe ohne sie. | `docs/ROADMAP.md` (P3) |
+| Importformat | Feste Abmachung, wie eine Datei aussieht, damit Chat und App sich verstehen. | `docs/IMPORT-FORMAT.md` |
