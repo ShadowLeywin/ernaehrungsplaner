@@ -15,31 +15,33 @@ Was nur du erledigen kannst, weil es ein echtes Handy oder dein GitHub-Konto bra
 
 ## A. Am Handy testen (zusammen etwa 20 Minuten)
 
+Erledigt am 23.11.2026, alle ohne gemeldeten Fehler ([A] laut Startprompt vom 23.11.2026; Rückmeldungen im Einzelnen, etwa zu A5 und A22, fehlen noch).
+
 | Nr. | Was du tust | Was du sehen solltest |
 |---|---|---|
-| A1 | Elan vom Startbildschirm öffnen | Grünes Zitrus-Icon, dann Seite „Heute“ mit Scheibe und sechs Mahlzeiten |
-| A2 | Oben und unten schauen | Nichts liegt unter der Statusleiste oder der Gestenleiste |
-| A3 | Bei „Frühstück“ auf das Plus, „hafer“ suchen, antippen, 80 eingeben, „Eintragen“ | Eintrag erscheint, die Scheibe füllt sich |
-| A4 | Beim Eintippen der Menge: Ist „Eintragen“ sichtbar, oder verdeckt ihn die Tastatur? | Knopf ist erreichbar |
-| A5 | Zurück-Taste von Android, während ein Blatt offen ist | Notiere, ob das Blatt schließt oder die App zur vorigen Seite springt |
-| A6 | Rezepte → „Zutaten und Mag-Liste“ → „skyr“ → „bei Open Food Facts suchen“ | Treffer mit „Übernehmen“; bei Fehlermeldung: Wortlaut notieren |
-| A7 | Flugmodus an, App schließen, neu öffnen, etwas eintragen | Alles geht, oben steht „offline“ |
-| A8 | Flugmodus aus. Mehr → „Backup speichern“ | Teilen-Menü öffnet sich; „In Drive speichern“ oder „Dateien“ wählen |
-| A9 | Mehr → „Backup einspielen“ → die gespeicherte Datei wählen → „Alles ersetzen“ | „Backup eingespielt“, Einträge sind da |
-| A10 | In einer anderen App Text markieren → Teilen → „Elan“ | Elan öffnet „Rezept importieren“ mit dem Text |
-| A11 | Woche → etwas einplanen → „Einkaufsliste“ → „Offene Posten teilen“ | Teilen-Menü mit der Liste |
-| A12 | Mehr → Referenzwerte: Geschlecht und Alter wählen. Dann Heute → „Alle Nährwerte“ | Prozent je Vitamin und Mineralstoff |
-| A13 | Health → Gewicht eintragen → „Tageswerte speichern“, App schließen und öffnen | Wert ist noch da |
-| A14 | Mehr → Darstellung: Design Blatt und Zitrus, dazu Hell und Dunkel durchschalten | Alles bleibt lesbar, die Wahl bleibt nach Neustart |
-| A15 | Mehr → „Was ist neu“ und „Über Elan“ lesen | Liste der Neuerungen, Funktionen kurz erklärt |
-| A16 | Bei einer Mahlzeit auf das Plus: Steht oben „Zuletzt eingetragen“ mit „+ 80 g“? Antippen | Eintrag ist sofort da, unten „Rückgängig“ |
-| A17 | Startbildschirm lange drücken → Widgets → Elan → „Elan · heute“ hinzufügen. Danach Wasser eintragen | Widget zeigt kcal übrig und das neue Wasser |
-| A18 | Zwei Minuten frei herumtippen | Notiere, was hakt, zu klein ist oder unklar heißt |
-| A19a | Samsung Health → Einstellungen → Health Connect → Synchronisieren einschalten (sonst kommen Ring-Daten nicht in Health Connect an) | Health Connect → Daten und Zugriff zeigt Schritte, Schlaf, Herzfrequenz von Samsung Health |
-| A19 | Mehr → Health Connect → „Mit Health Connect verbinden“, alle sieben Arten erlauben (auch HRV) | Heute zeigt die Werte mit „aus Health Connect“. Falls kein Erlaubnis-Fenster kommt: Bildschirmfoto an Claude |
-| A20 | Mehr → Erinnerungen → „Ans Trinken erinnern“ an, eine Uhrzeit auf in 30 Minuten stellen | Android fragt einmal nach Benachrichtigungen; zur Uhrzeit (auf ein paar Minuten genau) kommt „Wasser“ mit dem Blatt-Symbol |
-| A21 | Heute → „Wie geht es dir heute?“: je Frage eine Zahl tippen, dann Fortschritt öffnen | Zahlen bleiben gewählt; „Letzte 7 Tage“ zeigt Energie, Stimmung, Stress |
-| A22 | Fortschritt → Körperwerte: Steht bei HRV ein Wert? | Wenn „noch kein Wert“: Samsung Health gibt HRV nicht an Health Connect weiter; kurz melden |
+| A1 ✓ 23.11. | Elan vom Startbildschirm öffnen | Grünes Zitrus-Icon, dann Seite „Heute“ mit Scheibe und sechs Mahlzeiten |
+| A2 ✓ 23.11. | Oben und unten schauen | Nichts liegt unter der Statusleiste oder der Gestenleiste |
+| A3 ✓ 23.11. | Bei „Frühstück“ auf das Plus, „hafer“ suchen, antippen, 80 eingeben, „Eintragen“ | Eintrag erscheint, die Scheibe füllt sich |
+| A4 ✓ 23.11. | Beim Eintippen der Menge: Ist „Eintragen“ sichtbar, oder verdeckt ihn die Tastatur? | Knopf ist erreichbar |
+| A5 ✓ 23.11. | Zurück-Taste von Android, während ein Blatt offen ist | Notiere, ob das Blatt schließt oder die App zur vorigen Seite springt |
+| A6 ✓ 23.11. | Rezepte → „Zutaten und Mag-Liste“ → „skyr“ → „bei Open Food Facts suchen“ | Treffer mit „Übernehmen“; bei Fehlermeldung: Wortlaut notieren |
+| A7 ✓ 23.11. | Flugmodus an, App schließen, neu öffnen, etwas eintragen | Alles geht, oben steht „offline“ |
+| A8 ✓ 23.11. | Flugmodus aus. Mehr → „Backup speichern“ | Teilen-Menü öffnet sich; „In Drive speichern“ oder „Dateien“ wählen |
+| A9 ✓ 23.11. | Mehr → „Backup einspielen“ → die gespeicherte Datei wählen → „Alles ersetzen“ | „Backup eingespielt“, Einträge sind da |
+| A10 ✓ 23.11. | In einer anderen App Text markieren → Teilen → „Elan“ | Elan öffnet „Rezept importieren“ mit dem Text |
+| A11 ✓ 23.11. | Woche → etwas einplanen → „Einkaufsliste“ → „Offene Posten teilen“ | Teilen-Menü mit der Liste |
+| A12 ✓ 23.11. | Mehr → Referenzwerte: Geschlecht und Alter wählen. Dann Heute → „Alle Nährwerte“ | Prozent je Vitamin und Mineralstoff |
+| A13 ✓ 23.11. | Health → Gewicht eintragen → „Tageswerte speichern“, App schließen und öffnen | Wert ist noch da |
+| A14 ✓ 23.11. | Mehr → Darstellung: Design Blatt und Zitrus, dazu Hell und Dunkel durchschalten | Alles bleibt lesbar, die Wahl bleibt nach Neustart |
+| A15 ✓ 23.11. | Mehr → „Was ist neu“ und „Über Elan“ lesen | Liste der Neuerungen, Funktionen kurz erklärt |
+| A16 ✓ 23.11. | Bei einer Mahlzeit auf das Plus: Steht oben „Zuletzt eingetragen“ mit „+ 80 g“? Antippen | Eintrag ist sofort da, unten „Rückgängig“ |
+| A17 ✓ 23.11. | Startbildschirm lange drücken → Widgets → Elan → „Elan · heute“ hinzufügen. Danach Wasser eintragen | Widget zeigt kcal übrig und das neue Wasser |
+| A18 ✓ 23.11. | Zwei Minuten frei herumtippen | Notiere, was hakt, zu klein ist oder unklar heißt |
+| A19a ✓ 23.11. | Samsung Health → Einstellungen → Health Connect → Synchronisieren einschalten (sonst kommen Ring-Daten nicht in Health Connect an) | Health Connect → Daten und Zugriff zeigt Schritte, Schlaf, Herzfrequenz von Samsung Health |
+| A19 ✓ 23.11. | Mehr → Health Connect → „Mit Health Connect verbinden“, alle sieben Arten erlauben (auch HRV) | Heute zeigt die Werte mit „aus Health Connect“. Falls kein Erlaubnis-Fenster kommt: Bildschirmfoto an Claude |
+| A20 ✓ 23.11. | Mehr → Erinnerungen → „Ans Trinken erinnern“ an, eine Uhrzeit auf in 30 Minuten stellen | Android fragt einmal nach Benachrichtigungen; zur Uhrzeit (auf ein paar Minuten genau) kommt „Wasser“ mit dem Blatt-Symbol |
+| A21 ✓ 23.11. | Heute → „Wie geht es dir heute?“: je Frage eine Zahl tippen, dann Fortschritt öffnen | Zahlen bleiben gewählt; „Letzte 7 Tage“ zeigt Energie, Stimmung, Stress |
+| A22 ✓ 23.11. | Fortschritt → Körperwerte: Steht bei HRV ein Wert? | Wenn „noch kein Wert“: Samsung Health gibt HRV nicht an Health Connect weiter; kurz melden |
 
 ## B. Automatischer Bau einrichten (5 Minuten, am Rechner oder Handy)
 

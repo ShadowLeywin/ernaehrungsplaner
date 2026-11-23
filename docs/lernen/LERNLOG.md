@@ -340,3 +340,12 @@ Ein Eintrag pro Runde, höchstens 8 Zeilen. Keine persönlichen Gesundheitsdaten
 - **Entscheidung:** Vorlagen mit Schnell-Einträgen gibt es nicht im Wochenplan (Einkaufsliste braucht Zutaten). Stern ändert die Reihenfolge erst beim nächsten Öffnen, damit die Zeile nicht unter dem Finger wegspringt.
 - **Fehler:** Nach „Liste aus Datei laden“ kam der Hinweis vor dem Neuzeichnen; ein Test las deshalb die Restaurants zu früh. Lösung: erst `await neuZeigen()`, dann der Hinweis. Bei 320 px quetschten Stern, Minus, Anzahl und Plus den Namen auf drei Zeilen: Minus und Anzahl erscheinen jetzt erst nach der ersten Auswahl.
 - **Offen:** Der Maß-Test („Unterbauch: 88 cm gespeichert“) scheitert selten (heute 2 von 7 Läufen). Ursache unbekannt; die Diagnose prüft jetzt zusätzlich, ob der Wert in IndexedDB steht.
+
+## Session 16, Phase 1: Roadmap und Importformat (23.11.2026)
+
+- **Was und warum:** Startprompt „Roadmap und Paket 1“: sechs Pakete (P1–P6) geplant, gemeinsames Importformat für Plan- und Social-Import festgelegt, Handy-Tests A1–A22 abgehakt (keine Fehler gemeldet).
+- **Recherche:** Websuche zu OSM-Kacheln, Overpass, Open Prices, Share Target, Yazio. Die Primärseiten waren gesperrt (DNS-Fehler), deshalb alles als [vermutet] mit Quelle markiert.
+- **Entscheidung:** Importformat ohne Nährwerte, weil ein Chat sie schätzt; Elan ordnet Zutaten selbst zu. Verworfen: Nährwerte aus dem Chat übernehmen.
+- **Widerspruch:** Die alte Angebots-Action (marktguru, Schlüssel aus der Webseite) wird nicht wieder aufgebaut. Ersatz: erlaubte Quelle suchen, bis dahin Datei und Link auf den Original-Prospekt.
+- **Fund:** Die Einkaufsliste gilt schon je Woche, nicht je Tag; „Teilen an Elan“ gibt es schon (Intent-Filter `text/plain`).
+- **Fachbegriffe:** Overpass (Abfragedienst für OSM-Daten), ODbL (Datenbanklizenz mit Namensnennung und Weitergabe unter gleicher Lizenz), Referer (Kopfzeile mit der Herkunftsseite einer Anfrage).
