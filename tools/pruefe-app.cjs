@@ -1725,6 +1725,57 @@ async function migrationsLauf(browser) {
   await kontext.close();
 }
 
+/** Schema 7 → 8: Häkchen und eigene Posten der Wochen-Einkaufsliste ziehen in den Zeitraum Montag bis Sonntag um. */
+async function migration7Lauf(browser) {
+  const { kontext, seite, fehler } = await neueSeite(browser);
+  await seite.goto(`${URL_APP}manifest.webmanifest`);
+  // Version 7 mit den echten Migrationen der App bauen, dann Daten im alten Aufbau hineinlegen
+  const montag = await seite.evaluate(async () => {
+    const { MIGRATIONEN } = await import('/js/db.js');
+    const d = new Date();
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    const mo = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    await new Promise((ok, nein) => {
+      const anfrage = indexedDB.open('elan', 7);
+      anfrage.onupgradeneeded = (e) => { for (let v = e.oldVersion; v < 7; v += 1) MIGRATIONEN[v](anfrage.result, anfrage.transaction); };
+      anfrage.onsuccess = () => {
+        const db = anfrage.result;
+        const t = db.transaction(['plan', 'einkauf'], 'readwrite');
+        t.objectStore('plan').put({ id: 'p-apfel', datum: mo, slot: 'mittag', zutatId: 'basis:apfel', name: 'Apfel', marke: '', gramm: 340, je100: { kcal: 52 }, erstellt: d.toISOString() });
+        t.objectStore('plan').put({ id: 'p-reis', datum: mo, slot: 'mittag', zutatId: 'basis:reis', name: 'Reis', marke: '', gramm: 200, je100: { kcal: 350 }, erstellt: d.toISOString() });
+        t.objectStore('einkauf').put({ id: `${mo}|basis:apfel`, woche: mo, schluessel: 'basis:apfel', erledigt: true });
+        t.objectStore('einkauf').put({ id: 'eigen-1', woche: mo, eigen: true, name: 'Spülmittel', erledigt: false, erstellt: d.toISOString() });
+        t.oncomplete = () => { db.close(); ok(); };
+        t.onerror = () => nein(t.error);
+      };
+      anfrage.onerror = () => nein(anfrage.error);
+    });
+    return mo;
+  });
+  await seite.goto(`${URL_APP}#/woche/${montag}/einkauf`, { waitUntil: 'networkidle' });
+  await seite.locator('.zusatz').waitFor();
+  const apfelHaken = await seite.locator('.haken', { hasText: 'Apfel' }).locator('input').isChecked();
+  const reisHaken = await seite.locator('.haken', { hasText: 'Reis' }).locator('input').isChecked();
+  const eigene = await seite.locator('.haken', { hasText: 'Spülmittel' }).count();
+  const saetze = await seite.evaluate(() => new Promise((ok) => {
+    const a = indexedDB.open('elan');
+    a.onsuccess = () => {
+      const r = a.result.transaction('einkauf').objectStore('einkauf').getAll();
+      r.onsuccess = () => { const v = a.result.version; a.result.close(); ok({ version: v, saetze: r.result.map((x) => `${x.id} [${x.zeitraum}${'woche' in x ? ', woche' : ''}]`) }); };
+    };
+  }));
+  pruefe('Migration 7 → 8: Häkchen und eigene Posten der Woche bleiben erhalten', saetze.version === SCHEMA_VERSION && apfelHaken && !reisHaken && eigene === 1 && saetze.saetze.every((x) => !x.includes('woche') && x.includes('..')),
+    `Version ${saetze.version}; Apfel ${apfelHaken ? 'abgehakt' : 'offen'}, Reis ${reisHaken ? 'abgehakt' : 'offen'}, Spülmittel ${eigene}; ${saetze.saetze.join('; ')}`);
+  // Ein neues Häkchen nach der Migration landet unter dem neuen Schlüssel und übersteht ein Neuladen
+  await seite.locator('.haken', { hasText: 'Reis' }).locator('input').check();
+  await seite.waitForTimeout(150);
+  await seite.reload({ waitUntil: 'networkidle' });
+  await seite.locator('.zusatz').waitFor();
+  pruefe('Nach der Migration: neues Häkchen bleibt nach Neuladen', await seite.locator('.haken', { hasText: 'Reis' }).locator('input').isChecked());
+  pruefe('Migration 7 → 8 ohne Konsolenfehler', fehler.length === 0, fehler.slice(0, 3).join(' | ') || '0 Fehler');
+  await kontext.close();
+}
+
 (async () => {
   if (BILDER) fs.mkdirSync(BILDER, { recursive: true });
   ({ SCHEMA_VERSION } = await import('../js/logik/schema.js'));
@@ -1744,6 +1795,7 @@ async function migrationsLauf(browser) {
     await appLauf(browser);
     await willkommenLauf(browser);
     await migrationsLauf(browser);
+    await migration7Lauf(browser);
     await offlineLauf(browser);
     await dunkelLauf(browser);
   } catch (fehler) {

@@ -109,7 +109,8 @@ export const speicherePlan = (posten) => db.speichere('plan', { ...posten, id: p
 export const loeschePlan = (id) => db.loesche('plan', id);
 
 /** Häkchen und eigene Posten einer Woche; woche ist das Datum des Montags. */
-export const einkaufDerWoche = (woche) => db.nachIndex('einkauf', 'woche', woche);
+/** Häkchen und eigene Posten der Liste eines Zeitraums; schluessel aus zeitraumSchluessel() */
+export const einkaufImZeitraum = (schluessel) => db.nachIndex('einkauf', 'zeitraum', schluessel);
 export const speichereEinkauf = (satz) => db.speichere('einkauf', { ...satz, id: satz.id ?? crypto.randomUUID() });
 export const loescheEinkauf = (id) => db.loesche('einkauf', id);
 

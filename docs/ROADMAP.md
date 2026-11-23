@@ -158,4 +158,5 @@ Die Primärseiten (operations.osmfoundation.org, overpass-api.de, prices.openfoo
 
 | Teilschritt | Status | PR | Testergebnis |
 |---|---|---|---|
-| Phase 1: Roadmap, Importformat, Handy-Tests abgehakt | fertig | – | nur Doku |
+| Phase 1: Roadmap, Importformat, Handy-Tests abgehakt | fertig | – (Branch `claude/new-session-clchhs`) | nur Doku |
+| P1.1 Zeiträume und Schema 8 | fertig | – (Branch `claude/p1-1-zeitraum`) | 218 Unit, 146/146 Browser |

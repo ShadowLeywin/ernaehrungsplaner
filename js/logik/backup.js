@@ -3,6 +3,7 @@
 
 import { tageZwischen } from './datum.js';
 import { APP_KENNUNG, SCHEMA_VERSION, STORES } from './schema.js';
+import { migriereEinkaufSatz } from './zeitraum.js';
 
 /**
  * Umbauten für Backups aus älteren Schema-Versionen: BACKUP_MIGRATIONEN[1] hebt ein
@@ -21,6 +22,8 @@ export const BACKUP_MIGRATIONEN = {
   5: (daten) => ({ ...daten, labor: [], symptome: [] }),
   // Version 6 kannte noch keine Angebote
   6: (daten) => ({ ...daten, angebote: [] }),
+  // Version 7 führte die Einkaufsliste je Woche; ab 8 je Zeitraum
+  7: (daten) => ({ ...daten, einkauf: Array.isArray(daten.einkauf) ? daten.einkauf.map(migriereEinkaufSatz) : daten.einkauf }),
 };
 
 export function erstelleBackup(daten, jetzt = new Date()) {

@@ -1,6 +1,6 @@
 # Datenmodell
 
-Stand: Schema-Version 7 (App 1.0.0). Maßgeblich im Code: `js/logik/schema.js` und `js/db.js`.
+Stand: Schema-Version 8 (App 1.0.0). Maßgeblich im Code: `js/logik/schema.js` und `js/db.js`.
 
 ## Grundsätze
 
@@ -10,7 +10,7 @@ Stand: Schema-Version 7 (App 1.0.0). Maßgeblich im Code: `js/logik/schema.js` u
 - Nährwerte gelten immer je 100 g.
 - Darstellung (hell/dunkel) liegt je Gerät im `localStorage` und gehört nicht ins Backup.
 
-## Entitäten heute (Version 7)
+## Entitäten heute (Version 8)
 
 | Speicher | Schlüssel | Felder | Index |
 |---|---|---|---|
@@ -24,7 +24,7 @@ Stand: Schema-Version 7 (App 1.0.0). Maßgeblich im Code: `js/logik/schema.js` u
 | `symptome` (ab 6) | `id` | `art`, `staerke` (1 bis 5), `datum`, freiwillig `zeit`, `notiz`; `eintragIds` (zugeordnete Tagebuch-Einträge) | `datum` |
 | `einstellungen` | `schluessel` | `wert`; Schlüssel: `ziele`, `woche`, `slotAnteile` (Prozent je Slot, Summe 100), `gesundheit` (Wochenziel Gewicht, Wasser, Schlaf, Schritte), `referenzgruppe` (`geschlecht`, `alter`), `letztesBackup` | – |
 | `plan` (ab 3) | `id` | wie `eintraege` (`datum`, `slot`, `zutatId`, `name`, `gramm`, `je100`, `rezeptId`), dazu `uebernommen` | `datum` |
-| `einkauf` (ab 3) | `id` | `woche` (Datum des Montags); Häkchen: `schluessel`, `erledigt`, Kennung `<woche>\|<zutatId>`; eigener Posten: `eigen`, `name`, `erledigt` | `woche` |
+| `einkauf` (ab 3) | `id` | `zeitraum` (ab 8: `<von>..<bis>`, z. B. `2026-11-23..2026-11-29`; bis 7: `woche` = Datum des Montags); Häkchen: `schluessel`, `erledigt`, Kennung `<zeitraum>\|<zutatId>`; eigener Posten: `eigen`, `name`, `erledigt` | `zeitraum` (bis 7: `woche`) |
 | `rezepte` (ab 2) | `id` | `name`, `portionen`, `zutaten` [{`zutatId`, `name`, `marke`, `gramm`, `je100` (Kopie)}], `schritte` [{`text`, `prinzip`}], `erstellt`, `geaendert`; freiwillig fürs Vorkochen: `gewichtGekocht`, `haltbarTage`, `einfrierbar` | – |
 | `vorlieben` (ab 4) | `zutatId` | `mag` (J, R, K, N, S), `notiz` | – |
 
@@ -36,7 +36,7 @@ Kennungen: Basis-Zutaten `basis:<name>`, eigene `eigen:<uuid>`, Open Food Facts 
 Zutat (Datei oder Speicher) 1 ── n Eintrag n ── 1 Tag (über datum)
 Zutat n ── m Rezept (über rezepte.zutaten), Rezept 1 ── n Eintrag (über rezeptId)
 Plan-Posten ── wird zu ── Eintrag (Kopie beim Übernehmen, Posten bekommt uebernommen = true)
-Einkaufsliste = berechnet aus Plan-Posten der Woche; gespeichert sind nur Häkchen und eigene Posten
+Einkaufsliste = berechnet aus Plan-Posten eines Zeitraums (Woche, Monat, frei, höchstens 62 Tage); gespeichert sind nur Häkchen und eigene Posten je Zeitraum
 Zutat 1 ── n Angebot (über zutatId); abgelaufene Angebote bleiben gespeichert, werden aber nicht mehr gezeigt
 Symptom n ── m Eintrag (über symptome.eintragIds); gelöschte Einträge fallen in der Anzeige still weg
 Tagestyp (gym | calisthenics | rest) ── Ziel (in einstellungen.ziele)
@@ -69,10 +69,14 @@ Wochentag ── Tagestyp (in einstellungen.woche), Tag kann abweichen
 
 **Ablauf einer Schemaänderung:** `SCHEMA_VERSION` erhöhen → Migration anhängen → Backup-Migration ergänzen → diese Datei nachziehen → Test mit einem Backup der alten Version.
 
+## Migration 7 → 8 (23.11.2026)
+
+Die Einkaufsliste galt je Woche, ab 8 je Zeitraum. `migriereEinkaufSatz` (`js/logik/zeitraum.js`) macht aus `woche: '2026-11-09'` den Zeitraum `2026-11-09..2026-11-15`; Häkchen bekommen die Kennung `<zeitraum>|<zutatId>`, eigene Posten behalten ihre. Dieselbe Funktion läuft in der Datenbank (`MIGRATIONEN[7]` in `js/db.js`) und für alte Backups (`BACKUP_MIGRATIONEN[7]`). Plan-Posten ändern sich nicht. Geprüft von `test/zeitraum.test.js` und im Browsertest „Migration 7 → 8“.
+
 ## Backup-Format
 
 ```json
-{ "app": "elan", "schemaVersion": 7, "erstelltAm": "2026-11-13T10:00:00.000Z",
+{ "app": "elan", "schemaVersion": 8, "erstelltAm": "2026-11-13T10:00:00.000Z",
   "daten": { "zutaten": [], "eintraege": [], "tage": [], "einstellungen": [], "rezepte": [], "plan": [], "einkauf": [], "vorlieben": [], "messungen": [], "supplements": [], "labor": [], "symptome": [], "angebote": [] } }
 ```
 
