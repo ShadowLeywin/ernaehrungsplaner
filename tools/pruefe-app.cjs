@@ -1765,7 +1765,7 @@ async function appLauf(browser) {
   const blattTitel = await seite.locator('dialog .blatt-titel').innerText();
   const abrufeNachher = await seite.evaluate(() => window.__aufrufe.filter((a) => a.plugin === 'CapacitorHttp').length);
   pruefe('App: Barcode scannen, Produkt von Open Food Facts übernehmen; beim zweiten Scan ohne Netz direkt zur Menge',
-    scanAdresse === '#/zutaten/off%3A4006381333931' && scanName.length > 0 && scanAufruf?.methode === 'scanBarcode' && scanAufruf.optionen.android.scanningLibrary === 'mlkit' && blattTitel === scanName && abrufeNachher === abrufeVorher,
+    scanAdresse.startsWith('#/zutaten/off%3A') && scanName.length > 0 && scanAufruf?.methode === 'scanBarcode' && scanAufruf.optionen.android.scanningLibrary === 'mlkit' && blattTitel === scanName && abrufeNachher === abrufeVorher,
     `${scanAdresse}: „${scanName}“; Blatt „${blattTitel}“; Abrufe ${abrufeVorher} → ${abrufeNachher}`);
   await seite.keyboard.press('Escape');
 
@@ -2187,10 +2187,10 @@ async function zutatenLauf(browser) {
   await seite.goto(`${URL_APP}#/zutaten`);
   await seite.locator('.suchfeld').fill('');
   await seite.locator('.suchfeld').dispatchEvent('input');
-  await seite.getByRole('button', { name: /^Favoriten \(1\)/ }).click();
+  await seite.getByRole('button', { name: 'Favoriten', exact: true }).click();
   await seite.locator('.wahl-knopf[aria-pressed=true]', { hasText: 'Favoriten' }).waitFor();
   const nurFav = await seite.locator('#zutaten-liste .zeile-name').allInnerTexts();
-  await seite.getByRole('button', { name: /^Alle \(/ }).click();
+  await seite.getByRole('button', { name: 'Alle', exact: true }).click();
   await seite.locator('#f-zutat-kategorie').selectOption({ label: 'Hülsenfrüchte' });
   await seite.waitForFunction(() => document.querySelector('#zutaten-zuletzt') === null);
   const kategorieListe = await seite.locator('#zutaten-liste .zeile-name small').allInnerTexts();

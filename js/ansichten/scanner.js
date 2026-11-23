@@ -65,7 +65,9 @@ export async function scanneZutat() {
     });
     return null;
   }
-  const zutat = treffer[0];
+  // Die gescannte Nummer merken: Open Food Facts führt manche Produkte unter einer anderen Schreibweise
+  // (z. B. UPC mit oder ohne führende Null); so findet der nächste Scan die Zutat ohne neuen Abruf
+  const zutat = { ...treffer[0], barcode: code };
   await speicher.speichereZutat(zutat);
   hinweis(`„${zutat.name}“ von Open Food Facts übernommen.`);
   return zutat;

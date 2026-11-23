@@ -5,6 +5,16 @@ export const NEUIGKEITEN = [
   {
     version: '1.0.0',
     datum: '2026-11-23',
+    titel: 'Barcode-Scanner, Märkte-Suche repariert',
+    punkte: [
+      'Barcode-Scanner: Neben jeder Suche (Eintragen, Lebensmittel) steht „Scannen“. Elan erkennt den Strichcode, sucht zuerst bei deinen Zutaten und sonst bei Open Food Facts. Android fragt beim ersten Mal nach der Kamera; Bilder speichert Elan nie.',
+      'Rezepte und Lebensmittel haben oben zwei Reiter. Die Kategorie wählst du über ein Auswahlfeld statt über runde Knöpfe.',
+      'Märkte-Suche: leichtere Abfrage, ein Ersatzserver springt ein, und eine Fehlermeldung nennt jetzt den Grund.',
+    ],
+  },
+  {
+    version: '1.0.0',
+    datum: '2026-11-23',
     titel: 'Zutaten mit Favoriten',
     punkte: [
       'Stern an einer Zutat: Sie steht dann oben in der Zutatenliste und beim Eintragen unter „Favoriten“.',
