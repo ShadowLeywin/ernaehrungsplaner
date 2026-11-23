@@ -1,7 +1,7 @@
 # Importformat `elan-import` (Plan und Rezepte)
 
 Stand 23.11.2026, Version 1. Gemeinsames Format für P2 (Plan-Import) und P5 (Rezept aus Social Media über die Prompt-Brücke).
-Der Leser kommt mit P2.1 (`js/logik/planimport.js`, geplant). Bis dahin ist dieses Dokument die Abmachung.
+Leser: `js/logik/planimport.js` (`lesePlanImport`, `baueUebernahme`, `promptVorlage`), seit P2.1.
 
 ## Grundsätze
 
@@ -63,7 +63,7 @@ Der Leser kommt mit P2.1 (`js/logik/planimport.js`, geplant). Bis dahin ist dies
 |---|---|
 | `format` oder `version` falsch | ganze Datei abgelehnt, mit Satz, was erwartet wird |
 | Zutat eindeutig zugeordnet (ganzes Wort, wie bei Angeboten) | Nährwerte aus Elans Zutat |
-| Zutat nicht oder mehrdeutig zugeordnet | Vorschau zeigt „unbekannt“ mit Auswahl; ohne Wahl wird das Rezept trotzdem gespeichert, die Zutat zählt mit 0 und ist markiert |
+| Zutat nicht oder mehrdeutig zugeordnet | Vorschau zeigt „unbekannt“ mit Auswahl. Ohne Wahl wird das Rezept ohne diese Zutat gespeichert und die Vorschau nennt sie unter „ausgelassen“ (geändert am 23.11.2026: eine Zutat mit 0 kcal wäre ein stiller falscher Nährwert) |
 | `menge` statt `gramm` | Umrechnung wie im Rezept-Import, als Schätzung markiert |
 | Rezept-Name existiert in Elan schon | Vorschau fragt: vorhandenes nutzen oder als neues anlegen |
 | Plan-Posten verweist auf unbekanntes Rezept | Zeile abgelehnt und genannt |
