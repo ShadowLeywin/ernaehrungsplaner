@@ -166,5 +166,5 @@ Die Primärseiten (operations.osmfoundation.org, overpass-api.de, prices.openfoo
 | P3.1 Preislogik und Schema 9 | fertig | #37 | 226 Unit, 156/156 Browser |
 | P3.2 Märkte suchen und merken | fertig | #38 | 230 Unit, 161/161 Browser |
 | P3.3 Karte | zurückgestellt (E3.2: Liste statt Karte) | – | – |
-| P3.4 Preise je Markt und Vergleich in der Einkaufsliste | fertig | siehe PR | 231 Unit, 163/163 Browser |
+| P3.4 Preise je Markt und Vergleich in der Einkaufsliste | fertig | #39 | 231 Unit, 163/163 Browser |
 | P3.5 Open Prices | zurückgestellt: Abdeckung in Deutschland unbekannt, Dienst in der Arbeitsumgebung nicht erreichbar; erst nach Léons Test am Handy, ob gemerkte Preise reichen | – | – |
