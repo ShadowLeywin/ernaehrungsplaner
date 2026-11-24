@@ -1,6 +1,8 @@
 // Prospekte (P4): Angebote je Markt aus der eigenen Angebotsdatei, wie im Prospekt nach Kategorien, und Links zu den
 // Original-Prospekten der Händler. Elan lädt keine Prospekte und speichert keine Prospektbilder (Entscheidung E4.1).
+// Angebote kommen aus Screenshots, die Léon selbst macht: Ein Chat liest sie ab, die Antwort wird hier eingefügt.
 
+import { angeboteAusArtikeln, angebotsPrompt, leseAngebotsAntwort, mischeProspekt } from '../logik/angebotsprompt.js';
 import { formatKurz, isoDatum } from '../logik/datum.js';
 import { einkaufsliste } from '../logik/plan.js';
 import { euroText } from '../logik/preise.js';
@@ -8,12 +10,13 @@ import { leseAngebotsDateiBeliebig, linkFuer, prospektSeiten } from '../logik/pr
 import { APP_NAME } from '../logik/schema.js';
 import { wocheUm } from '../logik/zeitraum.js';
 import { kategorieName } from '../logik/zutat.js';
-import { oeffneExtern } from '../plattform.js';
+import { oeffneExtern, teileText } from '../plattform.js';
 import { neuZeichnen } from '../router.js';
 import * as speicher from '../speicher.js';
 import { el, haenge, hinweis, icon } from '../ui.js';
 
-const entwurf = { markt: null };
+// Gewählter Markt und die eingefügte Antwort überleben ein Neuzeichnen
+const entwurf = { markt: null, antwort: '' };
 const kurz = (iso) => `${iso.slice(8, 10)}.${iso.slice(5, 7)}.`;
 
 export async function zeigeProspekte(wurzel) {
@@ -23,12 +26,29 @@ export async function zeigeProspekte(wurzel) {
     speicher.einstellung('prospekt'), speicher.alleZutaten(), speicher.alleMaerkte(), speicher.ladeProspektLinks(), speicher.planZwischen(woche.von, woche.bis), speicher.alleRezepte(),
   ]);
   // Was diese Woche auf der Einkaufsliste steht, wird im Prospekt markiert
-  const aufListe = new Set(einkaufsliste(posten, new Map(rezepte.map((r) => [r.id, r])), new Map(zutaten.map((z) => [z.id, z]))).map((p) => p.schluessel));
+  const liste = einkaufsliste(posten, new Map(rezepte.map((r) => [r.id, r])), new Map(zutaten.map((z) => [z.id, z])));
+  const aufListe = new Set(liste.map((p) => p.schluessel));
   const seiten = prospekt ? prospektSeiten(prospekt.artikel ?? [], heute, aufListe) : [];
   const gewaehlt = seiten.find((s) => s.markt === entwurf.markt) ?? seiten[0] ?? null;
   document.title = `Prospekte – ${APP_NAME}`;
 
   const meldung = el('p', { class: 'klein', id: 'prospekt-meldung', role: 'status' });
+  // Datei und eingefügte Antwort landen gleich: Ein Prospekt mischt sich je Markt in die gespeicherten Angebote,
+  // damit Markt für Markt eingelesen werden kann. Eine ältere Datei (Version 1) ersetzt wie bisher alles.
+  const uebernimm = async (ergebnis) => {
+    if (ergebnis.prospekt) {
+      const gemischt = mischeProspekt(prospekt, ergebnis.prospekt, heute);
+      await speicher.ersetzeDateiAngebote(angeboteAusArtikeln(gemischt.artikel));
+      await speicher.setzeEinstellung('prospekt', gemischt);
+    } else await speicher.ersetzeDateiAngebote(ergebnis.angebote);
+    entwurf.markt = ergebnis.prospekt?.artikel[0]?.markt ?? null;
+    hinweis([
+      ergebnis.prospekt ? `${ergebnis.prospekt.artikel.length} Artikel geladen.` : `${ergebnis.angebote.length} Angebote geladen (ältere Datei ohne Prospekt).`,
+      ergebnis.angebote.length ? `${ergebnis.angebote.length} davon bei deinen Zutaten.` : null,
+      ergebnis.ungueltig ? `${ergebnis.ungueltig} ${ergebnis.ungueltig === 1 ? 'Zeile' : 'Zeilen'} ungültig.` : null,
+    ].filter(Boolean).join(' '));
+    neuZeichnen();
+  };
   const liesDatei = async (e) => {
     const datei = e.target.files?.[0];
     e.target.value = '';
@@ -36,15 +56,30 @@ export async function zeigeProspekte(wurzel) {
     let ergebnis;
     try { ergebnis = leseAngebotsDateiBeliebig(JSON.parse(await datei.text()), zutaten); } catch { ergebnis = { ok: false, fehler: ['Die Datei ist kein gültiges JSON.'] }; }
     if (!ergebnis.ok) { meldung.className = 'fehlertext'; meldung.textContent = ergebnis.fehler.join(' '); return; }
-    await speicher.ersetzeDateiAngebote(ergebnis.angebote);
-    if (ergebnis.prospekt) await speicher.setzeEinstellung('prospekt', ergebnis.prospekt);
-    entwurf.markt = null;
-    hinweis([
-      ergebnis.prospekt ? `${ergebnis.prospekt.artikel.length} Artikel geladen.` : `${ergebnis.angebote.length} Angebote geladen (ältere Datei ohne Prospekt).`,
-      ergebnis.angebote.length ? `${ergebnis.angebote.length} davon bei deinen Zutaten.` : null,
-      ergebnis.ungueltig ? `${ergebnis.ungueltig} ${ergebnis.ungueltig === 1 ? 'Zeile' : 'Zeilen'} ungültig.` : null,
-    ].filter(Boolean).join(' '));
-    neuZeichnen();
+    await uebernimm(ergebnis);
+  };
+
+  // Screenshots: Prompt kopieren, Antwort des Chats einfügen
+  const kopierePrompt = async () => {
+    const text = angebotsPrompt({ heute, maerkte: maerkte.map((m) => m.marke || m.name), brauche: liste.map((p) => p.name) });
+    try {
+      if ((await teileText(text, 'Angebote aus Screenshots')) === 'kopiert') hinweis('Prompt kopiert. In einem Claude-Chat einfügen und die Screenshots dazu schicken.');
+    } catch {
+      hinweis('Kopieren hat nicht geklappt.');
+    }
+  };
+  const antwortFeld = el('textarea', {
+    id: 'f-angebote-antwort', rows: 6, 'aria-label': 'Antwort des Chats', 'aria-describedby': 'f-angebote-fehler',
+    placeholder: 'Antwort des Chats hier einfügen ({"format": "elan-angebote", …})',
+    oninput: (e) => { entwurf.antwort = e.target.value; },
+  }, entwurf.antwort);
+  const antwortFehler = el('p', { class: 'fehlertext', id: 'f-angebote-fehler', role: 'alert' });
+  const liesAntwort = async () => {
+    const ergebnis = leseAngebotsAntwort(entwurf.antwort, zutaten);
+    if (!ergebnis.ok) { antwortFehler.textContent = ergebnis.fehler.join(' '); antwortFeld.focus(); return; }
+    if (!ergebnis.prospekt.artikel.length) { antwortFehler.textContent = 'In der Antwort steht kein gültiges Angebot.'; return; }
+    entwurf.antwort = '';
+    await uebernimm(ergebnis);
   };
 
   const linkKnopf = (link, name) => el('button', {
@@ -69,7 +104,7 @@ export async function zeigeProspekte(wurzel) {
     el('a', { class: 'zurueck', href: '#/angebote' }, icon('zurueck', 18), 'Angebote'),
     el('header', { class: 'detailkopf' },
       el('h1', {}, 'Prospekte'),
-      el('p', {}, 'Angebote aus deiner Angebotsdatei, je Markt wie im Prospekt. Was auf deiner Einkaufsliste dieser Woche steht, ist markiert.')),
+      el('p', {}, 'Angebote je Markt wie im Prospekt, aus Screenshots oder einer Angebotsdatei. Was auf deiner Einkaufsliste dieser Woche steht, ist markiert.')),
 
     eindeutig.length ? [
       el('h2', {}, 'Original-Prospekte'),
@@ -77,7 +112,17 @@ export async function zeigeProspekte(wurzel) {
       el('p', { class: 'klein' }, 'Öffnet die Seite des Händlers im Browser. Elan lädt dabei nichts herunter.'),
     ] : null,
 
-    el('h2', {}, 'Angebote aus der Datei'),
+    el('h2', {}, 'Aus Screenshots einlesen'),
+    el('ol', { class: 'schritte klein', id: 'angebote-schritte' },
+      el('li', {}, 'Prospekt öffnen und die Seiten mit Lebensmitteln als Screenshot speichern.'),
+      el('li', {}, 'Prompt kopieren, in einem Claude-Chat einfügen und die Screenshots dazu schicken.'),
+      el('li', {}, 'Die Antwort des Chats hier einfügen und laden. Je Markt ersetzt sie dessen alte Angebote.')),
+    el('button', { type: 'button', class: 'knopf', onclick: kopierePrompt }, 'Angebots-Prompt kopieren'),
+    antwortFeld,
+    antwortFehler,
+    el('button', { type: 'button', class: 'knopf leise', onclick: liesAntwort }, 'Antwort laden'),
+
+    el('h2', {}, 'Deine Angebote'),
     prospekt ? el('p', { class: 'klein', id: 'prospekt-stand' }, [prospekt.stand ? `Stand ${prospekt.stand.length === 10 ? formatKurz(prospekt.stand) : prospekt.stand}` : null, prospekt.quelle ? `Quelle: ${prospekt.quelle}` : null].filter(Boolean).join(' · ')) : null,
     !seiten.length ? el('p', { class: 'leer' }, prospekt ? 'Gerade gilt kein Angebot aus der Datei.' : 'Noch keine Angebotsdatei. Lade eine Datei im Format „elan-angebote“; sie bleibt nur auf diesem Gerät.') : null,
     seiten.length > 1 ? el('div', { class: 'prospekt-maerkte', role: 'group', 'aria-label': 'Markt' }, seiten.map((s) => el('button', {
